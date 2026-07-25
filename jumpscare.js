@@ -1,15 +1,13 @@
-/* jumpscare.js - Adapted for Blender Liquid Glass UI */
+// jumpscare.js - Click Jumpscare System (Adapted for Blender-style UI)
 
 (function() {
     const STORAGE_KEY = 'system_warning_consent'; 
     const SCROLL_THRESHOLD = 10; 
 
-    // Adapted phrases for a general blogging platform
     const phrases = [
-        "STOP", "BLENDER BLOG", "CLICK MORE!", "WELCOME!", "EXPLORE NOW", "AMAZING CONTENT"       
+        "STOP", "BLENDER BLOG", "CLICK MORE!", "WELCOME!", "AMAZING CONTENT", "KEEP EXPLORING"       
     ];
 
-    // Audio sources (will fail gracefully if not present)
     const audioSources = [
         '/sounds/prabowo.mp3', '/sounds/gibran.mp3', '/sounds/hai.mp3', 
         '/sounds/antek2asing.mp3', '/sounds/koruptor.mp3', '/sounds/maling.mp3', '/sounds/hai1.mp3'
@@ -19,18 +17,36 @@
     const AUDIO_LAYERS = 6; 
 
     let bypassWarning = false;
+
+    // Global link bypass
+    window.addEventListener('click', (e) => {
+        if (e.target.closest('a')) {
+            bypassWarning = true;
+            setTimeout(() => { bypassWarning = false; }, 1000);
+        }
+    });
+
+    // The "Are you sure you want to leave?" logic
+    window.addEventListener('beforeunload', (e) => {
+        if (!bypassWarning) {
+            e.preventDefault(); 
+            e.returnValue = ''; 
+        }
+    });
+   
     let audioContext = null;
     let audioBuffers = [];
     let isPlaying = false; 
     let isAccepted = false; 
     let areAssetsLoaded = false; 
     let lastAudioIndex = -1;
+
     let touchStartX = 0;
     let touchStartY = 0;
 
     const hasPriorConsent = localStorage.getItem(STORAGE_KEY) === 'true';
 
-    // Create Styles
+    // Create styles
     const style = document.createElement('style');
     style.innerHTML = `
         #consent-overlay {
@@ -47,7 +63,7 @@
             border: 4px solid #000;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);   
             display: flex; flex-direction: column; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
         }
         .consent-content-wrapper {
@@ -84,8 +100,7 @@
         }
 
         #warning-text {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-            font-size: 6rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 6rem;
             font-weight: 900; text-transform: uppercase;
             text-shadow: 4px 4px 0px #000;
             animation: shake 0.1s infinite;
@@ -103,7 +118,6 @@
     `;
     document.head.appendChild(style);
 
-    // Create Elements
     const preFlashOverlay = document.createElement('div');
     preFlashOverlay.id = 'hdr-pre-flash';
     document.body.appendChild(preFlashOverlay);
@@ -151,14 +165,7 @@
         try {
             const fetchPromises = audioSources.map(src => fetch(src));
             const responses = await Promise.all(fetchPromises);
-            
-            // Check if responses are ok, if not, skip audio but allow UI
-            const validResponses = responses.filter(r => r.ok);
-            if (validResponses.length === 0) {
-                throw new Error("No audio files found");
-            }
-
-            const bufferPromises = validResponses.map(res => res.arrayBuffer());
+            const bufferPromises = responses.map(res => res.arrayBuffer());
             const arrayBuffers = await Promise.all(bufferPromises);
             const decodePromises = arrayBuffers.map(buf => audioContext.decodeAudioData(buf));
             
@@ -195,32 +202,17 @@
             });
 
         } catch (error) {
-            console.log("Audio assets not found, running in visual-only mode.");
-            loadText.innerText = "Visual Mode Only.";
-            acceptBtn.innerText = "ACCEPT";
+            loadText.innerText = "Failed to load audio.";
+            // Allow continuation even without audio
+            acceptBtn.innerText = "CONTINUE";
             acceptBtn.disabled = false;
             declineBtn.disabled = false;
-            areAssetsLoaded = true; // Allow visual mode to proceed
-            
-            acceptBtn.addEventListener('click', () => {
-                localStorage.setItem(STORAGE_KEY, 'true');
-                consentOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    consentOverlay.style.display = 'none';
-                    isAccepted = true;
-                }, 300);
-            });
-
-            declineBtn.addEventListener('click', () => {
-                localStorage.removeItem(STORAGE_KEY);
-                bypassWarning = true; 
-                location.reload();
-            });
+            areAssetsLoaded = true;
         }
     }
 
     function playSound(buffer) {
-        if (!audioContext || !buffer) return;
+        if (!audioContext) return;
         for (let i = 0; i < AUDIO_LAYERS; i++) {
             const source = audioContext.createBufferSource();
             source.buffer = buffer;
@@ -241,8 +233,9 @@
             if (e && e.target && (
                 e.target.closest('#consent-overlay') || 
                 e.target.closest('a') || 
-                e.target.closest('#themeToggle') || 
-                e.target.closest('.menu-toggle')
+                e.target.closest('.blue-button') || 
+                e.target.closest('.nav-item') ||
+                e.target.closest('.template-card')
             )) return;
         }
 
@@ -253,12 +246,8 @@
         setTimeout(() => {
             textSpan.innerText = phrases[Math.floor(Math.random() * phrases.length)];
             flashOverlay.style.opacity = '1';
-            
-            if (audioBuffers.length > 0) {
-                let newIndex = Math.floor(Math.random() * audioBuffers.length);
-                if (audioBuffers[newIndex]) playSound(audioBuffers[newIndex]);
-            }
-            
+            let newIndex = Math.floor(Math.random() * audioBuffers.length);
+            if (audioBuffers[newIndex]) playSound(audioBuffers[newIndex]);
             setTimeout(() => { flashOverlay.style.opacity = '0'; }, 100);
         }, 5);
         setTimeout(() => { preFlashOverlay.style.opacity = '0'; }, 25);
@@ -280,22 +269,6 @@
             const diffX = Math.abs(e.changedTouches[0].screenX - touchStartX);
             const diffY = Math.abs(e.changedTouches[0].screenY - touchStartY);
             if (diffX < SCROLL_THRESHOLD && diffY < SCROLL_THRESHOLD) triggerWarning(e);
-        }
-    });
-
-    // Global link bypass
-    window.addEventListener('click', (e) => {
-        if (e.target.closest('a')) {
-            bypassWarning = true;
-            setTimeout(() => { bypassWarning = false; }, 1000);
-        }
-    });
-
-    // The "Are you sure you want to leave?" logic
-    window.addEventListener('beforeunload', (e) => {
-        if (!bypassWarning) {
-            e.preventDefault(); 
-            e.returnValue = ''; 
         }
     });
 

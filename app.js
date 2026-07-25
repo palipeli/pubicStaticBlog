@@ -1,224 +1,241 @@
-/* app.js - Main Application Logic */
+// app.js - Blog Platform Application Logic
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Data
-    const blogPosts = [
-        { id: 1, title: "Getting Started with Blender UI", excerpt: "Learn how to navigate the complex yet powerful interface of Blender 3D.", category: "Tutorial", date: "Oct 12" },
-        { id: 2, title: "The Art of Glass Materials", excerpt: "Creating realistic glass and transparency effects in Cycles renderer.", category: "Shading", date: "Oct 10" },
-        { id: 3, title: "Lighting Techniques for Interiors", excerpt: "Mastering HDRI and area lights for photorealistic interior renders.", category: "Lighting", date: "Oct 08" },
-        { id: 4, title: "Sculpting Organic Shapes", excerpt: "A deep dive into dynamic topology and sculpting brushes.", category: "Sculpting", date: "Oct 05" },
-        { id: 5, title: "Node Wrangler Essentials", excerpt: "Speed up your shading workflow with these essential node shortcuts.", category: "Workflow", date: "Oct 01" },
-        { id: 6, title: "Geometry Nodes Basics", excerpt: "Introduction to procedural modeling with geometry nodes.", category: "Nodes", date: "Sep 28" }
-    ];
-
-    const templates = [
-        { id: 'modern', name: 'Modern Grid', icon: '#007aff' },
-        { id: 'classic', name: 'Classic List', icon: '#ff9500' },
-        { id: 'magazine', name: 'Magazine', icon: '#ff2d55' },
-        { id: 'minimal', name: 'Minimal', icon: '#34c759' }
-    ];
-
-    // Elements
-    const contentArea = document.getElementById('content-area');
-    const templateList = document.getElementById('template-list');
-    const bigBlueBtn = document.getElementById('big-blue-btn');
-    const navItems = document.querySelectorAll('.nav-item');
-
-    // State
-    let currentTemplate = 'modern';
-
-    // Render Functions
-    function renderBlogGrid(posts) {
-        contentArea.innerHTML = '<div class="blog-grid"></div>';
-        const grid = contentArea.querySelector('.blog-grid');
-        
-        posts.forEach((post, index) => {
-            const card = document.createElement('div');
-            card.className = 'blog-card glass-panel';
-            card.style.animationDelay = `${index * 0.05}s`;
-            
-            card.innerHTML = `
-                <div class="blog-title">${post.title}</div>
-                <div class="blog-excerpt">${post.excerpt}</div>
-                <div class="blog-meta">${post.category} • ${post.date}</div>
-            `;
-            
-            grid.appendChild(card);
-        });
+// Blog Data
+const blogPosts = [
+    {
+        id: 1,
+        title: "Getting Started with Web Development",
+        excerpt: "Learn the fundamentals of modern web development including HTML, CSS, and JavaScript. This comprehensive guide will help you build your first website.",
+        date: "Dec 15, 2024",
+        icon: "🚀",
+        category: "Tutorial"
+    },
+    {
+        id: 2,
+        title: "Mastering CSS Grid Layout",
+        excerpt: "Discover the power of CSS Grid and create complex, responsive layouts with ease. Perfect for modern web design projects.",
+        date: "Dec 14, 2024",
+        icon: "🎨",
+        category: "Design"
+    },
+    {
+        id: 3,
+        title: "JavaScript ES6+ Features You Should Know",
+        excerpt: "Explore the latest JavaScript features including arrow functions, destructuring, async/await, and more to write cleaner code.",
+        date: "Dec 13, 2024",
+        icon: "⚡",
+        category: "Technology"
+    },
+    {
+        id: 4,
+        title: "Building Responsive Designs",
+        excerpt: "Learn best practices for creating websites that look great on all devices, from mobile phones to large desktop screens.",
+        date: "Dec 12, 2024",
+        icon: "📱",
+        category: "Design"
+    },
+    {
+        id: 5,
+        title: "Introduction to Web Accessibility",
+        excerpt: "Make your websites accessible to everyone. Learn about ARIA labels, semantic HTML, and inclusive design principles.",
+        date: "Dec 11, 2024",
+        icon: "♿",
+        category: "Tutorial"
+    },
+    {
+        id: 6,
+        title: "Performance Optimization Tips",
+        excerpt: "Speed up your website with these proven optimization techniques. Improve loading times and user experience.",
+        date: "Dec 10, 2024",
+        icon: "🏎️",
+        category: "Technology"
     }
+];
 
-    function renderBlogList(posts) {
-        contentArea.innerHTML = '<div style="display:flex; flex-direction:column; gap:10px;"></div>';
-        const list = contentArea.querySelector('div');
-        
-        posts.forEach((post, index) => {
-            const card = document.createElement('div');
-            card.className = 'blog-card glass-panel';
-            card.style.animationDelay = `${index * 0.05}s`;
-            card.style.flexDirection = 'row';
-            card.style.alignItems = 'center';
-            card.style.gap = '15px';
-            
-            card.innerHTML = `
-                <div style="flex:1">
-                    <div class="blog-title">${post.title}</div>
-                    <div class="blog-excerpt" style="-webkit-line-clamp:1">${post.excerpt}</div>
+// Initialize particles
+function createParticles() {
+    const container = document.getElementById('particles');
+    if (!container) return;
+    
+    for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 15 + 's';
+        particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        container.appendChild(particle);
+    }
+}
+
+// Render blog cards
+function renderBlogCards(containerId, posts) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    container.innerHTML = '';
+
+    posts.forEach((post, index) => {
+        const card = document.createElement('div');
+        card.className = 'blog-card';
+        card.style.animationDelay = (index * 0.1) + 's';
+
+        card.innerHTML = `
+            <div class="blog-image">${post.icon}</div>
+            <div class="blog-content">
+                <h3 class="blog-title">${post.title}</h3>
+                <p class="blog-excerpt">${post.excerpt}</p>
+                <div class="blog-meta">
+                    <span class="blog-date">${post.date}</span>
+                    <a href="#" class="read-more" onclick="event.preventDefault(); openBlog(${post.id})">Read More →</a>
                 </div>
-                <div class="blog-meta">${post.date}</div>
-            `;
-            
-            list.appendChild(card);
-        });
-    }
+            </div>
+        `;
 
-    function renderMagazine(posts) {
-        contentArea.innerHTML = '<div style="display:grid; grid-template-columns: 2fr 1fr; gap:15px;"></div>';
-        const grid = contentArea.querySelector('div');
-        
-        // Featured post
-        if (posts.length > 0) {
-            const featured = posts[0];
-            const featuredCard = document.createElement('div');
-            featuredCard.className = 'blog-card glass-panel';
-            featuredCard.style.gridRow = 'span 2';
-            featuredCard.style.background = 'rgba(0, 122, 255, 0.15)';
-            featuredCard.innerHTML = `
-                <div class="blog-title" style="font-size:18px">${featured.title}</div>
-                <div class="blog-excerpt" style="font-size:13px; line-height:1.6">${featured.excerpt}</div>
-                <div class="blog-meta">${featured.category} • ${featured.date}</div>
-            `;
-            grid.appendChild(featuredCard);
-        }
-
-        // Other posts
-        posts.slice(1).forEach((post, index) => {
-            const card = document.createElement('div');
-            card.className = 'blog-card glass-panel';
-            card.style.animationDelay = `${index * 0.05}s`;
-            card.innerHTML = `
-                <div class="blog-title">${post.title}</div>
-                <div class="blog-excerpt">${post.excerpt}</div>
-                <div class="blog-meta">${post.category}</div>
-            `;
-            grid.appendChild(card);
-        });
-    }
-
-    function renderMinimal(posts) {
-        contentArea.innerHTML = '<div style="display:flex; flex-direction:column; gap:20px; max-width:600px; margin:0 auto;"></div>';
-        const list = contentArea.querySelector('div');
-        
-        posts.forEach((post, index) => {
-            const card = document.createElement('div');
-            card.className = 'blog-card glass-panel';
-            card.style.animationDelay = `${index * 0.05}s`;
-            card.style.border = 'none';
-            card.style.background = 'transparent';
-            card.style.boxShadow = 'none';
-            card.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
-            card.style.borderRadius = '0';
-            card.style.padding = '20px 0';
-            
-            card.innerHTML = `
-                <div class="blog-title" style="font-size:16px">${post.title}</div>
-                <div class="blog-excerpt" style="font-size:12px; margin-top:5px">${post.excerpt}</div>
-                <div class="blog-meta" style="margin-top:10px">${post.date}</div>
-            `;
-            
-            list.appendChild(card);
-        });
-    }
-
-    function applyTemplate(templateId) {
-        currentTemplate = templateId;
-        
-        // Update active state in sidebar
-        document.querySelectorAll('.template-item').forEach(item => {
-            item.classList.remove('active');
-            if (item.dataset.template === templateId) {
-                item.classList.add('active');
-            }
-        });
-
-        // Render based on template
-        switch(templateId) {
-            case 'modern':
-                renderBlogGrid(blogPosts);
-                break;
-            case 'classic':
-                renderBlogList(blogPosts);
-                break;
-            case 'magazine':
-                renderMagazine(blogPosts);
-                break;
-            case 'minimal':
-                renderMinimal(blogPosts);
-                break;
-        }
-    }
-
-    // Initialize Sidebar
-    function initSidebar() {
-        templateList.innerHTML = '';
-        templates.forEach(template => {
-            const item = document.createElement('div');
-            item.className = 'template-item';
-            item.dataset.template = template.id;
-            item.innerHTML = `
-                <div class="icon-box" style="background:${template.icon}"></div>
-                <span>${template.name}</span>
-            `;
-            item.addEventListener('click', () => applyTemplate(template.id));
-            templateList.appendChild(item);
-        });
-
-        // Set default active
-        applyTemplate('modern');
-    }
-
-    // Event Listeners
-    bigBlueBtn.addEventListener('click', (e) => {
-        // Add ripple effect
-        bigBlueBtn.classList.add('ripple');
-        setTimeout(() => bigBlueBtn.classList.remove('ripple'), 500);
-        
-        // Random action for fun
-        const actions = ["Exploring...", "Rendering...", "Compiling...", "Baking..."];
-        const originalText = bigBlueBtn.innerText;
-        const randomAction = actions[Math.floor(Math.random() * actions.length)];
-        
-        bigBlueBtn.innerText = randomAction;
-        setTimeout(() => {
-            bigBlueBtn.innerText = originalText;
-        }, 1000);
+        container.appendChild(card);
     });
+}
+
+// Open blog post (placeholder function)
+function openBlog(id) {
+    const post = blogPosts.find(p => p.id === id);
+    if (post) {
+        alert(`Opening blog post: ${post.title}\n\nThis would navigate to the full article page in a production environment.`);
+    }
+}
+
+// Navigation
+function setupNavigation() {
+    const navItems = document.querySelectorAll('.nav-item');
+    const sections = document.querySelectorAll('.page-section');
 
     navItems.forEach(item => {
-        item.addEventListener('click', () => {
-            navItems.forEach(n => n.classList.remove('active'));
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // Update active nav item
+            navItems.forEach(nav => nav.classList.remove('active'));
             item.classList.add('active');
+
+            // Show corresponding section
+            const page = item.dataset.page;
+            sections.forEach(section => {
+                section.classList.remove('active');
+                if (section.id === page) {
+                    section.classList.add('active');
+                }
+            });
             
-            // Simple page simulation
-            const page = item.innerText.toLowerCase();
-            if (page === 'home') {
-                applyTemplate(currentTemplate);
-            } else if (page === 'about') {
-                contentArea.innerHTML = `
-                    <div class="glass-panel" style="padding:30px; border-radius:10px; animation:fadeIn 0.5s">
-                        <h2 style="font-size:20px; margin-bottom:15px">About Blender Blog</h2>
-                        <p style="font-size:13px; line-height:1.6; color:var(--text-dim)">
-                            A static blogging platform inspired by Blender's UI and Apple's liquid glass design. 
-                            Built with pure HTML, CSS, and JavaScript. Features aggressive transparency, 
-                            compact controls, and smooth animations.
-                        </p>
-                    </div>
-                `;
-            } else if (page === 'blogs') {
-                applyTemplate('modern');
-            }
+            // Scroll to top when changing pages
+            window.scrollTo(0, 0);
         });
     });
+}
 
-    // Initialize
-    initSidebar();
+// Template selection
+function setupTemplates() {
+    const templateCards = document.querySelectorAll('.template-card[data-template]');
+
+    templateCards.forEach(card => {
+        card.addEventListener('click', () => {
+            templateCards.forEach(c => c.classList.remove('active'));
+            card.classList.add('active');
+
+            const template = card.dataset.template;
+            applyTemplate(template);
+        });
+    });
+}
+
+// Apply different templates
+function applyTemplate(templateName) {
+    const blogCards = document.querySelectorAll('.blog-card');
+
+    switch(templateName) {
+        case 'modern':
+            blogCards.forEach(card => {
+                card.style.borderRadius = '8px';
+                card.style.transform = 'none';
+                card.style.border = '1px solid var(--border-color)';
+                card.style.background = 'var(--bg-panel)';
+            });
+            break;
+        case 'classic':
+            blogCards.forEach(card => {
+                card.style.borderRadius = '0';
+                card.style.border = '2px solid rgba(255,255,255,0.1)';
+                card.style.transform = 'none';
+            });
+            break;
+        case 'magazine':
+            blogCards.forEach((card, index) => {
+                card.style.gridColumn = '';
+                card.style.borderRadius = '8px';
+                card.style.border = '1px solid var(--border-color)';
+                if (index === 0) {
+                    card.style.gridColumn = '1 / -1';
+                }
+            });
+            break;
+        case 'minimal':
+            blogCards.forEach(card => {
+                card.style.background = 'transparent';
+                card.style.border = 'none';
+                card.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
+                card.style.borderRadius = '0';
+                card.style.transform = 'none';
+            });
+            break;
+    }
+}
+
+// Click me button handler
+function handleClickMe() {
+    const button = document.querySelector('.blue-button');
+    if (!button) return;
+    
+    button.style.animation = 'pulse 0.3s ease';
+
+    setTimeout(() => {
+        button.style.animation = '';
+    }, 300);
+
+    // Create ripple effect
+    const ripple = document.createElement('div');
+    ripple.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 10px;
+        height: 10px;
+        background: rgba(71, 114, 179, 0.6);
+        border-radius: 50%;
+        animation: rippleEffect 0.6s ease-out forwards;
+        pointer-events: none;
+        z-index: 9999;
+    `;
+
+    document.body.appendChild(ripple);
+
+    setTimeout(() => {
+        ripple.remove();
+    }, 600);
+
+    // Show friendly message
+    alert('🎉 Thanks for clicking! Explore the blogs using the navigation menu above.');
+}
+
+// Initialize application
+document.addEventListener('DOMContentLoaded', function() {
+    // Create floating particles
+    createParticles();
+    
+    // Render blog cards ONLY for the blogs page
+    renderBlogCards('blogs-blog-grid', blogPosts);
+    
+    // Setup navigation
+    setupNavigation();
+    
+    // Setup template selection
+    setupTemplates();
 });
