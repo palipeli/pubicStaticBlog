@@ -3,72 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blender Blog Platform</title>
+    <title>Blender-Style Blog Platform</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Top Bar -->
-    <div id="top-bar" class="glass-panel">
-        <!-- Left: Big Blue Button -->
-        <button id="big-blue-btn">CLICK ME</button>
-        
-        <!-- Right: Navigation Menu -->
-        <nav class="nav-menu">
-            <div class="nav-item active">Home</div>
-            <div class="nav-item">Blogs</div>
-            <div class="nav-item">About</div>
-        </nav>
-    </div>
+    <!-- Particles Background -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <button class="blue-button" onclick="handleClickMe()">Click Me</button>
+        </div>
+        <div class="header-right">
+            <a href="#" class="nav-item active" data-page="home">Home</a>
+            <a href="#" class="nav-item" data-page="blogs">Blogs</a>
+            <a href="#" class="nav-item" data-page="about">About</a>
+        </div>
+    </header>
 
     <!-- Main Container -->
-    <div id="main-container">
+    <div class="main-container">
         <!-- Content Area -->
-        <main id="content-area">
-            <!-- Blog posts will be rendered here by app.js -->
+        <main class="content-area">
+            <!-- Home Page -->
+            <section id="home" class="page-section active">
+                <div class="home-hero">
+                    <h1 class="home-title">Welcome to BlenderBlog</h1>
+                    <p class="home-lead">A static blogging platform inspired by the iconic 3D suite. Minimalist, fast, and transparent.</p>
+                    
+                    <div class="hero-image-container">
+                        <div class="abstract-geometric">
+                            <div class="geo-shape shape-1"></div>
+                            <div class="geo-shape shape-2"></div>
+                            <div class="geo-shape shape-3"></div>
+                            <div class="geo-shape shape-4"></div>
+                        </div>
+                    </div>
+
+                    <div class="home-content">
+                        <p>This platform demonstrates how powerful pure HTML, CSS, and JavaScript can be when combined with a strong design language. No database, no backend complexity—just pure content delivery.</p>
+                        <p>Experience the unique Blender-inspired interface featuring glass-morphism panels, smooth animations, and an intuitive navigation system. Every element is crafted with attention to detail, bringing you a professional aesthetic that puts your content first.</p>
+                        <p>Navigate to the <strong>Blogs</strong> section using the menu above to explore our collection of articles, tutorials, and insights. Or click the big blue button for a surprise experience!</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Blogs Page -->
+            <section id="blogs" class="page-section">
+                <h1 class="page-title">All Blog Posts</h1>
+                <p class="page-subtitle">Explore our collection of thoughts, tutorials, and insights.</p>
+                <div class="blog-grid" id="blogs-blog-grid"></div>
+            </section>
+
+            <!-- About Page -->
+            <section id="about" class="page-section">
+                <h1 class="page-title">About Us</h1>
+                <div class="about-content">
+                    <p>Welcome to our Blender-inspired blogging platform! This static website combines the sleek, professional aesthetic of Blender's UI with modern web technologies.</p>
+                    <p>Our platform features:</p>
+                    <ul class="features-list">
+                        <li>Transparent glass-morphism panels</li>
+                        <li>Smooth animations and transitions</li>
+                        <li>Responsive design for all devices</li>
+                        <li>Multiple blog templates</li>
+                        <li>Dark theme optimized for readability</li>
+                    </ul>
+                    <p>Built with pure HTML, CSS, and JavaScript - no frameworks required. Experience the perfect blend of form and function.</p>
+                </div>
+            </section>
         </main>
 
-        <!-- Right Sidebar -->
-        <aside id="sidebar" class="glass-panel">
+        <!-- Sidebar -->
+        <aside class="sidebar">
             <div class="sidebar-section">
-                <div class="sidebar-title">Templates</div>
-                <div id="template-list" class="template-list">
-                    <!-- Templates will be rendered here by app.js -->
-                </div>
-            </div>
-            
-            <div class="sidebar-section">
-                <div class="sidebar-title">Categories</div>
-                <div class="template-list">
-                    <div class="template-item">
-                        <div class="icon-box" style="background:#007aff"></div>
-                        <span>Tutorials</span>
+                <h3 class="sidebar-title">Blog Templates</h3>
+                <div class="template-grid">
+                    <div class="template-card active" data-template="modern">
+                        <div class="template-name">Modern</div>
+                        <div class="template-desc">Clean and minimalist design</div>
                     </div>
-                    <div class="template-item">
-                        <div class="icon-box" style="background:#ff9500"></div>
-                        <span>Shading</span>
+                    <div class="template-card" data-template="classic">
+                        <div class="template-name">Classic</div>
+                        <div class="template-desc">Traditional blog layout</div>
                     </div>
-                    <div class="template-item">
-                        <div class="icon-box" style="background:#ff2d55"></div>
-                        <span>Lighting</span>
+                    <div class="template-card" data-template="magazine">
+                        <div class="template-name">Magazine</div>
+                        <div class="template-desc">Full-width featured posts</div>
                     </div>
-                    <div class="template-item">
-                        <div class="icon-box" style="background:#34c759"></div>
-                        <span>Sculpting</span>
+                    <div class="template-card" data-template="minimal">
+                        <div class="template-name">Minimal</div>
+                        <div class="template-desc">Ultra-simple text-focused</div>
                     </div>
                 </div>
             </div>
 
             <div class="sidebar-section">
-                <div class="sidebar-title">Recent</div>
-                <div class="template-list">
-                    <div class="template-item" style="font-size:10px; opacity:0.7">
-                        Getting Started...
+                <h3 class="sidebar-title">Categories</h3>
+                <div class="template-grid">
+                    <div class="template-card">
+                        <div class="template-name">Technology</div>
+                        <div class="template-desc">12 posts</div>
                     </div>
-                    <div class="template-item" style="font-size:10px; opacity:0.7">
-                        Glass Materials...
+                    <div class="template-card">
+                        <div class="template-name">Design</div>
+                        <div class="template-desc">8 posts</div>
                     </div>
-                    <div class="template-item" style="font-size:10px; opacity:0.7">
-                        Lighting Tips...
+                    <div class="template-card">
+                        <div class="template-name">Tutorial</div>
+                        <div class="template-desc">15 posts</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Recent Posts</h3>
+                <div class="template-grid">
+                    <div class="template-card">
+                        <div class="template-name">Getting Started</div>
+                        <div class="template-desc">Dec 15, 2024</div>
+                    </div>
+                    <div class="template-card">
+                        <div class="template-name">Advanced Tips</div>
+                        <div class="template-desc">Dec 12, 2024</div>
                     </div>
                 </div>
             </div>
