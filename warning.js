@@ -1,18 +1,12 @@
-// jumpscare.js - Click Jumpscare System (Adapted for Blender-style UI)
-
 (function() {
     const STORAGE_KEY = 'system_warning_consent'; 
     const SCROLL_THRESHOLD = 10; 
 
     const phrases = [
-        "STOP", "BLENDER BLOG", "CLICK MORE!", "WELCOME!", "AMAZING CONTENT", "KEEP EXPLORING"       
+        "STOP", "PILIH PRABOWO GIBRAN", "PILIH NOMOR 2 2029", "HAIIIIIIII!", "ANTEK ANTEK ASING", "PALING NYAWIT"       
     ];
 
-    const audioSources = [
-        '/sounds/prabowo.mp3', '/sounds/gibran.mp3', '/sounds/hai.mp3', 
-        '/sounds/antek2asing.mp3', '/sounds/koruptor.mp3', '/sounds/maling.mp3', '/sounds/hai1.mp3'
-    ];
-
+    // Audio removed - no audio sources needed
     const VOLUME_GAIN = 2.0; 
     const AUDIO_LAYERS = 6; 
 
@@ -46,7 +40,6 @@
 
     const hasPriorConsent = localStorage.getItem(STORAGE_KEY) === 'true';
 
-    // Create styles
     const style = document.createElement('style');
     style.innerHTML = `
         #consent-overlay {
@@ -63,7 +56,7 @@
             border: 4px solid #000;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);   
             display: flex; flex-direction: column; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'VT323', monospace;
             overflow: hidden;
         }
         .consent-content-wrapper {
@@ -100,7 +93,7 @@
         }
 
         #warning-text {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 6rem;
+            font-family: 'VT323', monospace; font-size: 6rem;
             font-weight: 900; text-transform: uppercase;
             text-shadow: 4px 4px 0px #000;
             animation: shake 0.1s infinite;
@@ -155,76 +148,43 @@
     document.body.appendChild(consentOverlay);
 
     async function initAudio() {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        audioContext = new AudioContext();
-
+        // Audio initialization removed - assets are considered loaded immediately
         const acceptBtn = document.getElementById('accept-btn');
         const declineBtn = document.getElementById('decline-btn');
         const loadText = document.getElementById('loading-status');
 
-        try {
-            const fetchPromises = audioSources.map(src => fetch(src));
-            const responses = await Promise.all(fetchPromises);
-            const bufferPromises = responses.map(res => res.arrayBuffer());
-            const arrayBuffers = await Promise.all(bufferPromises);
-            const decodePromises = arrayBuffers.map(buf => audioContext.decodeAudioData(buf));
+        // Simulate asset loading completion without audio
+        areAssetsLoaded = true;
+        loadText.innerText = "Assets Loaded.";
+        acceptBtn.innerText = "ACCEPT";
+        acceptBtn.disabled = false;
+        declineBtn.disabled = false;
+        
+        acceptBtn.addEventListener('click', () => {
+            localStorage.setItem(STORAGE_KEY, 'true');
+            consentOverlay.style.opacity = '0';
+            setTimeout(() => {
+                consentOverlay.style.display = 'none';
+                isAccepted = true;
+            }, 300);
+        });
+
+        declineBtn.addEventListener('click', async () => {
+            localStorage.removeItem(STORAGE_KEY);
+            acceptBtn.disabled = true;
+            declineBtn.disabled = true;
             
-            audioBuffers = await Promise.all(decodePromises);
-            areAssetsLoaded = true;
-
-            loadText.innerText = "Assets Loaded.";
-            acceptBtn.innerText = "ACCEPT";
-            acceptBtn.disabled = false;
-            declineBtn.disabled = false;
-            
-            acceptBtn.addEventListener('click', () => {
-                if (audioContext.state === 'suspended') audioContext.resume();
-                localStorage.setItem(STORAGE_KEY, 'true');
-                consentOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    consentOverlay.style.display = 'none';
-                    isAccepted = true;
-                }, 300);
-            });
-
-            declineBtn.addEventListener('click', async () => {
-                localStorage.removeItem(STORAGE_KEY);
-                if (audioContext.state === 'suspended') await audioContext.resume();
-                acceptBtn.disabled = true;
-                declineBtn.disabled = true;
-                
-                const intervalId = setInterval(() => { triggerWarning(null, true); }, 100); 
-                setTimeout(() => {
-                    clearInterval(intervalId);
-                    bypassWarning = true; 
-                    location.reload();
-                }, 3000);
-            });
-
-        } catch (error) {
-            loadText.innerText = "Failed to load audio.";
-            // Allow continuation even without audio
-            acceptBtn.innerText = "CONTINUE";
-            acceptBtn.disabled = false;
-            declineBtn.disabled = false;
-            areAssetsLoaded = true;
-        }
+            const intervalId = setInterval(() => { triggerWarning(null, true); }, 100); 
+            setTimeout(() => {
+                clearInterval(intervalId);
+                bypassWarning = true; 
+                location.reload();
+            }, 3000);
+        });
     }
 
     function playSound(buffer) {
-        if (!audioContext) return;
-        for (let i = 0; i < AUDIO_LAYERS; i++) {
-            const source = audioContext.createBufferSource();
-            source.buffer = buffer;
-            const gainNode = audioContext.createGain();
-            gainNode.gain.value = VOLUME_GAIN; 
-            source.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            source.start(0);
-            if (i === AUDIO_LAYERS - 1) {
-                source.onended = () => { isPlaying = false; };
-            }
-        }
+        // Audio playback removed - no-op
     }
 
     async function triggerWarning(e, force = false) {
@@ -233,21 +193,20 @@
             if (e && e.target && (
                 e.target.closest('#consent-overlay') || 
                 e.target.closest('a') || 
-                e.target.closest('.blue-button') || 
-                e.target.closest('.nav-item') ||
-                e.target.closest('.template-card')
+                e.target.closest('#themeToggle') || 
+                e.target.closest('.menu-toggle') ||
+                e.target.closest('.theme-btn') ||
+                e.target.closest('.nav-item')
             )) return;
         }
 
-        if (audioContext && audioContext.state === 'suspended') await audioContext.resume();
         if (!force) isPlaying = true; 
 
         preFlashOverlay.style.opacity = '1';
         setTimeout(() => {
             textSpan.innerText = phrases[Math.floor(Math.random() * phrases.length)];
             flashOverlay.style.opacity = '1';
-            let newIndex = Math.floor(Math.random() * audioBuffers.length);
-            if (audioBuffers[newIndex]) playSound(audioBuffers[newIndex]);
+            // Audio playback removed
             setTimeout(() => { flashOverlay.style.opacity = '0'; }, 100);
         }, 5);
         setTimeout(() => { preFlashOverlay.style.opacity = '0'; }, 25);

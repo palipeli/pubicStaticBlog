@@ -131,60 +131,47 @@ function setupNavigation() {
     });
 }
 
-// Template selection
+// Template selection - now handles theme switching
 function setupTemplates() {
-    const templateCards = document.querySelectorAll('.template-card[data-template]');
+    const themeBtns = document.querySelectorAll('.theme-btn');
 
-    templateCards.forEach(card => {
-        card.addEventListener('click', () => {
-            templateCards.forEach(c => c.classList.remove('active'));
-            card.classList.add('active');
+    themeBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            themeBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
 
-            const template = card.dataset.template;
-            applyTemplate(template);
+            const theme = btn.dataset.theme;
+            applyTheme(theme);
         });
     });
 }
 
-// Apply different templates
-function applyTemplate(templateName) {
-    const blogCards = document.querySelectorAll('.blog-card');
-
-    switch(templateName) {
-        case 'modern':
-            blogCards.forEach(card => {
-                card.style.borderRadius = '8px';
-                card.style.transform = 'none';
-                card.style.border = '1px solid var(--border-color)';
-                card.style.background = 'var(--bg-panel)';
-            });
-            break;
-        case 'classic':
-            blogCards.forEach(card => {
-                card.style.borderRadius = '0';
-                card.style.border = '2px solid rgba(255,255,255,0.1)';
-                card.style.transform = 'none';
-            });
-            break;
-        case 'magazine':
-            blogCards.forEach((card, index) => {
-                card.style.gridColumn = '';
-                card.style.borderRadius = '8px';
-                card.style.border = '1px solid var(--border-color)';
-                if (index === 0) {
-                    card.style.gridColumn = '1 / -1';
-                }
-            });
-            break;
-        case 'minimal':
-            blogCards.forEach(card => {
-                card.style.background = 'transparent';
-                card.style.border = 'none';
-                card.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
-                card.style.borderRadius = '0';
-                card.style.transform = 'none';
-            });
-            break;
+// Apply different themes
+function applyTheme(themeName) {
+    const root = document.documentElement;
+    
+    if (themeName === 'blender') {
+        // Blender Dark Theme
+        root.style.setProperty('--bg-dark', '#1d1d1d');
+        root.style.setProperty('--bg-panel', 'rgba(40, 40, 40, 0.85)');
+        root.style.setProperty('--bg-header', 'rgba(30, 30, 30, 0.9)');
+        root.style.setProperty('--accent-blue', '#4772b3');
+        root.style.setProperty('--accent-blue-hover', '#5a8fd9');
+        root.style.setProperty('--text-primary', '#e6e6e6');
+        root.style.setProperty('--text-secondary', '#a0a0a0');
+        root.style.setProperty('--border-color', 'rgba(255, 255, 255, 0.1)');
+        document.body.style.background = 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)';
+    } else if (themeName === 'adwaita') {
+        // Adwaita Dark Theme (GNOME)
+        root.style.setProperty('--bg-dark', '#1e1e1e');
+        root.style.setProperty('--bg-panel', 'rgba(30, 30, 30, 0.9)');
+        root.style.setProperty('--bg-header', 'rgba(24, 24, 24, 0.95)');
+        root.style.setProperty('--accent-blue', '#3584e4');
+        root.style.setProperty('--accent-blue-hover', '#62a0ea');
+        root.style.setProperty('--text-primary', '#ffffff');
+        root.style.setProperty('--text-secondary', '#9a9a9a');
+        root.style.setProperty('--border-color', 'rgba(255, 255, 255, 0.08)');
+        document.body.style.background = 'linear-gradient(135deg, #242424 0%, #1a1a1a 100%)';
     }
 }
 
