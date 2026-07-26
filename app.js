@@ -1182,10 +1182,9 @@ function getRandomVerse() {
     return devotionalVerses[randomIndex];
 }
 
-// Typing delete animation - removes text character by character
-async function typingDeleteAnimation(element, speed = 30) {
+// Typing delete animation - removes text character by character, then types new text
+async function typingDeleteAnimation(element, deleteSpeed = 5, typeSpeed = 10, newText = '') {
     const text = element.textContent;
-    const originalText = text;
     
     return new Promise((resolve) => {
         let i = 0;
@@ -1195,9 +1194,24 @@ async function typingDeleteAnimation(element, speed = 30) {
                 i++;
             } else {
                 clearInterval(deleteInterval);
-                resolve();
+                
+                // Now type the new text
+                if (newText) {
+                    let j = 0;
+                    const typeInterval = setInterval(() => {
+                        if (j < newText.length) {
+                            element.textContent = newText.substring(0, j + 1);
+                            j++;
+                        } else {
+                            clearInterval(typeInterval);
+                            resolve();
+                        }
+                    }, typeSpeed);
+                } else {
+                    resolve();
+                }
             }
-        }, speed);
+        }, deleteSpeed);
     });
 }
 
@@ -1217,8 +1231,8 @@ async function initDevotional() {
     // Wait a brief moment before starting the delete animation
     await new Promise(resolve => setTimeout(resolve, 800));
     
-    // Perform typing delete animation
-    await typingDeleteAnimation(homeLeadElement, 30);
+    // Perform typing delete animation with fast speeds (5ms delete, 10ms type)
+    await typingDeleteAnimation(homeLeadElement, 5, 10);
     
     // Create devotional container
     const devotionalContainer = document.createElement('div');
