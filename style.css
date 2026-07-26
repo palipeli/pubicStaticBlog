@@ -348,24 +348,27 @@ html {
         pointer-events: auto;
     }
     
-    /* Toggle button always visible on mobile - positioned on right edge when collapsed */
+    /* Toggle button always visible on mobile - positioned fixed on right edge when collapsed */
     .sidebar-toggle {
-        position: fixed;
-        right: 0;
+        position: fixed !important;
+        right: 0 !important;
+        left: auto !important;
         top: 50%;
         transform: translateY(-50%) rotate(180deg) !important;
         border-radius: 12px 0 0 12px;
         box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
-        z-index: 1002;
+        z-index: 1002 !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
     }
     
     /* When expanded, move toggle to left edge of sidebar and show proper chevron */
     .sidebar.expanded .sidebar-toggle {
-        left: 0;
-        right: auto;
+        left: 0 !important;
+        right: auto !important;
         transform: translateY(-50%) rotate(0deg) !important;
-        border-radius: 12px 0 0 12px;
-        box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+        border-radius: 0 12px 12px 0;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
     }
     
     /* Main container doesn't need margin adjustment on mobile - sidebar floats */
@@ -432,11 +435,20 @@ html {
     }
 }
 
-/* On very small screens, always show the toggle button */
+/* On very small screens, always show the toggle button - overrides any other rules */
 @media (max-width: 480px) {
     .sidebar-toggle {
+        display: flex !important;
         opacity: 1 !important;
         pointer-events: auto !important;
+        visibility: visible !important;
+    }
+    
+    .sidebar.collapsed .sidebar-toggle,
+    .sidebar.expanded .sidebar-toggle {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        visibility: visible !important;
     }
 }
 
