@@ -35,7 +35,7 @@
 
     /* Sidebar content wrapper adjustments for tray */
     .sidebar.mobile-tray .sidebar-content-wrapper {
-        padding: 20px;
+        padding: 0;
         overflow-y: auto;
         opacity: 1 !important;
         pointer-events: auto !important;
@@ -51,9 +51,12 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 12px 20px;
+        padding: 16px 20px;
         border-bottom: 1px solid var(--border-color);
         position: relative;
+        background: var(--bg-panel);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
 
     .mobile-tray-handle {
@@ -83,6 +86,12 @@
         background: rgba(0, 0, 0, 0.1);
     }
 
+    /* Sidebar sections inside tray need proper margins */
+    .sidebar.mobile-tray .sidebar-content-wrapper > .sidebar-section {
+        margin-bottom: 25px;
+        padding: 20px;
+    }
+
     /* Mobile trigger button - styled like sidebar toggle but oriented for bottom-right */
     .mobile-tray-trigger {
         position: fixed;
@@ -91,10 +100,12 @@
         width: 56px;
         height: 56px;
         border-radius: 50%;
-        background: linear-gradient(135deg, var(--accent-blue) 0%, #3a5a8f 100%);
-        color: white;
-        border: none;
-        box-shadow: 0 4px 12px rgba(71, 114, 179, 0.4);
+        background: var(--bg-panel);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         cursor: pointer;
         z-index: 1001;
         display: flex;
@@ -104,8 +115,10 @@
     }
 
     .mobile-tray-trigger:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 16px rgba(71, 114, 179, 0.6);
+        background: var(--accent-blue);
+        color: white;
+        border-color: var(--accent-blue);
+        box-shadow: 0 4px 12px rgba(71, 114, 179, 0.4);
     }
 
     .mobile-tray-trigger:active {
@@ -113,8 +126,10 @@
     }
 
     .mobile-tray-trigger svg {
-        width: 28px;
-        height: 28px;
+        width: 20px;
+        height: 20px;
+        transform: rotate(180deg);
+        transition: transform 0.3s ease;
     }
 
     /* Overlay when tray is open */
@@ -138,7 +153,7 @@
 
     /* Adjust sidebar sections for mobile tray */
     .sidebar.mobile-tray .sidebar-section {
-        margin-bottom: 25px;
+        margin-bottom: 0;
     }
 
     .sidebar.mobile-tray .theme-chooser {

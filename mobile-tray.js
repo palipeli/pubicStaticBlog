@@ -114,6 +114,25 @@
         if (handle) {
             setupDragToClose(handle);
         }
+
+        // Add click handlers to post selector items for collapse animation
+        setupPostSelectorCollapse();
+    }
+
+    // Setup post selector item clicks to collapse the chooser
+    function setupPostSelectorCollapse() {
+        // Use event delegation on the sidebar
+        if (!sidebar) return;
+        
+        sidebar.addEventListener('click', (e) => {
+            const postItem = e.target.closest('.post-selector-item');
+            if (postItem) {
+                // Small delay to allow the click to process first
+                setTimeout(() => {
+                    collapsePostSelector();
+                }, 50);
+            }
+        });
     }
 
     // Open the tray
@@ -138,6 +157,37 @@
         
         // Restore body scroll
         document.body.style.overflow = '';
+    }
+
+    // Collapse the post selector list with animation
+    function collapsePostSelector() {
+        const blogSection = document.getElementById('blog-sidebar-section');
+        if (!blogSection) return;
+        
+        const postList = blogSection.querySelector('.post-selector-list');
+        const title = blogSection.querySelector('.sidebar-title');
+        
+        if (postList && title) {
+            // Animate collapsing
+            postList.style.maxHeight = postList.scrollHeight + 'px';
+            postList.style.overflow = 'hidden';
+            postList.style.transition = 'max-height 0.3s ease, opacity 0.3s ease';
+            title.style.transition = 'opacity 0.3s ease';
+            
+            requestAnimationFrame(() => {
+                postList.style.maxHeight = '0';
+                postList.style.opacity = '0';
+                title.style.opacity = '0';
+            });
+            
+            setTimeout(() => {
+                blogSection.style.display = 'none';
+                // Reset styles for next time
+                postList.style.maxHeight = '';
+                postList.style.opacity = '';
+                title.style.opacity = '';
+            }, 300);
+        }
     }
 
     // Setup drag-to-close functionality
