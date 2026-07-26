@@ -167,8 +167,8 @@ body {
 }
 
 .nav-item.active {
-    color: var(--text-primary);
-    background: rgba(255, 255, 255, 0.1);
+    color: var(--accent-blue);
+    background: rgba(53, 132, 228, 0.15);
 }
 
 /* Main Content */
