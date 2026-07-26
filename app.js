@@ -312,10 +312,37 @@ async function fetchBlogPostMetadata() {
         // Sync with window object for cross-module access
         window.blogPostMetadata = blogPostMetadata;
         
+        // Load the blog introduction content from markdown
+        loadBlogIntroduction();
+        
         return blogPostMetadata;
     } catch (err) {
         console.error('Error fetching blog post metadata:', err);
         return [];
+    }
+}
+
+// Load blog introduction content from /blog/new-updated-look.md
+async function loadBlogIntroduction() {
+    try {
+        const response = await fetch('/blog/new-updated-look.md');
+        if (!response.ok) {
+            throw new Error('Could not fetch blog introduction');
+        }
+        
+        const mdContent = await response.text();
+        const htmlContent = parseMarkdown(mdContent);
+        
+        const introContainer = document.getElementById('blog-intro-content');
+        if (introContainer) {
+            introContainer.innerHTML = htmlContent;
+        }
+    } catch (err) {
+        console.error('Error loading blog introduction:', err);
+        const introContainer = document.getElementById('blog-intro-content');
+        if (introContainer) {
+            introContainer.innerHTML = '<p>Failed to load introduction. Please check the README.md for details.</p>';
+        }
     }
 }
 
@@ -761,6 +788,8 @@ function applyTheme(themeName) {
         root.style.setProperty('--text-primary', '#2e3436');
         root.style.setProperty('--text-secondary', '#5e5e5e');
         root.style.setProperty('--border-color', 'rgba(0, 0, 0, 0.1)');
+        root.style.setProperty('--blur-overlay-brightness', '0.5');
+        root.style.setProperty('--dark-overlay-color', 'rgba(0, 0, 0, 0.5)');
         document.body.style.background = 'linear-gradient(135deg, #f6f5f4 0%, #ffffff 100%)';
     } else if (themeName === 'dark') {
         // Adwaita Dark Theme (GNOME) - Darker version
@@ -772,6 +801,8 @@ function applyTheme(themeName) {
         root.style.setProperty('--text-primary', '#ffffff');
         root.style.setProperty('--text-secondary', '#9a9a9a');
         root.style.setProperty('--border-color', 'rgba(255, 255, 255, 0.08)');
+        root.style.setProperty('--blur-overlay-brightness', '0.3');
+        root.style.setProperty('--dark-overlay-color', 'rgba(0, 0, 0, 0.7)');
         document.body.style.background = 'linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%)';
     }
 }
