@@ -1,4 +1,4 @@
-/* style.css - Minecraft-Style Blog Platform */
+/* style.css - Adwaita-Style Blog Platform */
 
 * {
     margin: 0;
@@ -7,57 +7,63 @@
 }
 
 :root {
-    /* Minecraft Theme Colors - Light Mode Default */
-    --mc-bg-dark: #ffffff;
-    --mc-stone: #fff0f5;
-    --mc-shadow: #dddddd;
-    
+    /* --- DEFAULT: LIGHT MODE (Pink & White) --- */
+    --mc-bg-dark: #ffffff;       /* Pure White Background */
+    --mc-stone: #fff0f5;         /* Lavender Blush elements */
+    --mc-shadow: #dddddd;        /* Light grey shadow */
+
     /* Text */
-    --text-main: #222222;
-    --text-muted: #666666;
-    
-    /* Theme Colors - Pink variants */
-    --pink-neon: #ff1493;
-    --pink-pastel: #ff69b4;
-    --pink-deep: #c71585;
+    --text-main: #222222;        /* Dark Grey text */
+    --text-muted: #666666;       /* Medium Grey text */
+
+    /* Theme Colors */
+    --pink-neon: #ff1493;        /* Deep Pink */
+    --pink-pastel: #ff69b4;      /* Hot Pink */
+    --pink-deep: #c71585;        /* Violet Red */
     --pink-glow: rgba(255, 105, 180, 0.3);
-    
-    /* Borders & UI */
-    --border-color: #ff69b4;
+
+    /* Misc */
+    --border-color: #ff69b4;     /* Pink borders in light mode */
     --btn-border: #888888;
     --logo-color: #ff1493;
     --logo-shadow: #ffd1dc;
-    --bg-pattern: #f0f0f0;
-    
+    --bg-pattern: #f0f0f0;       /* Light grey pixel pattern */
+
     /* Spacing & Sizes */
     --border-width: 4px;
     --container-width: 1000px;
-    --header-height: 48px;
+    --header-height: 40px;
     
     /* Fonts */
-    --font-main: 'VT323', monospace;
+    --font-main: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
     
     /* Transition */
-    --theme-transition-duration: 0.3s;
+    --theme-transition-duration: 0.4s;
+    --blur-overlay-brightness: 1.0;
+    --dark-overlay-color: rgba(0, 0, 0, 0.0);
 }
 
-[data-theme="dark"] {
-    --mc-bg-dark: #121212;
-    --mc-stone: #3a3a3a;
-    --mc-shadow: #1e1e1e;
-    --text-main: #ffffff;
-    --text-muted: #cccccc;
-    --pink-neon: #ff6ec7;
-    --pink-pastel: #ff92df;
-    --pink-deep: #b04286;
-    --pink-glow: rgba(255, 110, 199, 0.5);
-    --border-color: #ff92df;
-    --btn-border: #000000;
-    --logo-color: #ff6ec7;
-    --logo-shadow: #000000;
-    --bg-pattern: #1a1a1a;
+/* --- AUTOMATIC & MANUAL DARK MODE SWITCH --- */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --mc-bg-dark: #121212;
+        --mc-stone: #3a3a3a;
+        --mc-shadow: #1e1e1e;
+        --text-main: #ffffff;
+        --text-muted: #cccccc;
+        --pink-neon: #ff6ec7;
+        --pink-pastel: #ff92df;
+        --pink-deep: #b04286;
+        --pink-glow: rgba(255, 110, 199, 0.5);
+        --border-color: #ff92df;
+        --btn-border: #000000;
+        --logo-color: #ff6ec7;
+        --logo-shadow: #000000;
+        --bg-pattern: #1a1a1a;
+    }
 }
 
+/* Add this block to support the physical button click */
 body.dark-mode {
     --mc-bg-dark: #121212;
     --mc-stone: #3a3a3a;
@@ -75,18 +81,41 @@ body.dark-mode {
     --bg-pattern: #1a1a1a;
 }
 
-body {
-    font-family: var(--font-main);
-    font-size: 1.3rem;
-    background-color: transparent;
-    color: var(--text-main);
-    min-height: 100vh;
-    position: relative;
-    overflow-x: hidden;
-    transition: color var(--theme-transition-duration);
+/* Manual light mode override */
+body.light-mode {
+    --mc-bg-dark: #ffffff;
+    --mc-stone: #fff0f5;
+    --mc-shadow: #dddddd;
+    --text-main: #222222;
+    --text-muted: #666666;
+    --pink-neon: #ff1493;
+    --pink-pastel: #ff69b4;
+    --pink-deep: #c71585;
+    --pink-glow: rgba(255, 105, 180, 0.3);
+    --border-color: #ff69b4;
+    --btn-border: #888888;
+    --logo-color: #ff1493;
+    --logo-shadow: #ffd1dc;
+    --bg-pattern: #f0f0f0;
 }
 
-/* Background Image Layer (Blurred) */
+body {
+    margin: 0;
+    padding: 0;
+    /* Transparent so the pseudo-elements show through */
+    background-color: transparent;
+    color: var(--text-main);
+    font-family: 'VT323', monospace;
+    font-size: 1.3rem;
+
+    /* Structure for background layers */
+    position: relative;
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: color 0.3s;
+}
+
+/* --- BACKGROUND IMAGE LAYER (Blurred) --- */
 body::before {
     content: "";
     position: fixed;
@@ -94,16 +123,20 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -2;
+    z-index: -2; /* Furthest back */
+
     background-image: url('background.webp');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+
+    /* Blur Effect */
     filter: blur(10px);
+    /* Scale slightly to hide blurred edges */
     transform: scale(1.05);
 }
 
-/* Background Tint Layer (Readability) */
+/* --- BACKGROUND TINT LAYER (Readability) --- */
 body::after {
     content: "";
     position: fixed;
@@ -111,10 +144,14 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -1;
+    z-index: -1; /* Behind content, in front of image */
+
+    /* Adapts to Light/Dark mode variable */
     background-color: var(--mc-bg-dark);
+
+    /* Adjust opacity to see more/less of the image (0.8 = 80% solid color) */
     opacity: 0.8;
-    transition: background-color var(--theme-transition-duration);
+    transition: background-color 0.3s;
 }
 
 html {
@@ -131,7 +168,7 @@ a {
     color: inherit;
 }
 
-/* --- MINECRAFT BORDER UTILITY --- */
+/* --- UTILS --- */
 .mc-border {
     border: var(--border-width) solid;
     border-color:
@@ -140,11 +177,12 @@ a {
         var(--pink-deep)      /* Bottom */
         var(--pink-pastel);   /* Left */
     background-color: var(--mc-stone);
-    box-shadow: 4px 4px 0 var(--mc-shadow);
+    box-shadow: 4px 4px 0 var(--mc-shadow); /* Dynamic Shadow */
 }
 
 /* Header */
 .header {
+    /* Semi-transparent background adapts to mode */
     background: color-mix(in srgb, var(--mc-bg-dark) 90%, transparent);
     border-bottom: var(--border-width) solid var(--pink-deep);
     position: fixed;
@@ -155,7 +193,7 @@ a {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 16px;
+    padding: 0 20px;
     z-index: 1000;
     box-shadow: 0 4px 15px var(--pink-glow);
     backdrop-filter: blur(5px);
@@ -177,16 +215,18 @@ a {
 .header-left {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
 }
 
 .blue-button {
     display: inline-block;
-    padding: 4px 12px;
+    padding: 10px 25px;
     background: var(--mc-stone);
     color: var(--pink-pastel);
     text-transform: uppercase;
-    font-size: 1rem;
+    font-size: 1.4rem;
+
+    /* 3D Border Trick */
     box-shadow:
         inset 3px 3px 0 rgba(255,255,255,0.2),
         inset -3px -3px 0 rgba(0,0,0,0.2),
@@ -196,10 +236,10 @@ a {
     transition: all 0.3s ease;
 }
 
+/* Dark Mode Text Override for Buttons to ensure contrast */
 @media (prefers-color-scheme: dark) {
     .blue-button { color: var(--pink-pastel); }
 }
-
 @media (prefers-color-scheme: light) {
     .blue-button { color: var(--pink-deep); font-weight: bold; }
 }
@@ -208,7 +248,7 @@ a {
     font-family: 'VT323', monospace;
     font-style: normal;
     text-transform: lowercase;
-    font-size: 1rem;
+    font-size: 1.4rem;
 }
 
 .blue-button:hover {
@@ -220,6 +260,7 @@ a {
         inset -3px -3px 0 rgba(0,0,0,0.2),
         3px 5px 0 var(--btn-border),
         0 0 15px var(--pink-neon);
+    cursor: pointer;
 }
 
 .blue-button:active {
@@ -230,16 +271,18 @@ a {
 .header-right {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
 }
 
 .nav-item {
     display: inline-block;
-    padding: 4px 12px;
+    padding: 10px 25px;
     background: var(--mc-stone);
     color: var(--pink-pastel);
     text-transform: uppercase;
-    font-size: 1rem;
+    font-size: 1.4rem;
+
+    /* 3D Border Trick */
     box-shadow:
         inset 3px 3px 0 rgba(255,255,255,0.2),
         inset -3px -3px 0 rgba(0,0,0,0.2),
@@ -249,10 +292,10 @@ a {
     transition: all 0.3s ease;
 }
 
+/* Dark Mode Text Override for Buttons to ensure contrast */
 @media (prefers-color-scheme: dark) {
     .nav-item { color: var(--pink-pastel); }
 }
-
 @media (prefers-color-scheme: light) {
     .nav-item { color: var(--pink-deep); font-weight: bold; }
 }
@@ -266,6 +309,12 @@ a {
         inset -3px -3px 0 rgba(0,0,0,0.2),
         3px 5px 0 var(--btn-border),
         0 0 15px var(--pink-neon);
+    cursor: pointer;
+}
+
+.nav-item:active {
+    transform: translateY(2px);
+    box-shadow: 0 0 0 var(--btn-border);
 }
 
 .nav-item.active {
@@ -282,10 +331,9 @@ a {
 .main-container {
     display: block;
     margin-top: var(--header-height);
-    max-width: var(--container-width);
-    margin-left: auto;
+    height: calc(100vh - var(--header-height));
+    position: relative;
     margin-right: 280px;
-    padding: 0 16px;
     transition: margin-right 0.3s ease;
 }
 
@@ -294,9 +342,9 @@ a {
 }
 
 .content-area {
-    padding: 20px 0;
+    padding: 30px;
     overflow-y: auto;
-    min-height: calc(100vh - var(--header-height));
+    height: 100%;
     width: 100%;
 }
 
@@ -329,11 +377,9 @@ a {
 }
 
 .home-lead {
-    font-size: 1.5rem;
     color: var(--text-muted);
-    margin-bottom: 40px;
-    line-height: 1.6;
-    animation: fadeIn 0.6s ease-out 0.1s both;
+    font-size: 1.5rem;
+    margin-top: 10px;
 }
 
 .hero-image-container {
@@ -435,8 +481,10 @@ a {
 /* Sidebar */
 .sidebar {
     width: 280px;
-    background: color-mix(in srgb, var(--mc-bg-dark) 90%, transparent);
-    border-left: var(--border-width) solid var(--pink-deep);
+    background: var(--bg-panel);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-left: 1px solid var(--border-color);
     padding: 0;
     animation: slideLeft 0.5s ease-out;
     position: fixed;
@@ -445,8 +493,7 @@ a {
     height: calc(100vh - var(--header-height));
     box-sizing: border-box;
     z-index: 999;
-    transition: width 0.3s ease, opacity 0.3s ease, transform 0.3s ease, background var(--theme-transition-duration), border-color var(--theme-transition-duration);
-    box-shadow: -4px 0 15px var(--pink-glow);
+    transition: width 0.3s ease, opacity 0.3s ease, transform 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
 
 /* Sidebar content wrapper */
@@ -484,7 +531,7 @@ a {
     }
 }
 
-/* Sidebar toggle button - Minecraft style */
+/* Sidebar toggle button - fixed to left edge of sidebar, vertically centered */
 .sidebar-toggle {
     position: absolute;
     left: 0;
@@ -492,28 +539,21 @@ a {
     transform: translate(-100%, -50%);
     width: 24px;
     height: 48px;
-    background: var(--mc-stone);
+    border-radius: 12px 0 0 12px;
+    background: var(--bg-panel);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-right: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1001;
     transition: all 0.3s ease;
-    box-shadow:
-        inset 3px 3px 0 rgba(255,255,255,0.2),
-        inset -3px -3px 0 rgba(0,0,0,0.2),
-        3px 3px 0 var(--btn-border);
-    border: 2px solid var(--btn-border);
-    color: var(--pink-pastel);
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+    color: var(--text-primary);
     padding: 0;
-}
-
-@media (prefers-color-scheme: dark) {
-    .sidebar-toggle { color: var(--pink-pastel); }
-}
-
-@media (prefers-color-scheme: light) {
-    .sidebar-toggle { color: var(--pink-deep); font-weight: bold; }
 }
 
 /* When sidebar is expanded, show the chevron pointing left (<) */
@@ -528,13 +568,9 @@ a {
 }
 
 .sidebar-toggle:hover {
-    background: var(--pink-deep);
-    color: #fff;
-    box-shadow:
-        inset 3px 3px 0 rgba(255,255,255,0.2),
-        inset -3px -3px 0 rgba(0,0,0,0.2),
-        3px 5px 0 var(--btn-border),
-        0 0 15px var(--pink-neon);
+    background: var(--accent-pink);
+    color: white;
+    border-color: var(--accent-pink);
 }
 
 .sidebar-toggle:active {
@@ -664,6 +700,7 @@ a {
     color: var(--accent-pink-hover);
 }
 
+/* Theme Chooser */
 /* Theme Chooser - Minecraft style */
 .theme-chooser {
     display: flex;
@@ -673,11 +710,13 @@ a {
 
 .theme-btn {
     display: inline-block;
-    padding: 4px 12px;
+    padding: 10px 25px;
     background: var(--mc-stone);
     color: var(--pink-pastel);
     text-transform: uppercase;
-    font-size: 1rem;
+    font-size: 1.4rem;
+
+    /* 3D Border Trick */
     box-shadow:
         inset 3px 3px 0 rgba(255,255,255,0.2),
         inset -3px -3px 0 rgba(0,0,0,0.2),
@@ -688,10 +727,10 @@ a {
     text-align: left;
 }
 
+/* Dark Mode Text Override for Buttons to ensure contrast */
 @media (prefers-color-scheme: dark) {
     .theme-btn { color: var(--pink-pastel); }
 }
-
 @media (prefers-color-scheme: light) {
     .theme-btn { color: var(--pink-deep); font-weight: bold; }
 }
@@ -705,6 +744,12 @@ a {
         inset -3px -3px 0 rgba(0,0,0,0.2),
         3px 5px 0 var(--btn-border),
         0 0 15px var(--pink-neon);
+    cursor: pointer;
+}
+
+.theme-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 0 0 var(--btn-border);
 }
 
 .theme-btn.active {
@@ -725,16 +770,16 @@ a {
     margin-top: 20px;
 }
 
-/* Blog Layout Container - Minecraft style */
+/* Blog Layout Container - New Structure */
 .blog-layout-container {
     display: block;
-    margin-top: 40px;
+    margin-top: 20px;
 }
 
-/* About Layout Container - Minecraft style */
+/* About Layout Container - Same rectangle styling as blog */
 .about-layout-container {
     display: block;
-    margin-top: 40px;
+    margin-top: 20px;
 }
 
 /* Blog Main Content Area */
@@ -746,49 +791,29 @@ a {
 /* Blog Posts List */
 .blog-posts-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 25px;
 }
 
-/* Back to List Button - Minecraft style */
+/* Back to List Button */
 .back-to-list-btn,
 .back-to-intro-btn {
-    display: inline-block;
-    padding: 10px 25px;
-    background: var(--mc-stone);
-    color: var(--pink-pastel);
-    text-transform: uppercase;
-    font-size: 1.4rem;
-    box-shadow:
-        inset 3px 3px 0 rgba(255,255,255,0.2),
-        inset -3px -3px 0 rgba(0,0,0,0.2),
-        3px 3px 0 var(--btn-border);
-    border: 2px solid var(--btn-border);
+    background: rgba(71, 114, 179, 0.3);
+    border: 1px solid var(--accent-pink);
+    color: var(--text-primary);
+    padding: 10px 20px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
     margin-bottom: 20px;
-}
-
-@media (prefers-color-scheme: dark) {
-    .back-to-list-btn,
-    .back-to-intro-btn { color: var(--pink-pastel); }
-}
-
-@media (prefers-color-scheme: light) {
-    .back-to-list-btn,
-    .back-to-intro-btn { color: var(--pink-deep); font-weight: bold; }
+    transition: all 0.3s ease;
 }
 
 .back-to-list-btn:hover,
 .back-to-intro-btn:hover {
-    background: var(--pink-deep);
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow:
-        inset 3px 3px 0 rgba(255,255,255,0.2),
-        inset -3px -3px 0 rgba(0,0,0,0.2),
-        3px 5px 0 var(--btn-border),
-        0 0 15px var(--pink-neon);
+    background: rgba(71, 114, 179, 0.5);
+    transform: translateX(-5px);
 }
 
 /* Blog Introduction View */
@@ -802,103 +827,113 @@ a {
     display: block;
 }
 
-.blog-post-view .blog-article,
-.blog-intro-view .blog-article {
-    background: color-mix(in srgb, var(--mc-bg-dark) 60%, transparent);
-    border: 4px dashed var(--pink-deep);
+.blog-post-view .blog-article {
+    background: var(--bg-panel);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
     padding: 40px;
     line-height: 1.8;
-    font-size: 1.3rem;
-    color: var(--text-main);
-    transition: background var(--theme-transition-duration), border-color var(--theme-transition-duration);
+    font-size: 14px;
+}
+
+.blog-intro-view .blog-article {
+    background: var(--bg-panel);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 40px;
+    line-height: 1.8;
+    font-size: 14px;
+    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
 
 .blog-intro-view h1 {
-    font-size: 2.5rem;
+    font-size: 18px;
     font-weight: 400;
     margin-bottom: 15px;
-    color: var(--pink-pastel);
-    text-shadow: 3px 3px 0 var(--mc-shadow);
+    color: var(--text-primary);
 }
 
 .blog-intro-view h2 {
-    font-size: 2rem;
+    font-size: 20px;
     margin-top: 30px;
     margin-bottom: 15px;
-    color: var(--pink-pastel);
-    text-shadow: 2px 2px 0 var(--mc-shadow);
+    color: var(--text-primary);
 }
 
 .blog-intro-view h3 {
-    font-size: 1.7rem;
+    font-size: 17px;
     margin-top: 25px;
     margin-bottom: 10px;
-    color: var(--pink-pastel);
+    color: var(--text-primary);
 }
 
 .blog-intro-view p {
     margin-bottom: 15px;
-    color: var(--text-main);
-    font-size: 1.3rem;
+    color: var(--text-secondary);
+    font-size: 14px;
 }
 
 .blog-intro-view blockquote {
-    border-left: 4px solid var(--pink-pastel);
+    border-left: 4px solid var(--accent-pink);
     padding-left: 20px;
     margin: 20px 0;
     font-style: italic;
-    color: var(--text-muted);
+    color: var(--text-primary);
 }
 
 .blog-meta {
-    color: var(--text-muted);
-    font-size: 1.2rem;
+    color: var(--text-secondary);
+    font-size: 14px;
     margin-bottom: 20px;
 }
 
-/* Blog Article - Minecraft style */
+/* Blog Article */
 .blog-article {
-    background: color-mix(in srgb, var(--mc-bg-dark) 60%, transparent);
-    border: 4px dashed var(--pink-deep);
+    background: var(--bg-panel);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
     padding: 30px;
     line-height: 1.8;
-    font-size: 1.3rem;
-    color: var(--text-main);
-    transition: background var(--theme-transition-duration), border-color var(--theme-transition-duration);
+    font-size: 14px;
+    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
 
 .blog-article h1 {
-    font-size: 2.5rem;
+    font-size: 18px;
     font-weight: 400;
     margin-bottom: 10px;
-    color: var(--pink-pastel);
-    text-shadow: 3px 3px 0 var(--mc-shadow);
+    color: var(--text-primary);
 }
 
 .blog-article h2 {
-    font-size: 2rem;
+    font-size: 20px;
     margin: 30px 0 15px;
-    color: var(--pink-pastel);
-    border-bottom: 4px dashed var(--pink-deep);
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 10px;
-    text-shadow: 2px 2px 0 var(--mc-shadow);
 }
 
 .blog-article h3 {
-    font-size: 1.7rem;
+    font-size: 17px;
     margin: 25px 0 12px;
-    color: var(--pink-pastel);
+    color: var(--text-primary);
 }
 
 .blog-article p {
     margin-bottom: 15px;
-    color: var(--text-main);
-    font-size: 1.3rem;
+    color: var(--text-secondary);
+    font-size: 14px;
 }
 
 .blog-article ul, .blog-article ol {
     margin: 15px 0 15px 25px;
-    color: var(--text-main);
+    color: var(--text-secondary);
 }
 
 .blog-article li {
@@ -906,21 +941,21 @@ a {
 }
 
 .blog-article code {
-    background: var(--mc-shadow);
+    background: rgba(0, 0, 0, 0.3);
     padding: 2px 6px;
-    border: 2px solid var(--btn-border);
-    font-family: 'VT323', monospace;
-    font-size: 1.2rem;
-    color: var(--text-main);
+    border-radius: 3px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 14px;
+    color: #e0e0e0;
 }
 
 .blog-article pre {
-    background: var(--mc-shadow);
-    border: 4px solid var(--btn-border);
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
     padding: 15px;
     overflow-x: auto;
     margin: 20px 0;
-    box-shadow: 4px 4px 0 var(--mc-shadow);
 }
 
 .blog-article pre code {
@@ -929,25 +964,25 @@ a {
 }
 
 .blog-article blockquote {
-    border-left: 4px solid var(--pink-pastel);
+    border-left: 4px solid var(--accent-pink);
     padding-left: 20px;
     margin: 20px 0;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     font-style: italic;
 }
 
 .blog-article a {
-    color: var(--pink-pastel);
+    color: var(--accent-pink);
     text-decoration: none;
 }
 
 .blog-article a:hover {
-    color: var(--pink-neon);
+    color: var(--accent-pink-hover);
     text-decoration: underline;
 }
 
 .blog-article strong {
-    color: var(--text-main);
+    color: var(--text-primary);
     font-weight: 600;
 }
 
@@ -964,64 +999,39 @@ a {
 }
 
 .post-selector-item {
-    display: inline-block;
-    padding: 10px 25px;
-    background: var(--mc-stone);
-    color: var(--pink-pastel);
-    text-transform: uppercase;
-    font-size: 1.4rem;
-    box-shadow:
-        inset 3px 3px 0 rgba(255,255,255,0.2),
-        inset -3px -3px 0 rgba(0,0,0,0.2),
-        3px 3px 0 var(--btn-border);
-    border: 2px solid var(--btn-border);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 12px 15px;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
-@media (prefers-color-scheme: dark) {
-    .post-selector-item { color: var(--pink-pastel); }
-}
-
-@media (prefers-color-scheme: light) {
-    .post-selector-item { color: var(--pink-deep); font-weight: bold; }
-}
-
 .post-selector-item:hover {
-    background: var(--pink-deep);
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow:
-        inset 3px 3px 0 rgba(255,255,255,0.2),
-        inset -3px -3px 0 rgba(0,0,0,0.2),
-        3px 5px 0 var(--btn-border),
-        0 0 15px var(--pink-neon);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-pink);
+    transform: translateX(-5px);
 }
 
 .post-selector-item.active {
-    background: var(--pink-deep);
-    color: #fff;
-    box-shadow:
-        inset 3px 3px 0 rgba(255,255,255,0.2),
-        inset -3px -3px 0 rgba(0,0,0,0.2),
-        3px 3px 0 var(--btn-border),
-        0 0 15px var(--pink-neon);
+    background: rgba(255, 69, 252, 0.15);
+    border-color: var(--accent-pink);
 }
 
 .post-selector-item.active .post-selector-title {
-    color: #fff;
+    color: var(--accent-pink);
 }
 
 .post-selector-title {
-    font-size: 1.4rem;
+    font-size: 13px;
     font-weight: 600;
-    color: var(--text-main);
+    color: var(--text-primary);
     margin-bottom: 4px;
 }
 
 .post-selector-meta {
-    font-size: 1.1rem;
-    color: var(--text-muted);
+    font-size: 11px;
+    color: var(--text-secondary);
 }
 
 /* Category Filter in Sidebar - REMOVED */
@@ -1036,6 +1046,12 @@ a {
     border: 2px solid var(--btn-border);
 }
 
+.blog-card:hover {
+    transform: scale(1.02);
+    z-index: 10;
+    border-color: var(--pink-neon);
+    box-shadow: 4px 4px 0 var(--pink-pastel);
+}
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -1048,23 +1064,20 @@ a {
 }
 
 .blog-card:hover {
-    transform: scale(1.02);
-    z-index: 10;
-    border-color: var(--pink-neon);
-    box-shadow: 4px 4px 0 var(--pink-pastel);
+    transform: translateY(-5px);
+    border-color: var(--accent-pink);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .blog-image {
     width: 100%;
     height: 180px;
-    background: var(--mc-bg-dark);
+    background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 4rem;
-    overflow: hidden;
-    border: 2px solid var(--btn-border);
-    margin-bottom: 15px;
+    font-size: 48px;
+    color: var(--text-secondary);
 }
 
 .blog-content {
@@ -1072,70 +1085,43 @@ a {
 }
 
 .blog-title {
-    color: var(--pink-neon);
-    font-size: 1.8rem;
-    margin: 0 0 10px 0;
-    line-height: 1.1;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--text-primary);
 }
 
 .blog-excerpt {
-    font-size: 1.1rem;
-    color: var(--text-main);
-    margin-bottom: 20px;
-    flex-grow: 1;
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 15px;
 }
 
 .blog-meta {
-    font-size: 1rem;
-    color: var(--text-muted);
-    margin-bottom: 15px;
-    border-bottom: 2px solid var(--pink-deep);
-    padding-bottom: 5px;
-    display: inline-block;
-    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-secondary);
 }
 
 .blog-date {
-    background: var(--mc-bg-dark);
+    background: rgba(255, 255, 255, 0.05);
     padding: 4px 10px;
-    border: 2px solid var(--btn-border);
-    font-size: 1rem;
+    border-radius: 3px;
 }
 
 .read-more {
-    display: inline-block;
-    padding: 10px 25px;
-    background: var(--mc-stone);
-    color: var(--pink-pastel);
-    text-transform: uppercase;
-    font-size: 1.4rem;
-    box-shadow:
-        inset 3px 3px 0 rgba(255,255,255,0.2),
-        inset -3px -3px 0 rgba(0,0,0,0.2),
-        3px 3px 0 var(--btn-border);
-    border: 2px solid var(--btn-border);
-    cursor: pointer;
-    transition: all 0.3s ease;
+    color: var(--accent-pink);
     text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-    .read-more { color: var(--pink-pastel); }
-}
-
-@media (prefers-color-scheme: light) {
-    .read-more { color: var(--pink-deep); font-weight: bold; }
+    font-weight: 600;
+    font-size: 13px;
+    transition: color 0.2s ease;
 }
 
 .read-more:hover {
-    background: var(--pink-deep);
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow:
-        inset 3px 3px 0 rgba(255,255,255,0.2),
-        inset -3px -3px 0 rgba(0,0,0,0.2),
-        3px 5px 0 var(--btn-border),
-        0 0 15px var(--pink-neon);
+    color: var(--accent-pink-hover);
 }
 
 /* Page Sections */
@@ -1187,21 +1173,20 @@ a {
 }
 
 .profile-img {
-    width: 160px;
-    height: 160px;
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid var(--pink-pastel);
-    box-shadow: 2px 2px 0 var(--mc-shadow);
-    display: block;
-    margin: 0 auto 15px auto;
+    margin-bottom: 20px;
+    border: 3px solid var(--accent-pink);
+    box-shadow: 0 4px 15px rgba(53, 132, 228, 0.3);
 }
 
 .social-links {
     display: flex;
     justify-content: center;
     gap: 15px;
-    margin: 20px 0;
+    margin-bottom: 30px;
     flex-wrap: wrap;
 }
 
@@ -1209,57 +1194,36 @@ a {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 15px;
-    background: var(--mc-stone);
-    color: var(--pink-pastel);
-    text-transform: uppercase;
-    font-size: 1.1rem;
-    box-shadow:
-        inset 3px 3px 0 rgba(255,255,255,0.2),
-        inset -3px -3px 0 rgba(0,0,0,0.2),
-        3px 3px 0 var(--btn-border);
-    border: 2px solid var(--btn-border);
-    cursor: pointer;
-    transition: all 0.3s ease;
+    padding: 10px 20px;
+    border-radius: 6px;
     text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-    .mc-btn { color: var(--pink-pastel); }
-}
-
-@media (prefers-color-scheme: light) {
-    .mc-btn { color: var(--pink-deep); font-weight: bold; }
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
 }
 
 .mc-btn:hover {
-    background: var(--pink-deep);
-    color: #fff;
     transform: translateY(-2px);
-    box-shadow:
-        inset 3px 3px 0 rgba(255,255,255,0.2),
-        inset -3px -3px 0 rgba(0,0,0,0.2),
-        3px 5px 0 var(--btn-border),
-        0 0 15px var(--pink-neon);
-}
-
-.mc-btn:hover i {
-    transform: scale(1.2);
-    transition: transform 0.2s;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .about-hero h1 {
-    font-size: 3rem;
-    margin: 0;
-    color: var(--pink-pastel);
-    text-shadow: 4px 4px 0 var(--mc-shadow);
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .about-hero .subtitle {
-    font-size: 1.5rem;
-    color: var(--text-muted);
-    margin-top: 10px;
-    line-height: 1.6;
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
 }
 
 @keyframes float {
@@ -1722,20 +1686,21 @@ body.mobile-tray-open {
     overflow: hidden;
 }
 
-/* Footer Styles - Minecraft style */
+/* Footer Styles */
 footer {
-    margin-top: 80px;
-    background: var(--mc-shadow);
-    padding: 40px 20px;
+    background: var(--bg-panel);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border-color);
+    padding: 30px 20px;
     text-align: center;
-    border-top: 4px solid var(--pink-neon);
-    color: var(--pink-pastel);
+    margin-top: 40px;
 }
 
 footer p {
     margin: 8px 0;
-    color: var(--pink-pastel);
-    font-size: 1.3rem;
+    color: var(--text-secondary);
+    font-size: 14px;
 }
 
 /* Loading Spinner Animation for Lazy Loading */
