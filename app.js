@@ -498,6 +498,8 @@ function setupSidebarToggle() {
     // Toggle sidebar on button click
     sidebarToggle.addEventListener('click', (e) => {
         e.stopPropagation();
+        e.preventDefault();
+        
         sidebar.classList.toggle('collapsed');
         sidebar.classList.toggle('expanded');
         
@@ -510,6 +512,9 @@ function setupSidebarToggle() {
         const isCollapsed = sidebar.classList.contains('collapsed');
         sidebarToggle.setAttribute('aria-label', isCollapsed ? 'Open Sidebar' : 'Collapse Sidebar');
         sidebarToggle.setAttribute('title', isCollapsed ? 'Open Sidebar' : 'Collapse Sidebar');
+        
+        // Force reflow to ensure CSS transitions apply
+        void sidebar.offsetWidth;
     });
     
     // Handle window resize - sidebar always accessible via button

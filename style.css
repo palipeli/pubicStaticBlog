@@ -320,21 +320,20 @@ html {
 @media (max-width: 480px) {
     .sidebar {
         width: 280px;
-        transform: translateX(100%) !important;
+        transform: translateX(100%);
         box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
-        /* Reset transition for transform to allow smooth sliding */
-        transition: transform 0.3s ease !important;
+        transition: transform 0.3s ease;
     }
     
     .sidebar.expanded {
-        transform: translateX(0) !important;
+        transform: translateX(0);
         opacity: 1;
         pointer-events: auto;
     }
     
     .sidebar.collapsed {
         width: 280px;
-        transform: translateX(100%) !important;
+        transform: translateX(100%);
         opacity: 1;
     }
     
@@ -348,27 +347,39 @@ html {
         pointer-events: auto;
     }
     
-    /* Toggle button always visible on mobile - positioned fixed on right edge when collapsed */
+    /* Toggle button - completely independent fixed positioning on very small screens */
     .sidebar-toggle {
         position: fixed !important;
         right: 0 !important;
         left: auto !important;
-        top: 50%;
-        transform: translateY(-50%) rotate(180deg) !important;
-        border-radius: 12px 0 0 12px;
-        box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        border-radius: 12px 0 0 12px !important;
+        box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15) !important;
         z-index: 1002 !important;
         opacity: 1 !important;
         pointer-events: auto !important;
+        background: var(--bg-panel) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        border: 1px solid var(--border-color) !important;
+        border-right: none !important;
     }
     
-    /* When expanded, move toggle to left edge of sidebar and show proper chevron */
+    /* Rotate chevron to point left when collapsed (sidebar is off-screen right) */
+    .sidebar-toggle svg {
+        transform: rotate(180deg) !important;
+    }
+    
+    /* When expanded, keep button on right edge but rotate chevron back */
     .sidebar.expanded .sidebar-toggle {
-        left: 0 !important;
-        right: auto !important;
-        transform: translateY(-50%) rotate(0deg) !important;
-        border-radius: 0 12px 12px 0;
-        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+        transform: translateY(-50%) !important;
+        border-radius: 12px 0 0 12px !important;
+        box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .sidebar.expanded .sidebar-toggle svg {
+        transform: rotate(0deg) !important;
     }
     
     /* Main container doesn't need margin adjustment on mobile - sidebar floats */
