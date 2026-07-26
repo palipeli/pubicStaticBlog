@@ -8,6 +8,10 @@ window.blogPosts = []; // Full posts with content (lazy-loaded)
 window.blogPostMetadata = []; // Metadata only (loaded initially)
 const blogContentCache = new Map(); // Cache for loaded blog content
 
+// Devotional verses cache
+let devotionalVerses = [];
+let devotionalLoaded = false;
+
 // Shorthand references for cleaner code
 let blogPosts = window.blogPosts;
 let blogPostMetadata = window.blogPostMetadata;
@@ -988,6 +992,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Restore saved state after page refresh
     restoreAppState();
     
+    // Initialize devotional Bible verse feature
+    initDevotional();
+    
     // Fetch only blog post metadata (lazy load content on demand)
     fetchBlogPostMetadata().then(posts => {
         if (posts.length > 0) {
@@ -1140,4 +1147,126 @@ async function openBlogPostFromHomeLazy(id) {
     setTimeout(() => {
         openBlogPostLazy(id);
     }, 100);
+}
+
+// =====================
+// Devotional Bible Verse Functions
+// =====================
+
+// Load New Testament verses from JSON file
+async function loadDevotionalVerses() {
+    if (devotionalLoaded) return devotionalVerses;
+    
+    try {
+        const response = await fetch('/blog/nt_verses.json');
+        if (!response.ok) throw new Error('Failed to fetch verses');
+        
+        const allVerses = await response.json();
+        
+        // Filter for short verses (under 250 characters) suitable for devotionals
+        devotionalVerses = allVerses.filter(v => v.text && v.text.length < 250);
+        
+        devotionalLoaded = true;
+        console.log(`Loaded ${devotionalVerses.length} devotional verses`);
+        return devotionalVerses;
+    } catch (err) {
+        console.error('Error loading devotional verses:', err);
+        return [];
+    }
+}
+
+// Get a random verse from the loaded verses
+function getRandomVerse() {
+    if (devotionalVerses.length === 0) return null;
+    const randomIndex = Math.floor(Math.random() * devotionalVerses.length);
+    return devotionalVerses[randomIndex];
+}
+
+// Typing delete animation - removes text character by character
+async function typingDeleteAnimation(element, speed = 30) {
+    const text = element.textContent;
+    const originalText = text;
+    
+    return new Promise((resolve) => {
+        let i = 0;
+        const deleteInterval = setInterval(() => {
+            if (i < text.length) {
+                element.textContent = text.substring(0, text.length - i - 1);
+                i++;
+            } else {
+                clearInterval(deleteInterval);
+                resolve();
+            }
+        }, speed);
+    });
+}
+
+// Initialize devotional on the home page
+async function initDevotional() {
+    const homeLeadElement = document.querySelector('.home-lead');
+    if (!homeLeadElement) return;
+    
+    // Load verses first
+    await loadDevotionalVerses();
+    
+    if (devotionalVerses.length === 0) {
+        console.warn('No devotional verses available');
+        return;
+    }
+    
+    // Wait a brief moment before starting the delete animation
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    // Perform typing delete animation
+    await typingDeleteAnimation(homeLeadElement, 30);
+    
+    // Create devotional container
+    const devotionalContainer = document.createElement('div');
+    devotionalContainer.className = 'devotional-container';
+    devotionalContainer.innerHTML = `
+        <div class="devotional-content">
+            <p class="devotional-verse" id="devotional-verse"></p>
+            <p class="devotional-reference" id="devotional-reference"></p>
+            <button class="devotional-btn" id="another-verse-btn">Another Verse</button>
+        </div>
+    `;
+    
+    // Replace the welcome text with devotional content
+    homeLeadElement.style.display = 'none';
+    homeLeadElement.parentNode.insertBefore(devotionalContainer, homeLeadElement.nextSibling);
+    
+    // Display a random verse
+    displayRandomVerse();
+    
+    // Setup button click handler
+    const anotherVerseBtn = document.getElementById('another-verse-btn');
+    if (anotherVerseBtn) {
+        anotherVerseBtn.addEventListener('click', displayRandomVerse);
+    }
+}
+
+// Display a random verse in the devotional container
+function displayRandomVerse() {
+    const verse = getRandomVerse();
+    if (!verse) return;
+    
+    const verseElement = document.getElementById('devotional-verse');
+    const referenceElement = document.getElementById('devotional-reference');
+    
+    if (verseElement && referenceElement) {
+        // Fade out effect
+        verseElement.style.opacity = '0';
+        referenceElement.style.opacity = '0';
+        
+        setTimeout(() => {
+            verseElement.textContent = `"${verse.text}"`;
+            referenceElement.textContent = `— ${verse.reference}`;
+            
+            // Fade in effect
+            verseElement.style.transition = 'opacity 0.3s ease';
+            referenceElement.style.transition = 'opacity 0.3s ease';
+            verseElement.style.opacity = '1';
+            referenceElement.style.opacity = '1';
+        }, 200);
+    }
 }
