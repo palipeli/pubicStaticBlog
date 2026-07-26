@@ -29,7 +29,7 @@
         tray.className = 'mobile-nav-tray';
         tray.innerHTML = `
             <div class="mobile-tray-header">
-                <span class="mobile-tray-title">Menu</span>
+                <span class="mobile-tray-title">Quick Navigation</span>
                 <button class="mobile-tray-close" id="mobile-tray-close" aria-label="Close Menu">
                     <svg viewBox="0 0 24 24" width="24" height="24">
                         <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -37,6 +37,14 @@
                 </button>
             </div>
             <div class="mobile-tray-content">
+                <!-- Blog Posts Section (always visible when on blogs page, expanded by default) -->
+                <div class="mobile-tray-section blog-only" id="mobile-blog-posts-section" style="display: none;">
+                    <h3 class="mobile-tray-section-title">All Posts</h3>
+                    <div class="mobile-post-list" id="mobile-post-list">
+                        <!-- Posts will be rendered here -->
+                    </div>
+                </div>
+                
                 <!-- Theme Section -->
                 <div class="mobile-tray-section">
                     <h3 class="mobile-tray-section-title">Theme</h3>
@@ -57,24 +65,6 @@
                     </div>
                     <div class="mobile-about-text">
                         <p>A Blender-inspired blogging platform built with pure HTML, CSS, and JavaScript. Minimalist, fast, and transparent.</p>
-                    </div>
-                </div>
-                
-                <!-- Blog Posts Section (only visible on blog page) -->
-                <div class="mobile-tray-section blog-only" id="mobile-blog-posts-section" style="display: none;">
-                    <h3 class="mobile-tray-section-title">All Posts</h3>
-                    <div class="mobile-post-list" id="mobile-post-list">
-                        <!-- Posts will be rendered here -->
-                    </div>
-                </div>
-                
-                <!-- Navigation Links -->
-                <div class="mobile-tray-section">
-                    <h3 class="mobile-tray-section-title">Navigation</h3>
-                    <div class="mobile-nav-links">
-                        <a href="#" class="mobile-nav-item" data-page="home">Home</a>
-                        <a href="#" class="mobile-nav-item" data-page="blogs">Blogs</a>
-                        <a href="#" class="mobile-nav-item" data-page="about">About</a>
                     </div>
                 </div>
             </div>
@@ -281,6 +271,10 @@
             if (activePage.id === 'blogs') {
                 blogSection.style.display = 'block';
                 renderMobilePostList();
+                // Auto-expand tray when visiting blogs page
+                if (!isTrayOpen) {
+                    openTray();
+                }
             } else {
                 blogSection.style.display = 'none';
             }

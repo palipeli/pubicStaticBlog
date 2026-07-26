@@ -29,7 +29,8 @@
             e.target.closest('.mobile-nav-item') ||
             e.target.closest('.mobile-post-item') ||
             e.target.closest('#mobile-nav-tray') ||
-            e.target.closest('#mobile-tray-overlay')) {
+            e.target.closest('#mobile-tray-overlay') ||
+            e.target.closest('.header-right')) {
             bypassWarning = true;
             setTimeout(() => { bypassWarning = false; }, 1000);
         }
@@ -223,7 +224,8 @@
                 e.target.closest('.mobile-nav-item') ||
                 e.target.closest('.mobile-post-item') ||
                 e.target.closest('#mobile-nav-tray') ||
-                e.target.closest('#mobile-tray-overlay')
+                e.target.closest('#mobile-tray-overlay') ||
+                e.target.closest('.header-right')
             )) return;
         }
 

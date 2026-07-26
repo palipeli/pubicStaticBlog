@@ -1030,9 +1030,10 @@ html {
         justify-content: center;
     }
     
-    /* Hide desktop nav items on mobile, show tray toggle instead */
+    /* Keep nav items visible on mobile but adjust spacing */
     .header-right .nav-item {
-        display: none;
+        padding: 6px 10px;
+        font-size: 12px;
     }
 }
 
