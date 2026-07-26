@@ -19,6 +19,7 @@
     --font-main: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
     --blur-overlay-brightness: 1.0;
     --dark-overlay-color: rgba(0, 0, 0, 0.0);
+    --theme-transition-duration: 0.4s;
 }
 
 [data-theme="dark"] {
@@ -35,6 +36,7 @@ body {
     color: var(--text-primary);
     min-height: 100vh;
     position: relative;
+    transition: background var(--theme-transition-duration) ease, color var(--theme-transition-duration) ease;
 }
 
 body::before {
@@ -47,6 +49,7 @@ body::before {
     background: url('background.webp') no-repeat center center;
     background-size: cover;
     filter: blur(10px) brightness(var(--blur-overlay-brightness));
+    transition: filter var(--theme-transition-duration) ease;
     z-index: -2;
 }
 
@@ -58,6 +61,7 @@ body::after {
     width: 100%;
     height: 100%;
     background: var(--dark-overlay-color);
+    transition: background var(--theme-transition-duration) ease;
     z-index: -1;
 }
 
@@ -87,6 +91,7 @@ body {
     z-index: 1000;
     border-bottom: 1px solid var(--border-color);
     animation: slideDown 0.5s ease-out;
+    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
 
 @keyframes slideDown {
@@ -148,7 +153,7 @@ body {
     text-decoration: none;
     padding: 8px 16px;
     border-radius: 3px;
-    transition: all 0.2s ease;
+    transition: all 0.2s ease, color var(--theme-transition-duration) ease, background var(--theme-transition-duration) ease;
     font-size: 13px;
     font-weight: 500;
     background: transparent;
@@ -207,6 +212,7 @@ body {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 40px;
+    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
 
 .home-title {
@@ -339,7 +345,7 @@ body {
     height: calc(100vh - var(--header-height));
     box-sizing: border-box;
     z-index: 999;
-    transition: width 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+    transition: width 0.3s ease, opacity 0.3s ease, transform 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
 
 /* Sidebar content wrapper */
@@ -555,7 +561,7 @@ body {
     border-radius: 6px;
     padding: 12px 15px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, color var(--theme-transition-duration) ease;
     color: var(--text-primary);
     font-size: 13px;
     font-weight: 500;
@@ -657,10 +663,12 @@ body {
     padding: 40px;
     line-height: 1.8;
     font-size: 14px;
+    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
 
 .blog-intro-view h1 {
-    font-size: 26px;
+    font-size: 18px;
+    font-weight: 400;
     margin-bottom: 15px;
     color: var(--text-primary);
 }
@@ -709,10 +717,12 @@ body {
     padding: 30px;
     line-height: 1.8;
     font-size: 14px;
+    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
 
 .blog-article h1 {
-    font-size: 26px;
+    font-size: 18px;
+    font-weight: 400;
     margin-bottom: 10px;
     color: var(--text-primary);
 }
