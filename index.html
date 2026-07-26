@@ -15,15 +15,20 @@
     <!-- Particles Background -->
     <div class="particles" id="particles"></div>
 
-    <!-- Header -->
-    <header class="header">
-        <div class="header-left">
-            <button class="blue-button" onclick="handleClickMe()"><span>kamikami.eu</span></button>
-        </div>
-        <div class="header-right">
-            <a href="#" class="nav-item active" data-page="home">Home</a>
-            <a href="#" class="nav-item" data-page="blogs">Blogs</a>
-            <a href="#" class="nav-item" data-page="about">About</a>
+    <!-- Header (Minecraft style) -->
+    <header>
+        <div class="nav-container">
+            <div class="logo">Michelle's<span style="color:#fff;"> SHIT AUDIO</span></div>
+            
+            <button class="menu-toggle" onclick="toggleMenu()">
+                [ 🖕🏻 ]
+            </button>
+            
+            <nav class="nav-links" id="navLinks">
+                <a href="#" class="mc-btn nav-item active" data-page="home">Home</a>
+                <a href="#" class="mc-btn nav-item" data-page="blogs">Blogs</a>
+                <a href="#" class="mc-btn nav-item" data-page="about">About</a>
+            </nav>
         </div>
     </header>
 
@@ -33,55 +38,61 @@
         <main class="content-area">
             <!-- Home Page -->
             <section id="home" class="page-section active">
-                <div class="home-hero" id="home-hero-content">
-                    <p class="home-lead">WELCOME TO MY SUPER-CUTE-BUT-SHITTY WEBSITE! TAKE VICODIN IF YOU CAME FROM WSFTEAM.XYZ</p>
-                    <img src="logo.webp" alt="Blog Logo" style="display: block; margin: 20px auto; width: 70%; max-width: 560px;">
-                    
-                    <!-- Blog Buttons Section (kamikami.eu style) -->
-                    <div class="blog-buttons-container" id="blog-buttons-container" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 25px 0;">
-                        <!-- Buttons will be dynamically generated from posts.json -->
-                    </div>
-                 
-                    <div class="home-content">
-                        <p>I'm running a website where I post about shitty and janky technology that I like and personally use. Especially in audio, networking, and Linux technologies.</p>
-                        <p>Michelle's DNS is a .mobileconfig profile made to provision Apple iOS/iPadOS devices to allow sideloading using revoked certificate through privacy-preserving DNS which is compliant with WSFteam.xyz (partner) documentations and practice.</p>
-                        <p>If you want to send me cat pictures or other interesting files, please click the button above:</p>
-                    </div>
-                </div>
+                <main>
+                    <section class="hero mc-border">
+                        <p class="home-lead">WELCOME TO MY SUPER-CUTE-BUT-SHITTY WEBSITE! TAKE VICODIN IF YOU CAME FROM WSFTEAM.XYZ</p>
+                        <img src="logo.webp" alt="Blog Logo" style="display: block; margin: 0 auto 15px; max-width: 100%; height: auto; width: 500px;">
+                        
+                        <!-- Blog Buttons Section (kamikami.eu style) -->
+                        <div class="blog-buttons-container" id="blog-buttons-container" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 25px 0;">
+                            <!-- Buttons will be dynamically generated from posts.json -->
+                        </div>
+                     
+                        <div class="home-content">
+                            <p>I'm running a website where I post about shitty and janky technology that I like and personally use. Especially in audio, networking, and Linux technologies.</p>
+                            <p>Michelle's DNS is a .mobileconfig profile made to provision Apple iOS/iPadOS devices to allow sideloading using revoked certificate through privacy-preserving DNS which is compliant with WSFteam.xyz (partner) documentations and practice.</p>
+                            <p>If you want to send me cat pictures or other interesting files, please click the button above:</p>
+                        </div>
+                    </section>
+                </main>
             </section>
 
             <!-- Blogs Page -->
             <section id="blogs" class="page-section">
-                <div class="blog-layout-container">
-                    <!-- Main Content Area (Left) -->
-                    <div class="blog-main-content" id="blog-main-content">
-                        <!-- Blog Introduction (Default View) -->
-                        <div class="blog-intro-view" id="blog-intro-view">
-                            <article class="blog-article">
-                                <h1>New Updated Look</h1>
-                                <p class="blog-meta"><span class="blog-date">Published: Today</span></p>
-                                <div class="blog-text" id="blog-intro-content">
-                                    <!-- Content will be loaded from blog/new-updated-look.md via app.js -->
-                                    <p>Loading...</p>
-                                </div>
-                            </article>
-                        </div>
-                        
-                        <!-- Single Post View (Hidden by default) -->
-                        <div class="blog-post-view" id="blog-post-view" style="display: none;">
-                            <button class="back-to-intro-btn" onclick="showBlogIntro()">← Back to Blog Home</button>
-                            <article class="blog-article" id="blog-article-content">
-                                <!-- Markdown content will be rendered here -->
-                            </article>
+                <main>
+                    <div class="blog-layout-container">
+                        <!-- Main Content Area (Left) -->
+                        <div class="blog-main-content" id="blog-main-content">
+                            <!-- Blog Introduction (Default View) -->
+                            <div class="blog-intro-view" id="blog-intro-view">
+                                <article class="blog-article mc-border">
+                                    <h1>New Updated Look</h1>
+                                    <p class="blog-meta"><span class="blog-date">Published: Today</span></p>
+                                    <div class="blog-text" id="blog-intro-content">
+                                        <!-- Content will be loaded from blog/new-updated-look.md via app.js -->
+                                        <p>Loading...</p>
+                                    </div>
+                                </article>
+                            </div>
+                            
+                            <!-- Single Post View (Hidden by default) -->
+                            <div class="blog-post-view" id="blog-post-view" style="display: none;">
+                                <button class="back-to-intro-btn" onclick="showBlogIntro()">← Back to Blog Home</button>
+                                <article class="blog-article mc-border" id="blog-article-content">
+                                    <!-- Markdown content will be rendered here -->
+                                </article>
+                            </div>
                         </div>
                     </div>
-                </div>
+                    
+                    <h2 style="color:var(--pink-pastel); text-shadow: 2px 2px 0 #000; margin-top: 40px;">> Latest Entries_</h2>
+                </main>
             </section>
 
             <!-- About Page -->
             <section id="about" class="page-section">
-                <div class="about-layout-container">
-                    <div class="about-hero">
+                <main>
+                    <section class="hero mc-border">
                         <img src="favicon-circle.webp" alt="Michelle" class="profile-img">
                         
                         <div class="social-links">
@@ -102,8 +113,8 @@
                         <div style="margin-top:20px;">
                             <span style="font-size:3rem; animation: float 2s infinite;">💖</span>
                         </div>
-                    </div>
-                </div>
+                    </section>
+                </main>
             </section>
         </main>
 
@@ -140,6 +151,14 @@
     <script src="warning.js"></script>
     <script src="app.js"></script>
     <script src="mobile-tray.js"></script>
+    
+    <!-- Menu toggle function for mobile -->
+    <script>
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+    </script>
     
     <!-- Footer -->
     <footer>

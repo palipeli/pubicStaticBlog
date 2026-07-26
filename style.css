@@ -1,4 +1,4 @@
-/* style.css - Adwaita-Style Blog Platform */
+/* style.css - Minecraft Style Blog Platform (Michelle's aesthetic) */
 
 * {
     margin: 0;
@@ -7,62 +7,92 @@
 }
 
 :root {
-    --bg-dark: #f6f5f4;
-    --bg-panel: rgba(255, 255, 255, 0.95);
-    --bg-header: rgba(246, 245, 244, 0.95);
-    --accent-pink: #ff45fc;
-    --accent-pink-hover: #e031e0;
-    --text-primary: #2e3436;
-    --text-secondary: #5e5e5e;
-    --border-color: rgba(0, 0, 0, 0.1);
-    --header-height: 40px;
-    --font-main: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-    --blur-overlay-brightness: 1.0;
-    --dark-overlay-color: rgba(0, 0, 0, 0.0);
-    --theme-transition-duration: 0.4s;
+    /* Default Light Mode */
+    --mc-bg-dark: #ffffff;
+    --mc-stone: #fff0f5;
+    --mc-shadow: #dddddd;
+    
+    --text-main: #222222;
+    --text-muted: #666666;
+    
+    --pink-neon: #ff1493;
+    --pink-pastel: #ff69b4;
+    --pink-deep: #c71585;
+    --pink-glow: rgba(255, 105, 180, 0.3);
+    
+    --border-color: #ff69b4;
+    --btn-border: #888888;
+    --logo-color: #ff1493;
+    --logo-shadow: #ffd1dc;
+    --bg-pattern: #f0f0f0;
+    
+    --border-width: 4px;
+    --container-width: 1000px;
+    --header-height: 50px;
+    
+    --font-main: 'VT323', monospace;
+    --theme-transition-duration: 0.3s;
 }
 
+/* Dark mode via data attribute (for manual theme switching) */
 [data-theme="dark"] {
-    --blur-overlay-brightness: 0.6;
-    --dark-overlay-color: rgba(0, 0, 0, 0.4);
+    --mc-bg-dark: #121212;
+    --mc-stone: #3a3a3a;
+    --mc-shadow: #1e1e1e;
+    
+    --text-main: #ffffff;
+    --text-muted: #cccccc;
+    
+    --pink-neon: #ff6ec7;
+    --pink-pastel: #ff92df;
+    --pink-deep: #b04286;
+    --pink-glow: rgba(255, 110, 199, 0.5);
+    
+    --border-color: #ff92df;
+    --btn-border: #000000;
+    --logo-color: #ff6ec7;
+    --logo-shadow: #000000;
+    --bg-pattern: #1a1a1a;
 }
 
 body {
     font-family: var(--font-main);
-    background: linear-gradient(135deg, rgba(246, 245, 244, 0.85) 0%, rgba(255, 255, 255, 0.85) 100%), url('background.webp');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    color: var(--text-primary);
-    min-height: 100vh;
+    font-size: 1.3rem;
+    background-color: transparent;
+    color: var(--text-main);
     position: relative;
-    transition: background var(--theme-transition-duration) ease, color var(--theme-transition-duration) ease;
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: color var(--theme-transition-duration) ease;
 }
 
 body::before {
-    content: '';
+    content: "";
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('background.webp') no-repeat center center;
-    background-size: cover;
-    filter: blur(10px) brightness(var(--blur-overlay-brightness));
-    transition: filter var(--theme-transition-duration) ease;
     z-index: -2;
+    background-image: url('background.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: blur(10px);
+    transform: scale(1.05);
 }
 
 body::after {
-    content: '';
+    content: "";
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--dark-overlay-color);
-    transition: background var(--theme-transition-duration) ease;
     z-index: -1;
+    background-color: var(--mc-bg-dark);
+    opacity: 0.85;
+    transition: background-color var(--theme-transition-duration) ease;
 }
 
 html {
@@ -74,108 +104,163 @@ body {
     overflow-y: auto;
 }
 
-/* Header */
-.header {
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* --- HEADER (Minecraft style, compact like original) --- */
+header {
+    background: color-mix(in srgb, var(--mc-bg-dark) 90%, transparent);
+    border-bottom: var(--border-width) solid var(--pink-deep);
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
+    z-index: 100;
+    padding: 0.5rem 0;
+    box-shadow: 0 4px 15px var(--pink-glow);
+    backdrop-filter: blur(5px);
     height: var(--header-height);
-    background: var(--bg-header);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 20px;
-    z-index: 1000;
-    border-bottom: 1px solid var(--border-color);
-    animation: slideDown 0.5s ease-out;
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
 
-@keyframes slideDown {
-    from {
-        transform: translateY(-100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-.header-left {
+.nav-container {
+    max-width: var(--container-width);
+    margin: 0 auto;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 15px;
+    padding: 0 15px;
+    height: 100%;
 }
 
-.blue-button {
-    background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%);
-    color: white;
-    border: none;
-    padding: 3px 8px;
-    margin: 0 10px;
-    border-radius: 4px;
-    font-size: 10px;
-    font-weight: 600;
+.logo {
+    font-size: 1.8rem;
+    color: var(--logo-color);
+    text-shadow: 2px 2px 0 var(--logo-shadow);
+    letter-spacing: 1px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.logo span {
+    color: var(--text-main) !important;
+}
+
+/* Compact header buttons with bigger margins */
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+.mc-btn {
+    display: inline-block;
+    padding: 6px 15px;
+    background: var(--mc-stone);
+    color: var(--pink-pastel);
+    text-transform: uppercase;
+    font-size: 1.1rem;
+    font-family: var(--font-main);
+    
+    /* 3D Border Trick - Minecraft style */
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,0.2),
+        inset -2px -2px 0 rgba(0,0,0,0.2),
+        2px 2px 0 var(--btn-border);
+    border: 2px solid var(--btn-border);
+    
+    transition: all 0.1s;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(255, 20, 147, 0.4);
 }
 
-.blue-button span {
-    font-family: 'VT323', monospace;
-    font-style: italic;
-    text-transform: lowercase;
-    font-size: 1.4rem;
+@media (prefers-color-scheme: dark) {
+    .mc-btn { color: var(--pink-pastel); }
 }
 
-.blue-button:hover {
-    background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+@media (prefers-color-scheme: light) {
+    .mc-btn { color: var(--pink-deep); font-weight: bold; }
+}
+
+.mc-btn:hover {
+    background: var(--pink-deep);
+    color: #fff;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 20, 147, 0.6);
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,0.2),
+        inset -2px -2px 0 rgba(0,0,0,0.2),
+        2px 4px 0 var(--btn-border),
+        0 0 15px var(--pink-neon);
 }
 
-.blue-button:active {
-    transform: translateY(0);
+.mc-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 0 0 var(--btn-border);
 }
 
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.nav-item {
-    color: var(--text-secondary);
-    text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 3px;
-    transition: all 0.2s ease, color var(--theme-transition-duration) ease, background var(--theme-transition-duration) ease;
-    font-size: 13px;
-    font-weight: 500;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-}
-
-.nav-item:hover {
-    color: var(--text-primary);
-    background: rgba(255, 255, 255, 0.05);
-}
-
+/* Active nav state */
 .nav-item.active {
-    color: var(--accent-pink);
-    background: rgba(255, 69, 252, 0.15);
+    background: var(--pink-neon);
+    color: white;
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,0.2),
+        inset -2px -2px 0 rgba(0,0,0,0.2),
+        2px 2px 0 var(--btn-border),
+        0 0 15px var(--pink-neon);
 }
 
-/* Main Content */
+/* Menu toggle for mobile */
+.menu-toggle {
+    display: none;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    color: var(--pink-neon);
+    cursor: pointer;
+    font-family: var(--font-main);
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block;
+    }
+    
+    .nav-links {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        margin-top: 10px;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--mc-bg-dark);
+        border: 2px solid var(--pink-deep);
+        padding: 15px;
+        box-shadow: 0 4px 15px var(--pink-glow);
+    }
+    
+    .nav-links.active {
+        display: flex;
+    }
+    
+    .nav-links .mc-btn {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 8px;
+    }
+}
+
+/* --- MAIN CONTENT AREA --- */
+main {
+    max-width: var(--container-width);
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
 .main-container {
     display: block;
     margin-top: var(--header-height);
-    height: calc(100vh - var(--header-height));
+    min-height: calc(100vh - var(--header-height) - 100px);
     position: relative;
     margin-right: 280px;
     transition: margin-right 0.3s ease;
@@ -186,10 +271,51 @@ body {
 }
 
 .content-area {
-    padding: 30px;
+    padding: 20px;
     overflow-y: auto;
     height: 100%;
     width: 100%;
+}
+
+/* --- UTILS - Minecraft Border Style --- */
+.mc-border {
+    border: var(--border-width) solid;
+    border-color:
+        var(--pink-pastel)    /* Top */
+        var(--pink-deep)      /* Right */
+        var(--pink-deep)      /* Bottom */
+        var(--pink-pastel);   /* Left */
+    background-color: var(--mc-stone);
+    box-shadow: 4px 4px 0 var(--mc-shadow);
+}
+
+/* --- HERO SECTION (Minecraft style) --- */
+.hero {
+    text-align: center;
+    margin-bottom: 60px;
+    padding: 40px;
+    background: color-mix(in srgb, var(--mc-bg-dark) 60%, transparent);
+    border: var(--border-width) dashed var(--pink-deep);
+}
+
+.hero-mini {
+    text-align: left;
+    margin-bottom: 40px;
+    padding: 20px;
+    border-bottom: var(--border-width) dashed var(--pink-deep);
+}
+
+h1 {
+    font-size: 3rem;
+    margin: 0;
+    color: var(--pink-pastel);
+    text-shadow: 4px 4px 0 var(--mc-shadow);
+}
+
+p.subtitle {
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    margin-top: 10px;
 }
 
 /* Home Hero Section */
@@ -199,39 +325,11 @@ body {
     text-align: center;
 }
 
-/* Home Layout Container - Same rectangle styling as blog and about pages */
-.home-layout-container {
-    display: block;
-    margin-top: 20px;
-}
-
-.home-layout-container .home-hero {
-    background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 40px;
-    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
-}
-
-.home-title {
-    font-size: 42px;
-    font-weight: 700;
-    margin-bottom: 15px;
-    background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: fadeIn 0.6s ease-out;
-}
-
 .home-lead {
-    font-size: 18px;
-    color: var(--text-secondary);
-    margin-bottom: 40px;
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    margin-bottom: 30px;
     line-height: 1.6;
-    animation: fadeIn 0.6s ease-out 0.1s both;
 }
 
 .hero-image-container {
@@ -616,25 +714,43 @@ body {
     gap: 25px;
 }
 
-/* Back to List Button */
+/* Back to List Button (Minecraft style) */
 .back-to-list-btn,
 .back-to-intro-btn {
-    background: rgba(71, 114, 179, 0.3);
-    border: 1px solid var(--accent-pink);
-    color: var(--text-primary);
-    padding: 10px 20px;
-    border-radius: 6px;
+    background: var(--mc-stone);
+    color: var(--pink-pastel);
+    padding: 8px 18px;
+    font-family: var(--font-main);
+    font-size: 1.1rem;
+    text-transform: uppercase;
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
     margin-bottom: 20px;
-    transition: all 0.3s ease;
+    
+    /* Minecraft 3D border style */
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,0.2),
+        inset -2px -2px 0 rgba(0,0,0,0.2),
+        2px 2px 0 var(--btn-border);
+    border: 2px solid var(--btn-border);
+    
+    transition: all 0.1s;
+}
+
+@media (prefers-color-scheme: light) {
+    .back-to-list-btn,
+    .back-to-intro-btn { color: var(--pink-deep); font-weight: bold; }
 }
 
 .back-to-list-btn:hover,
 .back-to-intro-btn:hover {
-    background: rgba(71, 114, 179, 0.5);
-    transform: translateX(-5px);
+    background: var(--pink-deep);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,0.2),
+        inset -2px -2px 0 rgba(0,0,0,0.2),
+        2px 4px 0 var(--btn-border),
+        0 0 15px var(--pink-neon);
 }
 
 /* Blog Introduction View */
@@ -648,27 +764,21 @@ body {
     display: block;
 }
 
-.blog-post-view .blog-article {
-    background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 40px;
-    line-height: 1.8;
-    font-size: 14px;
-}
-
+/* Blog article styles - Minecraft style with mc-border */
+.blog-post-view .blog-article,
 .blog-intro-view .blog-article {
-    background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 40px;
+    background: var(--mc-stone);
+    border: var(--border-width) solid;
+    border-color:
+        var(--pink-pastel)    /* Top */
+        var(--pink-deep)      /* Right */
+        var(--pink-deep)      /* Bottom */
+        var(--pink-pastel);   /* Left */
+    box-shadow: 4px 4px 0 var(--mc-shadow);
+    padding: 30px;
     line-height: 1.8;
-    font-size: 14px;
-    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    font-size: 1.2rem;
+    color: var(--text-main);
 }
 
 .blog-intro-view h1 {
@@ -713,48 +823,53 @@ body {
 }
 
 /* Blog Article */
+/* Blog article base styling (Minecraft style) */
 .blog-article {
-    background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    background: var(--mc-stone);
+    border: var(--border-width) solid;
+    border-color:
+        var(--pink-pastel)    /* Top */
+        var(--pink-deep)      /* Right */
+        var(--pink-deep)      /* Bottom */
+        var(--pink-pastel);   /* Left */
+    box-shadow: 4px 4px 0 var(--mc-shadow);
     padding: 30px;
     line-height: 1.8;
-    font-size: 14px;
-    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    font-size: 1.2rem;
+    color: var(--text-main);
 }
 
 .blog-article h1 {
-    font-size: 18px;
-    font-weight: 400;
-    margin-bottom: 10px;
-    color: var(--text-primary);
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: var(--pink-pastel);
+    text-shadow: 2px 2px 0 var(--mc-shadow);
 }
 
 .blog-article h2 {
-    font-size: 20px;
-    margin: 30px 0 15px;
-    color: var(--text-primary);
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 10px;
+    font-size: 1.6rem;
+    margin: 25px 0 12px;
+    color: var(--pink-pastel);
+    text-shadow: 2px 2px 0 var(--mc-shadow);
+    border-bottom: 2px solid var(--pink-deep);
+    padding-bottom: 8px;
 }
 
 .blog-article h3 {
-    font-size: 17px;
-    margin: 25px 0 12px;
-    color: var(--text-primary);
+    font-size: 1.4rem;
+    margin: 20px 0 10px;
+    color: var(--text-main);
 }
 
 .blog-article p {
     margin-bottom: 15px;
-    color: var(--text-secondary);
-    font-size: 14px;
+    color: var(--text-muted);
+    font-size: 1.2rem;
 }
 
 .blog-article ul, .blog-article ol {
     margin: 15px 0 15px 25px;
-    color: var(--text-secondary);
+    color: var(--text-muted);
 }
 
 .blog-article li {
@@ -762,21 +877,22 @@ body {
 }
 
 .blog-article code {
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--mc-shadow);
     padding: 2px 6px;
     border-radius: 3px;
-    font-family: 'Consolas', 'Monaco', monospace;
-    font-size: 14px;
-    color: #e0e0e0;
+    font-family: var(--font-main);
+    font-size: 1.1rem;
+    color: var(--pink-neon);
 }
 
 .blog-article pre {
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
+    background: var(--mc-shadow);
+    border: 2px solid var(--btn-border);
+    border-radius: 4px;
     padding: 15px;
     overflow-x: auto;
     margin: 20px 0;
+    box-shadow: 2px 2px 0 var(--mc-shadow);
 }
 
 .blog-article pre code {
@@ -976,76 +1092,65 @@ body {
     margin-bottom: 30px;
 }
 
-/* About Hero Section */
-.about-hero {
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
-    background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 40px;
-}
-
+/* --- PROFILE IMG & SOCIAL LINKS (Minecraft style) --- */
 .profile-img {
-    width: 150px;
-    height: 150px;
+    width: 160px;
+    height: 160px;
     border-radius: 50%;
     object-fit: cover;
-    margin-bottom: 20px;
-    border: 3px solid var(--accent-pink);
-    box-shadow: 0 4px 15px rgba(53, 132, 228, 0.3);
+    border: 3px solid var(--pink-pastel);
+    box-shadow: 2px 2px 0 var(--mc-shadow);
+    display: block;
+    margin: 0 auto 15px auto;
 }
 
 .social-links {
     display: flex;
     justify-content: center;
     gap: 15px;
-    margin-bottom: 30px;
+    margin: 20px 0;
     flex-wrap: wrap;
 }
 
-.mc-btn {
+.social-links .mc-btn {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 20px;
-    border-radius: 6px;
+    padding: 8px 15px;
+    font-size: 1.1rem;
     text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
 }
 
-.mc-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+.social-links .mc-btn:hover i {
+    transform: scale(1.2);
+    transition: transform 0.2s;
+}
+
+/* About Hero Section */
+.about-hero {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
 }
 
 .about-hero h1 {
-    font-size: 36px;
-    font-weight: 700;
-    margin-bottom: 15px;
-    background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-size: 3rem;
+    margin: 0;
+    color: var(--pink-pastel);
+    text-shadow: 4px 4px 0 var(--mc-shadow);
 }
 
 .about-hero .subtitle {
-    font-size: 16px;
-    line-height: 1.8;
-    color: var(--text-secondary);
-    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    margin-top: 10px;
+    line-height: 1.6;
 }
 
 @keyframes float {
-    0%, 100% { transform: translateY(0); }
+    0% { transform: translateY(0px); }
     50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
 }
 
 .about-content {
@@ -1176,88 +1281,123 @@ body {
     100% { transform: scale(1); }
 }
 
-/* Blog Buttons Container (kamikami.eu style) */
+/* Blog Buttons Container (Minecraft style) */
 .blog-buttons-container {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 15px;
     flex-wrap: wrap;
-    margin: 18px 0;
+    margin: 20px 0;
 }
 
-/* Blog Button Style (inspired by kamikami.eu mc-btn) */
+/* Blog Button Style (Minecraft mc-btn style) */
 .blog-btn {
-    font-size: 0.7rem; /* Reduced from 0.8rem */
-    padding: 8px 15px; /* Reduced from 15px 25px */
-    background: linear-gradient(135deg, var(--accent-pink) 0%, #3a5a8f 100%);
-    color: white;
+    font-size: 1rem;
+    padding: 8px 18px;
+    background: var(--mc-stone);
+    color: var(--pink-pastel);
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     text-decoration: none;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(71, 114, 179, 0.4);
-    border: none;
+    font-family: var(--font-main);
+    text-transform: uppercase;
+    
+    /* Minecraft 3D border style */
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,0.2),
+        inset -2px -2px 0 rgba(0,0,0,0.2),
+        2px 2px 0 var(--btn-border);
+    border: 2px solid var(--btn-border);
+    
+    transition: all 0.1s;
     cursor: pointer;
-    font-weight: 600;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+@media (prefers-color-scheme: light) {
+    .blog-btn { color: var(--pink-deep); font-weight: bold; }
 }
 
 .blog-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(71, 114, 179, 0.6);
-    filter: brightness(1.1);
+    background: var(--pink-deep);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,0.2),
+        inset -2px -2px 0 rgba(0,0,0,0.2),
+        2px 4px 0 var(--btn-border),
+        0 0 15px var(--pink-neon);
 }
 
 .blog-btn:active {
-    transform: translateY(-1px);
+    transform: translateY(2px);
+    box-shadow: 0 0 0 var(--btn-border);
 }
 
 .blog-btn i {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 }
 
 /* Category-specific button colors */
 .blog-btn.category-tutorial {
     background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+    color: white;
 }
 .blog-btn.category-tutorial:hover {
-    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.6);
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,0.2),
+        inset -2px -2px 0 rgba(0,0,0,0.2),
+        2px 4px 0 #000,
+        0 0 15px rgba(40, 167, 69, 0.6);
 }
 
 .blog-btn.category-blog {
     background: linear-gradient(135deg, #3584e4 0%, #3a5a8f 100%);
-    box-shadow: 0 4px 15px rgba(53, 132, 228, 0.4);
+    color: white;
 }
 .blog-btn.category-blog:hover {
-    box-shadow: 0 6px 20px rgba(53, 132, 228, 0.6);
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,0.2),
+        inset -2px -2px 0 rgba(0,0,0,0.2),
+        2px 4px 0 #000,
+        0 0 15px rgba(53, 132, 228, 0.6);
 }
 
 .blog-btn.category-technology {
     background: linear-gradient(135deg, #e83e8c 0%, #c7254e 100%);
-    box-shadow: 0 4px 15px rgba(232, 62, 140, 0.4);
+    color: white;
 }
 .blog-btn.category-technology:hover {
-    box-shadow: 0 6px 20px rgba(232, 62, 140, 0.6);
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,0.2),
+        inset -2px -2px 0 rgba(0,0,0,0.2),
+        2px 4px 0 #000,
+        0 0 15px rgba(232, 62, 140, 0.6);
 }
 
 .blog-btn.category-legal {
     background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
+    color: white;
 }
 .blog-btn.category-legal:hover {
-    box-shadow: 0 6px 20px rgba(108, 117, 125, 0.6);
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,0.2),
+        inset -2px -2px 0 rgba(0,0,0,0.2),
+        2px 4px 0 #000,
+        0 0 15px rgba(108, 117, 125, 0.6);
 }
 
 /* Fun category (cat pictures button) */
 .blog-btn.category-fun {
     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+    color: white;
 }
 .blog-btn.category-fun:hover {
-    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,0.2),
+        inset -2px -2px 0 rgba(0,0,0,0.2),
+        2px 4px 0 #000,
+        0 0 15px rgba(255, 107, 107, 0.6);
 }
 
 @keyframes rippleEffect {
@@ -1503,21 +1643,19 @@ body.mobile-tray-open {
     overflow: hidden;
 }
 
-/* Footer Styles */
+/* --- FOOTER (Minecraft style) --- */
 footer {
-    background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-top: 1px solid var(--border-color);
-    padding: 30px 20px;
+    margin-top: 80px;
+    background: var(--mc-shadow);
+    padding: 40px 20px;
     text-align: center;
-    margin-top: 40px;
+    border-top: 4px solid var(--pink-neon);
+    color: var(--pink-pastel);
 }
 
 footer p {
     margin: 8px 0;
-    color: var(--text-secondary);
-    font-size: 14px;
+    font-size: 1.2rem;
 }
 
 /* Loading Spinner Animation for Lazy Loading */
