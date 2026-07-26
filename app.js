@@ -714,14 +714,10 @@ function setupNavigation() {
                 }
             }
             
-            // Update mobile tray blog posts visibility
+            // Update mobile tray blog posts visibility (always visible now)
             const mobileBlogSection = document.getElementById('mobile-blog-posts-section');
-            if (mobileBlogSection) {
-                if (page === 'blogs') {
-                    mobileBlogSection.classList.add('blog-visible');
-                } else {
-                    mobileBlogSection.classList.remove('blog-visible');
-                }
+            if (mobileBlogSection && typeof window.updateBlogPostsVisibility === 'function') {
+                window.updateBlogPostsVisibility();
             }
             
             // Scroll to top when changing pages

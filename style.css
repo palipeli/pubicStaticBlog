@@ -1140,11 +1140,7 @@ body.mobile-tray-open {
     font-size: 1.1rem;
 }
 
-/* Blog posts section in mobile tray - always visible when on blogs page */
+/* Blog posts selector in mobile tray - always visible below nav buttons */
 #mobile-blog-posts-section {
-    display: none;
-}
-
-#mobile-blog-posts-section.blog-visible {
     display: block;
 }

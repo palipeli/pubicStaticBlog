@@ -39,7 +39,7 @@
                     </div>
                 </div>
                 
-                <!-- Blog Posts Section (visible only on blogs page) -->
+                <!-- Blog Posts Selector Section (always visible below nav buttons) -->
                 <div class="mobile-tray-section" id="mobile-blog-posts-section">
                     <h3 class="mobile-tray-section-title">All Posts</h3>
                     <div class="mobile-post-list" id="mobile-post-list">
@@ -264,10 +264,13 @@
         
         if (blogSection && activePage) {
             if (activePage.id === 'blogs') {
-                blogSection.classList.add('blog-visible');
                 renderMobilePostList();
             } else {
-                blogSection.classList.remove('blog-visible');
+                // Still render but show placeholder when not on blogs page
+                const container = document.getElementById('mobile-post-list');
+                if (container) {
+                    container.innerHTML = '<p style="color: var(--text-secondary); font-size: 13px;">Navigate to Blogs to view posts</p>';
+                }
             }
         }
     }
