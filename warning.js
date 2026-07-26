@@ -30,7 +30,8 @@
             e.target.closest('.mobile-post-item') ||
             e.target.closest('#mobile-nav-tray') ||
             e.target.closest('#mobile-tray-overlay') ||
-            e.target.closest('.header-right')) {
+            e.target.closest('.header-right') ||
+            e.target.closest('.back-to-intro-btn')) {
             bypassWarning = true;
             setTimeout(() => { bypassWarning = false; }, 1000);
         }
@@ -225,7 +226,8 @@
                 e.target.closest('.mobile-post-item') ||
                 e.target.closest('#mobile-nav-tray') ||
                 e.target.closest('#mobile-tray-overlay') ||
-                e.target.closest('.header-right')
+                e.target.closest('.header-right') ||
+                e.target.closest('.back-to-intro-btn')
             )) return;
         }
 
