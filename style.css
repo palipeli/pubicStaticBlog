@@ -1187,7 +1187,7 @@ body {
 
 /* Blog Button Style (inspired by kamikami.eu mc-btn) */
 .blog-btn {
-    font-size: 1.1rem;
+    font-size: 0.8rem;
     padding: 15px 25px;
     background: linear-gradient(135deg, var(--accent-pink) 0%, #3a5a8f 100%);
     color: white;
