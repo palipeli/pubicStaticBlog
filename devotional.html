@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Devotional - kamikami.eu</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="icon" type="image/webp" href="favicon-circle.webp">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    
+    <style>
+        .devotional-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-theme .devotional-container {
+            background: rgba(30, 30, 30, 0.95);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .typing-delete-text {
+            font-family: 'VT323', monospace;
+            font-size: 1.5rem;
+            color: #666;
+            min-height: 2em;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .dark-theme .typing-delete-text {
+            color: #999;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            background-color: #333;
+            animation: blink 1s infinite;
+        }
+
+        .dark-theme .cursor {
+            background-color: #fff;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .verse-display {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+
+        .verse-display.visible {
+            display: block;
+            opacity: 1;
+        }
+
+        .verse-reference {
+            font-family: 'VT323', monospace;
+            font-size: 2rem;
+            color: #e74c3c;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .dark-theme .verse-reference {
+            color: #ff6b6b;
+        }
+
+        .verse-text {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            color: #333;
+            text-align: justify;
+        }
+
+        .dark-theme .verse-text {
+            color: #eee;
+        }
+
+        .refresh-btn {
+            display: block;
+            margin: 30px auto;
+            padding: 15px 30px;
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .back-home-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-family: 'VT323', monospace;
+            font-size: 1rem;
+            color: #667eea;
+            text-decoration: none;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+
+        .back-home-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .loading-indicator {
+            text-align: center;
+            padding: 40px;
+            font-family: 'VT323', monospace;
+            font-size: 1.5rem;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <!-- Particles Background -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <a href="index.html" class="blue-button"><span>kamikami.eu</span></a>
+        </div>
+        <div class="header-right">
+            <a href="index.html" class="nav-item">Home</a>
+            <a href="index.html#blogs" class="nav-item">Blogs</a>
+            <a href="index.html#about" class="nav-item">About</a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Content Area -->
+        <main class="content-area">
+            <section class="page-section active">
+                <div class="devotional-container">
+                    <h1 style="text-align: center; font-family: 'VT323', monospace; font-size: 2.5rem; margin-bottom: 30px;">
+                        📖 Daily Devotional
+                    </h1>
+                    
+                    <!-- Typing Delete Animation Area -->
+                    <div class="typing-delete-text" id="typing-text">
+                        <span id="delete-target">WELCOME TO MY SUPER-CUTE-BUT-SHITTY WEBSITE! TAKE VICODIN IF YOU CAME FROM WSFTEAM.XYZ</span><span class="cursor">&nbsp;</span>
+                    </div>
+                    
+                    <!-- Loading Indicator -->
+                    <div class="loading-indicator" id="loading" style="display: none;">
+                        <i class="fas fa-spinner fa-spin"></i> Loading Scripture...
+                    </div>
+                    
+                    <!-- Verse Display Area -->
+                    <div class="verse-display" id="verse-display">
+                        <div class="verse-reference" id="verse-reference"></div>
+                        <div class="verse-text" id="verse-text"></div>
+                        
+                        <button class="refresh-btn" onclick="loadRandomVerse()">
+                            <i class="fas fa-sync-alt"></i> Another Verse
+                        </button>
+                        
+                        <div style="text-align: center;">
+                            <a href="index.html" class="back-home-btn">
+                                <i class="fas fa-arrow-left"></i> Back to Home
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>Nothing to see down here</p>
+        <p style="font-size:0.9rem; color:#666;">Idjen Boulevard No.48, Kota Malang 65112, Indonesia.</p>
+        <p style="font-size:0.9rem; color:#666;">sel@kamikami.eu.</p>
+        <p style="font-size:0.9rem; color:#666;">Copyright © Michelle, 2026</p>
+    </footer>
+
+    <script>
+        // Preloaded verses data (will be loaded from JSON)
+        let versesData = null;
+
+        // Load verses from JSON file
+        async function loadVersesData() {
+            try {
+                const response = await fetch('blog/nt_verses.json');
+                versesData = await response.json();
+                return true;
+            } catch (error) {
+                console.error('Error loading verses:', error);
+                return false;
+            }
+        }
+
+        // Get random short verse (under 250 characters for devotional reading)
+        function getRandomShortVerse() {
+            if (!versesData || versesData.length === 0) return null;
+            
+            // Filter for shorter verses suitable for devotionals
+            const shortVerses = versesData.filter(v => v.text.length < 250 && v.text.length > 20);
+            
+            if (shortVerses.length === 0) {
+                // Fallback to any verse if no short ones found
+                return versesData[Math.floor(Math.random() * versesData.length)];
+            }
+            
+            return shortVerses[Math.floor(Math.random() * shortVerses.length)];
+        }
+
+        // Typing delete animation
+        function animateDeleteAndReplace(textToDelete, verse) {
+            const targetElement = document.getElementById('delete-target');
+            const typingContainer = document.getElementById('typing-text');
+            const verseDisplay = document.getElementById('verse-display');
+            const verseReference = document.getElementById('verse-reference');
+            const verseText = document.getElementById('verse-text');
+            const loading = document.getElementById('loading');
+
+            let charIndex = textToDelete.length;
+            const deleteSpeed = 30; // ms per character
+
+            function deleteChar() {
+                if (charIndex > 0) {
+                    charIndex--;
+                    targetElement.textContent = textToDelete.substring(0, charIndex);
+                    setTimeout(deleteChar, deleteSpeed);
+                } else {
+                    // Deletion complete, now show loading briefly then display verse
+                    typingContainer.style.display = 'none';
+                    loading.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        loading.style.display = 'none';
+                        verseReference.textContent = verse.reference;
+                        verseText.textContent = verse.text;
+                        verseDisplay.classList.add('visible');
+                    }, 500);
+                }
+            }
+
+            // Start deletion after a brief pause
+            setTimeout(deleteChar, 1000);
+        }
+
+        // Load and display a random verse
+        function loadRandomVerse() {
+            if (!versesData) {
+                document.getElementById('loading').style.display = 'block';
+                loadVersesData().then(() => {
+                    document.getElementById('loading').style.display = 'none';
+                    const verse = getRandomShortVerse();
+                    if (verse) {
+                        animateDeleteAndReplace(
+                            'WELCOME TO MY SUPER-CUTE-BUT-SHITTY WEBSITE! TAKE VICODIN IF YOU CAME FROM WSFTEAM.XYZ',
+                            verse
+                        );
+                    }
+                });
+            } else {
+                const verse = getRandomShortVerse();
+                if (verse) {
+                    // Reset display
+                    document.getElementById('verse-display').classList.remove('visible');
+                    document.getElementById('typing-text').style.display = 'block';
+                    document.getElementById('delete-target').textContent = 
+                        'WELCOME TO MY SUPER-CUTE-BUT-SHITTY WEBSITE! TAKE VICODIN IF YOU CAME FROM WSFTEAM.XYZ';
+                    
+                    setTimeout(() => {
+                        animateDeleteAndReplace(
+                            'WELCOME TO MY SUPER-CUTE-BUT-SHITTY WEBSITE! TAKE VICODIN IF YOU CAME FROM WSFTEAM.XYZ',
+                            verse
+                        );
+                    }, 100);
+                }
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Show loading while fetching verses
+            document.getElementById('loading').style.display = 'block';
+            
+            await loadVersesData();
+            
+            document.getElementById('loading').style.display = 'none';
+            
+            // Start the animation with a random verse
+            const verse = getRandomShortVerse();
+            if (verse) {
+                animateDeleteAndReplace(
+                    'WELCOME TO MY SUPER-CUTE-BUT-SHITTY WEBSITE! TAKE VICODIN IF YOU CAME FROM WSFTEAM.XYZ',
+                    verse
+                );
+            }
+        });
+    </script>
+</body>
+</html>

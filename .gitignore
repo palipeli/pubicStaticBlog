@@ -1,3 +1,8 @@
-(index.html is a source file, so no need to add it to .gitignore)
-
-(empty — output nothing)
+```json
+{
+  "error": {
+    "type": "llm_call_failed",
+    "message": "{\"message\":\"Operation not allowed\"}\n"
+  }
+}
+```
