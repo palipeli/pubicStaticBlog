@@ -39,8 +39,8 @@
                     </div>
                 </div>
                 
-                <!-- Blog Posts Section (always visible when on blogs page, expanded by default) -->
-                <div class="mobile-tray-section blog-only" id="mobile-blog-posts-section" style="display: none;">
+                <!-- Blog Posts Section (visible only on blogs page) -->
+                <div class="mobile-tray-section" id="mobile-blog-posts-section">
                     <h3 class="mobile-tray-section-title">All Posts</h3>
                     <div class="mobile-post-list" id="mobile-post-list">
                         <!-- Posts will be rendered here -->
@@ -264,14 +264,10 @@
         
         if (blogSection && activePage) {
             if (activePage.id === 'blogs') {
-                blogSection.style.display = 'block';
+                blogSection.classList.add('blog-visible');
                 renderMobilePostList();
-                // Auto-expand tray when visiting blogs page
-                if (!isTrayOpen) {
-                    openTray();
-                }
             } else {
-                blogSection.style.display = 'none';
+                blogSection.classList.remove('blog-visible');
             }
         }
     }

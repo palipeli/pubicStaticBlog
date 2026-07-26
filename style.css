@@ -998,6 +998,14 @@ footer p {
 /* Mobile tray sections */
 .mobile-tray-section {
     margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px dashed var(--pink-deep);
+}
+
+.mobile-tray-section:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
 }
 
 .mobile-tray-section-title {
@@ -1122,6 +1130,7 @@ body.mobile-tray-open {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    margin-bottom: 15px;
 }
 
 .mobile-nav-item.mc-btn {
@@ -1129,4 +1138,13 @@ body.mobile-tray-open {
     text-align: center;
     padding: 10px 15px;
     font-size: 1.1rem;
+}
+
+/* Blog posts section in mobile tray - always visible when on blogs page */
+#mobile-blog-posts-section {
+    display: none;
+}
+
+#mobile-blog-posts-section.blog-visible {
+    display: block;
 }
