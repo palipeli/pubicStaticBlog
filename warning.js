@@ -22,7 +22,6 @@
             e.target.closest('.blue-button') ||
             e.target.closest('.mc-btn') ||
             e.target.closest('.post-selector-item') ||
-                e.target.closest('.sidebar-toggle') ||
             e.target.closest('.sidebar-toggle')) {
             bypassWarning = true;
             setTimeout(() => { bypassWarning = false; }, 1000);

@@ -310,14 +310,11 @@ function setupNavigation() {
             
             // Toggle blog sidebar visibility based on current page
             const blogSidebarSection = document.getElementById('blog-sidebar-section');
-            const nonBlogSections = document.querySelectorAll('.non-blog-only');
             
             if (page === 'blogs') {
                 if (blogSidebarSection) blogSidebarSection.style.display = 'block';
-                nonBlogSections.forEach(el => el.style.display = 'none');
             } else {
                 if (blogSidebarSection) blogSidebarSection.style.display = 'none';
-                nonBlogSections.forEach(el => el.style.display = 'block');
             }
             
             // Scroll to top when changing pages
