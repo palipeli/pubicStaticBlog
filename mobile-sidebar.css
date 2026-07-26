@@ -1,0 +1,97 @@
+/* mobile-sidebar.css - Mobile-specific floating sidebar styles */
+
+/* Mobile breakpoint */
+@media (max-width: 768px) {
+    /* Override sidebar to float over content instead of collapsing */
+    .sidebar.mobile-floating {
+        position: fixed;
+        right: 0;
+        top: var(--header-height);
+        height: calc(100vh - var(--header-height));
+        width: 280px;
+        max-width: 85vw;
+        z-index: 1000;
+        box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+    }
+    
+    /* When sidebar is open/expanded on mobile */
+    .sidebar.mobile-floating.mobile-open {
+        transform: translateX(0);
+    }
+    
+    /* When sidebar is closed on mobile - hide content but keep toggle visible */
+    .sidebar.mobile-floating:not(.mobile-open) {
+        transform: translateX(100%);
+    }
+    
+    /* Sidebar content wrapper for mobile floating */
+    .sidebar.mobile-floating .sidebar-content-wrapper {
+        opacity: 1;
+        pointer-events: auto;
+        transition: opacity 0.3s ease;
+    }
+    
+    .sidebar.mobile-floating:not(.mobile-open) .sidebar-content-wrapper {
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    /* Mobile toggle button - always visible, positioned at screen edge */
+    .sidebar.mobile-floating .sidebar-toggle {
+        position: fixed;
+        left: auto;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 56px;
+        border-radius: 8px 0 0 8px;
+        z-index: 1001;
+        box-shadow: -3px 0 12px rgba(0, 0, 0, 0.25);
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+    
+    /* Toggle button when sidebar is open - points left */
+    .sidebar.mobile-floating.mobile-open .sidebar-toggle svg {
+        transform: rotate(180deg);
+    }
+    
+    /* Toggle button when sidebar is closed - points right */
+    .sidebar.mobile-floating:not(.mobile-open) .sidebar-toggle svg {
+        transform: rotate(0deg);
+    }
+    
+    /* Adjust main container - no margin adjustment needed since sidebar floats */
+    .main-container.sidebar-collapsed {
+        margin-right: 0;
+    }
+    
+    /* Overlay backdrop when sidebar is open on mobile */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: var(--header-height);
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+        opacity: 1;
+    }
+}
+
+/* Very small screens - adjust sidebar width */
+@media (max-width: 400px) {
+    .sidebar.mobile-floating {
+        max-width: 90vw;
+    }
+}

@@ -303,14 +303,15 @@ html {
 }
 
 /* Auto-collapse on constrained space - handle resize smoothly */
+/* Note: This is overridden by mobile-sidebar.css when .mobile-floating class is applied */
 @media (max-width: 768px) {
-    .sidebar:not(.expanded) {
+    .sidebar:not(.expanded):not(.mobile-floating) {
         width: 0;
         opacity: 0;
         transform: translateX(20px);
         pointer-events: none;
     }
-    .sidebar:not(.expanded) .sidebar-content-wrapper {
+    .sidebar:not(.expanded):not(.mobile-floating) .sidebar-content-wrapper {
         opacity: 0;
         pointer-events: none;
     }
@@ -362,9 +363,9 @@ html {
     transform: translate(-100%, -50%) scale(0.95);
 }
 
-/* Hide toggle button when sidebar is collapsed on mobile */
+/* Hide toggle button when sidebar is collapsed on mobile (only if not using floating mode) */
 @media (max-width: 768px) {
-    .sidebar.collapsed .sidebar-toggle {
+    .sidebar.collapsed:not(.mobile-floating) .sidebar-toggle {
         opacity: 0;
         pointer-events: none;
     }
