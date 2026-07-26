@@ -1,0 +1,314 @@
+/* Mobile Tray Styles - For constrained spaces on mobile devices */
+
+/* Mobile Tray Container - Fixed at bottom, floats over content */
+.mobile-tray {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-panel);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border-color);
+    z-index: 1002;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.mobile-tray.open {
+    transform: translateY(0);
+}
+
+/* Mobile Tray Header - Tap handle area */
+.mobile-tray-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    min-height: 48px;
+    background: rgba(255, 255, 255, 0.05);
+    flex-shrink: 0;
+}
+
+.mobile-tray-handle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mobile-tray-handle-icon {
+    width: 20px;
+    height: 4px;
+    background: var(--text-secondary);
+    border-radius: 2px;
+    opacity: 0.5;
+}
+
+.mobile-tray-close {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.mobile-tray-close:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: var(--text-primary);
+}
+
+/* Mobile Tray Content - Scrollable area */
+.mobile-tray-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile tray sections */
+.mobile-tray-section {
+    margin-bottom: 24px;
+}
+
+.mobile-tray-section:last-child {
+    margin-bottom: 0;
+}
+
+.mobile-tray-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Theme chooser in mobile tray */
+.mobile-theme-chooser {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mobile-theme-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mobile-theme-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-blue);
+}
+
+.mobile-theme-btn.active {
+    background: rgba(71, 114, 179, 0.3);
+    border-color: var(--accent-blue);
+}
+
+.mobile-theme-btn.active::after {
+    content: '✓';
+    color: var(--accent-blue);
+    font-weight: bold;
+}
+
+/* Profile section in mobile tray */
+.mobile-profile-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.mobile-photo-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    width: 100px;
+    height: 100px;
+}
+
+.mobile-photo-placeholder svg {
+    color: var(--text-secondary);
+    width: 60px;
+    height: 60px;
+}
+
+.mobile-about-short p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Post selector in mobile tray */
+.mobile-post-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mobile-post-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mobile-post-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-blue);
+}
+
+.mobile-post-item.active {
+    background: rgba(71, 114, 179, 0.2);
+    border-color: var(--accent-blue);
+}
+
+.mobile-post-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.mobile-post-meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* Mobile tray toggle button - Fixed floating button */
+.mobile-tray-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+    box-shadow: 0 4px 12px rgba(71, 114, 179, 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0;
+}
+
+.mobile-tray-toggle:hover {
+    background: var(--accent-blue-hover);
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(71, 114, 179, 0.6);
+}
+
+.mobile-tray-toggle:active {
+    transform: scale(0.95);
+}
+
+.mobile-tray-toggle svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+}
+
+.mobile-tray-toggle.open svg {
+    transform: rotate(180deg);
+}
+
+/* Overlay when tray is open */
+.mobile-tray-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.mobile-tray-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Hide desktop sidebar toggle on mobile when using tray */
+@media (max-width: 768px) {
+    .sidebar-toggle {
+        display: none !important;
+    }
+    
+    /* Show mobile tray toggle only on mobile */
+    .mobile-tray-toggle {
+        display: flex !important;
+    }
+    
+    /* Adjust main container on mobile */
+    .main-container {
+        margin-right: 0 !important;
+    }
+}
+
+/* Hide mobile tray on desktop */
+@media (min-width: 769px) {
+    .mobile-tray,
+    .mobile-tray-toggle,
+    .mobile-tray-overlay {
+        display: none !important;
+    }
+}
+
+/* Safe area insets for notched devices */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .mobile-tray {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    .mobile-tray-toggle {
+        bottom: calc(20px + env(safe-area-inset-bottom));
+    }
+}

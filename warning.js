@@ -22,7 +22,14 @@
             e.target.closest('.blue-button') ||
             e.target.closest('.mc-btn') ||
             e.target.closest('.post-selector-item') ||
-            e.target.closest('.sidebar-toggle')) {
+            e.target.closest('.sidebar-toggle') ||
+            e.target.closest('.mobile-tray') ||
+            e.target.closest('.mobile-tray-toggle') ||
+            e.target.closest('.mobile-tray-overlay') ||
+            e.target.closest('.mobile-theme-btn') ||
+            e.target.closest('.mobile-post-item') ||
+            e.target.closest('.mobile-tray-close') ||
+            e.target.closest('.mobile-tray-header')) {
             bypassWarning = true;
             setTimeout(() => { bypassWarning = false; }, 1000);
         }
@@ -209,7 +216,14 @@
                 e.target.closest('.blue-button') ||
                 e.target.closest('.mc-btn') ||
                 e.target.closest('.post-selector-item') ||
-                e.target.closest('.sidebar-toggle')
+                e.target.closest('.sidebar-toggle') ||
+                e.target.closest('.mobile-tray') ||
+                e.target.closest('.mobile-tray-toggle') ||
+                e.target.closest('.mobile-tray-overlay') ||
+                e.target.closest('.mobile-theme-btn') ||
+                e.target.closest('.mobile-post-item') ||
+                e.target.closest('.mobile-tray-close') ||
+                e.target.closest('.mobile-tray-header')
             )) return;
         }
 
