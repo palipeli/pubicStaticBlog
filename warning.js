@@ -20,7 +20,8 @@
             e.target.closest('.theme-btn') ||
             e.target.closest('.nav-item') ||
             e.target.closest('.blue-button') ||
-            e.target.closest('.mc-btn')) {
+            e.target.closest('.mc-btn') ||
+            e.target.closest('.post-selector-item')) {
             bypassWarning = true;
             setTimeout(() => { bypassWarning = false; }, 1000);
         }
@@ -205,7 +206,8 @@
                 e.target.closest('.theme-btn') ||
                 e.target.closest('.nav-item') ||
                 e.target.closest('.blue-button') ||
-                e.target.closest('.mc-btn')
+                e.target.closest('.mc-btn') ||
+                e.target.closest('.post-selector-item')
             )) return;
         }
 
