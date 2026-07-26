@@ -1,4 +1,4 @@
-// app.js - Blog Platform Application Logic
+// app.js - Blog Platform Application Logic and Bible Devotional
 
 // State Persistence Key
 const STATE_STORAGE_KEY = 'blogPlatformState';
@@ -11,6 +11,120 @@ const blogContentCache = new Map(); // Cache for loaded blog content
 // Shorthand references for cleaner code
 let blogPosts = window.blogPosts;
 let blogPostMetadata = window.blogPostMetadata;
+
+// Bible Devotional - Pre-loaded verses from nt_verses.json
+let bibleVerses = [];
+let devotionalActive = false;
+
+// Load Bible verses from pre-extracted JSON (cleaned version without footnote markers)
+async function loadBibleVerses() {
+    try {
+        const response = await fetch('/blog/nt_verses_clean.json');
+        if (!response.ok) throw new Error('Could not fetch Bible verses');
+        bibleVerses = await response.json();
+        console.log(`Loaded ${bibleVerses.length} Bible verses`);
+    } catch (err) {
+        console.error('Error loading Bible verses:', err);
+        bibleVerses = [];
+    }
+}
+
+// Get a random short verse (under 150 chars for display)
+function getRandomShortVerse() {
+    if (bibleVerses.length === 0) return null;
+    
+    // Filter for shorter verses
+    const shortVerses = bibleVerses.filter(v => v.text.length < 150);
+    const pool = shortVerses.length > 0 ? shortVerses : bibleVerses;
+    
+    return pool[Math.floor(Math.random() * pool.length)];
+}
+
+// Typing delete animation - removes text character by character
+function typeDeleteAnimation(element, callback) {
+    const text = element.textContent;
+    let index = 0;
+    
+    function deleteChar() {
+        if (index < text.length) {
+            element.textContent = text.substring(0, text.length - index - 1);
+            index++;
+            setTimeout(deleteChar, 15); // Fast deletion
+        } else {
+            if (callback) callback();
+        }
+    }
+    
+    deleteChar();
+}
+
+// Typing write animation - types text character by character
+function typeWriteAnimation(element, text, callback) {
+    let index = 0;
+    element.textContent = '';
+    
+    function typeChar() {
+        if (index < text.length) {
+            element.textContent += text.charAt(index);
+            index++;
+            setTimeout(typeChar, 20); // Fast typing
+        } else {
+            if (callback) callback();
+        }
+    }
+    
+    typeChar();
+}
+
+// Run the devotional - delete old text, type new verse
+function runDevotional() {
+    if (devotionalActive || bibleVerses.length === 0) return;
+    devotionalActive = true;
+    
+    const heroElement = document.getElementById('home-hero-content');
+    if (!heroElement) return;
+    
+    const leadParagraph = heroElement.querySelector('.home-lead');
+    if (!leadParagraph) return;
+    
+    // Get random verse
+    const verse = getRandomShortVerse();
+    if (!verse) return;
+    
+    // Format: "Book Chapter:Verse NRSVUE - Verse text"
+    const displayText = `${verse.book} ${verse.chapter}:${verse.verse} NRSVUE — ${verse.text}`;
+    
+    // First, delete the existing text
+    typeDeleteAnimation(leadParagraph, () => {
+        // Then type the new verse
+        typeWriteAnimation(leadParagraph, displayText, () => {
+            // Optional: could cycle to another verse after delay
+        });
+    });
+}
+
+// Check if warning has been accepted/cleared
+function isWarningCleared() {
+    // Check localStorage for consent
+    const hasConsent = localStorage.getItem('system_warning_consent') === 'true';
+    // Also check if consent overlay is gone
+    const consentOverlay = document.getElementById('consent-overlay');
+    const isOverlayGone = !consentOverlay || consentOverlay.style.display === 'none';
+    return hasConsent && isOverlayGone;
+}
+
+// Monitor for warning clearance and trigger devotional
+function monitorWarningAndStartDevotional() {
+    const checkInterval = setInterval(() => {
+        if (isWarningCleared()) {
+            clearInterval(checkInterval);
+            // Small delay to ensure UI is settled
+            setTimeout(() => {
+                runDevotional();
+            }, 300);
+        }
+    }, 100);
+}
 
 // =====================
 // State Persistence Functions
@@ -983,6 +1097,11 @@ document.addEventListener('DOMContentLoaded', function() {
     setupSidebarToggle();
     
     // Setup state persistence (auto-save on user actions)
+    // Load Bible verses and start devotional monitoring
+    loadBibleVerses().then(() => {
+        monitorWarningAndStartDevotional();
+    });
+
     setupStatePersistence();
     
     // Restore saved state after page refresh

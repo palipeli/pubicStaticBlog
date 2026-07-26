@@ -1,3 +1,10 @@
-(index.html is a source file, so no need to add it to .gitignore)
-
-(empty — output nothing)
+```json
+{
+  "nt_verses.json": {
+    "book": "Matthew",
+    "chapter": 1,
+    "verse": 1,
+    "text": "The book of the generation of Jesus Christ, the son of David, the son of Abraham."
+  }
+}
+```
