@@ -227,6 +227,12 @@ function preloadBlogPostContent(postId) {
     }, 150); // 150ms delay before preloading on hover
 }
 
+// Expose functions globally for mobile tray access
+window.preloadBlogPostContent = preloadBlogPostContent;
+window.loadBlogPostContent = loadBlogPostContent;
+window.openBlogPostLazy = openBlogPostLazy;
+window.openBlogPostFromHomeLazy = openBlogPostFromHomeLazy;
+
 // Fetch all markdown files from /blog/ using posts.json manifest (legacy - loads all content immediately)
 async function fetchBlogPosts() {
     try {
