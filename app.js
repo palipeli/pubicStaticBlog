@@ -276,12 +276,12 @@ function filterByCategory(category) {
         item.classList.toggle('active', item.dataset.category === category);
     });
     
-    // Filter and re-render
+    // Filter and re-render the post selector
     const filtered = category === 'all' 
         ? blogPosts 
         : blogPosts.filter(post => post.category === category);
     
-    renderBlogCards(filtered);
+    renderPostSelector(filtered);
 }
 
 // Open a blog post
@@ -294,8 +294,8 @@ function openBlogPost(id) {
         item.classList.toggle('active', blogPosts[index]?.id === id);
     });
     
-    // Show post view, hide list
-    document.getElementById('blog-posts-list').style.display = 'none';
+    // Hide intro view, show post view
+    document.getElementById('blog-intro-view').style.display = 'none';
     document.getElementById('blog-post-view').style.display = 'block';
     
     // Render post content
@@ -313,19 +313,15 @@ function openBlogPost(id) {
     window.scrollTo(0, 0);
 }
 
-// Show blog list (back from post view)
-function showBlogList() {
-    document.getElementById('blog-posts-list').style.display = 'none';
-    document.getElementById('blog-post-view').style.display = 'block';
+// Show blog introduction (back from post view)
+function showBlogIntro() {
+    document.getElementById('blog-post-view').style.display = 'none';
+    document.getElementById('blog-intro-view').style.display = 'block';
     
     // Clear active state
     document.querySelectorAll('.post-selector-item').forEach(item => {
         item.classList.remove('active');
     });
-    
-    // Render introduction content
-    const article = document.getElementById('blog-article-content');
-    article.innerHTML = blogIntroduction.content;
 }
 
 // Initialize particles
@@ -478,14 +474,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fetch and render blog posts
     fetchBlogPosts().then(posts => {
         if (posts.length > 0) {
-            // Show introduction by default instead of cards
-            document.getElementById('blog-posts-list').style.display = 'none';
-            document.getElementById('blog-post-view').style.display = 'block';
-            
-            // Render introduction content
-            const article = document.getElementById('blog-article-content');
-            article.innerHTML = blogIntroduction.content;
-            
+            // Introduction view is already visible by default in HTML
+            // Just render the sidebar components
             renderPostSelector(posts);
             renderCategories(posts);
         }
