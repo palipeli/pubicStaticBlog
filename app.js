@@ -470,9 +470,13 @@ function setupSidebarToggle() {
         if (isMobileView()) {
             sidebar.classList.add('collapsed');
             mainContainer.classList.add('sidebar-collapsed');
+            sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
+            sidebarToggle.setAttribute('title', 'Open Sidebar');
         } else {
             sidebar.classList.remove('collapsed');
             mainContainer.classList.remove('sidebar-collapsed');
+            sidebarToggle.setAttribute('aria-label', 'Collapse Sidebar');
+            sidebarToggle.setAttribute('title', 'Collapse Sidebar');
         }
     }
     
@@ -485,22 +489,24 @@ function setupSidebarToggle() {
         sidebar.classList.toggle('collapsed');
         mainContainer.classList.toggle('sidebar-collapsed');
         
-        // Update toggle button aria-label
+        // Update toggle button aria-label and icon direction
         const isCollapsed = sidebar.classList.contains('collapsed');
-        sidebarToggle.setAttribute('aria-label', isCollapsed ? 'Open Sidebar' : 'Close Sidebar');
-        sidebarToggle.setAttribute('title', isCollapsed ? 'Open Sidebar' : 'Close Sidebar');
+        sidebarToggle.setAttribute('aria-label', isCollapsed ? 'Open Sidebar' : 'Collapse Sidebar');
+        sidebarToggle.setAttribute('title', isCollapsed ? 'Open Sidebar' : 'Collapse Sidebar');
     });
     
-    // Handle window resize
+    // Handle window resize - sidebar always accessible via button
     let resizeTimeout;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-            // Only auto-collapse on mobile, don't auto-expand on desktop
-            // to preserve user's choice
+            // On mobile, auto-collapse for space but button remains visible
+            // On desktop, preserve user's choice
             if (isMobileView() && !sidebar.classList.contains('collapsed')) {
                 sidebar.classList.add('collapsed');
                 mainContainer.classList.add('sidebar-collapsed');
+                sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
+                sidebarToggle.setAttribute('title', 'Open Sidebar');
             }
         }, 200);
     });
