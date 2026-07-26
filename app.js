@@ -471,11 +471,13 @@ function setupSidebarToggle() {
         if (isMobileView()) {
             sidebar.classList.add('collapsed');
             sidebar.classList.remove('expanded');
+            mainContainer.classList.add('sidebar-collapsed');
             sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
             sidebarToggle.setAttribute('title', 'Open Sidebar');
         } else {
             sidebar.classList.remove('collapsed');
             sidebar.classList.add('expanded');
+            mainContainer.classList.remove('sidebar-collapsed');
             sidebarToggle.setAttribute('aria-label', 'Collapse Sidebar');
             sidebarToggle.setAttribute('title', 'Collapse Sidebar');
         }
@@ -489,6 +491,7 @@ function setupSidebarToggle() {
         e.stopPropagation();
         sidebar.classList.toggle('collapsed');
         sidebar.classList.toggle('expanded');
+        mainContainer.classList.toggle('sidebar-collapsed');
         
         // Update toggle button aria-label and icon direction
         const isCollapsed = sidebar.classList.contains('collapsed');
@@ -503,16 +506,22 @@ function setupSidebarToggle() {
         resizeTimeout = setTimeout(() => {
             // On mobile, auto-collapse for space but button remains visible
             // On desktop, preserve user's choice
-            if (isMobileView() && !sidebar.classList.contains('collapsed')) {
-                sidebar.classList.add('collapsed');
-                sidebar.classList.remove('expanded');
-                sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
-                sidebarToggle.setAttribute('title', 'Open Sidebar');
-            } else if (!isMobileView() && !sidebar.classList.contains('expanded')) {
-                sidebar.classList.add('expanded');
-                sidebar.classList.remove('collapsed');
-                sidebarToggle.setAttribute('aria-label', 'Collapse Sidebar');
-                sidebarToggle.setAttribute('title', 'Collapse Sidebar');
+            if (isMobileView()) {
+                if (!sidebar.classList.contains('collapsed')) {
+                    sidebar.classList.add('collapsed');
+                    sidebar.classList.remove('expanded');
+                    mainContainer.classList.add('sidebar-collapsed');
+                    sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
+                    sidebarToggle.setAttribute('title', 'Open Sidebar');
+                }
+            } else {
+                // Desktop: only auto-expand if user hasn't manually collapsed it
+                if (!sidebar.classList.contains('collapsed') && !sidebar.classList.contains('expanded')) {
+                    sidebar.classList.add('expanded');
+                    mainContainer.classList.remove('sidebar-collapsed');
+                    sidebarToggle.setAttribute('aria-label', 'Collapse Sidebar');
+                    sidebarToggle.setAttribute('title', 'Collapse Sidebar');
+                }
             }
         }, 200);
     });
