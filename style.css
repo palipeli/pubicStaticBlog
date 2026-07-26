@@ -320,21 +320,21 @@ html {
 @media (max-width: 480px) {
     .sidebar {
         width: 280px;
-        transform: translateX(100%);
+        transform: translateX(100%) !important;
         box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
         /* Reset transition for transform to allow smooth sliding */
-        transition: transform 0.3s ease, opacity 0.3s ease;
+        transition: transform 0.3s ease !important;
     }
     
     .sidebar.expanded {
-        transform: translateX(0);
+        transform: translateX(0) !important;
         opacity: 1;
         pointer-events: auto;
     }
     
     .sidebar.collapsed {
         width: 280px;
-        transform: translateX(100%);
+        transform: translateX(100%) !important;
         opacity: 1;
     }
     
@@ -353,7 +353,7 @@ html {
         position: fixed;
         right: 0;
         top: 50%;
-        transform: translateY(-50%) rotate(180deg);
+        transform: translateY(-50%) rotate(180deg) !important;
         border-radius: 12px 0 0 12px;
         box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
         z-index: 1002;
@@ -363,7 +363,7 @@ html {
     .sidebar.expanded .sidebar-toggle {
         left: 0;
         right: auto;
-        transform: translateY(-50%) rotate(0deg);
+        transform: translateY(-50%) rotate(0deg) !important;
         border-radius: 12px 0 0 12px;
         box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
     }
