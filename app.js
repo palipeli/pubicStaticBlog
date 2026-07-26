@@ -85,59 +85,61 @@ function parseFrontmatter(content) {
     return { frontmatter, content: body };
 }
 
-// Fetch all markdown files from /blog/
+// Fetch all markdown files from /blog/ using posts.json manifest
 async function fetchBlogPosts() {
     try {
-        // Fetch the index of blog files
-        const response = await fetch('/blog/');
+        // Fetch the posts.json manifest file
+        const response = await fetch('/blog/posts.json');
         if (!response.ok) {
-            throw new Error('Could not fetch blog directory');
+            throw new Error('Could not fetch blog manifest');
         }
         
-        const html = await response.text();
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
+        const postsMeta = await response.json();
         
-        // Extract links to .md files
-        const links = Array.from(doc.querySelectorAll('a[href$=".md"]'))
-            .map(a => a.getAttribute('href'));
-        
-        if (links.length === 0) {
-            console.warn('No markdown files found in /blog/');
+        if (postsMeta.length === 0) {
+            console.warn('No posts found in manifest');
             return [];
         }
         
-        // Fetch each markdown file
+        // Fetch each markdown file content
         const posts = await Promise.all(
-            links.map(async (href) => {
+            postsMeta.map(async (meta) => {
                 try {
-                    const mdResponse = await fetch(href);
+                    const mdResponse = await fetch(meta.slug);
                     if (!mdResponse.ok) throw new Error('Failed to fetch');
                     
                     const mdContent = await mdResponse.text();
                     const { frontmatter, content } = parseFrontmatter(mdContent);
                     
                     return {
-                        id: href.replace('.md', '').replace('/blog/', ''),
-                        slug: href,
-                        title: frontmatter.title || 'Untitled',
-                        date: frontmatter.date || '',
-                        category: frontmatter.category || 'Uncategorized',
-                        icon: frontmatter.icon || '📄',
+                        id: meta.id,
+                        slug: meta.slug,
+                        title: frontmatter.title || meta.title || 'Untitled',
+                        date: frontmatter.date || meta.date || '',
+                        category: frontmatter.category || meta.category || 'Uncategorized',
+                        icon: frontmatter.icon || meta.icon || '📄',
                         content: content,
                         htmlContent: parseMarkdown(content)
                     };
                 } catch (err) {
-                    console.error(`Error fetching ${href}:`, err);
-                    return null;
+                    console.error(`Error fetching ${meta.slug}:`, err);
+                    // Return metadata even if content fetch fails
+                    return {
+                        id: meta.id,
+                        slug: meta.slug,
+                        title: meta.title || 'Untitled',
+                        date: meta.date || '',
+                        category: meta.category || 'Uncategorized',
+                        icon: meta.icon || '📄',
+                        content: '',
+                        htmlContent: '<p>Error loading content.</p>'
+                    };
                 }
             })
         );
         
-        // Filter out failed fetches and sort by date
-        blogPosts = posts
-            .filter(post => post !== null)
-            .sort((a, b) => new Date(b.date) - new Date(a.date));
+        // Sort by date
+        blogPosts = posts.sort((a, b) => new Date(b.date) - new Date(a.date));
         
         return blogPosts;
     } catch (err) {
@@ -332,6 +334,18 @@ function setupNavigation() {
                     section.classList.add('active');
                 }
             });
+            
+            // Toggle blog sidebar visibility based on current page
+            const blogSidebarSection = document.getElementById('blog-sidebar-section');
+            const nonBlogSections = document.querySelectorAll('.non-blog-only');
+            
+            if (page === 'blogs') {
+                if (blogSidebarSection) blogSidebarSection.style.display = 'block';
+                nonBlogSections.forEach(el => el.style.display = 'none');
+            } else {
+                if (blogSidebarSection) blogSidebarSection.style.display = 'none';
+                nonBlogSections.forEach(el => el.style.display = 'block');
+            }
             
             // Scroll to top when changing pages
             window.scrollTo(0, 0);

@@ -65,21 +65,6 @@
                             </article>
                         </div>
                     </div>
-                    
-                    <!-- Sidebar (Right) - Post Selector -->
-                    <aside class="blog-sidebar" id="blog-sidebar">
-                        <h3 class="sidebar-title">All Posts</h3>
-                        <div class="post-selector-list" id="post-selector-list">
-                            <!-- Post links will be loaded here -->
-                        </div>
-                        
-                        <div class="sidebar-section">
-                            <h3 class="sidebar-title">Categories</h3>
-                            <div class="category-filter" id="category-filter">
-                                <!-- Categories will be loaded here -->
-                            </div>
-                        </div>
-                    </aside>
                 </div>
             </section>
 
@@ -111,7 +96,20 @@
                 </div>
             </div>
 
-            <div class="sidebar-section">
+            <!-- Blog Post Selector - Only visible on Blogs page -->
+            <div class="sidebar-section blog-only" id="blog-sidebar-section" style="display: none;">
+                <h3 class="sidebar-title">All Posts</h3>
+                <div class="post-selector-list" id="post-selector-list">
+                    <!-- Post links will be loaded here -->
+                </div>
+                
+                <h3 class="sidebar-title" style="margin-top: 20px;">Categories</h3>
+                <div class="category-filter" id="category-filter">
+                    <!-- Categories will be loaded here -->
+                </div>
+            </div>
+
+            <div class="sidebar-section non-blog-only">
                 <h3 class="sidebar-title">Categories</h3>
                 <div class="template-grid">
                     <div class="template-card">
@@ -129,7 +127,7 @@
                 </div>
             </div>
 
-            <div class="sidebar-section">
+            <div class="sidebar-section non-blog-only">
                 <h3 class="sidebar-title">Recent Posts</h3>
                 <div class="template-grid">
                     <div class="template-card">
