@@ -47,11 +47,6 @@
                     </div>
                 </div>
                 
-                <!-- All Post Link -->
-                <div class="mobile-tray-section">
-                    <a href="#all-posts" class="mobile-tray-link">ALL POST</a>
-                </div>
-                
                 <!-- About Section -->
                 <div class="mobile-tray-section">
                     <div class="mobile-photo-placeholder">
