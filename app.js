@@ -595,8 +595,9 @@ function renderBlogButtons(posts) {
     // Add "Send me cat pictures and files!" button (kamikami.eu style)
     const catButton = document.createElement('a');
     catButton.className = 'blog-btn category-fun';
-    catButton.href = 'mailto:kamikami@example.com?subject=Cat Pictures & Body=Here are some cat pictures!';
+    catButton.href = 'https://cloud.kamikami.eu/s/send-me-cat-pics';
     catButton.target = '_blank';
+    catButton.rel = 'noopener noreferrer';
     
     catButton.innerHTML = `
         <i class="fa-solid fa-cat"></i>
