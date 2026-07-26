@@ -12,20 +12,27 @@ const blogContentCache = new Map(); // Cache for loaded blog content
 let blogPosts = window.blogPosts;
 let blogPostMetadata = window.blogPostMetadata;
 
-// Bible Devotional - Pre-loaded verses from nt_verses.json
+// Bible Devotional - verses loaded on demand
 let bibleVerses = [];
 let devotionalActive = false;
+let versesLoaded = false;
 
 // Load Bible verses from pre-extracted JSON (cleaned version without footnote markers)
+// Only loads when needed to keep initial page load lightweight
 async function loadBibleVerses() {
+    if (versesLoaded) return bibleVerses;
+    
     try {
         const response = await fetch('/blog/nt_verses_clean.json');
         if (!response.ok) throw new Error('Could not fetch Bible verses');
         bibleVerses = await response.json();
+        versesLoaded = true;
         console.log(`Loaded ${bibleVerses.length} Bible verses`);
+        return bibleVerses;
     } catch (err) {
         console.error('Error loading Bible verses:', err);
         bibleVerses = [];
+        return [];
     }
 }
 
@@ -77,9 +84,17 @@ function typeWriteAnimation(element, text, callback) {
 }
 
 // Run the devotional - delete old text, type new verse
-function runDevotional() {
-    if (devotionalActive || bibleVerses.length === 0) return;
+async function runDevotional() {
+    if (devotionalActive) return;
     devotionalActive = true;
+    
+    // Load verses on-demand when animation starts (lightweight initial load)
+    await loadBibleVerses();
+    
+    if (bibleVerses.length === 0) {
+        devotionalActive = false;
+        return;
+    }
     
     const heroElement = document.getElementById('home-hero-content');
     if (!heroElement) return;
@@ -114,13 +129,13 @@ function isWarningCleared() {
 }
 
 // Monitor for warning clearance and trigger devotional
-function monitorWarningAndStartDevotional() {
-    const checkInterval = setInterval(() => {
+async function monitorWarningAndStartDevotional() {
+    const checkInterval = setInterval(async () => {
         if (isWarningCleared()) {
             clearInterval(checkInterval);
             // Small delay to ensure UI is settled
-            setTimeout(() => {
-                runDevotional();
+            setTimeout(async () => {
+                await runDevotional();
             }, 300);
         }
     }, 100);
