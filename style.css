@@ -355,12 +355,12 @@ html {
     }
 }
 
-/* Sidebar toggle button - fixed to left edge of sidebar, vertically centered */
+/* Sidebar toggle button - fixed to viewport edge, vertically centered */
 .sidebar-toggle {
-    position: absolute;
-    left: 0;
+    position: fixed;
+    right: 0;
     top: 50%;
-    transform: translate(-100%, -50%);
+    transform: translateY(-50%);
     width: 24px;
     height: 48px;
     border-radius: 12px 0 0 12px;
@@ -391,6 +391,16 @@ html {
     transform: rotate(0deg);
 }
 
+/* Move toggle button to the left when sidebar is collapsed */
+.sidebar.collapsed .sidebar-toggle {
+    right: auto;
+    left: 0;
+    border-radius: 0 12px 12px 0;
+    border-left: none;
+    border-right: 1px solid var(--border-color);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+}
+
 .sidebar-toggle:hover {
     background: var(--accent-blue);
     color: white;
@@ -398,18 +408,22 @@ html {
 }
 
 .sidebar-toggle:active {
-    transform: translate(-100%, -50%) scale(0.95);
+    transform: translateY(-50%) scale(0.95);
 }
 
-/* Hide toggle button when sidebar is collapsed on mobile */
+.sidebar.collapsed .sidebar-toggle:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+/* Always show toggle button - it's fixed to viewport edge */
 @media (max-width: 768px) and (min-width: 481px) {
     .sidebar.collapsed .sidebar-toggle {
-        opacity: 0;
-        pointer-events: none;
+        opacity: 1;
+        pointer-events: auto;
     }
 }
 
-/* On very small screens, always show toggle when sidebar is expanded */
+/* On very small screens, always show toggle when sidebar is expanded or collapsed */
 @media (max-width: 480px) {
     .sidebar.expanded .sidebar-toggle {
         opacity: 1;
@@ -417,8 +431,8 @@ html {
     }
     
     .sidebar.collapsed .sidebar-toggle {
-        opacity: 0;
-        pointer-events: none;
+        opacity: 1;
+        pointer-events: auto;
     }
 }
 

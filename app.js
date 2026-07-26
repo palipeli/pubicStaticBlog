@@ -520,6 +520,21 @@ function setupSidebarToggle() {
         sidebarToggle.setAttribute('title', isCollapsed ? 'Open Sidebar' : 'Collapse Sidebar');
     });
     
+    // Close sidebar when clicking outside on mobile/very small screens
+    document.addEventListener('click', (e) => {
+        if (isVerySmallScreen() || isMobileView()) {
+            if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target) && !sidebar.classList.contains('collapsed')) {
+                sidebar.classList.add('collapsed');
+                sidebar.classList.remove('expanded');
+                if (!isVerySmallScreen()) {
+                    mainContainer.classList.add('sidebar-collapsed');
+                }
+                sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
+                sidebarToggle.setAttribute('title', 'Open Sidebar');
+            }
+        }
+    });
+    
     // Handle window resize - sidebar always accessible via button
     let resizeTimeout;
     window.addEventListener('resize', () => {
