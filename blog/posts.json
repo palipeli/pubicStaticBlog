@@ -8,30 +8,6 @@
     "icon": "🚀"
   },
   {
-    "id": "css-grid",
-    "slug": "/blog/css-grid.md",
-    "title": "Mastering CSS Grid Layout",
-    "date": "Dec 14, 2024",
-    "category": "Design",
-    "icon": "🎨"
-  },
-  {
-    "id": "javascript-es6",
-    "slug": "/blog/javascript-es6.md",
-    "title": "Modern JavaScript ES6+ Features",
-    "date": "Dec 13, 2024",
-    "category": "Technology",
-    "icon": "⚡"
-  },
-  {
-    "id": "responsive-design",
-    "slug": "/blog/responsive-design.md",
-    "title": "Responsive Web Design Principles",
-    "date": "Dec 12, 2024",
-    "category": "Design",
-    "icon": "📱"
-  },
-  {
     "id": "cloudflare-trouble",
     "slug": "/blog/cloudflare-trouble.md",
     "title": "This Site Was Revived From The Dead and Thanks to Cloudflare For That",
