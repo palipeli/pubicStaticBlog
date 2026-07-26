@@ -29,24 +29,22 @@ venv/
 .vscode/
 .idea/
 
-# System files
-.DS_Store
-Thumbs.db
-
-# Coverage and testing
+# Coverage
 .coverage
 coverage/
 htmlcov/
 
-# Package managers
-.npm/
-.yarn/
-.pnpm/
-.bazel/
+# Build directories
+dist/
+build/
+target/
 .mypy_cache/
 .pytest_cache/
-target/
 .gradle/
+
+# System files
+.DS_Store
+Thumbs.db
 
 # Compressed files
 *.zip

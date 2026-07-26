@@ -1,7 +1,9 @@
 // app.js - Blog Platform Application Logic
 
 // Global state for blog posts
-let blogPosts = [];
+let blogPosts = []; // Full posts with content (lazy-loaded)
+let blogPostMetadata = []; // Metadata only (loaded initially)
+const blogContentCache = new Map(); // Cache for loaded blog content
 
 // Default introduction content shown before selecting a post
 const blogIntroduction = {
@@ -110,7 +112,115 @@ function parseFrontmatter(content) {
     return { frontmatter, content: body };
 }
 
-// Fetch all markdown files from /blog/ using posts.json manifest
+// Fetch only blog post metadata from /blog/ using posts.json manifest (lazy load content)
+async function fetchBlogPostMetadata() {
+    try {
+        // Fetch the posts.json manifest file
+        const response = await fetch('/blog/posts.json');
+        if (!response.ok) {
+            throw new Error('Could not fetch blog manifest');
+        }
+        
+        const postsMeta = await response.json();
+        
+        if (postsMeta.length === 0) {
+            console.warn('No posts found in manifest');
+            return [];
+        }
+        
+        // Store only metadata (no content fetched yet)
+        blogPostMetadata = postsMeta.map(meta => ({
+            id: meta.id,
+            slug: meta.slug,
+            title: meta.title || 'Untitled',
+            date: meta.date || '',
+            category: meta.category || 'Uncategorized',
+            icon: meta.icon || '📄',
+            _contentLoaded: false // Flag to track if content has been loaded
+        }));
+        
+        // Sort by date
+        blogPostMetadata = blogPostMetadata.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        return blogPostMetadata;
+    } catch (err) {
+        console.error('Error fetching blog post metadata:', err);
+        return [];
+    }
+}
+
+// Lazy load a single blog post's content on demand
+async function loadBlogPostContent(postId) {
+    // Check if already loaded in cache
+    if (blogContentCache.has(postId)) {
+        return blogContentCache.get(postId);
+    }
+    
+    // Find the post metadata
+    const meta = blogPostMetadata.find(p => p.id === postId);
+    if (!meta) {
+        console.error(`Post with id ${postId} not found`);
+        return null;
+    }
+    
+    // Check if content already loaded in the post object
+    if (meta._contentLoaded && meta.htmlContent) {
+        return meta;
+    }
+    
+    try {
+        const mdResponse = await fetch(meta.slug);
+        if (!mdResponse.ok) throw new Error('Failed to fetch content');
+        
+        const mdContent = await mdResponse.text();
+        const { frontmatter, content } = parseFrontmatter(mdContent);
+        
+        // Update metadata with full content
+        meta.title = frontmatter.title || meta.title;
+        meta.date = frontmatter.date || meta.date;
+        meta.category = frontmatter.category || meta.category;
+        meta.icon = frontmatter.icon || meta.icon;
+        meta.content = content;
+        meta.htmlContent = parseMarkdown(content);
+        meta._contentLoaded = true;
+        
+        // Cache the loaded post
+        blogContentCache.set(postId, meta);
+        
+        return meta;
+    } catch (err) {
+        console.error(`Error fetching content for ${meta.slug}:`, err);
+        // Return metadata with error state
+        meta.content = '';
+        meta.htmlContent = '<p>Error loading content.</p>';
+        meta._contentLoaded = true;
+        blogContentCache.set(postId, meta);
+        return meta;
+    }
+}
+
+// Preload content for posts near the cursor (hover optimization)
+let preloadTimeout = null;
+function preloadBlogPostContent(postId) {
+    // Clear any existing preload timeout
+    if (preloadTimeout) {
+        clearTimeout(preloadTimeout);
+    }
+    
+    // Debounce preload to avoid excessive requests during rapid hover
+    preloadTimeout = setTimeout(() => {
+        // Only preload if not already loaded
+        if (!blogContentCache.has(postId)) {
+            loadBlogPostContent(postId).then(post => {
+                if (post) {
+                    console.log(`Preloaded content for: ${post.title}`);
+                }
+            });
+        }
+    }, 150); // 150ms delay before preloading on hover
+}
+
+// Fetch all markdown files from /blog/ using posts.json manifest (legacy - loads all content immediately)
 async function fetchBlogPosts() {
     try {
         // Fetch the posts.json manifest file
@@ -206,7 +316,7 @@ function renderBlogCards(posts) {
     });
 }
 
-// Render post selector in sidebar
+// Render post selector in sidebar (with lazy loading and hover preload)
 function renderPostSelector(posts) {
     const container = document.getElementById('post-selector-list');
     if (!container) return;
@@ -216,7 +326,10 @@ function renderPostSelector(posts) {
     posts.forEach(post => {
         const item = document.createElement('div');
         item.className = 'post-selector-item';
-        item.onclick = () => openBlogPost(post.id);
+        // Use metadata-only approach: load content on click, preload on hover
+        item.onclick = () => openBlogPostLazy(post.id);
+        // Preload content on mouseenter (hover) with debounce
+        item.onmouseenter = () => preloadBlogPostContent(post.id);
         
         item.innerHTML = `
             <div class="post-selector-title">${post.icon} ${post.title}</div>
@@ -231,7 +344,7 @@ function renderPostSelector(posts) {
 
 // Filter posts by category - REMOVED (categories no longer in sidebar)
 
-// Open a blog post
+// Open a blog post (legacy - uses pre-loaded posts)
 function openBlogPost(id) {
     const post = blogPosts.find(p => p.id === id);
     if (!post) return;
@@ -257,6 +370,59 @@ function openBlogPost(id) {
     
     // Render post content
     const article = document.getElementById('blog-article-content');
+    article.innerHTML = `
+        <h1>${post.icon} ${post.title}</h1>
+        <div class="blog-meta" style="margin-bottom: 20px;">
+            <span class="blog-date">${post.date}</span>
+            <span style="margin-left: 15px;">${post.category}</span>
+        </div>
+        <div class="blog-post-content">${post.htmlContent}</div>
+    `;
+    
+    // Scroll to top
+    window.scrollTo(0, 0);
+}
+
+// Open a blog post with lazy loading (new approach - loads content on demand)
+async function openBlogPostLazy(id) {
+    // Show loading state first
+    const article = document.getElementById('blog-article-content');
+    
+    // Check if we're currently on home or about page, and switch to blogs if so
+    const currentPage = document.querySelector('.page-section.active');
+    if (currentPage && (currentPage.id === 'home' || currentPage.id === 'about')) {
+        // Find and click the blogs nav item to switch to blogs page
+        const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
+        if (blogsNavItem) {
+            blogsNavItem.click();
+        }
+    }
+    
+    // Update active state in sidebar
+    document.querySelectorAll('.post-selector-item').forEach((item, index) => {
+        item.classList.toggle('active', blogPostMetadata[index]?.id === id);
+    });
+    
+    // Hide intro view, show post view with loading indicator
+    document.getElementById('blog-intro-view').style.display = 'none';
+    document.getElementById('blog-post-view').style.display = 'block';
+    
+    // Show enhanced loading state with spinner
+    article.innerHTML = `
+        <div class="loading-container">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Loading post...</p>
+        </div>
+    `;
+    
+    // Load the post content (will use cache if already loaded)
+    const post = await loadBlogPostContent(id);
+    if (!post) {
+        article.innerHTML = '<p style="color: var(--text-secondary);">Error loading post.</p>';
+        return;
+    }
+    
+    // Render post content with fade-in animation
     article.innerHTML = `
         <h1>${post.icon} ${post.title}</h1>
         <div class="blog-meta" style="margin-bottom: 20px;">
@@ -575,16 +741,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup sidebar toggle
     setupSidebarToggle();
     
-    // Fetch and render blog posts
-    fetchBlogPosts().then(posts => {
+    // Fetch only blog post metadata (lazy load content on demand)
+    fetchBlogPostMetadata().then(posts => {
         if (posts.length > 0) {
             // Introduction view is already visible by default in HTML
-            // Just render the sidebar components
+            // Just render the sidebar components with lazy loading support
             renderPostSelector(posts);
             // Categories removed from sidebar - no longer rendering
             
-            // Render blog buttons on home page (kamikami.eu style)
-            renderBlogButtons(posts);
+            // Render blog buttons on home page (kamikami.eu style) with lazy loading
+            renderBlogButtonsLazy(posts);
             
             // Show post selector sidebar on Home page by default (since it's the active page on load)
             const blogSidebarSection = document.getElementById('blog-sidebar-section');
@@ -595,7 +761,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Render blog buttons on home page (inspired by kamikami.eu)
+// Render blog buttons on home page (inspired by kamikami.eu) - legacy version
 function renderBlogButtons(posts) {
     const container = document.getElementById('blog-buttons-container');
     if (!container) return;
@@ -647,7 +813,61 @@ function renderBlogButtons(posts) {
     container.appendChild(catButton);
 }
 
-// Open a blog post from home page button
+// Render blog buttons on home page with lazy loading support (new version)
+function renderBlogButtonsLazy(posts) {
+    const container = document.getElementById('blog-buttons-container');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    // Filter posts to show only Michelle DNS and Privacy Policy on home page
+    const homePagePosts = posts.filter(post => 
+        post.id === 'michelle-dns-for-ios-sideloading' || 
+        post.id === 'privacy-policy'
+    );
+    
+    if (homePagePosts.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    homePagePosts.forEach(post => {
+        const categoryClass = post.category ? 'category-' + post.category.toLowerCase().replace(/\s+/g, '-') : '';
+        
+        const button = document.createElement('a');
+        button.className = `blog-btn ${categoryClass}`;
+        button.href = '#';
+        // Use lazy loading: preload on hover, load on click
+        button.onmouseenter = () => preloadBlogPostContent(post.id);
+        button.onclick = (e) => {
+            e.preventDefault();
+            openBlogPostFromHomeLazy(post.id);
+        };
+        
+        button.innerHTML = `
+            <i class="fa-solid fa-book"></i>
+            <span>${post.title}</span>
+        `;
+        
+        container.appendChild(button);
+    });
+    
+    // Add "Send me cat pictures and files!" button (kamikami.eu style)
+    const catButton = document.createElement('a');
+    catButton.className = 'blog-btn category-fun';
+    catButton.href = 'https://cloud.kamikami.eu/s/send-me-cat-pics';
+    catButton.target = '_blank';
+    catButton.rel = 'noopener noreferrer';
+    
+    catButton.innerHTML = `
+        <i class="fa-solid fa-cat"></i>
+        <span>Send me cat pictures and files!</span>
+    `;
+    
+    container.appendChild(catButton);
+}
+
+// Open a blog post from home page button (legacy)
 function openBlogPostFromHome(id) {
     // Navigate to blogs page first
     const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
@@ -658,5 +878,19 @@ function openBlogPostFromHome(id) {
     // Then open the specific post after a short delay
     setTimeout(() => {
         openBlogPost(id);
+    }, 100);
+}
+
+// Open a blog post from home page button with lazy loading (new)
+async function openBlogPostFromHomeLazy(id) {
+    // Navigate to blogs page first
+    const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
+    if (blogsNavItem) {
+        blogsNavItem.click();
+    }
+    
+    // Then open the specific post with lazy loading after a short delay
+    setTimeout(() => {
+        openBlogPostLazy(id);
     }, 100);
 }
