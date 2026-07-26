@@ -292,18 +292,32 @@
             
             // Preload content on touch start for faster response
             item.addEventListener('touchstart', () => {
-                if (typeof preloadBlogPostContent === 'function') {
-                    preloadBlogPostContent(post.id);
+                if (typeof window.preloadBlogPostContent === 'function') {
+                    window.preloadBlogPostContent(post.id);
                 }
             }, { passive: true });
+            
+            // Also preload on mouseenter/hover for devices that support it
+            item.addEventListener('mouseenter', () => {
+                if (typeof window.preloadBlogPostContent === 'function') {
+                    window.preloadBlogPostContent(post.id);
+                }
+            });
+            
+            // Preload on mouseover as backup
+            item.addEventListener('mouseover', () => {
+                if (typeof window.preloadBlogPostContent === 'function') {
+                    window.preloadBlogPostContent(post.id);
+                }
+            });
             
             item.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 
                 // Use global openBlogPostLazy function for lazy loading
-                if (typeof openBlogPostLazy === 'function') {
-                    openBlogPostLazy(post.id);
+                if (typeof window.openBlogPostLazy === 'function') {
+                    window.openBlogPostLazy(post.id);
                 } else if (typeof openBlogPost === 'function') {
                     openBlogPost(post.id);
                 }
