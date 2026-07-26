@@ -369,6 +369,13 @@ html {
         opacity: 0;
         pointer-events: none;
     }
+    
+    /* Ensure toggle is always visible in mobile floating mode */
+    .sidebar.mobile-floating .sidebar-toggle {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: flex !important;
+    }
 }
 
 @keyframes slideLeft {

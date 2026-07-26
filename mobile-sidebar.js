@@ -28,6 +28,11 @@
         // Add mobile floating class to sidebar
         sidebar.classList.add('mobile-floating');
         
+        // Ensure toggle button is visible
+        sidebarToggle.style.display = 'flex';
+        sidebarToggle.style.opacity = '1';
+        sidebarToggle.style.visibility = 'visible';
+        
         // Create overlay backdrop
         let overlay = document.querySelector('.sidebar-overlay');
         if (!overlay) {
