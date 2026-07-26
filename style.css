@@ -33,9 +33,30 @@
     --theme-transition-duration: 0.3s;
 }
 
-/* Dark mode via prefers-color-scheme (automatic) */
+/* Dark mode - manual override via data-theme attribute */
+[data-theme="dark"] {
+    --mc-bg-dark: #121212;
+    --mc-stone: #3a3a3a;
+    --mc-shadow: #1e1e1e;
+    
+    --text-main: #ffffff;
+    --text-muted: #cccccc;
+    
+    --pink-neon: #ff6ec7;
+    --pink-pastel: #ff92df;
+    --pink-deep: #b04286;
+    --pink-glow: rgba(255, 110, 199, 0.5);
+    
+    --border-color: #ff92df;
+    --btn-border: #000000;
+    --logo-color: #ff6ec7;
+    --logo-shadow: #000000;
+    --bg-pattern: #1a1a1a;
+}
+
+/* Dark mode via prefers-color-scheme (auto fallback) */
 @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]):not([data-theme="dark"]) {
         --mc-bg-dark: #121212;
         --mc-stone: #3a3a3a;
         --mc-shadow: #1e1e1e;
@@ -105,10 +126,12 @@ a {
 header {
     background: color-mix(in srgb, var(--mc-bg-dark) 90%, transparent);
     border-bottom: var(--border-width) solid var(--pink-deep);
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
     z-index: 100;
-    padding: 1rem 0;
+    padding: 0.5rem 0;
     box-shadow: 0 4px 15px var(--pink-glow);
     backdrop-filter: blur(5px);
 }
@@ -123,7 +146,7 @@ header {
 }
 
 .logo {
-    font-size: 2.5rem;
+    font-size: 2rem;
     color: var(--logo-color);
     text-shadow: 3px 3px 0 var(--logo-shadow);
     letter-spacing: 2px;
@@ -137,16 +160,16 @@ header {
 /* --- NAVIGATION (Compact buttons with bigger margins) --- */
 .nav-links {
     display: flex;
-    gap: 15px;
+    gap: 20px;
 }
 
 .mc-btn {
     display: inline-block;
-    padding: 10px 25px;
+    padding: 6px 15px;
     background: var(--mc-stone);
     color: var(--pink-pastel);
     text-transform: uppercase;
-    font-size: 1.4rem;
+    font-size: 1.1rem;
     font-family: var(--font-main);
     
     /* 3D Border Trick - Minecraft style */
@@ -234,14 +257,14 @@ header {
 /* --- MAIN CONTENT AREA --- */
 main {
     max-width: var(--container-width);
-    margin: 40px auto;
+    margin: 60px auto 40px auto;
     padding: 0 20px;
 }
 
 .main-container {
     display: block;
     margin-top: 0;
-    min-height: calc(100vh - 200px);
+    min-height: calc(100vh - 100px);
     position: relative;
     margin-right: 280px;
     transition: margin-right 0.3s ease;
@@ -375,7 +398,7 @@ p.subtitle {
     top: 0;
     height: 100vh;
     box-sizing: border-box;
-    z-index: 99;
+    z-index: 90;
     transition: width 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
 }
 

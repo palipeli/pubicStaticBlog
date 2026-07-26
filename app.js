@@ -772,38 +772,16 @@ function setupTemplates() {
 // Apply different themes
 function applyTheme(themeName) {
     const root = document.documentElement;
-    
+
     if (themeName === 'auto') {
-        // Auto theme - detect system preference
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        applyTheme(prefersDark ? 'dark' : 'light');
-        return;
+        // Remove any manual theme attribute, let CSS media query handle it
+        root.removeAttribute('data-theme');
     } else if (themeName === 'light') {
-        // Adwaita Light Theme (GNOME default)
-        root.style.setProperty('--bg-dark', '#f6f5f4');
-        root.style.setProperty('--bg-panel', 'rgba(255, 255, 255, 0.95)');
-        root.style.setProperty('--bg-header', 'rgba(246, 245, 244, 0.95)');
-        root.style.setProperty('--accent-pink', '#ff45fc');
-        root.style.setProperty('--accent-pink-hover', '#e031e0');
-        root.style.setProperty('--text-primary', '#2e3436');
-        root.style.setProperty('--text-secondary', '#5e5e5e');
-        root.style.setProperty('--border-color', 'rgba(0, 0, 0, 0.1)');
-        root.style.setProperty('--blur-overlay-brightness', '1.0');
-        root.style.setProperty('--dark-overlay-color', 'rgba(0, 0, 0, 0.0)');
-        document.body.style.background = 'linear-gradient(135deg, #f6f5f4 0%, #ffffff 100%)';
+        // Force light theme
+        root.setAttribute('data-theme', 'light');
     } else if (themeName === 'dark') {
-        // Adwaita Dark Theme (GNOME) - Darker version
-        root.style.setProperty('--bg-dark', '#121212');
-        root.style.setProperty('--bg-panel', 'rgba(18, 18, 18, 0.9)');
-        root.style.setProperty('--bg-header', 'rgba(12, 12, 12, 0.95)');
-        root.style.setProperty('--accent-pink', '#ff45fc');
-        root.style.setProperty('--accent-pink-hover', '#e031e0');
-        root.style.setProperty('--text-primary', '#ffffff');
-        root.style.setProperty('--text-secondary', '#9a9a9a');
-        root.style.setProperty('--border-color', 'rgba(255, 255, 255, 0.08)');
-        root.style.setProperty('--blur-overlay-brightness', '0.6');
-        root.style.setProperty('--dark-overlay-color', 'rgba(0, 0, 0, 0.4)');
-        document.body.style.background = 'linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%)';
+        // Force dark theme - Minecraft style
+        root.setAttribute('data-theme', 'dark');
     }
 }
 
