@@ -1112,10 +1112,8 @@ document.addEventListener('DOMContentLoaded', function() {
     setupSidebarToggle();
     
     // Setup state persistence (auto-save on user actions)
-    // Load Bible verses and start devotional monitoring
-    loadBibleVerses().then(() => {
-        monitorWarningAndStartDevotional();
-    });
+    // Start devotional monitoring - Bible verses will be loaded only when animation starts
+    monitorWarningAndStartDevotional();
 
     setupStatePersistence();
     
