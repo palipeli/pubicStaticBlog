@@ -134,6 +134,45 @@ html {
     margin-right: 0;
 }
 
+/* On very small screens, sidebar floats over content instead of pushing it */
+@media (max-width: 480px) {
+    .main-container {
+        margin-right: 0 !important;
+    }
+    
+    .main-container.sidebar-collapsed {
+        margin-right: 0 !important;
+    }
+    
+    /* Sidebar floats over content on mobile */
+    .sidebar:not(.expanded) {
+        width: 0;
+        opacity: 0;
+        transform: translateX(20px);
+        pointer-events: none;
+    }
+    
+    .sidebar:not(.expanded) .sidebar-content-wrapper {
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    /* When expanded on mobile, sidebar overlays content */
+    .sidebar.expanded {
+        width: 280px;
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+        box-shadow: -5px 0 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Hide toggle when collapsed on very small screens */
+    .sidebar.collapsed .sidebar-toggle {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
 .content-area {
     padding: 30px;
     overflow-y: auto;
@@ -303,7 +342,7 @@ html {
 }
 
 /* Auto-collapse on constrained space - handle resize smoothly */
-@media (max-width: 768px) {
+@media (max-width: 768px) and (min-width: 481px) {
     .sidebar:not(.expanded) {
         width: 0;
         opacity: 0;
@@ -363,7 +402,20 @@ html {
 }
 
 /* Hide toggle button when sidebar is collapsed on mobile */
-@media (max-width: 768px) {
+@media (max-width: 768px) and (min-width: 481px) {
+    .sidebar.collapsed .sidebar-toggle {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
+/* On very small screens, always show toggle when sidebar is expanded */
+@media (max-width: 480px) {
+    .sidebar.expanded .sidebar-toggle {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    
     .sidebar.collapsed .sidebar-toggle {
         opacity: 0;
         pointer-events: none;
@@ -912,7 +964,7 @@ html {
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 768px) and (min-width: 481px) {
     /* On mobile, sidebar is collapsed by default but toggle button remains visible */
     .sidebar.collapsed {
         width: 0;

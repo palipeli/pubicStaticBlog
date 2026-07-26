@@ -466,15 +466,29 @@ function setupSidebarToggle() {
         return window.innerWidth <= 768;
     }
     
+    // Check if we're on very small screen (phone)
+    function isVerySmallScreen() {
+        return window.innerWidth <= 480;
+    }
+    
     // Initialize sidebar state based on screen size
     function initSidebarState() {
-        if (isMobileView()) {
+        if (isVerySmallScreen()) {
+            // On very small screens, sidebar floats over content
+            sidebar.classList.add('collapsed');
+            sidebar.classList.remove('expanded');
+            mainContainer.classList.remove('sidebar-collapsed'); // Content uses full width
+            sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
+            sidebarToggle.setAttribute('title', 'Open Sidebar');
+        } else if (isMobileView()) {
+            // On mobile (481-768px), sidebar collapses but can be toggled
             sidebar.classList.add('collapsed');
             sidebar.classList.remove('expanded');
             mainContainer.classList.add('sidebar-collapsed');
             sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
             sidebarToggle.setAttribute('title', 'Open Sidebar');
         } else {
+            // Desktop: sidebar expanded by default
             sidebar.classList.remove('collapsed');
             sidebar.classList.add('expanded');
             mainContainer.classList.remove('sidebar-collapsed');
@@ -491,7 +505,14 @@ function setupSidebarToggle() {
         e.stopPropagation();
         sidebar.classList.toggle('collapsed');
         sidebar.classList.toggle('expanded');
-        mainContainer.classList.toggle('sidebar-collapsed');
+        
+        // On very small screens, don't adjust content margin (sidebar floats)
+        if (!isVerySmallScreen()) {
+            mainContainer.classList.toggle('sidebar-collapsed');
+        } else {
+            // On very small screens, always keep content at full width
+            mainContainer.classList.remove('sidebar-collapsed');
+        }
         
         // Update toggle button aria-label and icon direction
         const isCollapsed = sidebar.classList.contains('collapsed');
@@ -504,9 +525,18 @@ function setupSidebarToggle() {
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-            // On mobile, auto-collapse for space but button remains visible
-            // On desktop, preserve user's choice
-            if (isMobileView()) {
+            // On very small screens (<480px), sidebar floats over content
+            if (isVerySmallScreen()) {
+                // Keep content at full width, sidebar overlays when expanded
+                mainContainer.classList.remove('sidebar-collapsed');
+                if (!sidebar.classList.contains('collapsed')) {
+                    sidebar.classList.add('collapsed');
+                    sidebar.classList.remove('expanded');
+                    sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
+                    sidebarToggle.setAttribute('title', 'Open Sidebar');
+                }
+            } else if (isMobileView()) {
+                // On mobile (481-768px), auto-collapse for space but button remains visible
                 if (!sidebar.classList.contains('collapsed')) {
                     sidebar.classList.add('collapsed');
                     sidebar.classList.remove('expanded');
@@ -515,7 +545,7 @@ function setupSidebarToggle() {
                     sidebarToggle.setAttribute('title', 'Open Sidebar');
                 }
             } else {
-                // Desktop: only auto-expand if user hasn't manually collapsed it
+                // Desktop: preserve user's choice, only auto-expand if no manual interaction
                 if (!sidebar.classList.contains('collapsed') && !sidebar.classList.contains('expanded')) {
                     sidebar.classList.add('expanded');
                     mainContainer.classList.remove('sidebar-collapsed');
