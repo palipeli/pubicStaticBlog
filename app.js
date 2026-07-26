@@ -1218,6 +1218,17 @@ async function initDevotional() {
     const homeLeadElement = document.querySelector('.home-lead');
     if (!homeLeadElement) return;
     
+    // Wait for warning to be accepted before starting devotional
+    await new Promise((resolve) => {
+        // If already accepted (from localStorage), start immediately
+        if (localStorage.getItem('system_warning_consent') === 'true') {
+            resolve();
+        } else {
+            // Listen for the warning-accepted event
+            window.addEventListener('warning-accepted', () => resolve(), { once: true });
+        }
+    });
+    
     // Load verses first
     await loadDevotionalVerses();
     
@@ -1234,7 +1245,8 @@ async function initDevotional() {
     if (!verse) return;
     
     const originalText = homeLeadElement.textContent;
-    const verseText = `${verse.text} — ${verse.reference}`;
+    // Add NRSVUE after the reference (e.g., "Matthew 1:1" becomes "Matthew 1:1 NRSVUE")
+    const verseText = `${verse.text} — ${verse.reference} NRSVUE`;
     
     // Perform typing delete animation with fast speeds (5ms delete, 10ms type)
     await typingDeleteAnimation(homeLeadElement, originalText, verseText, 5, 10);
