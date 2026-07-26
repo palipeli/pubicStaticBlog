@@ -1070,6 +1070,15 @@ html {
     box-shadow: 0 6px 20px rgba(108, 117, 125, 0.6);
 }
 
+/* Fun category (cat pictures button) */
+.blog-btn.category-fun {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+}
+.blog-btn.category-fun:hover {
+    box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+}
+
 @keyframes rippleEffect {
     0% {
         transform: translate(-50%, -50%) scale(1);

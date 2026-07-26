@@ -562,12 +562,18 @@ function renderBlogButtons(posts) {
     
     container.innerHTML = '';
     
-    if (posts.length === 0) {
+    // Filter posts to show only Michelle DNS and Privacy Policy on home page
+    const homePagePosts = posts.filter(post => 
+        post.id === 'michelle-dns-for-ios-sideloading' || 
+        post.id === 'privacy-policy'
+    );
+    
+    if (homePagePosts.length === 0) {
         container.style.display = 'none';
         return;
     }
     
-    posts.forEach(post => {
+    homePagePosts.forEach(post => {
         const categoryClass = post.category ? 'category-' + post.category.toLowerCase().replace(/\s+/g, '-') : '';
         
         const button = document.createElement('a');
@@ -585,6 +591,19 @@ function renderBlogButtons(posts) {
         
         container.appendChild(button);
     });
+    
+    // Add "Send me cat pictures and files!" button (kamikami.eu style)
+    const catButton = document.createElement('a');
+    catButton.className = 'blog-btn category-fun';
+    catButton.href = 'mailto:kamikami@example.com?subject=Cat Pictures & Body=Here are some cat pictures!';
+    catButton.target = '_blank';
+    
+    catButton.innerHTML = `
+        <i class="fa-solid fa-cat"></i>
+        <span>Send me cat pictures and files!</span>
+    `;
+    
+    container.appendChild(catButton);
 }
 
 // Open a blog post from home page button

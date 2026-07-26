@@ -38,6 +38,16 @@ coverage/
 htmlcov/
 .coverage
 
+# Build directories
+dist/
+build/
+target/
+.mypy_cache/
+.pytest_cache/
+.gradle/
+julia-*/
+zig*/
+
 # Compressed files
 *.zip
 *.gz
