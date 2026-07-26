@@ -1,4 +1,4 @@
-/* mobile-sidebar.css - Mobile Floating Sidebar Styles */
+/* mobile-tray.css - Mobile Floating Tray Styles */
 
 /* Mobile breakpoint for floating tray behavior */
 @media (max-width: 480px) {
@@ -83,8 +83,8 @@
         background: rgba(0, 0, 0, 0.1);
     }
 
-    /* Mobile trigger button - fixed at bottom right */
-    .mobile-sidebar-trigger {
+    /* Mobile trigger button - styled like sidebar toggle but oriented for bottom-right */
+    .mobile-tray-trigger {
         position: fixed;
         bottom: 20px;
         right: 20px;
@@ -103,16 +103,16 @@
         transition: all 0.3s ease;
     }
 
-    .mobile-sidebar-trigger:hover {
+    .mobile-tray-trigger:hover {
         transform: scale(1.1);
         box-shadow: 0 6px 16px rgba(71, 114, 179, 0.6);
     }
 
-    .mobile-sidebar-trigger:active {
+    .mobile-tray-trigger:active {
         transform: scale(0.95);
     }
 
-    .mobile-sidebar-trigger svg {
+    .mobile-tray-trigger svg {
         width: 28px;
         height: 28px;
     }

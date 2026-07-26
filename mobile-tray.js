@@ -1,4 +1,4 @@
-// mobile-sidebar.js - Mobile Floating Sidebar Tray Functionality
+// mobile-tray.js - Mobile Floating Tray Functionality
 // Only activates on screens with width <= 480px
 
 (function() {
@@ -29,7 +29,7 @@
         sidebar.classList.add('mobile-tray');
 
         // Create trigger button if it doesn't exist
-        if (!document.querySelector('.mobile-sidebar-trigger')) {
+        if (!document.querySelector('.mobile-tray-trigger')) {
             createTriggerButton();
         }
 
@@ -43,7 +43,7 @@
             createTrayHeader();
         }
 
-        triggerButton = document.querySelector('.mobile-sidebar-trigger');
+        triggerButton = document.querySelector('.mobile-tray-trigger');
         overlay = document.querySelector('.mobile-tray-overlay');
         trayHeader = document.querySelector('.mobile-tray-header');
 
@@ -51,14 +51,15 @@
         setupEventListeners();
     }
 
-    // Create the floating trigger button
+    // Create the floating trigger button - styled like sidebar toggle but oriented correctly
     function createTriggerButton() {
         const button = document.createElement('button');
-        button.className = 'mobile-sidebar-trigger';
+        button.className = 'mobile-tray-trigger';
         button.setAttribute('aria-label', 'Open Menu');
+        // Using same chevron icon as sidebar toggle, rotated to point up for opening from bottom
         button.innerHTML = `
             <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
             </svg>
         `;
         document.body.appendChild(button);
@@ -187,7 +188,7 @@
         
         sidebar.classList.remove('mobile-tray', 'active');
         
-        const trigger = document.querySelector('.mobile-sidebar-trigger');
+        const trigger = document.querySelector('.mobile-tray-trigger');
         if (trigger) trigger.remove();
         
         const overlayEl = document.querySelector('.mobile-tray-overlay');
