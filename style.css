@@ -1028,6 +1028,8 @@ html {
         display: flex;
         align-items: center;
         justify-content: center;
+        margin-left: auto; /* Push to rightmost position */
+        order: 10; /* Ensure it's last in flex container */
     }
     
     /* Keep nav items visible on mobile but adjust spacing */

@@ -229,10 +229,10 @@
             </svg>
         `;
         
-        // Insert into header-right, before nav items
+        // Insert into header-right, after all nav items (rightmost position)
         const headerRight = document.querySelector('.header-right');
         if (headerRight) {
-            headerRight.insertBefore(toggleBtn, headerRight.firstChild);
+            headerRight.appendChild(toggleBtn);
         }
         
         // Add click event listener directly when creating button
