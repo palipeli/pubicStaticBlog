@@ -13,8 +13,9 @@
     function initMobileSidebar() {
         const sidebar = document.getElementById('sidebar');
         const sidebarToggle = document.getElementById('sidebar-toggle');
+        const mobileSidebarToggle = document.getElementById('mobile-sidebar-toggle');
         
-        if (!sidebar || !sidebarToggle) return;
+        if (!sidebar) return;
         
         // Only activate on mobile
         if (!isMobileView()) {
@@ -27,11 +28,6 @@
         
         // Add mobile floating class to sidebar
         sidebar.classList.add('mobile-floating');
-        
-        // Ensure toggle button is visible
-        sidebarToggle.style.display = 'flex';
-        sidebarToggle.style.opacity = '1';
-        sidebarToggle.style.visibility = 'visible';
         
         // Create overlay backdrop
         let overlay = document.querySelector('.sidebar-overlay');
@@ -46,17 +42,19 @@
             });
         }
         
-        // Override toggle button behavior for mobile
-        sidebarToggle.addEventListener('click', function(e) {
-            e.stopPropagation();
-            e.preventDefault();
-            
-            if (sidebar.classList.contains('mobile-open')) {
-                closeMobileSidebar();
-            } else {
-                openMobileSidebar();
-            }
-        });
+        // Use the new mobile toggle button for mobile
+        if (mobileSidebarToggle) {
+            mobileSidebarToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                
+                if (sidebar.classList.contains('mobile-open')) {
+                    closeMobileSidebar();
+                } else {
+                    openMobileSidebar();
+                }
+            });
+        }
         
         // Handle swipe gestures for better mobile UX
         setupSwipeGestures(sidebar);
