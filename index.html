@@ -33,6 +33,9 @@
                     <h1 class="home-title">MICHELLE'S PLAYGROUND AND DNS PROFILE</h1>
                     <p class="home-lead">WELCOME TO MY SUPER-CUTE-BUT-SHITTY WEBSITE! TAKE VICODIN IF YOU CAME FROM WSFTEAM.XYZ</p>
                     
+                    <!-- Blog Logo -->
+                    <img src="blog-logo.webp" alt="Blog Logo" style="width: 70%; max-width: 560px; display: block; margin: 20px auto;">
+                    
                     <!-- Blog Buttons Section (kamikami.eu style) -->
                     <div class="blog-buttons-container" id="blog-buttons-container" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 25px 0;">
                         <!-- Buttons will be dynamically generated from posts.json -->
@@ -134,8 +137,16 @@
                     <h3 class="sidebar-title">Theme</h3>
                     <div class="theme-chooser">
                         <button class="theme-btn active" data-theme="auto">Auto</button>
-                        <button class="theme-btn" data-theme="adwaita-light">Adwaita Light</button>
-                        <button class="theme-btn" data-theme="adwaita-dark">Adwaita Dark</button>
+                        <button class="theme-btn" data-theme="light">Light</button>
+                        <button class="theme-btn" data-theme="dark">Dark</button>
+                    </div>
+                </div>
+
+                <!-- ALL POST Section - Below Theme Chooser -->
+                <div class="sidebar-section">
+                    <h3 class="sidebar-title">ALL POST</h3>
+                    <div class="post-selector-list" id="all-post-list">
+                        <!-- Post links will be loaded here -->
                     </div>
                 </div>
 
