@@ -47,17 +47,6 @@
                     </div>
                 </div>
                 
-                <!-- About Section -->
-                <div class="mobile-tray-section">
-                    <div class="mobile-photo-placeholder">
-                        <svg viewBox="0 0 100 100" width="80" height="80">
-                            <circle cx="50" cy="35" r="20" fill="currentColor" opacity="0.3"/>
-                            <ellipse cx="50" cy="85" rx="30" ry="15" fill="currentColor" opacity="0.3"/>
-                        </svg>
-                    </div>
-                    <div class="mobile-about-text">
-                        <p>A Blender-inspired blogging platform built with pure HTML, CSS, and JavaScript. Minimalist, fast, and transparent.</p>
-                    </div>
                 </div>
             </div>
         `;
