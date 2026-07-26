@@ -503,16 +503,20 @@ function setupSidebarToggle() {
         resizeTimeout = setTimeout(() => {
             // On mobile, auto-collapse for space but button remains visible
             // On desktop, preserve user's choice
-            if (isMobileView() && !sidebar.classList.contains('collapsed')) {
-                sidebar.classList.add('collapsed');
-                sidebar.classList.remove('expanded');
-                sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
-                sidebarToggle.setAttribute('title', 'Open Sidebar');
-            } else if (!isMobileView() && !sidebar.classList.contains('expanded')) {
-                sidebar.classList.add('expanded');
-                sidebar.classList.remove('collapsed');
-                sidebarToggle.setAttribute('aria-label', 'Collapse Sidebar');
-                sidebarToggle.setAttribute('title', 'Collapse Sidebar');
+            if (isMobileView()) {
+                if (!sidebar.classList.contains('collapsed')) {
+                    sidebar.classList.add('collapsed');
+                    sidebar.classList.remove('expanded');
+                    sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
+                    sidebarToggle.setAttribute('title', 'Open Sidebar');
+                }
+            } else {
+                // Desktop: only auto-expand if user hasn't manually collapsed it
+                if (!sidebar.classList.contains('collapsed') && !sidebar.classList.contains('expanded')) {
+                    sidebar.classList.add('expanded');
+                    sidebarToggle.setAttribute('aria-label', 'Collapse Sidebar');
+                    sidebarToggle.setAttribute('title', 'Collapse Sidebar');
+                }
             }
         }, 200);
     });

@@ -272,6 +272,7 @@ html {
     height: calc(100vh - var(--header-height));
     box-sizing: border-box;
     z-index: 999;
+    transition: width 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
 }
 
 /* Sidebar content wrapper */
@@ -280,7 +281,7 @@ html {
     height: 100%;
     overflow-y: auto;
     opacity: 1;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.3s ease;
     width: 100%;
     box-sizing: border-box;
 }
@@ -299,6 +300,9 @@ html {
 @media (max-width: 768px) {
     .sidebar:not(.expanded) {
         width: 0;
+        opacity: 0;
+        transform: translateX(20px);
+        pointer-events: none;
     }
     .sidebar:not(.expanded) .sidebar-content-wrapper {
         opacity: 0;
@@ -350,6 +354,14 @@ html {
 
 .sidebar-toggle:active {
     transform: translate(-100%, -50%) scale(0.95);
+}
+
+/* Hide toggle button when sidebar is collapsed on mobile */
+@media (max-width: 768px) {
+    .sidebar.collapsed .sidebar-toggle {
+        opacity: 0;
+        pointer-events: none;
+    }
 }
 
 @keyframes slideLeft {
@@ -872,7 +884,6 @@ html {
     /* On mobile, sidebar is collapsed by default but toggle button remains visible */
     .sidebar.collapsed {
         width: 0;
-        padding: 0;
         opacity: 0;
         transform: translateX(20px);
         pointer-events: none;
@@ -882,6 +893,10 @@ html {
         opacity: 1;
         transform: translateX(0);
         pointer-events: auto;
+    }
+    
+    .content-area {
+        max-width: 100vw;
     }
     
     .blog-grid {
