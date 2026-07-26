@@ -4,42 +4,49 @@
 __pycache__/
 *.o
 *.obj
+*.class
+*.exe
+*.dll
+*.so
+*.a
+*.out
+
+# Dependencies
+node_modules/
+venv/
+.venv/
+.env
+.env.local
+.env.*
+
+# Build directories
 dist/
 build/
 target/
-
-# Dependencies
-.venv/
-venv/
-node_modules/
-.julia/
-.zig-cache/
-.mypy_cache/
-.pytest_cache/
-.coverage
-coverage/
-htmlcov/
-
-# Logs and temp files
 *.log
 *.tmp
 *.swp
 *.swo
 
-# Environment
-.env
-.env.local
-.env.*
-
 # Editors
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# System
+# System files
 .DS_Store
 Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Python specific
+.mypy_cache/
+.pytest_cache/
+
+# Gradle
+.gradle/
 
 # Compressed files
 *.zip
@@ -64,89 +71,4 @@ Thumbs.db
 *.tar.bz2
 *.tar.xz
 *.tar.zst
-
-# Gradle
-.gradle/
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-*.so
-.coverage
-htmlcov/
-.pytest_cache/
-.mypy_cache/
-.tox/
-noxfile.json
-*.pot
-*.po
-*.mo
-.svn/
-CVS/
-.git/
-.gitignore
-.pytest_cache/
-.hypothesis/
-.coverage.xml
-.coverage.*
-nosetests.xml
-coverage.xml
-*.cover
-*.log
-.pyup.yml
-.isort.cfg
-.tox/
-.coverage
-htmlcov/
-.pytest_cache/
-.mypy_cache/
-.eggs/
-eggs/
-parts/
-develop-eggs/
-.installed.cfg
-lib/
-lib64/
-pip-delete-this-directory.txt
-site-packages/
-wheels/
-*.whl
-*.egg-info/
-.venv/
-venv/
-ENV/
-env/
-ENV.bak/
-env.bak/
-.env
-.env.local
-.venv.bak
-.ENV
-.env.example
-.python-version
-*.sublime-project
-*.sublime-workspace
-.pydevproject
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.project
-.pycharm/
-*.iml
-*.iws
-*.log
-*.tmp
-.DS_Store
-Thumbs.db
-```
-
-Wait, let me reconsider this. The only modified file is `style.css`, which is a source code file. There are no build artifacts, dependencies, or temporary files in the change list. According to rule #6, if the change list contains only source or config files and no build artifacts, dependencies, or temp files, I should output an empty .gitignore.
-
-```gitignore
-
 ```
