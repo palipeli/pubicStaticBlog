@@ -466,12 +466,21 @@ function setupSidebarToggle() {
         return window.innerWidth <= 768;
     }
     
+    // Check if we're on very small screens (phones) where sidebar should float
+    function isVerySmallScreen() {
+        return window.innerWidth <= 480;
+    }
+    
     // Initialize sidebar state based on screen size
     function initSidebarState() {
         if (isMobileView()) {
             sidebar.classList.add('collapsed');
             sidebar.classList.remove('expanded');
-            mainContainer.classList.add('sidebar-collapsed');
+            // On very small screens, don't apply sidebar-collapsed to main container
+            // because the sidebar floats over content instead of pushing it
+            if (!isVerySmallScreen()) {
+                mainContainer.classList.add('sidebar-collapsed');
+            }
             sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
             sidebarToggle.setAttribute('title', 'Open Sidebar');
         } else {
@@ -491,7 +500,11 @@ function setupSidebarToggle() {
         e.stopPropagation();
         sidebar.classList.toggle('collapsed');
         sidebar.classList.toggle('expanded');
-        mainContainer.classList.toggle('sidebar-collapsed');
+        
+        // Only toggle mainContainer class on non-floating screens
+        if (!isVerySmallScreen()) {
+            mainContainer.classList.toggle('sidebar-collapsed');
+        }
         
         // Update toggle button aria-label and icon direction
         const isCollapsed = sidebar.classList.contains('collapsed');
@@ -504,9 +517,18 @@ function setupSidebarToggle() {
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-            // On mobile, auto-collapse for space but button remains visible
+            // On very small screens (phones), sidebar floats over content
+            // On mobile but not very small, auto-collapse for space but button remains visible
             // On desktop, preserve user's choice
-            if (isMobileView()) {
+            if (isVerySmallScreen()) {
+                // Floating mode: keep collapsed state but don't modify mainContainer
+                if (!sidebar.classList.contains('collapsed')) {
+                    sidebar.classList.add('collapsed');
+                    sidebar.classList.remove('expanded');
+                    sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
+                    sidebarToggle.setAttribute('title', 'Open Sidebar');
+                }
+            } else if (isMobileView()) {
                 if (!sidebar.classList.contains('collapsed')) {
                     sidebar.classList.add('collapsed');
                     sidebar.classList.remove('expanded');

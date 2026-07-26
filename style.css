@@ -316,6 +316,68 @@ html {
     }
 }
 
+/* Mobile floating sidebar - floats over content instead of pushing it */
+@media (max-width: 480px) {
+    .sidebar {
+        width: 280px;
+        transform: translateX(100%);
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.2);
+        /* Reset transition for transform to allow smooth sliding */
+        transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    
+    .sidebar.expanded {
+        transform: translateX(0);
+        opacity: 1;
+        pointer-events: auto;
+    }
+    
+    .sidebar.collapsed {
+        width: 280px;
+        transform: translateX(100%);
+        opacity: 1;
+    }
+    
+    .sidebar.collapsed .sidebar-content-wrapper {
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    .sidebar.expanded .sidebar-content-wrapper {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    
+    /* Toggle button always visible on mobile - positioned on right edge when collapsed */
+    .sidebar-toggle {
+        position: fixed;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%) rotate(180deg);
+        border-radius: 12px 0 0 12px;
+        box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+        z-index: 1002;
+    }
+    
+    /* When expanded, move toggle to left edge of sidebar and show proper chevron */
+    .sidebar.expanded .sidebar-toggle {
+        left: 0;
+        right: auto;
+        transform: translateY(-50%) rotate(0deg);
+        border-radius: 12px 0 0 12px;
+        box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Main container doesn't need margin adjustment on mobile - sidebar floats */
+    .main-container {
+        margin-right: 0 !important;
+    }
+    
+    .main-container.sidebar-collapsed {
+        margin-right: 0 !important;
+    }
+}
+
 /* Sidebar toggle button - fixed to left edge of sidebar, vertically centered */
 .sidebar-toggle {
     position: absolute;
@@ -362,11 +424,19 @@ html {
     transform: translate(-100%, -50%) scale(0.95);
 }
 
-/* Hide toggle button when sidebar is collapsed on mobile */
-@media (max-width: 768px) {
+/* Hide toggle button when sidebar is collapsed on mobile (but not on very small screens) */
+@media (max-width: 768px) and (min-width: 481px) {
     .sidebar.collapsed .sidebar-toggle {
         opacity: 0;
         pointer-events: none;
+    }
+}
+
+/* On very small screens, always show the toggle button */
+@media (max-width: 480px) {
+    .sidebar-toggle {
+        opacity: 1 !important;
+        pointer-events: auto !important;
     }
 }
 
