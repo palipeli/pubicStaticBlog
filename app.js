@@ -1,5 +1,8 @@
 // app.js - Blog Platform Application Logic
 
+// State Persistence Key
+const STATE_STORAGE_KEY = 'blogPlatformState';
+
 // Global state for blog posts - exposed on window for cross-module access
 window.blogPosts = []; // Full posts with content (lazy-loaded)
 window.blogPostMetadata = []; // Metadata only (loaded initially)
@@ -8,6 +11,166 @@ const blogContentCache = new Map(); // Cache for loaded blog content
 // Shorthand references for cleaner code
 let blogPosts = window.blogPosts;
 let blogPostMetadata = window.blogPostMetadata;
+
+// =====================
+// State Persistence Functions
+// =====================
+
+// Save current application state to localStorage
+function saveAppState() {
+    const currentState = {
+        currentPage: getCurrentPage(),
+        activeBlogPost: getActiveBlogPostId(),
+        sidebarCollapsed: isSidebarCollapsed(),
+        theme: getCurrentTheme(),
+        timestamp: Date.now()
+    };
+    
+    try {
+        localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(currentState));
+        console.log('App state saved:', currentState);
+    } catch (err) {
+        console.warn('Failed to save app state:', err);
+    }
+}
+
+// Load application state from localStorage
+function loadAppState() {
+    try {
+        const savedState = localStorage.getItem(STATE_STORAGE_KEY);
+        if (savedState) {
+            const state = JSON.parse(savedState);
+            console.log('Loaded app state:', state);
+            return state;
+        }
+    } catch (err) {
+        console.warn('Failed to load app state:', err);
+    }
+    return null;
+}
+
+// Clear saved state (useful for logout or reset)
+function clearAppState() {
+    try {
+        localStorage.removeItem(STATE_STORAGE_KEY);
+        console.log('App state cleared');
+    } catch (err) {
+        console.warn('Failed to clear app state:', err);
+    }
+}
+
+// Get current active page
+function getCurrentPage() {
+    const activeSection = document.querySelector('.page-section.active');
+    return activeSection ? activeSection.id : 'home';
+}
+
+// Get currently active blog post ID (if viewing a post)
+function getActiveBlogPostId() {
+    const postView = document.getElementById('blog-post-view');
+    if (postView && postView.style.display !== 'none') {
+        const activeItem = document.querySelector('.post-selector-item.active');
+        if (activeItem) {
+            // Extract post ID from the onclick handler or data attribute
+            const postId = activeItem.getAttribute('data-post-id');
+            if (postId) return postId;
+        }
+    }
+    return null;
+}
+
+// Check if sidebar is collapsed
+function isSidebarCollapsed() {
+    const sidebar = document.getElementById('sidebar');
+    return sidebar ? sidebar.classList.contains('collapsed') : false;
+}
+
+// Get current theme
+function getCurrentTheme() {
+    const activeThemeBtn = document.querySelector('.theme-btn.active');
+    return activeThemeBtn ? activeThemeBtn.dataset.theme : 'auto';
+}
+
+// Restore application state after page load
+function restoreAppState() {
+    const savedState = loadAppState();
+    if (!savedState) {
+        console.log('No saved state to restore');
+        return;
+    }
+    
+    // Wait for DOM to be ready and blog posts to be loaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => applySavedState(savedState));
+    } else {
+        applySavedState(savedState);
+    }
+}
+
+// Apply saved state to the application
+function applySavedState(state) {
+    console.log('Applying saved state:', state);
+    
+    // Restore theme first (before other UI updates)
+    if (state.theme) {
+        const themeBtn = document.querySelector(`.theme-btn[data-theme="${state.theme}"]`);
+        if (themeBtn && !themeBtn.classList.contains('active')) {
+            themeBtn.click();
+        }
+    }
+    
+    // Restore sidebar state
+    if (state.sidebarCollapsed) {
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar && !sidebar.classList.contains('collapsed')) {
+            const toggleBtn = document.getElementById('sidebar-toggle');
+            if (toggleBtn) {
+                toggleBtn.click();
+            }
+        }
+    }
+    
+    // Restore page navigation
+    if (state.currentPage && state.currentPage !== 'home') {
+        const navItem = document.querySelector(`.nav-item[data-page="${state.currentPage}"]`);
+        if (navItem) {
+            navItem.click();
+        }
+    }
+    
+    // Restore blog post view (must be done after navigating to blogs page)
+    if (state.activeBlogPost && state.currentPage === 'blogs') {
+        // Wait a bit for the page transition and blog posts to load
+        setTimeout(() => {
+            if (typeof openBlogPostLazy === 'function') {
+                openBlogPostLazy(state.activeBlogPost);
+            }
+        }, 300);
+    }
+}
+
+// Auto-save state on various user actions
+function setupStatePersistence() {
+    // Save state when navigating between pages
+    document.addEventListener('click', (e) => {
+        const navItem = e.target.closest('.nav-item');
+        const postItem = e.target.closest('.post-selector-item');
+        const backBtn = e.target.closest('.back-to-intro-btn');
+        const themeBtn = e.target.closest('.theme-btn');
+        const sidebarToggle = e.target.closest('.sidebar-toggle');
+        
+        if (navItem || postItem || backBtn || themeBtn || sidebarToggle) {
+            // Delay save slightly to allow UI updates
+            setTimeout(saveAppState, 100);
+        }
+    });
+    
+    // Also save before page unload
+    window.addEventListener('beforeunload', saveAppState);
+    
+    // Save state periodically (every 30 seconds) as backup
+    setInterval(saveAppState, 30000);
+}
 
 // Default introduction content shown before selecting a post
 const blogIntroduction = {
@@ -339,6 +502,8 @@ function renderPostSelector(posts) {
     posts.forEach(post => {
         const item = document.createElement('div');
         item.className = 'post-selector-item';
+        // Add data attribute for state persistence
+        item.setAttribute('data-post-id', post.id);
         // Use metadata-only approach: load content on click, preload on hover
         item.onclick = () => openBlogPostLazy(post.id);
         // Preload content on mouseenter (hover) with debounce
@@ -445,6 +610,9 @@ async function openBlogPostLazy(id) {
         <div class="blog-post-content">${post.htmlContent}</div>
     `;
     
+    // Save state after opening a post
+    setTimeout(saveAppState, 100);
+    
     // Scroll to top
     window.scrollTo(0, 0);
 }
@@ -458,6 +626,9 @@ function showBlogIntro() {
     document.querySelectorAll('.post-selector-item').forEach(item => {
         item.classList.remove('active');
     });
+    
+    // Save state after going back to intro
+    setTimeout(saveAppState, 100);
 }
 
 // Initialize particles
@@ -512,6 +683,9 @@ function setupNavigation() {
             
             // Scroll to top when changing pages
             window.scrollTo(0, 0);
+            
+            // Save state after navigation
+            setTimeout(saveAppState, 100);
         });
     });
 }
@@ -549,6 +723,9 @@ function setupTemplates() {
             const theme = btn.dataset.theme;
             applyTheme(theme);
             saveThemePreference(theme);
+            
+            // Save state after theme change
+            setTimeout(saveAppState, 100);
         });
     });
     
@@ -710,6 +887,9 @@ function setupSidebarToggle() {
         const isCollapsed = sidebar.classList.contains('collapsed');
         sidebarToggle.setAttribute('aria-label', isCollapsed ? 'Open Sidebar' : 'Collapse Sidebar');
         sidebarToggle.setAttribute('title', isCollapsed ? 'Open Sidebar' : 'Collapse Sidebar');
+        
+        // Save state after sidebar toggle
+        setTimeout(saveAppState, 100);
     });
     
     // Handle window resize - sidebar always accessible via button
@@ -753,6 +933,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Setup sidebar toggle
     setupSidebarToggle();
+    
+    // Setup state persistence (auto-save on user actions)
+    setupStatePersistence();
+    
+    // Restore saved state after page refresh
+    restoreAppState();
     
     // Fetch only blog post metadata (lazy load content on demand)
     fetchBlogPostMetadata().then(posts => {
