@@ -27,6 +27,11 @@ body {
 
 html {
     height: 100%;
+    overflow: hidden;
+}
+
+body {
+    overflow-y: auto;
 }
 
 /* Header */
@@ -1304,4 +1309,21 @@ html {
 /* Prevent body scroll when tray is open */
 body.mobile-tray-open {
     overflow: hidden;
+}
+
+/* Footer Styles */
+footer {
+    background: var(--bg-panel);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border-color);
+    padding: 30px 20px;
+    text-align: center;
+    margin-top: 40px;
+}
+
+footer p {
+    margin: 8px 0;
+    color: var(--text-secondary);
+    font-size: 14px;
 }

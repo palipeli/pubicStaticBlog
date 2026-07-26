@@ -359,9 +359,9 @@ function applyTheme(themeName) {
     if (themeName === 'auto') {
         // Auto theme - detect system preference
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        applyTheme(prefersDark ? 'adwaita-dark' : 'adwaita-light');
+        applyTheme(prefersDark ? 'dark' : 'light');
         return;
-    } else if (themeName === 'adwaita-light') {
+    } else if (themeName === 'light') {
         // Adwaita Light Theme (GNOME default)
         root.style.setProperty('--bg-dark', '#f6f5f4');
         root.style.setProperty('--bg-panel', 'rgba(255, 255, 255, 0.95)');
@@ -372,7 +372,7 @@ function applyTheme(themeName) {
         root.style.setProperty('--text-secondary', '#5e5e5e');
         root.style.setProperty('--border-color', 'rgba(0, 0, 0, 0.1)');
         document.body.style.background = 'linear-gradient(135deg, #f6f5f4 0%, #ffffff 100%)';
-    } else if (themeName === 'adwaita-dark') {
+    } else if (themeName === 'dark') {
         // Adwaita Dark Theme (GNOME) - Darker version
         root.style.setProperty('--bg-dark', '#121212');
         root.style.setProperty('--bg-panel', 'rgba(18, 18, 18, 0.9)');
@@ -595,8 +595,9 @@ function renderBlogButtons(posts) {
     // Add "Send me cat pictures and files!" button (kamikami.eu style)
     const catButton = document.createElement('a');
     catButton.className = 'blog-btn category-fun';
-    catButton.href = 'mailto:kamikami@example.com?subject=Cat Pictures & Body=Here are some cat pictures!';
+    catButton.href = 'https://cloud.kamikami.eu/s/send-me-cat-pics';
     catButton.target = '_blank';
+    catButton.rel = 'noopener noreferrer';
     
     catButton.innerHTML = `
         <i class="fa-solid fa-cat"></i>

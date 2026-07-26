@@ -42,9 +42,14 @@
                     <h3 class="mobile-tray-section-title">Theme</h3>
                     <div class="mobile-theme-chooser">
                         <button class="mobile-theme-btn" data-theme="auto">Auto</button>
-                        <button class="mobile-theme-btn" data-theme="adwaita-light">Adwaita Light</button>
-                        <button class="mobile-theme-btn" data-theme="adwaita-dark">Adwaita Dark</button>
+                        <button class="mobile-theme-btn" data-theme="light">Light</button>
+                        <button class="mobile-theme-btn" data-theme="dark">Dark</button>
                     </div>
+                </div>
+                
+                <!-- All Post Link -->
+                <div class="mobile-tray-section">
+                    <a href="#all-posts" class="mobile-tray-link">ALL POST</a>
                 </div>
                 
                 <!-- About Section -->
