@@ -309,14 +309,7 @@ function setupNavigation() {
                 }
             });
             
-            // Show/hide "All Posts" in sidebar only on Blog page
-            if (blogSidebarSection) {
-                if (page === 'blogs') {
-                    blogSidebarSection.style.display = 'block';
-                } else {
-                    blogSidebarSection.style.display = 'none';
-                }
-            }
+        
             
             // Scroll to top when changing pages
             window.scrollTo(0, 0);
