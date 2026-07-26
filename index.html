@@ -51,9 +51,36 @@
 
             <!-- Blogs Page -->
             <section id="blogs" class="page-section">
-                <h1 class="page-title">All Blog Posts</h1>
-                <p class="page-subtitle">Explore our collection of thoughts, tutorials, and insights.</p>
-                <div class="blog-grid" id="blogs-blog-grid"></div>
+                <div class="blog-layout-container">
+                    <!-- Main Content Area (Left) -->
+                    <div class="blog-main-content" id="blog-main-content">
+                        <div class="blog-posts-list" id="blog-posts-list">
+                            <!-- Blog cards will be loaded here -->
+                        </div>
+                        <!-- Single Post View -->
+                        <div class="blog-post-view" id="blog-post-view" style="display: none;">
+                            <button class="back-to-list-btn" onclick="showBlogList()">← Back to Posts</button>
+                            <article class="blog-article" id="blog-article-content">
+                                <!-- Markdown content will be rendered here -->
+                            </article>
+                        </div>
+                    </div>
+                    
+                    <!-- Sidebar (Right) - Post Selector -->
+                    <aside class="blog-sidebar" id="blog-sidebar">
+                        <h3 class="sidebar-title">All Posts</h3>
+                        <div class="post-selector-list" id="post-selector-list">
+                            <!-- Post links will be loaded here -->
+                        </div>
+                        
+                        <div class="sidebar-section">
+                            <h3 class="sidebar-title">Categories</h3>
+                            <div class="category-filter" id="category-filter">
+                                <!-- Categories will be loaded here -->
+                            </div>
+                        </div>
+                    </aside>
+                </div>
             </section>
 
             <!-- About Page -->
