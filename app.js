@@ -91,8 +91,8 @@ function runDevotional() {
     const verse = getRandomShortVerse();
     if (!verse) return;
     
-    // Format: "Book Chapter:Verse NRSVUE - Verse text"
-    const displayText = `${verse.book} ${verse.chapter}:${verse.verse} NRSVUE — ${verse.text}`;
+    // Format: "Verse text — Book Chapter:Verse NRSVUE"
+    const displayText = `${verse.text} — ${verse.book} ${verse.chapter}:${verse.verse} NRSVUE`;
     
     // First, delete the existing text
     typeDeleteAnimation(leadParagraph, () => {

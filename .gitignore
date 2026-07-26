@@ -1,10 +1,18 @@
-```json
-{
-  "nt_verses.json": {
-    "book": "Matthew",
-    "chapter": 1,
-    "verse": 1,
-    "text": "The book of the generation of Jesus Christ, the son of David, the son of Abraham."
-  }
-}
+```
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# Dependencies
+node_modules/
 ```
