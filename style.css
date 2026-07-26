@@ -126,6 +126,12 @@ html {
     margin-top: var(--header-height);
     height: calc(100vh - var(--header-height));
     position: relative;
+    margin-right: 280px;
+    transition: margin-right 0.3s ease;
+}
+
+.main-container.sidebar-collapsed {
+    margin-right: 0;
 }
 
 .content-area {
