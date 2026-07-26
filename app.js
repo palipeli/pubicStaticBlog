@@ -326,7 +326,7 @@ function setupNavigation() {
     });
 }
 
-// Template selection - now handles theme switching
+// Template selection - now handles theme switching with cookie persistence
 function setupTemplates() {
     const themeBtns = document.querySelectorAll('.theme-btn');
 
@@ -337,15 +337,33 @@ function setupTemplates() {
 
             const theme = btn.dataset.theme;
             applyTheme(theme);
+            saveThemePreference(theme);
         });
     });
+    
+    // Load saved theme on initialization
+    const savedTheme = getSavedTheme();
+    const savedBtn = document.querySelector(`.theme-btn[data-theme="${savedTheme}"]`);
+    if (savedBtn) {
+        themeBtns.forEach(b => b.classList.remove('active'));
+        savedBtn.classList.add('active');
+        applyTheme(savedTheme);
+    } else {
+        // Default to auto if no button matches
+        applyTheme('auto');
+    }
 }
 
 // Apply different themes
 function applyTheme(themeName) {
     const root = document.documentElement;
     
-    if (themeName === 'adwaita-light') {
+    if (themeName === 'auto') {
+        // Auto theme - detect system preference
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        applyTheme(prefersDark ? 'adwaita-dark' : 'adwaita-light');
+        return;
+    } else if (themeName === 'adwaita-light') {
         // Adwaita Light Theme (GNOME default)
         root.style.setProperty('--bg-dark', '#f6f5f4');
         root.style.setProperty('--bg-panel', 'rgba(255, 255, 255, 0.95)');
@@ -357,17 +375,47 @@ function applyTheme(themeName) {
         root.style.setProperty('--border-color', 'rgba(0, 0, 0, 0.1)');
         document.body.style.background = 'linear-gradient(135deg, #f6f5f4 0%, #ffffff 100%)';
     } else if (themeName === 'adwaita-dark') {
-        // Adwaita Dark Theme (GNOME)
-        root.style.setProperty('--bg-dark', '#1e1e1e');
-        root.style.setProperty('--bg-panel', 'rgba(30, 30, 30, 0.9)');
-        root.style.setProperty('--bg-header', 'rgba(24, 24, 24, 0.95)');
+        // Adwaita Dark Theme (GNOME) - Darker version
+        root.style.setProperty('--bg-dark', '#121212');
+        root.style.setProperty('--bg-panel', 'rgba(18, 18, 18, 0.9)');
+        root.style.setProperty('--bg-header', 'rgba(12, 12, 12, 0.95)');
         root.style.setProperty('--accent-blue', '#3584e4');
         root.style.setProperty('--accent-blue-hover', '#62a0ea');
         root.style.setProperty('--text-primary', '#ffffff');
         root.style.setProperty('--text-secondary', '#9a9a9a');
         root.style.setProperty('--border-color', 'rgba(255, 255, 255, 0.08)');
-        document.body.style.background = 'linear-gradient(135deg, #242424 0%, #1a1a1a 100%)';
+        document.body.style.background = 'linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%)';
     }
+}
+
+// Cookie helpers for theme persistence
+function setCookie(name, value, days) {
+    const d = new Date();
+    d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = name + '=' + value + ';expires=' + d.toUTCString() + ';path=/';
+}
+
+function getCookie(name) {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? match[2] : null;
+}
+
+// Check if first visit (no cookie set)
+function isFirstVisit() {
+    return getCookie('theme_preference') === null;
+}
+
+// Get saved theme or default to auto
+function getSavedTheme() {
+    if (isFirstVisit()) {
+        return 'auto';
+    }
+    return getCookie('theme_preference') || 'auto';
+}
+
+// Save theme preference
+function saveThemePreference(theme) {
+    setCookie('theme_preference', theme, 365);
 }
 
 // Click me button handler
