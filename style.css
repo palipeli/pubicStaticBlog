@@ -41,7 +41,24 @@
     --theme-transition-duration: 0.3s;
 }
 
-[data-theme="dark"], body.dark-mode {
+[data-theme="dark"] {
+    --mc-bg-dark: #121212;
+    --mc-stone: #3a3a3a;
+    --mc-shadow: #1e1e1e;
+    --text-main: #ffffff;
+    --text-muted: #cccccc;
+    --pink-neon: #ff6ec7;
+    --pink-pastel: #ff92df;
+    --pink-deep: #b04286;
+    --pink-glow: rgba(255, 110, 199, 0.5);
+    --border-color: #ff92df;
+    --btn-border: #000000;
+    --logo-color: #ff6ec7;
+    --logo-shadow: #000000;
+    --bg-pattern: #1a1a1a;
+}
+
+body.dark-mode {
     --mc-bg-dark: #121212;
     --mc-stone: #3a3a3a;
     --mc-shadow: #1e1e1e;
