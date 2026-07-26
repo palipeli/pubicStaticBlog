@@ -574,6 +574,16 @@ function renderBlogButtons(posts) {
     }
     
     homePagePosts.forEach(post => {
+        // Add logo image before Privacy Policy button
+        if (post.id === 'privacy-policy') {
+            const logoImg = document.createElement('img');
+            logoImg.src = 'bloglogo.webp';
+            logoImg.alt = 'Blog Logo';
+            logoImg.className = 'blog-logo-image';
+            logoImg.style.cssText = 'max-width: 150px; max-height: 150px; object-fit: contain; margin-right: 15px;';
+            container.appendChild(logoImg);
+        }
+        
         const categoryClass = post.category ? 'category-' + post.category.toLowerCase().replace(/\s+/g, '-') : '';
         
         const button = document.createElement('a');
