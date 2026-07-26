@@ -788,8 +788,8 @@ function applyTheme(themeName) {
         root.style.setProperty('--text-primary', '#2e3436');
         root.style.setProperty('--text-secondary', '#5e5e5e');
         root.style.setProperty('--border-color', 'rgba(0, 0, 0, 0.1)');
-        root.style.setProperty('--blur-overlay-brightness', '0.5');
-        root.style.setProperty('--dark-overlay-color', 'rgba(0, 0, 0, 0.5)');
+        root.style.setProperty('--blur-overlay-brightness', '1.0');
+        root.style.setProperty('--dark-overlay-color', 'rgba(0, 0, 0, 0.0)');
         document.body.style.background = 'linear-gradient(135deg, #f6f5f4 0%, #ffffff 100%)';
     } else if (themeName === 'dark') {
         // Adwaita Dark Theme (GNOME) - Darker version
@@ -801,8 +801,8 @@ function applyTheme(themeName) {
         root.style.setProperty('--text-primary', '#ffffff');
         root.style.setProperty('--text-secondary', '#9a9a9a');
         root.style.setProperty('--border-color', 'rgba(255, 255, 255, 0.08)');
-        root.style.setProperty('--blur-overlay-brightness', '0.3');
-        root.style.setProperty('--dark-overlay-color', 'rgba(0, 0, 0, 0.7)');
+        root.style.setProperty('--blur-overlay-brightness', '0.6');
+        root.style.setProperty('--dark-overlay-color', 'rgba(0, 0, 0, 0.4)');
         document.body.style.background = 'linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%)';
     }
 }

@@ -17,13 +17,13 @@
     --border-color: rgba(0, 0, 0, 0.1);
     --header-height: 40px;
     --font-main: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-    --blur-overlay-brightness: 0.95;
-    --dark-overlay-color: rgba(0, 0, 0, 0.1);
+    --blur-overlay-brightness: 1.0;
+    --dark-overlay-color: rgba(0, 0, 0, 0.0);
 }
 
 [data-theme="dark"] {
-    --blur-overlay-brightness: 0.75;
-    --dark-overlay-color: rgba(0, 0, 0, 0.25);
+    --blur-overlay-brightness: 0.6;
+    --dark-overlay-color: rgba(0, 0, 0, 0.4);
 }
 
 body {
