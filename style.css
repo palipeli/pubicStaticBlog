@@ -463,6 +463,29 @@ body {
     color: var(--text-secondary);
 }
 
+/* ALL POST Button */
+.all-post-btn {
+    display: inline-block;
+    background: rgba(53, 132, 228, 0.2);
+    border: 1px solid var(--accent-blue);
+    border-radius: 6px;
+    padding: 12px 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--accent-blue);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.all-post-btn:hover {
+    background: rgba(53, 132, 228, 0.3);
+    border-color: var(--accent-blue-hover);
+    color: var(--accent-blue-hover);
+}
+
 /* Theme Chooser */
 .theme-chooser {
     display: flex;
