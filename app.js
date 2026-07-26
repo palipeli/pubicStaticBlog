@@ -4,6 +4,32 @@
 let blogPosts = [];
 let currentCategory = 'all';
 
+// Default introduction content shown before selecting a post
+const blogIntroduction = {
+    title: "Welcome to Our Blog",
+    date: "",
+    category: "",
+    icon: "📝",
+    content: `
+        <h1>Welcome to Our Blog</h1>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        
+        <h2>Discover Amazing Content</h2>
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        
+        <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+        
+        <h2>Stay Updated</h2>
+        <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.</p>
+        
+        <blockquote>
+            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+        </blockquote>
+        
+        <p>Select a post from the sidebar to start reading, or browse by category using the filters above.</p>
+    `
+};
+
 // Simple Markdown parser
 function parseMarkdown(markdown) {
     if (!markdown) return '';
@@ -289,13 +315,17 @@ function openBlogPost(id) {
 
 // Show blog list (back from post view)
 function showBlogList() {
-    document.getElementById('blog-posts-list').style.display = 'grid';
-    document.getElementById('blog-post-view').style.display = 'none';
+    document.getElementById('blog-posts-list').style.display = 'none';
+    document.getElementById('blog-post-view').style.display = 'block';
     
     // Clear active state
     document.querySelectorAll('.post-selector-item').forEach(item => {
         item.classList.remove('active');
     });
+    
+    // Render introduction content
+    const article = document.getElementById('blog-article-content');
+    article.innerHTML = blogIntroduction.content;
 }
 
 // Initialize particles
@@ -448,7 +478,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fetch and render blog posts
     fetchBlogPosts().then(posts => {
         if (posts.length > 0) {
-            renderBlogCards(posts);
+            // Show introduction by default instead of cards
+            document.getElementById('blog-posts-list').style.display = 'none';
+            document.getElementById('blog-post-view').style.display = 'block';
+            
+            // Render introduction content
+            const article = document.getElementById('blog-article-content');
+            article.innerHTML = blogIntroduction.content;
+            
             renderPostSelector(posts);
             renderCategories(posts);
         }
