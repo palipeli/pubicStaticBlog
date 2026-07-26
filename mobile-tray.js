@@ -252,19 +252,11 @@
     // Update blog posts visibility based on current page
     function updateBlogPostsVisibility() {
         const blogSection = document.getElementById('mobile-blog-posts-section');
-        const activePage = document.querySelector('.page-section.active');
         
-        if (blogSection && activePage) {
-            if (activePage.id === 'blogs') {
-                blogSection.style.display = 'block';
-                renderMobilePostList();
-                // Auto-expand tray when visiting blogs page
-                if (!isTrayOpen) {
-                    openTray();
-                }
-            } else {
-                blogSection.style.display = 'none';
-            }
+        // Always show blog posts section in mobile tray (like in sidebar)
+        if (blogSection) {
+            blogSection.style.display = 'block';
+            renderMobilePostList();
         }
     }
     
