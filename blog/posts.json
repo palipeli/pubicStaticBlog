@@ -30,5 +30,29 @@
     "date": "Dec 12, 2024",
     "category": "Design",
     "icon": "📱"
+  },
+  {
+    "id": "cloudflare-trouble",
+    "slug": "/blog/cloudflare-trouble.md",
+    "title": "This Site Was Revived From The Dead and Thanks to Cloudflare For That",
+    "date": "Dec 29 2025",
+    "category": "Blog",
+    "icon": "🔧"
+  },
+  {
+    "id": "michelle-dns-for-ios-sideloading",
+    "slug": "/blog/michelle-dns-for-ios-sideloading.md",
+    "title": "Introducing Michelle DNS Suite for iOS Sideloading",
+    "date": "Mar 6 2026",
+    "category": "Technology",
+    "icon": "📱"
+  },
+  {
+    "id": "privacy-policy",
+    "slug": "/blog/privacy-policy.md",
+    "title": "Privacy Policy",
+    "date": "Mar 25 2026",
+    "category": "Legal",
+    "icon": "🔒"
   }
 ]
