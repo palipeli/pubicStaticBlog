@@ -16,10 +16,11 @@
     --text-secondary: #5e5e5e;
     --border-color: rgba(0, 0, 0, 0.1);
     --header-height: 40px;
+    --font-main: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: var(--font-main);
     background: linear-gradient(135deg, #f6f5f4 0%, #ffffff 100%);
     color: var(--text-primary);
     min-height: 100vh;
