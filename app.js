@@ -484,6 +484,11 @@ function setupSidebarToggle() {
         e.stopPropagation();
         sidebar.classList.toggle('collapsed');
         mainContainer.classList.toggle('sidebar-collapsed');
+        
+        // Update toggle button aria-label
+        const isCollapsed = sidebar.classList.contains('collapsed');
+        sidebarToggle.setAttribute('aria-label', isCollapsed ? 'Open Sidebar' : 'Close Sidebar');
+        sidebarToggle.setAttribute('title', isCollapsed ? 'Open Sidebar' : 'Close Sidebar');
     });
     
     // Handle window resize
