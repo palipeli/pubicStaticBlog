@@ -308,15 +308,6 @@ function setupNavigation() {
                 }
             });
             
-            // Toggle blog sidebar visibility based on current page
-            const blogSidebarSection = document.getElementById('blog-sidebar-section');
-            
-            if (page === 'blogs') {
-                if (blogSidebarSection) blogSidebarSection.style.display = 'block';
-            } else {
-                if (blogSidebarSection) blogSidebarSection.style.display = 'none';
-            }
-            
             // Scroll to top when changing pages
             window.scrollTo(0, 0);
         });

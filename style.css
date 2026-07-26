@@ -123,6 +123,7 @@ body {
     margin-top: var(--header-height);
     min-height: calc(100vh - var(--header-height));
     position: relative;
+    overflow-x: hidden; /* Prevent horizontal scroll from sidebar button */
 }
 
 .content-area {
@@ -262,12 +263,13 @@ body {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-left: 1px solid var(--border-color);
-    padding: 0; /* Remove padding from sidebar itself */
-    overflow: visible; /* Allow toggle button to be visible when collapsed */
+    padding: 0;
+    overflow: visible;
     animation: slideLeft 0.5s ease-out;
     transition: width 0.3s ease;
     flex-shrink: 0;
     position: relative;
+    box-sizing: border-box;
 }
 
 /* Sidebar content wrapper */
@@ -277,7 +279,8 @@ body {
     overflow-y: auto;
     opacity: 1;
     transition: opacity 0.2s ease;
-    width: 280px; /* Fixed width to prevent content squishing */
+    width: 280px;
+    box-sizing: border-box;
 }
 
 /* Collapsed sidebar state - only hide content, keep button visible */
@@ -293,32 +296,37 @@ body {
 /* Sidebar toggle button - fixed to left edge of sidebar, vertically centered */
 .sidebar-toggle {
     position: absolute;
-    left: -24px; /* Position button to the left of sidebar */
+    left: 0;
     top: 50%;
-    transform: translateY(-50%);
+    transform: translate(-100%, -50%);
     width: 24px;
     height: 48px;
-    border-radius: 0 12px 12px 0; /* Half-circle shape on right side */
+    border-radius: 12px 0 0 12px;
     background: var(--bg-panel);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
-    border-left: none; /* No border on left edge since it's at sidebar edge */
+    border-right: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1001; /* Above sidebar content */
+    z-index: 1001;
     transition: all 0.3s ease;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
     color: var(--text-primary);
     padding: 0;
 }
 
-/* When sidebar is collapsed, button moves with sidebar to leftmost position */
-.sidebar.collapsed .sidebar-toggle {
-    left: -24px;
-    border-radius: 0 12px 12px 0;
+/* When sidebar is expanded, show the chevron pointing left (<) */
+.sidebar-toggle svg {
+    transform: rotate(0deg);
+    transition: transform 0.3s ease;
+}
+
+/* When sidebar is collapsed, rotate chevron to point right (>) */
+.sidebar.collapsed .sidebar-toggle svg {
+    transform: rotate(180deg);
 }
 
 .sidebar-toggle:hover {
@@ -328,12 +336,7 @@ body {
 }
 
 .sidebar-toggle:active {
-    transform: translateY(-50%) scale(0.95);
-}
-
-/* Toggle button icon rotation when sidebar is collapsed */
-.sidebar.collapsed .sidebar-toggle svg {
-    transform: rotate(180deg);
+    transform: translate(-100%, -50%) scale(0.95);
 }
 
 /* Adjust content area when sidebar is collapsed */
@@ -486,6 +489,22 @@ body {
     width: 100%;
 }
 
+/* Blog Post View - ensures proper display when viewing individual posts */
+.blog-post-view {
+    width: 100%;
+    display: block;
+}
+
+.blog-post-view .blog-article {
+    background: var(--bg-panel);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 40px;
+    line-height: 1.8;
+}
+
 .blog-intro-view .blog-article {
     background: var(--bg-panel);
     backdrop-filter: blur(10px);
@@ -627,6 +646,10 @@ body {
 }
 
 /* Blog Sidebar (in main sidebar) */
+.sidebar-section.blog-only {
+    display: block !important; /* Always visible in sidebar for consistent access */
+}
+
 .post-selector-list {
     display: flex;
     flex-direction: column;
