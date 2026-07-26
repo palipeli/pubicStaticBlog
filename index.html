@@ -117,6 +117,12 @@
 
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
+            <!-- Toggle button fixed to left edge of sidebar, vertically centered -->
+            <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Collapse Sidebar" title="Collapse Sidebar">
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                </svg>
+            </button>
             <div class="sidebar-content-wrapper">
                 <div class="sidebar-section">
                     <h3 class="sidebar-title">Theme</h3>
@@ -135,12 +141,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Toggle button outside sidebar content, fixed to right edge of viewport -->
-            <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Open Sidebar" title="Open Sidebar">
-                <svg viewBox="0 0 24 24" width="20" height="20">
-                    <path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
-                </svg>
-            </button>
         </aside>
     </div>
 

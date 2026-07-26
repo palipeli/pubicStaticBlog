@@ -1,1 +1,18 @@
-Nothing should be ignored since the changes only include source/config files (.js, .html, .css) with no build artifacts, dependencies, or temp files.
+```
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Editors
+.vscode/
+.idea/
+
+# Dependencies
+node_modules/
+```
