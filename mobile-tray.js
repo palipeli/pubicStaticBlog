@@ -257,24 +257,18 @@
         });
     }
     
-    // Update blog posts visibility based on current page
+
+    // Update blog posts visibility based on current page - always render post list
     function updateBlogPostsVisibility() {
         const blogSection = document.getElementById('mobile-blog-posts-section');
         const activePage = document.querySelector('.page-section.active');
-        
+
         if (blogSection && activePage) {
-            if (activePage.id === 'blogs') {
-                renderMobilePostList();
-            } else {
-                // Still render but show placeholder when not on blogs page
-                const container = document.getElementById('mobile-post-list');
-                if (container) {
-                    container.innerHTML = '<p style="color: var(--text-secondary); font-size: 13px;">Navigate to Blogs to view posts</p>';
-                }
-            }
+            // Always render the post list, regardless of which page we're on
+            renderMobilePostList();
         }
     }
-    
+
     // Render post list in mobile tray
     function renderMobilePostList() {
         const container = document.getElementById('mobile-post-list');

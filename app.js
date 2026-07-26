@@ -613,6 +613,11 @@ async function openBlogPostLazy(id) {
     
     // Track currently active blog post for mobile tray
     window.currentlyActiveBlogPost = id;
+    
+    // Update mobile tray post list active state
+    if (typeof window.updateBlogPostsVisibility === 'function') {
+        window.updateBlogPostsVisibility();
+    }
 
     // Hide intro view, show post view with loading indicator
     document.getElementById('blog-intro-view').style.display = 'none';
