@@ -312,10 +312,37 @@ async function fetchBlogPostMetadata() {
         // Sync with window object for cross-module access
         window.blogPostMetadata = blogPostMetadata;
         
+        // Load the blog introduction content from markdown
+        loadBlogIntroduction();
+        
         return blogPostMetadata;
     } catch (err) {
         console.error('Error fetching blog post metadata:', err);
         return [];
+    }
+}
+
+// Load blog introduction content from /blog/new-updated-look.md
+async function loadBlogIntroduction() {
+    try {
+        const response = await fetch('/blog/new-updated-look.md');
+        if (!response.ok) {
+            throw new Error('Could not fetch blog introduction');
+        }
+        
+        const mdContent = await response.text();
+        const htmlContent = parseMarkdown(mdContent);
+        
+        const introContainer = document.getElementById('blog-intro-content');
+        if (introContainer) {
+            introContainer.innerHTML = htmlContent;
+        }
+    } catch (err) {
+        console.error('Error loading blog introduction:', err);
+        const introContainer = document.getElementById('blog-intro-content');
+        if (introContainer) {
+            introContainer.innerHTML = '<p>Failed to load introduction. Please check the README.md for details.</p>';
+        }
     }
 }
 
