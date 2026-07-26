@@ -290,7 +290,6 @@ function createParticles() {
 function setupNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
     const sections = document.querySelectorAll('.page-section');
-    const blogSidebarSection = document.getElementById('blog-sidebar-section');
 
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
@@ -308,15 +307,6 @@ function setupNavigation() {
                     section.classList.add('active');
                 }
             });
-            
-            // Show/hide "All Posts" in sidebar only on Blog page
-            if (blogSidebarSection) {
-                if (page === 'blogs') {
-                    blogSidebarSection.style.display = 'block';
-                } else {
-                    blogSidebarSection.style.display = 'none';
-                }
-            }
             
             // Scroll to top when changing pages
             window.scrollTo(0, 0);
