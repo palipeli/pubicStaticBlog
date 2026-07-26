@@ -32,7 +32,7 @@
     /* Spacing & Sizes */
     --border-width: 4px;
     --container-width: 1000px;
-    --header-height: 60px;
+    --header-height: 48px;
     
     /* Fonts */
     --font-main: 'VT323', monospace;
@@ -155,7 +155,7 @@ a {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
+    padding: 0 16px;
     z-index: 1000;
     box-shadow: 0 4px 15px var(--pink-glow);
     backdrop-filter: blur(5px);
@@ -177,16 +177,16 @@ a {
 .header-left {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
 }
 
 .blue-button {
     display: inline-block;
-    padding: 10px 25px;
+    padding: 4px 12px;
     background: var(--mc-stone);
     color: var(--pink-pastel);
     text-transform: uppercase;
-    font-size: 1.4rem;
+    font-size: 1rem;
     box-shadow:
         inset 3px 3px 0 rgba(255,255,255,0.2),
         inset -3px -3px 0 rgba(0,0,0,0.2),
@@ -208,7 +208,7 @@ a {
     font-family: 'VT323', monospace;
     font-style: normal;
     text-transform: lowercase;
-    font-size: 1.4rem;
+    font-size: 1rem;
 }
 
 .blue-button:hover {
@@ -230,16 +230,16 @@ a {
 .header-right {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 20px;
 }
 
 .nav-item {
     display: inline-block;
-    padding: 10px 25px;
+    padding: 4px 12px;
     background: var(--mc-stone);
     color: var(--pink-pastel);
     text-transform: uppercase;
-    font-size: 1.4rem;
+    font-size: 1rem;
     box-shadow:
         inset 3px 3px 0 rgba(255,255,255,0.2),
         inset -3px -3px 0 rgba(0,0,0,0.2),
@@ -285,7 +285,7 @@ a {
     max-width: var(--container-width);
     margin-left: auto;
     margin-right: 280px;
-    padding: 0 20px;
+    padding: 0 16px;
     transition: margin-right 0.3s ease;
 }
 
@@ -673,11 +673,11 @@ a {
 
 .theme-btn {
     display: inline-block;
-    padding: 10px 25px;
+    padding: 4px 12px;
     background: var(--mc-stone);
     color: var(--pink-pastel);
     text-transform: uppercase;
-    font-size: 1.4rem;
+    font-size: 1rem;
     box-shadow:
         inset 3px 3px 0 rgba(255,255,255,0.2),
         inset -3px -3px 0 rgba(0,0,0,0.2),
