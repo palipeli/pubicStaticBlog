@@ -995,6 +995,81 @@ html {
     100% { transform: scale(1); }
 }
 
+/* Blog Buttons Container (kamikami.eu style) */
+.blog-buttons-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin: 25px 0;
+}
+
+/* Blog Button Style (inspired by kamikami.eu mc-btn) */
+.blog-btn {
+    font-size: 1.1rem;
+    padding: 15px 25px;
+    background: linear-gradient(135deg, var(--accent-blue) 0%, #3a5a8f 100%);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(71, 114, 179, 0.4);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.blog-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(71, 114, 179, 0.6);
+    filter: brightness(1.1);
+}
+
+.blog-btn:active {
+    transform: translateY(-1px);
+}
+
+.blog-btn i {
+    font-size: 1.2rem;
+}
+
+/* Category-specific button colors */
+.blog-btn.category-tutorial {
+    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
+}
+.blog-btn.category-tutorial:hover {
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.6);
+}
+
+.blog-btn.category-blog {
+    background: linear-gradient(135deg, #3584e4 0%, #3a5a8f 100%);
+    box-shadow: 0 4px 15px rgba(53, 132, 228, 0.4);
+}
+.blog-btn.category-blog:hover {
+    box-shadow: 0 6px 20px rgba(53, 132, 228, 0.6);
+}
+
+.blog-btn.category-technology {
+    background: linear-gradient(135deg, #e83e8c 0%, #c7254e 100%);
+    box-shadow: 0 4px 15px rgba(232, 62, 140, 0.4);
+}
+.blog-btn.category-technology:hover {
+    box-shadow: 0 6px 20px rgba(232, 62, 140, 0.6);
+}
+
+.blog-btn.category-legal {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
+}
+.blog-btn.category-legal:hover {
+    box-shadow: 0 6px 20px rgba(108, 117, 125, 0.6);
+}
+
 @keyframes rippleEffect {
     0% {
         transform: translate(-50%, -50%) scale(1);

@@ -548,6 +548,55 @@ document.addEventListener('DOMContentLoaded', function() {
             // Just render the sidebar components
             renderPostSelector(posts);
             // Categories removed from sidebar - no longer rendering
+            
+            // Render blog buttons on home page (kamikami.eu style)
+            renderBlogButtons(posts);
         }
     });
 });
+
+// Render blog buttons on home page (inspired by kamikami.eu)
+function renderBlogButtons(posts) {
+    const container = document.getElementById('blog-buttons-container');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    if (posts.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    posts.forEach(post => {
+        const categoryClass = post.category ? 'category-' + post.category.toLowerCase().replace(/\s+/g, '-') : '';
+        
+        const button = document.createElement('a');
+        button.className = `blog-btn ${categoryClass}`;
+        button.href = '#';
+        button.onclick = (e) => {
+            e.preventDefault();
+            openBlogPostFromHome(post.id);
+        };
+        
+        button.innerHTML = `
+            <i class="fa-solid fa-book"></i>
+            <span>${post.title}</span>
+        `;
+        
+        container.appendChild(button);
+    });
+}
+
+// Open a blog post from home page button
+function openBlogPostFromHome(id) {
+    // Navigate to blogs page first
+    const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
+    if (blogsNavItem) {
+        blogsNavItem.click();
+    }
+    
+    // Then open the specific post after a short delay
+    setTimeout(() => {
+        openBlogPost(id);
+    }, 100);
+}
