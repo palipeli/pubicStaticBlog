@@ -66,10 +66,10 @@ body {
     background: linear-gradient(135deg, var(--accent-blue) 0%, #3a5a8f 100%);
     color: white;
     border: none;
-    padding: 4px 12px;
+    padding: 3px 8px;
     margin: 0 10px;
     border-radius: 4px;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -264,6 +264,7 @@ body {
     animation: slideLeft 0.5s ease-out;
     transition: transform 0.3s ease, width 0.3s ease, opacity 0.3s ease;
     flex-shrink: 0;
+    position: relative;
 }
 
 /* Collapsed sidebar state */
@@ -271,15 +272,15 @@ body {
     width: 0;
     padding: 0;
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateX(100%);
     pointer-events: none;
 }
 
-/* Sidebar toggle button */
+/* Sidebar toggle button - inside sidebar on right edge */
 .sidebar-toggle {
-    position: fixed;
-    left: 0;
-    top: calc(var(--header-height) + 20px);
+    position: absolute;
+    right: -16px;
+    top: 50%;
     transform: translateY(-50%);
     width: 32px;
     height: 32px;
@@ -292,7 +293,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 999;
+    z-index: 1000;
     transition: all 0.3s ease;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     color: var(--text-primary);
@@ -310,9 +311,10 @@ body {
     transform: translateY(-50%) scale(0.95);
 }
 
-/* When sidebar is collapsed, move toggle to right edge of content */
-.main-container.sidebar-collapsed .sidebar-toggle {
-    left: 0;
+/* When sidebar is collapsed, toggle appears on right edge of collapsed area */
+.sidebar.collapsed .sidebar-toggle {
+    right: -16px;
+    transform: translateY(-50%);
 }
 
 /* Adjust content area when sidebar is collapsed */
@@ -817,10 +819,6 @@ body {
     
     .main-container {
         position: relative;
-    }
-    
-    .main-container.sidebar-collapsed .sidebar-toggle {
-        left: 0;
     }
 
     .blog-grid {
