@@ -66,10 +66,10 @@ body {
     background: linear-gradient(135deg, var(--accent-blue) 0%, #3a5a8f 100%);
     color: white;
     border: none;
-    padding: 6px 16px;
+    padding: 4px 12px;
     margin: 0 10px;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -262,6 +262,62 @@ body {
     padding: 20px;
     overflow-y: auto;
     animation: slideLeft 0.5s ease-out;
+    transition: transform 0.3s ease, width 0.3s ease, opacity 0.3s ease;
+    flex-shrink: 0;
+}
+
+/* Collapsed sidebar state */
+.sidebar.collapsed {
+    width: 0;
+    padding: 0;
+    opacity: 0;
+    transform: translateX(20px);
+    pointer-events: none;
+}
+
+/* Sidebar toggle button */
+.sidebar-toggle {
+    position: fixed;
+    left: 0;
+    top: calc(var(--header-height) + 20px);
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg-panel);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    color: var(--text-primary);
+    padding: 0;
+}
+
+.sidebar-toggle:hover {
+    background: var(--accent-blue);
+    color: white;
+    border-color: var(--accent-blue);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.sidebar-toggle:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+/* When sidebar is collapsed, move toggle to right edge of content */
+.main-container.sidebar-collapsed .sidebar-toggle {
+    left: 0;
+}
+
+/* Adjust content area when sidebar is collapsed */
+.main-container.sidebar-collapsed .content-area {
+    margin-right: 0;
 }
 
 @keyframes slideLeft {
@@ -750,8 +806,21 @@ body {
 
 /* Responsive */
 @media (max-width: 768px) {
+    /* On mobile, sidebar is collapsed by default */
     .sidebar {
-        display: none;
+        width: 0;
+        padding: 0;
+        opacity: 0;
+        transform: translateX(20px);
+        pointer-events: none;
+    }
+    
+    .main-container {
+        position: relative;
+    }
+    
+    .main-container.sidebar-collapsed .sidebar-toggle {
+        left: 0;
     }
 
     .blog-grid {

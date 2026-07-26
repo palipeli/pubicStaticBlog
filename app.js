@@ -455,6 +455,55 @@ function handleClickMe() {
     alert('🎉 Thanks for clicking! Explore the blogs using the navigation menu above.');
 }
 
+// Sidebar toggle functionality
+function setupSidebarToggle() {
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const mainContainer = document.querySelector('.main-container');
+    
+    if (!sidebarToggle || !sidebar || !mainContainer) return;
+    
+    // Check if we're on mobile/small screen
+    function isMobileView() {
+        return window.innerWidth <= 768;
+    }
+    
+    // Initialize sidebar state based on screen size
+    function initSidebarState() {
+        if (isMobileView()) {
+            sidebar.classList.add('collapsed');
+            mainContainer.classList.add('sidebar-collapsed');
+        } else {
+            sidebar.classList.remove('collapsed');
+            mainContainer.classList.remove('sidebar-collapsed');
+        }
+    }
+    
+    // Call on load
+    initSidebarState();
+    
+    // Toggle sidebar on button click
+    sidebarToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        sidebar.classList.toggle('collapsed');
+        mainContainer.classList.toggle('sidebar-collapsed');
+    });
+    
+    // Handle window resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            // Only auto-collapse on mobile, don't auto-expand on desktop
+            // to preserve user's choice
+            if (isMobileView() && !sidebar.classList.contains('collapsed')) {
+                sidebar.classList.add('collapsed');
+                mainContainer.classList.add('sidebar-collapsed');
+            }
+        }, 200);
+    });
+}
+
 // Initialize application
 document.addEventListener('DOMContentLoaded', function() {
     // Create floating particles
@@ -465,6 +514,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Setup template selection
     setupTemplates();
+    
+    // Setup sidebar toggle
+    setupSidebarToggle();
     
     // Fetch and render blog posts
     fetchBlogPosts().then(posts => {
