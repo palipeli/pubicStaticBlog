@@ -1183,14 +1183,12 @@ function getRandomVerse() {
 }
 
 // Typing delete animation - removes text character by character, then types new text
-async function typingDeleteAnimation(element, deleteSpeed = 5, typeSpeed = 10, newText = '') {
-    const text = element.textContent;
-    
+async function typingDeleteAnimation(element, originalText, newText, deleteSpeed = 5, typeSpeed = 10) {
     return new Promise((resolve) => {
         let i = 0;
         const deleteInterval = setInterval(() => {
-            if (i < text.length) {
-                element.textContent = text.substring(0, text.length - i - 1);
+            if (i < originalText.length) {
+                element.textContent = originalText.substring(0, originalText.length - i - 1);
                 i++;
             } else {
                 clearInterval(deleteInterval);
@@ -1215,7 +1213,7 @@ async function typingDeleteAnimation(element, deleteSpeed = 5, typeSpeed = 10, n
     });
 }
 
-// Initialize devotional on the home page
+// Initialize devotional on the home page - replaces welcome text with Bible verse in place
 async function initDevotional() {
     const homeLeadElement = document.querySelector('.home-lead');
     if (!homeLeadElement) return;
@@ -1231,56 +1229,13 @@ async function initDevotional() {
     // Wait a brief moment before starting the delete animation
     await new Promise(resolve => setTimeout(resolve, 800));
     
-    // Perform typing delete animation with fast speeds (5ms delete, 10ms type)
-    await typingDeleteAnimation(homeLeadElement, 5, 10);
-    
-    // Create devotional container
-    const devotionalContainer = document.createElement('div');
-    devotionalContainer.className = 'devotional-container';
-    devotionalContainer.innerHTML = `
-        <div class="devotional-content">
-            <p class="devotional-verse" id="devotional-verse"></p>
-            <p class="devotional-reference" id="devotional-reference"></p>
-            <button class="devotional-btn" id="another-verse-btn">Another Verse</button>
-        </div>
-    `;
-    
-    // Replace the welcome text with devotional content
-    homeLeadElement.style.display = 'none';
-    homeLeadElement.parentNode.insertBefore(devotionalContainer, homeLeadElement.nextSibling);
-    
-    // Display a random verse
-    displayRandomVerse();
-    
-    // Setup button click handler
-    const anotherVerseBtn = document.getElementById('another-verse-btn');
-    if (anotherVerseBtn) {
-        anotherVerseBtn.addEventListener('click', displayRandomVerse);
-    }
-}
-
-// Display a random verse in the devotional container
-function displayRandomVerse() {
+    // Get random verse before starting animation
     const verse = getRandomVerse();
     if (!verse) return;
     
-    const verseElement = document.getElementById('devotional-verse');
-    const referenceElement = document.getElementById('devotional-reference');
+    const originalText = homeLeadElement.textContent;
+    const verseText = `${verse.text} — ${verse.reference}`;
     
-    if (verseElement && referenceElement) {
-        // Fade out effect
-        verseElement.style.opacity = '0';
-        referenceElement.style.opacity = '0';
-        
-        setTimeout(() => {
-            verseElement.textContent = `"${verse.text}"`;
-            referenceElement.textContent = `— ${verse.reference}`;
-            
-            // Fade in effect
-            verseElement.style.transition = 'opacity 0.3s ease';
-            referenceElement.style.transition = 'opacity 0.3s ease';
-            verseElement.style.opacity = '1';
-            referenceElement.style.opacity = '1';
-        }, 200);
-    }
+    // Perform typing delete animation with fast speeds (5ms delete, 10ms type)
+    await typingDeleteAnimation(homeLeadElement, originalText, verseText, 5, 10);
 }
