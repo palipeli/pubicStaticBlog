@@ -702,9 +702,9 @@ function setupNavigation() {
             // Show/hide "All Posts" in sidebar on Home, About, and Blogs pages
             if (blogSidebarSection) {
                 if (page === 'blogs' || page === 'home' || page === 'about') {
-                    blogSidebarSection.style.display = 'block';
+                    blogSidebarSection.classList.remove('hidden');
                 } else {
-                    blogSidebarSection.style.display = 'none';
+                    blogSidebarSection.classList.add('hidden');
                 }
             }
             
@@ -963,7 +963,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show post selector sidebar on Home page by default (since it's the active page on load)
             const blogSidebarSection = document.getElementById('blog-sidebar-section');
             if (blogSidebarSection) {
-                blogSidebarSection.style.display = 'block';
+                blogSidebarSection.classList.remove('hidden');
             }
         }
     });

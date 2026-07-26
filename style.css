@@ -281,6 +281,12 @@ main {
     width: 100%;
 }
 
+/* Adjust main content when sidebar is positioned below header */
+#home > main,
+#about > main {
+    padding-top: 20px;
+}
+
 /* Page sections */
 .page-section {
     display: none;
@@ -395,8 +401,8 @@ p.subtitle {
     padding: 0;
     position: fixed;
     right: 0;
-    top: 0;
-    height: 100vh;
+    top: 50px;
+    height: calc(100vh - 50px);
     box-sizing: border-box;
     z-index: 90;
     transition: width 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
@@ -438,7 +444,7 @@ p.subtitle {
 .sidebar-toggle {
     position: absolute;
     left: 0;
-    top: 50%;
+    top: calc(50% + 25px);
     transform: translate(-100%, -50%);
     width: 24px;
     height: 48px;
@@ -496,10 +502,23 @@ p.subtitle {
 }
 
 /* Theme Chooser */
+.theme-chooser-label {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--pink-pastel);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--pink-deep);
+    display: block;
+}
+
 .theme-chooser {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    margin-top: 20px;
 }
 
 .theme-btn {
@@ -533,6 +552,77 @@ p.subtitle {
         inset -2px -2px 0 rgba(0,0,0,0.2),
         2px 2px 0 var(--btn-border),
         0 0 15px var(--pink-neon);
+}
+
+/* Post Selector List */
+.post-selector-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.post-selector-item {
+    background: var(--mc-stone);
+    border: 2px solid var(--btn-border);
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,0.2),
+        inset -2px -2px 0 rgba(0,0,0,0.2),
+        2px 2px 0 var(--btn-border);
+}
+
+.post-selector-item:hover {
+    background: var(--pink-deep);
+    border-color: var(--pink-neon);
+    transform: translateY(-2px);
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,0.2),
+        inset -2px -2px 0 rgba(0,0,0,0.2),
+        2px 4px 0 var(--btn-border),
+        0 0 15px var(--pink-neon);
+}
+
+.post-selector-item.active {
+    background: var(--pink-neon);
+    border-color: var(--pink-neon);
+    box-shadow:
+        inset 2px 2px 0 rgba(255,255,255,0.2),
+        inset -2px -2px 0 rgba(0,0,0,0.2),
+        2px 2px 0 var(--btn-border),
+        0 0 15px var(--pink-neon);
+}
+
+.post-selector-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--pink-pastel);
+    margin-bottom: 5px;
+}
+
+.post-selector-item:hover .post-selector-title,
+.post-selector-item.active .post-selector-title {
+    color: white;
+}
+
+.post-selector-meta {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.post-selector-item:hover .post-selector-meta,
+.post-selector-item.active .post-selector-meta {
+    color: var(--pink-pastel);
+}
+
+/* Blog-only sidebar section */
+.blog-only {
+    display: block;
+}
+
+.blog-only.hidden {
+    display: none;
 }
 
 /* Blog Layout */
