@@ -290,6 +290,7 @@ function createParticles() {
 function setupNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
     const sections = document.querySelectorAll('.page-section');
+    const blogSidebarSection = document.getElementById('blog-sidebar-section');
 
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
@@ -307,6 +308,15 @@ function setupNavigation() {
                     section.classList.add('active');
                 }
             });
+            
+            // Show/hide "All Posts" in sidebar only on Blog page
+            if (blogSidebarSection) {
+                if (page === 'blogs') {
+                    blogSidebarSection.style.display = 'block';
+                } else {
+                    blogSidebarSection.style.display = 'none';
+                }
+            }
             
             // Scroll to top when changing pages
             window.scrollTo(0, 0);
@@ -460,10 +470,12 @@ function setupSidebarToggle() {
     function initSidebarState() {
         if (isMobileView()) {
             sidebar.classList.add('collapsed');
+            sidebar.classList.remove('expanded');
             sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
             sidebarToggle.setAttribute('title', 'Open Sidebar');
         } else {
             sidebar.classList.remove('collapsed');
+            sidebar.classList.add('expanded');
             sidebarToggle.setAttribute('aria-label', 'Collapse Sidebar');
             sidebarToggle.setAttribute('title', 'Collapse Sidebar');
         }
@@ -476,6 +488,7 @@ function setupSidebarToggle() {
     sidebarToggle.addEventListener('click', (e) => {
         e.stopPropagation();
         sidebar.classList.toggle('collapsed');
+        sidebar.classList.toggle('expanded');
         
         // Update toggle button aria-label and icon direction
         const isCollapsed = sidebar.classList.contains('collapsed');
@@ -492,8 +505,14 @@ function setupSidebarToggle() {
             // On desktop, preserve user's choice
             if (isMobileView() && !sidebar.classList.contains('collapsed')) {
                 sidebar.classList.add('collapsed');
+                sidebar.classList.remove('expanded');
                 sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
                 sidebarToggle.setAttribute('title', 'Open Sidebar');
+            } else if (!isMobileView() && !sidebar.classList.contains('expanded')) {
+                sidebar.classList.add('expanded');
+                sidebar.classList.remove('collapsed');
+                sidebarToggle.setAttribute('aria-label', 'Collapse Sidebar');
+                sidebarToggle.setAttribute('title', 'Collapse Sidebar');
             }
         }, 200);
     });

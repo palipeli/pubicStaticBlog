@@ -295,6 +295,17 @@ html {
     pointer-events: none;
 }
 
+/* Auto-collapse on constrained space - handle resize smoothly */
+@media (max-width: 768px) {
+    .sidebar:not(.expanded) {
+        width: 0;
+    }
+    .sidebar:not(.expanded) .sidebar-content-wrapper {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
 /* Sidebar toggle button - fixed to left edge of sidebar, vertically centered */
 .sidebar-toggle {
     position: absolute;
@@ -500,6 +511,7 @@ html {
     border-radius: 8px;
     padding: 40px;
     line-height: 1.8;
+    font-size: 14px;
 }
 
 .blog-intro-view .blog-article {
@@ -510,23 +522,24 @@ html {
     border-radius: 8px;
     padding: 40px;
     line-height: 1.8;
+    font-size: 14px;
 }
 
 .blog-intro-view h1 {
-    font-size: 36px;
+    font-size: 26px;
     margin-bottom: 15px;
     color: var(--text-primary);
 }
 
 .blog-intro-view h2 {
-    font-size: 26px;
+    font-size: 20px;
     margin-top: 30px;
     margin-bottom: 15px;
     color: var(--text-primary);
 }
 
 .blog-intro-view h3 {
-    font-size: 20px;
+    font-size: 17px;
     margin-top: 25px;
     margin-bottom: 10px;
     color: var(--text-primary);
@@ -535,6 +548,7 @@ html {
 .blog-intro-view p {
     margin-bottom: 15px;
     color: var(--text-secondary);
+    font-size: 14px;
 }
 
 .blog-intro-view blockquote {
@@ -560,16 +574,17 @@ html {
     border-radius: 8px;
     padding: 30px;
     line-height: 1.8;
+    font-size: 14px;
 }
 
 .blog-article h1 {
-    font-size: 32px;
+    font-size: 26px;
     margin-bottom: 10px;
     color: var(--text-primary);
 }
 
 .blog-article h2 {
-    font-size: 24px;
+    font-size: 20px;
     margin: 30px 0 15px;
     color: var(--text-primary);
     border-bottom: 1px solid var(--border-color);
@@ -577,7 +592,7 @@ html {
 }
 
 .blog-article h3 {
-    font-size: 20px;
+    font-size: 17px;
     margin: 25px 0 12px;
     color: var(--text-primary);
 }
@@ -585,6 +600,7 @@ html {
 .blog-article p {
     margin-bottom: 15px;
     color: var(--text-secondary);
+    font-size: 14px;
 }
 
 .blog-article ul, .blog-article ol {
@@ -644,7 +660,7 @@ html {
 
 /* Blog Sidebar (in main sidebar) */
 .sidebar-section.blog-only {
-    display: block !important; /* Always visible in sidebar for consistent access */
+    /* Visibility controlled by JavaScript based on current page */
 }
 
 .post-selector-list {
