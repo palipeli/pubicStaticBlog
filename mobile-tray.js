@@ -244,6 +244,13 @@
         if (headerRight) {
             headerRight.insertBefore(toggleBtn, headerRight.firstChild);
         }
+        
+        // Add click event listener directly when creating button
+        toggleBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            openTray();
+        });
     }
     
     // Sync theme buttons between mobile tray and sidebar
@@ -346,9 +353,9 @@
     // Initialize
     function init() {
         if (isMobileView()) {
+            createToggleButton();
             createMobileTray();
             createOverlay();
-            createToggleButton();
         }
         
         window.addEventListener('resize', handleResize);
