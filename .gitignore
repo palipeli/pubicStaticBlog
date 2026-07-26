@@ -4,12 +4,10 @@
 __pycache__/
 *.o
 *.obj
-dist/
-build/
 *.class
-*.so
-*.dll
 *.exe
+*.dll
+*.so
 *.a
 *.out
 
@@ -39,6 +37,16 @@ Thumbs.db
 coverage/
 htmlcov/
 .coverage
+
+# Build directories
+dist/
+build/
+target/
+.gradle/
+
+# Python cache
+.mypy_cache/
+.pytest_cache/
 
 # Compressed files
 *.zip

@@ -783,8 +783,8 @@ function applyTheme(themeName) {
         root.style.setProperty('--bg-dark', '#f6f5f4');
         root.style.setProperty('--bg-panel', 'rgba(255, 255, 255, 0.95)');
         root.style.setProperty('--bg-header', 'rgba(246, 245, 244, 0.95)');
-        root.style.setProperty('--accent-blue', '#ff45fc');
-        root.style.setProperty('--accent-blue-hover', '#e031e0');
+        root.style.setProperty('--accent-pink', '#ff45fc');
+        root.style.setProperty('--accent-pink-hover', '#e031e0');
         root.style.setProperty('--text-primary', '#2e3436');
         root.style.setProperty('--text-secondary', '#5e5e5e');
         root.style.setProperty('--border-color', 'rgba(0, 0, 0, 0.1)');
@@ -796,8 +796,8 @@ function applyTheme(themeName) {
         root.style.setProperty('--bg-dark', '#121212');
         root.style.setProperty('--bg-panel', 'rgba(18, 18, 18, 0.9)');
         root.style.setProperty('--bg-header', 'rgba(12, 12, 12, 0.95)');
-        root.style.setProperty('--accent-blue', '#ff45fc');
-        root.style.setProperty('--accent-blue-hover', '#e031e0');
+        root.style.setProperty('--accent-pink', '#ff45fc');
+        root.style.setProperty('--accent-pink-hover', '#e031e0');
         root.style.setProperty('--text-primary', '#ffffff');
         root.style.setProperty('--text-secondary', '#9a9a9a');
         root.style.setProperty('--border-color', 'rgba(255, 255, 255, 0.08)');

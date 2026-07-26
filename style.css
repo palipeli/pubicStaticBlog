@@ -10,8 +10,8 @@
     --bg-dark: #f6f5f4;
     --bg-panel: rgba(255, 255, 255, 0.95);
     --bg-header: rgba(246, 245, 244, 0.95);
-    --accent-blue: #ff45fc;
-    --accent-blue-hover: #e031e0;
+    --accent-pink: #ff45fc;
+    --accent-pink-hover: #e031e0;
     --text-primary: #2e3436;
     --text-secondary: #5e5e5e;
     --border-color: rgba(0, 0, 0, 0.1);
@@ -167,8 +167,8 @@ body {
 }
 
 .nav-item.active {
-    color: var(--accent-blue);
-    background: rgba(53, 132, 228, 0.15);
+    color: var(--accent-pink);
+    background: rgba(255, 69, 252, 0.15);
 }
 
 /* Main Content */
@@ -420,9 +420,9 @@ body {
 }
 
 .sidebar-toggle:hover {
-    background: var(--accent-blue);
+    background: var(--accent-pink);
     color: white;
-    border-color: var(--accent-blue);
+    border-color: var(--accent-pink);
 }
 
 .sidebar-toggle:active {
@@ -505,13 +505,13 @@ body {
 
 .template-card:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-color: var(--accent-blue);
+    border-color: var(--accent-pink);
     transform: translateX(-5px);
 }
 
 .template-card.active {
     background: rgba(71, 114, 179, 0.2);
-    border-color: var(--accent-blue);
+    border-color: var(--accent-pink);
 }
 
 .template-name {
@@ -529,12 +529,12 @@ body {
 .all-post-btn {
     display: inline-block;
     background: rgba(53, 132, 228, 0.2);
-    border: 1px solid var(--accent-blue);
+    border: 1px solid var(--accent-pink);
     border-radius: 6px;
     padding: 12px 30px;
     cursor: pointer;
     transition: all 0.3s ease;
-    color: var(--accent-blue);
+    color: var(--accent-pink);
     font-size: 14px;
     font-weight: 600;
     text-decoration: none;
@@ -544,8 +544,8 @@ body {
 
 .all-post-btn:hover {
     background: rgba(53, 132, 228, 0.3);
-    border-color: var(--accent-blue-hover);
-    color: var(--accent-blue-hover);
+    border-color: var(--accent-pink-hover);
+    color: var(--accent-pink-hover);
 }
 
 /* Theme Chooser */
@@ -570,12 +570,12 @@ body {
 
 .theme-btn:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-color: var(--accent-blue);
+    border-color: var(--accent-pink);
 }
 
 .theme-btn.active {
     background: rgba(71, 114, 179, 0.3);
-    border-color: var(--accent-blue);
+    border-color: var(--accent-pink);
 }
 
 /* Blog Cards */
@@ -615,7 +615,7 @@ body {
 .back-to-list-btn,
 .back-to-intro-btn {
     background: rgba(71, 114, 179, 0.3);
-    border: 1px solid var(--accent-blue);
+    border: 1px solid var(--accent-pink);
     color: var(--text-primary);
     padding: 10px 20px;
     border-radius: 6px;
@@ -694,7 +694,7 @@ body {
 }
 
 .blog-intro-view blockquote {
-    border-left: 4px solid var(--accent-blue);
+    border-left: 4px solid var(--accent-pink);
     padding-left: 20px;
     margin: 20px 0;
     font-style: italic;
@@ -780,7 +780,7 @@ body {
 }
 
 .blog-article blockquote {
-    border-left: 4px solid var(--accent-blue);
+    border-left: 4px solid var(--accent-pink);
     padding-left: 20px;
     margin: 20px 0;
     color: var(--text-secondary);
@@ -788,12 +788,12 @@ body {
 }
 
 .blog-article a {
-    color: var(--accent-blue);
+    color: var(--accent-pink);
     text-decoration: none;
 }
 
 .blog-article a:hover {
-    color: var(--accent-blue-hover);
+    color: var(--accent-pink-hover);
     text-decoration: underline;
 }
 
@@ -825,13 +825,13 @@ body {
 
 .post-selector-item:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-color: var(--accent-blue);
+    border-color: var(--accent-pink);
     transform: translateX(-5px);
 }
 
 .post-selector-item.active {
     background: rgba(71, 114, 179, 0.2);
-    border-color: var(--accent-blue);
+    border-color: var(--accent-pink);
 }
 
 .post-selector-title {
@@ -873,7 +873,7 @@ body {
 
 .blog-card:hover {
     transform: translateY(-5px);
-    border-color: var(--accent-blue);
+    border-color: var(--accent-pink);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
@@ -921,7 +921,7 @@ body {
 }
 
 .read-more {
-    color: var(--accent-blue);
+    color: var(--accent-pink);
     text-decoration: none;
     font-weight: 600;
     font-size: 13px;
@@ -929,7 +929,7 @@ body {
 }
 
 .read-more:hover {
-    color: var(--accent-blue-hover);
+    color: var(--accent-pink-hover);
 }
 
 /* Page Sections */
@@ -986,7 +986,7 @@ body {
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 20px;
-    border: 3px solid var(--accent-blue);
+    border: 3px solid var(--accent-pink);
     box-shadow: 0 4px 15px rgba(53, 132, 228, 0.3);
 }
 
@@ -1180,7 +1180,7 @@ body {
 .blog-btn {
     font-size: 1.1rem;
     padding: 15px 25px;
-    background: linear-gradient(135deg, var(--accent-blue) 0%, #3a5a8f 100%);
+    background: linear-gradient(135deg, var(--accent-pink) 0%, #3a5a8f 100%);
     color: white;
     display: inline-flex;
     align-items: center;
@@ -1384,12 +1384,12 @@ body {
 
 .mobile-theme-btn:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-color: var(--accent-blue);
+    border-color: var(--accent-pink);
 }
 
 .mobile-theme-btn.active {
     background: rgba(71, 114, 179, 0.3);
-    border-color: var(--accent-blue);
+    border-color: var(--accent-pink);
 }
 
 /* Photo Placeholder in Mobile Tray */
@@ -1433,7 +1433,7 @@ body {
 
 .mobile-post-item:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-color: var(--accent-blue);
+    border-color: var(--accent-pink);
 }
 
 .mobile-post-title {
@@ -1470,7 +1470,7 @@ body {
 
 .mobile-nav-item:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-color: var(--accent-blue);
+    border-color: var(--accent-pink);
 }
 
 /* Prevent body scroll when tray is open */
@@ -1506,7 +1506,7 @@ footer p {
     height: 24px;
     border: 3px solid rgba(53, 132, 228, 0.2);
     border-radius: 50%;
-    border-top-color: var(--accent-blue);
+    border-top-color: var(--accent-pink);
     animation: spin 0.8s linear infinite;
 }
 
