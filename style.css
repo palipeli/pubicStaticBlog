@@ -23,7 +23,10 @@ body {
     background: linear-gradient(135deg, #f6f5f4 0%, #ffffff 100%);
     color: var(--text-primary);
     min-height: 100vh;
-    overflow-x: hidden;
+}
+
+html {
+    height: 100%;
 }
 
 /* Header */
@@ -119,25 +122,17 @@ body {
 
 /* Main Content */
 .main-container {
-    display: flex;
+    display: block;
     margin-top: var(--header-height);
-    min-height: calc(100vh - var(--header-height));
+    height: calc(100vh - var(--header-height));
     position: relative;
-    overflow-x: hidden; /* Prevent horizontal scroll from sidebar button */
 }
 
 .content-area {
-    flex: 1;
     padding: 30px;
     overflow-y: auto;
-    transition: margin-right 0.3s ease;
-    margin-right: 280px; /* Account for fixed sidebar width */
-    height: calc(100vh - var(--header-height));
-}
-
-/* When sidebar is collapsed, content area takes full width */
-.main-container.sidebar-collapsed .content-area {
-    margin-right: 0;
+    height: 100%;
+    width: 100%;
 }
 
 /* Home Hero Section */
@@ -270,10 +265,7 @@ body {
     -webkit-backdrop-filter: blur(10px);
     border-left: 1px solid var(--border-color);
     padding: 0;
-    overflow: visible;
     animation: slideLeft 0.5s ease-out;
-    transition: width 0.3s ease;
-    flex-shrink: 0;
     position: fixed;
     right: 0;
     top: var(--header-height);
@@ -289,7 +281,7 @@ body {
     overflow-y: auto;
     opacity: 1;
     transition: opacity 0.2s ease;
-    width: 280px;
+    width: 100%;
     box-sizing: border-box;
 }
 
@@ -862,7 +854,7 @@ body {
 /* Responsive */
 @media (max-width: 768px) {
     /* On mobile, sidebar is collapsed by default but toggle button remains visible */
-    .sidebar {
+    .sidebar.collapsed {
         width: 0;
         padding: 0;
         opacity: 0;
@@ -870,14 +862,10 @@ body {
         pointer-events: none;
     }
     
-    .main-container.sidebar-collapsed .sidebar {
+    .sidebar:not(.collapsed) {
         opacity: 1;
         transform: translateX(0);
         pointer-events: auto;
-    }
-    
-    .main-container.sidebar-collapsed .content-area {
-        margin-right: 0;
     }
     
     .blog-grid {

@@ -460,12 +460,10 @@ function setupSidebarToggle() {
     function initSidebarState() {
         if (isMobileView()) {
             sidebar.classList.add('collapsed');
-            mainContainer.classList.add('sidebar-collapsed');
             sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
             sidebarToggle.setAttribute('title', 'Open Sidebar');
         } else {
             sidebar.classList.remove('collapsed');
-            mainContainer.classList.remove('sidebar-collapsed');
             sidebarToggle.setAttribute('aria-label', 'Collapse Sidebar');
             sidebarToggle.setAttribute('title', 'Collapse Sidebar');
         }
@@ -478,7 +476,6 @@ function setupSidebarToggle() {
     sidebarToggle.addEventListener('click', (e) => {
         e.stopPropagation();
         sidebar.classList.toggle('collapsed');
-        mainContainer.classList.toggle('sidebar-collapsed');
         
         // Update toggle button aria-label and icon direction
         const isCollapsed = sidebar.classList.contains('collapsed');
@@ -495,7 +492,6 @@ function setupSidebarToggle() {
             // On desktop, preserve user's choice
             if (isMobileView() && !sidebar.classList.contains('collapsed')) {
                 sidebar.classList.add('collapsed');
-                mainContainer.classList.add('sidebar-collapsed');
                 sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
                 sidebarToggle.setAttribute('title', 'Open Sidebar');
             }
