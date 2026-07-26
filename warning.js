@@ -39,7 +39,12 @@
 
     // The "Are you sure you want to leave?" logic
     window.addEventListener('beforeunload', (e) => {
-        if (!bypassWarning && !isAccepted) {
+        if (isFlashing) {
+            // Prevent close/refresh during flash sequence
+            e.preventDefault(); 
+            e.returnValue = ''; 
+        } else if (!bypassWarning && !isAccepted) {
+            // Original warning behavior
             e.preventDefault(); 
             e.returnValue = ''; 
         }
@@ -51,6 +56,7 @@
     let isAccepted = false; 
     let areAssetsLoaded = false; 
     let lastAudioIndex = -1;
+    let isFlashing = false; // Flag to track if flash sequence is ongoing
 
     let touchStartX = 0;
     let touchStartY = 0;
@@ -194,10 +200,12 @@
             localStorage.removeItem(STORAGE_KEY);
             acceptBtn.disabled = true;
             declineBtn.disabled = true;
+            isFlashing = true; // Start flash sequence - prevent close/refresh
             
             const intervalId = setInterval(() => { triggerWarning(null, true); }, 100); 
             setTimeout(() => {
                 clearInterval(intervalId);
+                isFlashing = false; // End flash sequence - allow close/refresh
                 bypassWarning = true;
                 location.reload();
             }, 3000);
