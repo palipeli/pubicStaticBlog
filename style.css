@@ -510,8 +510,12 @@ body {
 }
 
 .template-card.active {
-    background: rgba(71, 114, 179, 0.2);
+    background: rgba(255, 69, 252, 0.15);
     border-color: var(--accent-pink);
+}
+
+.template-card.active .template-name {
+    color: var(--accent-pink);
 }
 
 .template-name {
@@ -574,8 +578,9 @@ body {
 }
 
 .theme-btn.active {
-    background: rgba(71, 114, 179, 0.3);
+    background: rgba(255, 69, 252, 0.15);
     border-color: var(--accent-pink);
+    color: var(--accent-pink);
 }
 
 /* Blog Cards */
@@ -830,8 +835,12 @@ body {
 }
 
 .post-selector-item.active {
-    background: rgba(71, 114, 179, 0.2);
+    background: rgba(255, 69, 252, 0.15);
     border-color: var(--accent-pink);
+}
+
+.post-selector-item.active .post-selector-title {
+    color: var(--accent-pink);
 }
 
 .post-selector-title {
@@ -1388,8 +1397,9 @@ body {
 }
 
 .mobile-theme-btn.active {
-    background: rgba(71, 114, 179, 0.3);
+    background: rgba(255, 69, 252, 0.15);
     border-color: var(--accent-pink);
+    color: var(--accent-pink);
 }
 
 /* Photo Placeholder in Mobile Tray */
@@ -1436,6 +1446,15 @@ body {
     border-color: var(--accent-pink);
 }
 
+.mobile-post-item.active {
+    background: rgba(255, 69, 252, 0.15);
+    border-color: var(--accent-pink);
+}
+
+.mobile-post-item.active .mobile-post-title {
+    color: var(--accent-pink);
+}
+
 .mobile-post-title {
     font-size: 14px;
     font-weight: 600;
@@ -1471,6 +1490,12 @@ body {
 .mobile-nav-item:hover {
     background: rgba(255, 255, 255, 0.1);
     border-color: var(--accent-pink);
+}
+
+.mobile-nav-item.active {
+    background: rgba(255, 69, 252, 0.15);
+    border-color: var(--accent-pink);
+    color: var(--accent-pink);
 }
 
 /* Prevent body scroll when tray is open */
