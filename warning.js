@@ -11,7 +11,6 @@
     const AUDIO_LAYERS = 6; 
 
     let bypassWarning = false;
-    let declineFlashTriggered = false; // Track if decline flash sequence was triggered
 
     // Global link bypass - only skip warning for actual links and interactive UI elements
     window.addEventListener('click', (e) => {
@@ -40,8 +39,7 @@
 
     // The "Are you sure you want to leave?" logic
     window.addEventListener('beforeunload', (e) => {
-        // Only prevent refresh if decline flash sequence was triggered and not yet accepted
-        if (!bypassWarning && declineFlashTriggered && !isAccepted) {
+        if (!bypassWarning && !isAccepted) {
             e.preventDefault(); 
             e.returnValue = ''; 
         }
@@ -183,8 +181,6 @@
         
         acceptBtn.addEventListener('click', () => {
             localStorage.setItem(STORAGE_KEY, 'true');
-            // After accepting, clear the decline flag so refresh prevention is disabled
-            declineFlashTriggered = false;
             consentOverlay.style.opacity = '0';
             setTimeout(() => {
                 consentOverlay.style.display = 'none';
@@ -199,15 +195,10 @@
             acceptBtn.disabled = true;
             declineBtn.disabled = true;
             
-            // Mark that decline flash sequence was triggered
-            declineFlashTriggered = true;
-            
             const intervalId = setInterval(() => { triggerWarning(null, true); }, 100); 
             setTimeout(() => {
                 clearInterval(intervalId);
                 bypassWarning = true;
-                // Clear decline flag after reload so refresh prevention is disabled
-                declineFlashTriggered = false;
                 location.reload();
             }, 3000);
         });
