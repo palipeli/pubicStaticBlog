@@ -1,9 +1,13 @@
 // app.js - Blog Platform Application Logic
 
-// Global state for blog posts
-let blogPosts = []; // Full posts with content (lazy-loaded)
-let blogPostMetadata = []; // Metadata only (loaded initially)
+// Global state for blog posts - exposed on window for cross-module access
+window.blogPosts = []; // Full posts with content (lazy-loaded)
+window.blogPostMetadata = []; // Metadata only (loaded initially)
 const blogContentCache = new Map(); // Cache for loaded blog content
+
+// Shorthand references for cleaner code
+let blogPosts = window.blogPosts;
+let blogPostMetadata = window.blogPostMetadata;
 
 // Default introduction content shown before selecting a post
 const blogIntroduction = {
@@ -141,6 +145,9 @@ async function fetchBlogPostMetadata() {
         
         // Sort by date
         blogPostMetadata = blogPostMetadata.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
+        // Sync with window object for cross-module access
+        window.blogPostMetadata = blogPostMetadata;
         
         return blogPostMetadata;
     } catch (err) {
