@@ -1,1 +1,3 @@
-(empty)
+(index.html is a source file, so no changes needed to .gitignore)
+
+(index.html is just a regular HTML file being modified, which doesn't require any new ignore rules)
