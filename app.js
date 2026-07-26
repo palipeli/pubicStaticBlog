@@ -562,11 +562,8 @@ function renderBlogButtons(posts) {
     
     container.innerHTML = '';
     
-    // Filter posts to show only Michelle DNS and Privacy Policy on home page
-    const homePagePosts = posts.filter(post => 
-        post.id === 'michelle-dns-for-ios-sideloading' || 
-        post.id === 'privacy-policy'
-    );
+    // Show all posts on home page
+    const homePagePosts = posts;
     
     if (homePagePosts.length === 0) {
         container.style.display = 'none';
