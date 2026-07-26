@@ -548,6 +548,74 @@ document.addEventListener('DOMContentLoaded', function() {
             // Just render the sidebar components
             renderPostSelector(posts);
             // Categories removed from sidebar - no longer rendering
+            
+            // Render blog buttons on home page (kamikami.eu style)
+            renderBlogButtons(posts);
         }
     });
 });
+
+// Render blog buttons on home page (inspired by kamikami.eu)
+function renderBlogButtons(posts) {
+    const container = document.getElementById('blog-buttons-container');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    // Filter posts to show only Michelle DNS and Privacy Policy on home page
+    const homePagePosts = posts.filter(post => 
+        post.id === 'michelle-dns-for-ios-sideloading' || 
+        post.id === 'privacy-policy'
+    );
+    
+    if (homePagePosts.length === 0) {
+        container.style.display = 'none';
+        return;
+    }
+    
+    homePagePosts.forEach(post => {
+        const categoryClass = post.category ? 'category-' + post.category.toLowerCase().replace(/\s+/g, '-') : '';
+        
+        const button = document.createElement('a');
+        button.className = `blog-btn ${categoryClass}`;
+        button.href = '#';
+        button.onclick = (e) => {
+            e.preventDefault();
+            openBlogPostFromHome(post.id);
+        };
+        
+        button.innerHTML = `
+            <i class="fa-solid fa-book"></i>
+            <span>${post.title}</span>
+        `;
+        
+        container.appendChild(button);
+    });
+    
+    // Add "Send me cat pictures and files!" button (kamikami.eu style)
+    const catButton = document.createElement('a');
+    catButton.className = 'blog-btn category-fun';
+    catButton.href = 'mailto:kamikami@example.com?subject=Cat Pictures & Body=Here are some cat pictures!';
+    catButton.target = '_blank';
+    
+    catButton.innerHTML = `
+        <i class="fa-solid fa-cat"></i>
+        <span>Send me cat pictures and files!</span>
+    `;
+    
+    container.appendChild(catButton);
+}
+
+// Open a blog post from home page button
+function openBlogPostFromHome(id) {
+    // Navigate to blogs page first
+    const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
+    if (blogsNavItem) {
+        blogsNavItem.click();
+    }
+    
+    // Then open the specific post after a short delay
+    setTimeout(() => {
+        openBlogPost(id);
+    }, 100);
+}
