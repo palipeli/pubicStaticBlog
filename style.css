@@ -153,6 +153,21 @@ body {
     text-align: center;
 }
 
+/* Home Layout Container - Same rectangle styling as blog and about pages */
+.home-layout-container {
+    display: block;
+    margin-top: 20px;
+}
+
+.home-layout-container .home-hero {
+    background: var(--bg-panel);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 40px;
+}
+
 .home-title {
     font-size: 42px;
     font-weight: 700;

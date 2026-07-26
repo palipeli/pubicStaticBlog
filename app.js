@@ -302,6 +302,9 @@ function setupNavigation() {
     const sections = document.querySelectorAll('.page-section');
     const blogSidebarSection = document.getElementById('blog-sidebar-section');
 
+    // Wrap home content in rectangle on initialization
+    wrapHomeContentInRectangle();
+
     navItems.forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
@@ -332,6 +335,27 @@ function setupNavigation() {
             window.scrollTo(0, 0);
         });
     });
+}
+
+// Wrap home page content in a rectangle container (like blog and about pages)
+function wrapHomeContentInRectangle() {
+    const homeHero = document.getElementById('home-hero-content');
+    if (!homeHero) return;
+    
+    // Check if already wrapped
+    if (homeHero.parentElement.classList.contains('home-layout-container')) {
+        return;
+    }
+    
+    // Create wrapper container
+    const wrapper = document.createElement('div');
+    wrapper.className = 'home-layout-container';
+    
+    // Insert wrapper before homeHero
+    homeHero.parentNode.insertBefore(wrapper, homeHero);
+    
+    // Move homeHero into wrapper
+    wrapper.appendChild(homeHero);
 }
 
 // Template selection - now handles theme switching with cookie persistence
