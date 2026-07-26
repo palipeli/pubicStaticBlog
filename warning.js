@@ -12,9 +12,15 @@
 
     let bypassWarning = false;
 
-    // Global link bypass
+    // Global link bypass - only skip warning for actual links and interactive UI elements
     window.addEventListener('click', (e) => {
-        if (e.target.closest('a')) {
+        if (e.target.closest('a') || 
+            e.target.closest('#themeToggle') || 
+            e.target.closest('.menu-toggle') ||
+            e.target.closest('.theme-btn') ||
+            e.target.closest('.nav-item') ||
+            e.target.closest('.blue-button') ||
+            e.target.closest('.mc-btn')) {
             bypassWarning = true;
             setTimeout(() => { bypassWarning = false; }, 1000);
         }
@@ -189,18 +195,22 @@
 
     async function triggerWarning(e, force = false) {
         if (!force) {
-            if (!isAccepted || !areAssetsLoaded || isPlaying) return; 
+            if (!isAccepted || !areAssetsLoaded) return; 
+            // Don't trigger on clicks to interactive elements
             if (e && e.target && (
                 e.target.closest('#consent-overlay') || 
                 e.target.closest('a') || 
                 e.target.closest('#themeToggle') || 
                 e.target.closest('.menu-toggle') ||
                 e.target.closest('.theme-btn') ||
-                e.target.closest('.nav-item')
+                e.target.closest('.nav-item') ||
+                e.target.closest('.blue-button') ||
+                e.target.closest('.mc-btn')
             )) return;
         }
 
-        if (!force) isPlaying = true; 
+        // Always allow multiple triggers - don't set isPlaying flag
+        // Only use isPlaying for forced triggers to prevent recursion during flash
 
         preFlashOverlay.style.opacity = '1';
         setTimeout(() => {

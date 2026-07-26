@@ -1,4 +1,4 @@
-/* style.css - Blender-Style Blog Platform */
+/* style.css - Adwaita-Style Blog Platform */
 
 * {
     margin: 0;
@@ -7,20 +7,20 @@
 }
 
 :root {
-    --bg-dark: #1d1d1d;
-    --bg-panel: rgba(40, 40, 40, 0.85);
-    --bg-header: rgba(30, 30, 30, 0.9);
-    --accent-blue: #4772b3;
-    --accent-blue-hover: #5a8fd9;
-    --text-primary: #e6e6e6;
-    --text-secondary: #a0a0a0;
-    --border-color: rgba(255, 255, 255, 0.1);
+    --bg-dark: #f6f5f4;
+    --bg-panel: rgba(255, 255, 255, 0.95);
+    --bg-header: rgba(246, 245, 244, 0.95);
+    --accent-blue: #3584e4;
+    --accent-blue-hover: #1c71d8;
+    --text-primary: #2e3436;
+    --text-secondary: #5e5e5e;
+    --border-color: rgba(0, 0, 0, 0.1);
     --header-height: 40px;
 }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+    background: linear-gradient(135deg, #f6f5f4 0%, #ffffff 100%);
     color: var(--text-primary);
     min-height: 100vh;
     overflow-x: hidden;
@@ -67,6 +67,7 @@ body {
     color: white;
     border: none;
     padding: 8px 24px;
+    margin: 0 10px;
     border-radius: 4px;
     font-size: 14px;
     font-weight: 600;
@@ -582,43 +583,7 @@ body {
     color: var(--text-secondary);
 }
 
-/* Category Filter in Sidebar */
-.sidebar .category-filter {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.sidebar .category-item {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 10px 15px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 13px;
-    color: var(--text-primary);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.sidebar .category-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--accent-blue);
-}
-
-.sidebar .category-item.active {
-    background: rgba(71, 114, 179, 0.3);
-    border-color: var(--accent-blue);
-}
-
-.sidebar .category-count {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 11px;
-}
+/* Category Filter in Sidebar - REMOVED */
 
 .blog-card {
     background: var(--bg-panel);

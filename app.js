@@ -2,7 +2,6 @@
 
 // Global state for blog posts
 let blogPosts = [];
-let currentCategory = 'all';
 
 // Default introduction content shown before selecting a post
 const blogIntroduction = {
@@ -26,7 +25,7 @@ const blogIntroduction = {
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
         </blockquote>
         
-        <p>Select a post from the sidebar to start reading, or browse by category using the filters above.</p>
+        <p>Select a post from the sidebar to start reading.</p>
     `
 };
 
@@ -228,61 +227,9 @@ function renderPostSelector(posts) {
     });
 }
 
-// Render category filter
-function renderCategories(posts) {
-    const container = document.getElementById('category-filter');
-    if (!container) return;
-    
-    // Count posts per category
-    const categories = {};
-    posts.forEach(post => {
-        const cat = post.category;
-        categories[cat] = (categories[cat] || 0) + 1;
-    });
-    
-    container.innerHTML = '';
-    
-    // All categories option
-    const allItem = document.createElement('div');
-    allItem.className = 'category-item active';
-    allItem.dataset.category = 'all';
-    allItem.innerHTML = `
-        <span>All Posts</span>
-        <span class="category-count">${posts.length}</span>
-    `;
-    allItem.onclick = () => filterByCategory('all');
-    container.appendChild(allItem);
-    
-    // Individual categories
-    Object.entries(categories).forEach(([cat, count]) => {
-        const item = document.createElement('div');
-        item.className = 'category-item';
-        item.dataset.category = cat;
-        item.innerHTML = `
-            <span>${cat}</span>
-            <span class="category-count">${count}</span>
-        `;
-        item.onclick = () => filterByCategory(cat);
-        container.appendChild(item);
-    });
-}
+// Render category filter - REMOVED (categories no longer in sidebar)
 
-// Filter posts by category
-function filterByCategory(category) {
-    currentCategory = category;
-    
-    // Update active state
-    document.querySelectorAll('.category-item').forEach(item => {
-        item.classList.toggle('active', item.dataset.category === category);
-    });
-    
-    // Filter and re-render the post selector
-    const filtered = category === 'all' 
-        ? blogPosts 
-        : blogPosts.filter(post => post.category === category);
-    
-    renderPostSelector(filtered);
-}
+// Filter posts by category - REMOVED (categories no longer in sidebar)
 
 // Open a blog post
 function openBlogPost(id) {
@@ -398,18 +345,18 @@ function setupTemplates() {
 function applyTheme(themeName) {
     const root = document.documentElement;
     
-    if (themeName === 'blender') {
-        // Blender Dark Theme
-        root.style.setProperty('--bg-dark', '#1d1d1d');
-        root.style.setProperty('--bg-panel', 'rgba(40, 40, 40, 0.85)');
-        root.style.setProperty('--bg-header', 'rgba(30, 30, 30, 0.9)');
-        root.style.setProperty('--accent-blue', '#4772b3');
-        root.style.setProperty('--accent-blue-hover', '#5a8fd9');
-        root.style.setProperty('--text-primary', '#e6e6e6');
-        root.style.setProperty('--text-secondary', '#a0a0a0');
-        root.style.setProperty('--border-color', 'rgba(255, 255, 255, 0.1)');
-        document.body.style.background = 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)';
-    } else if (themeName === 'adwaita') {
+    if (themeName === 'adwaita-light') {
+        // Adwaita Light Theme (GNOME default)
+        root.style.setProperty('--bg-dark', '#f6f5f4');
+        root.style.setProperty('--bg-panel', 'rgba(255, 255, 255, 0.95)');
+        root.style.setProperty('--bg-header', 'rgba(246, 245, 244, 0.95)');
+        root.style.setProperty('--accent-blue', '#3584e4');
+        root.style.setProperty('--accent-blue-hover', '#1c71d8');
+        root.style.setProperty('--text-primary', '#2e3436');
+        root.style.setProperty('--text-secondary', '#5e5e5e');
+        root.style.setProperty('--border-color', 'rgba(0, 0, 0, 0.1)');
+        document.body.style.background = 'linear-gradient(135deg, #f6f5f4 0%, #ffffff 100%)';
+    } else if (themeName === 'adwaita-dark') {
         // Adwaita Dark Theme (GNOME)
         root.style.setProperty('--bg-dark', '#1e1e1e');
         root.style.setProperty('--bg-panel', 'rgba(30, 30, 30, 0.9)');
@@ -477,7 +424,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Introduction view is already visible by default in HTML
             // Just render the sidebar components
             renderPostSelector(posts);
-            renderCategories(posts);
+            // Categories removed from sidebar - no longer rendering
         }
     });
 });
