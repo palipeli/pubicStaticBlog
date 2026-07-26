@@ -1082,43 +1082,6 @@ html {
     transform: translateY(0);
 }
 
-.mobile-tray-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    border-bottom: 1px solid var(--border-color);
-    position: sticky;
-    top: 0;
-    background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    z-index: 1;
-}
-
-.mobile-tray-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.mobile-tray-close {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 8px;
-    color: var(--text-primary);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.mobile-tray-close:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
 .mobile-tray-content {
     padding: 20px;
 }

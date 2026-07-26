@@ -28,14 +28,6 @@
         tray.id = 'mobile-nav-tray';
         tray.className = 'mobile-nav-tray';
         tray.innerHTML = `
-            <div class="mobile-tray-header">
-                <span class="mobile-tray-title">Quick Navigation</span>
-                <button class="mobile-tray-close" id="mobile-tray-close" aria-label="Close Menu">
-                    <svg viewBox="0 0 24 24" width="24" height="24">
-                        <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                    </svg>
-                </button>
-            </div>
             <div class="mobile-tray-content">
                 <!-- Blog Posts Section (always visible when on blogs page, expanded by default) -->
                 <div class="mobile-tray-section blog-only" id="mobile-blog-posts-section" style="display: none;">
@@ -79,27 +71,7 @@
     
     // Setup event listeners for the tray
     function setupTrayEventListeners(tray) {
-        const toggleBtn = document.getElementById('mobile-tray-toggle');
-        const closeBtn = document.getElementById('mobile-tray-close');
         const overlay = document.getElementById('mobile-tray-overlay');
-        
-        // Toggle button click - prevent warning flash
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                openTray();
-            });
-        }
-        
-        // Close button click
-        if (closeBtn) {
-            closeBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                closeTray();
-            });
-        }
         
         // Overlay click - close tray without triggering warning
         if (overlay) {
@@ -162,25 +134,6 @@
         });
     }
     
-    // Open the tray
-    function openTray() {
-        if (!isMobileView()) return;
-        
-        const tray = document.getElementById('mobile-nav-tray');
-        const overlay = document.getElementById('mobile-tray-overlay');
-        
-        if (!tray) return;
-        
-        tray.classList.add('open');
-        if (overlay) overlay.classList.add('open');
-        
-        isTrayOpen = true;
-        document.body.classList.add('mobile-tray-open');
-        
-        // Update blog posts section visibility
-        updateBlogPostsVisibility();
-    }
-    
     // Close the tray
     function closeTray() {
         const tray = document.getElementById('mobile-nav-tray');
@@ -191,6 +144,28 @@
         
         isTrayOpen = false;
         document.body.classList.remove('mobile-tray-open');
+    }
+    
+    // Open the tray (used for auto-expand on blogs page)
+    function openTray() {
+        if (!isMobileView()) return;
+        
+        const tray = document.getElementById('mobile-nav-tray');
+        const overlay = document.getElementById('mobile-tray-overlay');
+        
+        if (!tray) return;
+        
+        // Only open if not already open
+        if (tray.classList.contains('open')) return;
+        
+        // Open tray
+        tray.classList.add('open');
+        if (overlay) overlay.classList.add('open');
+        isTrayOpen = true;
+        document.body.classList.add('mobile-tray-open');
+        
+        // Update blog posts section visibility
+        updateBlogPostsVisibility();
     }
     
     // Create the overlay
@@ -222,7 +197,7 @@
         const toggleBtn = document.createElement('button');
         toggleBtn.id = 'mobile-tray-toggle';
         toggleBtn.className = 'mobile-tray-toggle';
-        toggleBtn.setAttribute('aria-label', 'Open Menu');
+        toggleBtn.setAttribute('aria-label', 'Toggle Menu');
         toggleBtn.innerHTML = `
             <svg viewBox="0 0 24 24" width="24" height="24">
                 <path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
@@ -236,10 +211,33 @@
         }
         
         // Add click event listener directly when creating button
-        toggleBtn.addEventListener('click', (e) => {
+        toggleBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            openTray();
+            
+            const tray = document.getElementById('mobile-nav-tray');
+            const overlay = document.getElementById('mobile-tray-overlay');
+            
+            if (!tray) return;
+            
+            const isOpen = tray.classList.contains('open');
+            
+            if (isOpen) {
+                // Close tray
+                tray.classList.remove('open');
+                if (overlay) overlay.classList.remove('open');
+                isTrayOpen = false;
+                document.body.classList.remove('mobile-tray-open');
+            } else {
+                // Open tray
+                tray.classList.add('open');
+                if (overlay) overlay.classList.add('open');
+                isTrayOpen = true;
+                document.body.classList.add('mobile-tray-open');
+                
+                // Update blog posts section visibility
+                updateBlogPostsVisibility();
+            }
         });
     }
     
