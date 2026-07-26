@@ -236,6 +236,16 @@ function openBlogPost(id) {
     const post = blogPosts.find(p => p.id === id);
     if (!post) return;
     
+    // Check if we're currently on home or about page, and switch to blogs if so
+    const currentPage = document.querySelector('.page-section.active');
+    if (currentPage && (currentPage.id === 'home' || currentPage.id === 'about')) {
+        // Find and click the blogs nav item to switch to blogs page
+        const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
+        if (blogsNavItem) {
+            blogsNavItem.click();
+        }
+    }
+    
     // Update active state in sidebar
     document.querySelectorAll('.post-selector-item').forEach((item, index) => {
         item.classList.toggle('active', blogPosts[index]?.id === id);
@@ -309,9 +319,9 @@ function setupNavigation() {
                 }
             });
             
-            // Show/hide "All Posts" in sidebar only on Blog page
+            // Show/hide "All Posts" in sidebar on Home, About, and Blogs pages
             if (blogSidebarSection) {
-                if (page === 'blogs') {
+                if (page === 'blogs' || page === 'home' || page === 'about') {
                     blogSidebarSection.style.display = 'block';
                 } else {
                     blogSidebarSection.style.display = 'none';
@@ -551,6 +561,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Render blog buttons on home page (kamikami.eu style)
             renderBlogButtons(posts);
+            
+            // Show post selector sidebar on Home page by default (since it's the active page on load)
+            const blogSidebarSection = document.getElementById('blog-sidebar-section');
+            if (blogSidebarSection) {
+                blogSidebarSection.style.display = 'block';
+            }
         }
     });
 });
