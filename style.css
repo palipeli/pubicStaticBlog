@@ -1182,7 +1182,7 @@ body {
     justify-content: center;
     gap: 20px;
     flex-wrap: wrap;
-    margin: 25px 0;
+    margin: 18px 0;
 }
 
 /* Blog Button Style (inspired by kamikami.eu mc-btn) */
@@ -1195,7 +1195,7 @@ body {
     align-items: center;
     gap: 10px;
     text-decoration: none;
-    border-radius: 6px;
+    border-radius: 4px;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(71, 114, 179, 0.4);
     border: none;
