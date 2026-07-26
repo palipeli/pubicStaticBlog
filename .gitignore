@@ -1,10 +1,13 @@
 ```gitignore
-# Compiled and binary files
+# Compiled and build artifacts
 *.pyc
 __pycache__/
-*.class
 *.o
 *.obj
+dist/
+build/
+target/
+*.class
 *.exe
 *.dll
 *.so
@@ -19,14 +22,13 @@ venv/
 .env.local
 .env.*
 
-# Build artifacts
-dist/
-build/
-target/
+# Logs and temp files
 *.log
 *.tmp
+*.swp
+*.swo
 
-# Editors and IDEs
+# Editors
 .vscode/
 .idea/
 *.swp
@@ -40,6 +42,14 @@ Thumbs.db
 coverage/
 htmlcov/
 .coverage
+
+# Python specific
+.mypy_cache/
+.pytest_cache/
+
+# Java/Gradle
+.gradle/
+build/
 
 # Compressed files
 *.zip
@@ -60,8 +70,4 @@ htmlcov/
 *.Z
 *.lz
 *.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
 ```

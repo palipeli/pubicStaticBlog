@@ -1,0 +1,167 @@
+/* mobile-sidebar.css - Mobile Floating Sidebar Styles */
+
+/* Mobile breakpoint for floating tray behavior */
+@media (max-width: 480px) {
+    /* Override sidebar to become a bottom tray */
+    .sidebar.mobile-tray {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto !important;
+        width: 100% !important;
+        max-width: 100%;
+        height: 70vh;
+        max-height: 500px;
+        border-left: none;
+        border-top: 1px solid var(--border-color);
+        border-radius: 16px 16px 0 0;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+        transform: translateY(100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1002;
+        opacity: 1 !important;
+    }
+
+    /* Show the tray when active */
+    .sidebar.mobile-tray.active {
+        transform: translateY(0);
+    }
+
+    /* Hide the default toggle button on mobile tray mode */
+    .sidebar.mobile-tray .sidebar-toggle {
+        display: none !important;
+    }
+
+    /* Sidebar content wrapper adjustments for tray */
+    .sidebar.mobile-tray .sidebar-content-wrapper {
+        padding: 20px;
+        overflow-y: auto;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+
+    /* Main container should not have margin-right on mobile tray mode */
+    .main-container {
+        margin-right: 0 !important;
+    }
+
+    /* Mobile tray header with close button */
+    .mobile-tray-header {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 12px 20px;
+        border-bottom: 1px solid var(--border-color);
+        position: relative;
+    }
+
+    .mobile-tray-handle {
+        width: 40px;
+        height: 4px;
+        background: var(--text-secondary);
+        border-radius: 2px;
+        opacity: 0.5;
+    }
+
+    .mobile-tray-close {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        border: none;
+        color: var(--text-primary);
+        font-size: 24px;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 4px;
+        transition: background 0.2s ease;
+    }
+
+    .mobile-tray-close:hover {
+        background: rgba(0, 0, 0, 0.1);
+    }
+
+    /* Mobile trigger button - fixed at bottom right */
+    .mobile-sidebar-trigger {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent-blue) 0%, #3a5a8f 100%);
+        color: white;
+        border: none;
+        box-shadow: 0 4px 12px rgba(71, 114, 179, 0.4);
+        cursor: pointer;
+        z-index: 1001;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+    .mobile-sidebar-trigger:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 16px rgba(71, 114, 179, 0.6);
+    }
+
+    .mobile-sidebar-trigger:active {
+        transform: scale(0.95);
+    }
+
+    .mobile-sidebar-trigger svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    /* Overlay when tray is open */
+    .mobile-tray-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1001;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+
+    .mobile-tray-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* Adjust sidebar sections for mobile tray */
+    .sidebar.mobile-tray .sidebar-section {
+        margin-bottom: 25px;
+    }
+
+    .sidebar.mobile-tray .theme-chooser {
+        gap: 10px;
+    }
+
+    .sidebar.mobile-tray .theme-btn {
+        padding: 14px 18px;
+        font-size: 14px;
+    }
+
+    .sidebar.mobile-tray .post-selector-list {
+        gap: 12px;
+    }
+
+    .sidebar.mobile-tray .post-selector-item {
+        padding: 14px 16px;
+    }
+
+    /* Hide desktop sidebar toggle on mobile */
+    @media (max-width: 480px) {
+        .sidebar-toggle {
+            display: none;
+        }
+    }
+}
