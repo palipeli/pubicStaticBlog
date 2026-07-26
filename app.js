@@ -807,6 +807,20 @@ function applyTheme(themeName) {
     }
 }
 
+// Setup system theme change listener for auto mode
+function setupSystemThemeListener() {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    
+    // Listen for changes in system color scheme preference
+    mediaQuery.addEventListener('change', (e) => {
+        // Only react if auto theme is currently selected
+        const activeThemeBtn = document.querySelector('.theme-btn.active');
+        if (activeThemeBtn && activeThemeBtn.dataset.theme === 'auto') {
+            applyTheme('auto');
+        }
+    });
+}
+
 // Cookie helpers for theme persistence
 function setCookie(name, value, days) {
     const d = new Date();
@@ -961,6 +975,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Setup template selection
     setupTemplates();
+    
+    // Setup system theme change listener for auto mode
+    setupSystemThemeListener();
     
     // Setup sidebar toggle
     setupSidebarToggle();
