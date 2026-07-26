@@ -608,6 +608,9 @@ async function openBlogPostLazy(id) {
         item.classList.toggle('active', blogPostMetadata[index]?.id === id);
     });
     
+    // Track currently active blog post for mobile tray
+    window.currentlyActiveBlogPost = id;
+
     // Hide intro view, show post view with loading indicator
     document.getElementById('blog-intro-view').style.display = 'none';
     document.getElementById('blog-post-view').style.display = 'block';

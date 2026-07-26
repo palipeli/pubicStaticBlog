@@ -29,6 +29,16 @@
         tray.className = 'mobile-nav-tray';
         tray.innerHTML = `
             <div class="mobile-tray-content">
+                <!-- Navigation Links Section -->
+                <div class="mobile-tray-section">
+                    <h3 class="mobile-tray-section-title">Navigation</h3>
+                    <div class="mobile-nav-list">
+                        <button class="mobile-nav-item mc-btn" data-page="home">Home</button>
+                        <button class="mobile-nav-item mc-btn" data-page="blogs">Blogs</button>
+                        <button class="mobile-nav-item mc-btn" data-page="about">About</button>
+                    </div>
+                </div>
+                
                 <!-- Blog Posts Section (always visible when on blogs page, expanded by default) -->
                 <div class="mobile-tray-section blog-only" id="mobile-blog-posts-section" style="display: none;">
                     <h3 class="mobile-tray-section-title">All Posts</h3>
@@ -39,14 +49,12 @@
                 
                 <!-- Theme Section -->
                 <div class="mobile-tray-section">
-                    <h3 class="mobile-tray-section-title">Theme</h3>
+                    <h3 class="mobile-tray-section-title">THEMES</h3>
                     <div class="mobile-theme-chooser">
                         <button class="mobile-theme-btn" data-theme="auto">Auto</button>
                         <button class="mobile-theme-btn" data-theme="light">Light</button>
                         <button class="mobile-theme-btn" data-theme="dark">Dark</button>
                     </div>
-                </div>
-                
                 </div>
             </div>
         `;
@@ -285,6 +293,13 @@
         posts.forEach(post => {
             const item = document.createElement('div');
             item.className = 'mobile-post-item';
+            
+            // Check if this post is currently active
+            const isActive = window.currentlyActiveBlogPost === post.id;
+            if (isActive) {
+                item.classList.add('active');
+            }
+            
             item.innerHTML = `
                 <div class="mobile-post-title">${post.icon} ${post.title}</div>
                 <div class="mobile-post-meta">${post.date}</div>
@@ -327,8 +342,28 @@
             
             container.appendChild(item);
         });
+        
+        // Update active states after rendering
+        updateMobilePostListActiveState();
     }
     
+    // Update active state in mobile post list
+    function updateMobilePostListActiveState() {
+        const container = document.getElementById('mobile-post-list');
+        if (!container) return;
+        
+        const items = container.querySelectorAll('.mobile-post-item');
+        const activeId = window.currentlyActiveBlogPost;
+        
+        items.forEach(item => {
+            const title = item.querySelector('.mobile-post-title');
+            if (title && title.textContent.includes(activeId)) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    }
     // Handle resize events
     let resizeTimeout;
     function handleResize() {
