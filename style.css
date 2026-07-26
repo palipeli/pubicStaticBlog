@@ -122,12 +122,15 @@ body {
     display: flex;
     margin-top: var(--header-height);
     min-height: calc(100vh - var(--header-height));
+    position: relative;
 }
 
 .content-area {
     flex: 1;
     padding: 30px;
     overflow-y: auto;
+    transition: margin-right 0.3s ease;
+    margin-right: 280px; /* Account for sidebar width */
 }
 
 /* Home Hero Section */
@@ -259,43 +262,50 @@ body {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-left: 1px solid var(--border-color);
-    padding: 20px;
-    overflow-y: auto;
+    padding: 0; /* Remove padding from sidebar itself */
+    overflow: hidden; /* Hide content when collapsed */
     animation: slideLeft 0.5s ease-out;
     transition: transform 0.3s ease, width 0.3s ease, opacity 0.3s ease;
     flex-shrink: 0;
     position: relative;
 }
 
+/* Sidebar content wrapper */
+.sidebar-content-wrapper {
+    padding: 20px;
+    height: 100%;
+    overflow-y: auto;
+}
+
 /* Collapsed sidebar state */
 .sidebar.collapsed {
     width: 0;
-    padding: 0;
     opacity: 0;
     transform: translateX(100%);
     pointer-events: none;
 }
 
-/* Sidebar toggle button - inside sidebar on right edge */
+/* Sidebar toggle button - fixed to right edge of viewport, vertically centered */
 .sidebar-toggle {
-    position: absolute;
-    right: -16px;
+    position: fixed;
+    right: 0;
     top: 50%;
     transform: translateY(-50%);
     width: 32px;
-    height: 32px;
-    border-radius: 50%;
+    height: 64px;
+    border-radius: 16px 0 0 16px; /* Half-circle shape on left side */
     background: var(--bg-panel);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
+    border-right: none; /* No border on right edge since it's at viewport edge */
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 1001; /* Above sidebar */
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
     color: var(--text-primary);
     padding: 0;
 }
@@ -304,17 +314,15 @@ body {
     background: var(--accent-blue);
     color: white;
     border-color: var(--accent-blue);
-    transform: translateY(-50%) scale(1.1);
 }
 
 .sidebar-toggle:active {
     transform: translateY(-50%) scale(0.95);
 }
 
-/* When sidebar is collapsed, toggle appears on right edge of collapsed area */
-.sidebar.collapsed .sidebar-toggle {
-    right: -16px;
-    transform: translateY(-50%);
+/* Toggle button icon rotation when sidebar is expanded */
+.sidebar:not(.collapsed) .sidebar-toggle svg {
+    transform: rotate(180deg);
 }
 
 /* Adjust content area when sidebar is collapsed */
@@ -808,7 +816,7 @@ body {
 
 /* Responsive */
 @media (max-width: 768px) {
-    /* On mobile, sidebar is collapsed by default */
+    /* On mobile, sidebar is collapsed by default but toggle button remains visible */
     .sidebar {
         width: 0;
         padding: 0;
