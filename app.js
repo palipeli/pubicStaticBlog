@@ -422,6 +422,9 @@ window.preloadBlogPostContent = preloadBlogPostContent;
 window.loadBlogPostContent = loadBlogPostContent;
 window.openBlogPostLazy = openBlogPostLazy;
 window.openBlogPostFromHomeLazy = openBlogPostFromHomeLazy;
+window.applyTheme = applyTheme;
+window.getSavedTheme = getSavedTheme;
+window.saveThemePreference = saveThemePreference;
 
 // Fetch all markdown files from /blog/ using posts.json manifest (legacy - loads all content immediately)
 async function fetchBlogPosts() {
@@ -713,6 +716,11 @@ function setupNavigation() {
             
             // Scroll to top when changing pages
             window.scrollTo(0, 0);
+            
+            // Notify mobile tray of page change
+            if (typeof updateBlogPostsVisibility === 'function') {
+                setTimeout(updateBlogPostsVisibility, 100);
+            }
             
             // Save state after navigation
             setTimeout(saveAppState, 100);

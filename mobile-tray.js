@@ -420,6 +420,9 @@
             // Clear interval after 5 seconds to avoid infinite checking
             setTimeout(() => clearInterval(checkAndRenderPosts), 5000);
         });
+        
+        // Expose updateBlogPostsVisibility globally for app.js to call
+        window.updateBlogPostsVisibility = updateBlogPostsVisibility;
     }
     
     // Start initialization
