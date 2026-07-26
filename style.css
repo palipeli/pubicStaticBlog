@@ -16,10 +16,11 @@
     --text-secondary: #5e5e5e;
     --border-color: rgba(0, 0, 0, 0.1);
     --header-height: 40px;
+    --font-main: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: var(--font-main);
     background: linear-gradient(135deg, #f6f5f4 0%, #ffffff 100%);
     color: var(--text-primary);
     min-height: 100vh;
@@ -151,6 +152,21 @@ body {
     max-width: 800px;
     margin: 0 auto;
     text-align: center;
+}
+
+/* Home Layout Container - Same rectangle styling as blog and about pages */
+.home-layout-container {
+    display: block;
+    margin-top: 20px;
+}
+
+.home-layout-container .home-hero {
+    background: var(--bg-panel);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 40px;
 }
 
 .home-title {
