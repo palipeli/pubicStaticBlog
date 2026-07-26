@@ -4,14 +4,12 @@
 __pycache__/
 *.o
 *.obj
-dist/
-build/
-target/
 *.class
-*.so
-*.dll
 *.exe
+*.dll
+*.so
 *.a
+*.out
 
 # Dependencies
 node_modules/
@@ -21,7 +19,10 @@ venv/
 .env.local
 .env.*
 
-# Logs and temp files
+# Build directories
+dist/
+build/
+target/
 *.log
 *.tmp
 *.swp
@@ -30,95 +31,18 @@ venv/
 # Editors
 .vscode/
 .idea/
-*.DS_Store
+
+# System files
+.DS_Store
 Thumbs.db
 
-# Testing and coverage
-.coverage
+# Coverage
 coverage/
 htmlcov/
-.pytest_cache/
+.coverage
+
+# Cache directories
 .mypy_cache/
-
-# Compressed files
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
-
-# Gradle
+.pytest_cache/
 .gradle/
-
-# Python specific
-*.pyo
-*.pyd
-*.egg-info/
-.Python
-pip-log.txt
-pip-delete-this-directory.txt
-
-# JavaScript/Node.js specific
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.jscsrc
-.jshintrc
-.npmrc
-.node_repl_history
-.cache/
-.nyc_output/
-coverage/
-.nyc_output/
-
-# Java specific
-*.class
-*.jar
-*.war
-*.ear
-hs_err_pid*
-
-# C/C++ specific
-*.o
-*.a
-*.so
-*.dll
-*.exe
-*.out
-*.app
-*.dylib
-
-# Ruby specific
-*.gem
-*.rbc
-.bundle/
-vendor/bundle/
-.rbenv-gemsets
-.rbenv-version
-
-# Go specific
-*.o
-*.a
-*.swp
-*~
-.DS_Store
-.svn/
-CVS/
 ```
