@@ -273,11 +273,11 @@
         const container = document.getElementById('mobile-post-list');
         if (!container) return;
         
-        // Get posts from global blogPosts array if available
-        const posts = typeof blogPosts !== 'undefined' ? blogPosts : [];
+        // Get posts from global window.blogPostMetadata array (lazy loading - metadata only)
+        const posts = typeof window.blogPostMetadata !== 'undefined' ? window.blogPostMetadata : [];
         
         if (posts.length === 0) {
-            container.innerHTML = '<p style="color: var(--text-secondary); font-size: 13px;">No posts available.</p>';
+            container.innerHTML = '<p style="color: var(--text-secondary); font-size: 13px;">Loading posts...</p>';
             return;
         }
         
@@ -290,12 +290,35 @@
                 <div class="mobile-post-meta">${post.date}</div>
             `;
             
+            // Preload content on touch start for faster response
+            item.addEventListener('touchstart', () => {
+                if (typeof window.preloadBlogPostContent === 'function') {
+                    window.preloadBlogPostContent(post.id);
+                }
+            }, { passive: true });
+            
+            // Also preload on mouseenter/hover for devices that support it
+            item.addEventListener('mouseenter', () => {
+                if (typeof window.preloadBlogPostContent === 'function') {
+                    window.preloadBlogPostContent(post.id);
+                }
+            });
+            
+            // Preload on mouseover as backup
+            item.addEventListener('mouseover', () => {
+                if (typeof window.preloadBlogPostContent === 'function') {
+                    window.preloadBlogPostContent(post.id);
+                }
+            });
+            
             item.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 
-                // Use global openBlogPost function if available
-                if (typeof openBlogPost === 'function') {
+                // Use global openBlogPostLazy function for lazy loading
+                if (typeof window.openBlogPostLazy === 'function') {
+                    window.openBlogPostLazy(post.id);
+                } else if (typeof openBlogPost === 'function') {
                     openBlogPost(post.id);
                 }
                 
@@ -349,6 +372,18 @@
                     setTimeout(updateBlogPostsVisibility, 100);
                 });
             });
+            
+            // Also listen for when blog metadata is loaded to render mobile post list
+            // This ensures the mobile tray can access window.blogPostMetadata once it's available
+            const checkAndRenderPosts = setInterval(() => {
+                if (typeof window.blogPostMetadata !== 'undefined' && window.blogPostMetadata.length > 0) {
+                    updateBlogPostsVisibility();
+                    clearInterval(checkAndRenderPosts);
+                }
+            }, 100);
+            
+            // Clear interval after 5 seconds to avoid infinite checking
+            setTimeout(() => clearInterval(checkAndRenderPosts), 5000);
         });
     }
     
