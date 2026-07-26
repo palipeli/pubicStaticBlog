@@ -266,6 +266,8 @@
         if (blogSection && activePage) {
             // Always render the post list, regardless of which page we're on
             renderMobilePostList();
+            // Also update active state
+            updateMobilePostListActiveState();
         }
     }
 
@@ -283,13 +285,15 @@
         }
         
         container.innerHTML = '';
+        const activeId = window.currentlyActiveBlogPost;
+        
         posts.forEach(post => {
             const item = document.createElement('div');
             item.className = 'mobile-post-item';
+            item.dataset.postId = post.id;
             
             // Check if this post is currently active
-            const isActive = window.currentlyActiveBlogPost === post.id;
-            if (isActive) {
+            if (activeId === post.id) {
                 item.classList.add('active');
             }
             
@@ -335,9 +339,6 @@
             
             container.appendChild(item);
         });
-        
-        // Update active states after rendering
-        updateMobilePostListActiveState();
     }
     
     // Update active state in mobile post list
@@ -349,8 +350,7 @@
         const activeId = window.currentlyActiveBlogPost;
         
         items.forEach(item => {
-            const title = item.querySelector('.mobile-post-title');
-            if (title && title.textContent.includes(activeId)) {
+            if (item.dataset.postId === activeId) {
                 item.classList.add('active');
             } else {
                 item.classList.remove('active');

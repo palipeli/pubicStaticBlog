@@ -1046,7 +1046,8 @@ footer p {
         0 0 15px var(--pink-neon);
 }
 
-.mobile-post-item.active {
+.mobile-post-item.active,
+.mobile-post-item[data-post-id].active {
     background: var(--pink-neon);
     box-shadow:
         inset 2px 2px 0 rgba(255,255,255,0.3),
@@ -1062,7 +1063,8 @@ footer p {
 }
 
 .mobile-post-item:hover .mobile-post-title,
-.mobile-post-item.active .mobile-post-title {
+.mobile-post-item.active .mobile-post-title,
+.mobile-post-item[data-post-id].active .mobile-post-title {
     color: white;
 }
 
@@ -1072,7 +1074,8 @@ footer p {
 }
 
 .mobile-post-item:hover .mobile-post-meta,
-.mobile-post-item.active .mobile-post-meta {
+.mobile-post-item.active .mobile-post-meta,
+.mobile-post-item[data-post-id].active .mobile-post-meta {
     color: var(--pink-pastel);
 }
 
