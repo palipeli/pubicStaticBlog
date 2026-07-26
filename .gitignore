@@ -1,7 +1,8 @@
 ```gitignore
-# Compiled and build artifacts
+# Compiled and binary files
 *.pyc
 __pycache__/
+*.class
 *.o
 *.obj
 *.exe
@@ -18,32 +19,25 @@ venv/
 .env.local
 .env.*
 
-# Logs and temp files
+# Build artifacts
+dist/
+build/
+target/
 *.log
 *.tmp
 *.swp
-*.swo
 
 # Editors
 .vscode/
 .idea/
 
-# OS
+# System files
 .DS_Store
 Thumbs.db
+```
 
-# Coverage
-coverage/
-htmlcov/
-.coverage
+Wait, let me reconsider. The only modified files are `app.js` and `style.css`, which are source files. There are no build artifacts, dependency directories, or temporary files in the change list that need to be ignored.
 
-# Build directories
-dist/
-build/
-target/
-.gradle/
+```gitignore
 
-# Cache
-.mypy_cache/
-.pytest_cache/
 ```
