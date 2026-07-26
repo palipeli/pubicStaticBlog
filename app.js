@@ -503,15 +503,18 @@ function setupSidebarToggle() {
     // Toggle sidebar on button click
     sidebarToggle.addEventListener('click', (e) => {
         e.stopPropagation();
-        sidebar.classList.toggle('collapsed');
-        sidebar.classList.toggle('expanded');
         
-        // On very small screens, don't adjust content margin (sidebar floats)
-        if (!isVerySmallScreen()) {
-            mainContainer.classList.toggle('sidebar-collapsed');
-        } else {
-            // On very small screens, always keep content at full width
+        // On very small screens (<480px), always toggle between overlay states
+        if (isVerySmallScreen()) {
+            sidebar.classList.toggle('collapsed');
+            sidebar.classList.toggle('expanded');
+            // Content always stays full width on phones
             mainContainer.classList.remove('sidebar-collapsed');
+        } else {
+            // On larger screens, toggle collapsed state and adjust content margin
+            sidebar.classList.toggle('collapsed');
+            sidebar.classList.toggle('expanded');
+            mainContainer.classList.toggle('sidebar-collapsed');
         }
         
         // Update toggle button aria-label and icon direction
