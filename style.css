@@ -131,7 +131,13 @@ body {
     padding: 30px;
     overflow-y: auto;
     transition: margin-right 0.3s ease;
-    margin-right: 280px; /* Account for sidebar width */
+    margin-right: 280px; /* Account for fixed sidebar width */
+    height: calc(100vh - var(--header-height));
+}
+
+/* When sidebar is collapsed, content area takes full width */
+.main-container.sidebar-collapsed .content-area {
+    margin-right: 0;
 }
 
 /* Home Hero Section */
@@ -268,8 +274,12 @@ body {
     animation: slideLeft 0.5s ease-out;
     transition: width 0.3s ease;
     flex-shrink: 0;
-    position: relative;
+    position: fixed;
+    right: 0;
+    top: var(--header-height);
+    height: calc(100vh - var(--header-height));
     box-sizing: border-box;
+    z-index: 999;
 }
 
 /* Sidebar content wrapper */
@@ -320,13 +330,13 @@ body {
 
 /* When sidebar is expanded, show the chevron pointing left (<) */
 .sidebar-toggle svg {
-    transform: rotate(0deg);
+    transform: rotate(180deg);
     transition: transform 0.3s ease;
 }
 
 /* When sidebar is collapsed, rotate chevron to point right (>) */
 .sidebar.collapsed .sidebar-toggle svg {
-    transform: rotate(180deg);
+    transform: rotate(0deg);
 }
 
 .sidebar-toggle:hover {
@@ -337,11 +347,6 @@ body {
 
 .sidebar-toggle:active {
     transform: translate(-100%, -50%) scale(0.95);
-}
-
-/* Adjust content area when sidebar is collapsed */
-.main-container.sidebar-collapsed .content-area {
-    margin-right: 0;
 }
 
 @keyframes slideLeft {
@@ -865,10 +870,16 @@ body {
         pointer-events: none;
     }
     
-    .main-container {
-        position: relative;
+    .main-container.sidebar-collapsed .sidebar {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
     }
-
+    
+    .main-container.sidebar-collapsed .content-area {
+        margin-right: 0;
+    }
+    
     .blog-grid {
         grid-template-columns: 1fr;
     }
