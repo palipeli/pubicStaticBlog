@@ -1,9 +1,3 @@
----
-title: "Introducing Michelle DNS Suite for iOS Sideloading"
-description: "Sideloading can a great way to obtain more functionality from a phone, albeit it needs a little bit of technique"
-pubDate: "Mar 6 2026"
----
-
 ## Signing iOS apps legally
 It has been known that installing apps from outside the Apple's Appstore ecosystem is iffy but it might be circumvented. The current "official" supported method to install apps through Altstore and Sidestore requires the need to use containerisation to keep more than 3 apps installed at once. Not to forget that these solution will be broken each time an iOS update is performed. There is one method through DNS. 
 
