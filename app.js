@@ -732,27 +732,20 @@ function renderBlogPostSelectorGrid(posts) {
     posts.forEach((post, index) => {
         const card = document.createElement('div');
         card.className = 'blog-card';
-        card.style.animationDelay = (index * 0.1) + 's';
+        card.style.animationDelay = (index * 0.05) + 's';
         
         card.innerHTML = `
             <div class="blog-image">${post.icon}</div>
             <div class="blog-content">
                 <h3 class="blog-title">${post.title}</h3>
                 <p class="blog-excerpt">${post.category} • ${post.date}</p>
-                <div class="blog-meta">
-                    <span class="blog-date"></span>
-                    <a href="#" class="read-more" onclick="event.preventDefault(); openBlogPostLazy('${post.id}')">Read More →</a>
-                </div>
             </div>
         `;
         
         // Make entire card clickable
         card.style.cursor = 'pointer';
-        card.onclick = (e) => {
-            // Prevent double-triggering if clicking on the "Read More" link
-            if (!e.target.closest('.read-more')) {
-                openBlogPostLazy(post.id);
-            }
+        card.onclick = () => {
+            openBlogPostLazy(post.id);
         };
         
         // Prefetch on hover

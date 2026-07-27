@@ -4,6 +4,7 @@
 __pycache__/
 *.o
 *.obj
+*.class
 *.exe
 *.dll
 *.so
@@ -28,7 +29,7 @@ venv/
 .vscode/
 .idea/
 
-# OS
+# System files
 .DS_Store
 Thumbs.db
 
