@@ -1,1 +1,4 @@
-Nothing should be ignored based on the provided file changes. The deletion of `test_markdown.js` is a source code file, which should not be added to .gitignore according to rule #7. Since there are no build artifacts, dependencies, or temporary files in the changes, no new ignore rules are needed.
+```
+# Test files
+test_*.js
+```
