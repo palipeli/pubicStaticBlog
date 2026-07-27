@@ -29,7 +29,7 @@ vpp.itunes.apple.com
 (courtesy to Khoindvn.io Discord server and r/sideloaded)
 
 These domains are used to verify the legitimacy of the certificates being used to sign these apps. This means that simply blocking them would allow the usage of leaked enterprise certificates that is not bound with ```PPQCheck``` and we will get back to that because it is important. With this mechanism bypassed, you can benefit on leaked enterprise certificates to install apps outside Appstore like this:
-![blog placeholder](/media/signing.webp)
+![](/media/signing.webp)
 
 ## PPQCheck
 Late iOS 18 introduced a more aggressive ```PPQCheck``` which allows Apple to detect illegitimate apps installed to be blacklisted. This same mechanism is used to verify the AppID of the installed apps and if it finds the exact same one listed on Appstore's database, that certificate is lined up for blacklist by iOS. The idea is to block it and prevent the certificate to be blacklisted, however this approach is impossible because it is needed for apps to be run for the first time, so it is possible in a way.
@@ -37,7 +37,7 @@ Late iOS 18 introduced a more aggressive ```PPQCheck``` which allows Apple to de
 If you allow the ```PPQCheck``` to run for first launch of sideloaded apps, then quickly blocking the service, then this method will work. Unlike certificate checking which was done by the seven domains listed that happens within the range of every second to every a few seconds, this checking happens less (around 48 hours according to a post from r/sideloading). However, this also means that using only one DNS server that block all the needed domains is impossible. The idea is to use a .mobileconfig that allows to switch between 7 domains+PPQ blocked and 7 domains blocked only.
 
 ## Introducing Michelle DNS Suite for Sideloading
-![blog placeholder](/media/dns.webp)
+![](/media/dns.webp)
 ## [Download DNS profile here](https://cloud.kamikami.eu/s/michelledns)
 
 This profile allows user to choose between 3 DNS over TLS server that is hosted by me under Cloudflare. "Sideload Install Only" mode blocks the 7 domains listed to prevent certificates from being blacklisted instantly, while "Sideloaded KEEP" adds PPQ blocking to blacklists from PPQCheck. As a bonus, this DNS suite profile also performs ads and tracking filtering with filters provided by oisd.nl for break free experience and anti phishing from URLhaus. The workflow to install apps after installing the DNS profile then became:
