@@ -30,10 +30,10 @@
     --blur-overlay-brightness: 0.6;
     --dark-overlay-color: rgba(0, 0, 0, 0.4);
     --bg-panel: rgba(30, 30, 30, 0.95);
-    --btn-bg: #2a2a2a;
+    --btn-bg: #1a1a1a;
     --btn-text: #ffffff;
     --btn-border: rgba(255, 255, 255, 0.2);
-    --btn-hover-bg: #1a1a1a;
+    --btn-hover-bg: #0a0a0a;
 }
 
 [data-theme="light"] {
