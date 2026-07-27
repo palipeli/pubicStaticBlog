@@ -25,6 +25,8 @@
 [data-theme="dark"] {
     --blur-overlay-brightness: 0.6;
     --dark-overlay-color: rgba(0, 0, 0, 0.4);
+    --text-primary: #f6f5f4;
+    --text-secondary: #d3d3d3;
 }
 
 body {
