@@ -901,78 +901,156 @@ body {
 
 /* Category Filter in Sidebar - REMOVED */
 
+.blog-post-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin: 8px 0;
+}
+
+@media (max-width: 900px) {
+    .blog-post-selector-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 5px;
+        margin: 6px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .blog-post-selector-grid {
+        grid-template-columns: 1fr;
+        gap: 4px;
+        margin: 4px 0;
+    }
+}
+
 .blog-card {
     background: var(--bg-panel);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    animation: fadeInUp 0.5s ease-out;
+    border-radius: 6px;
+    overflow: visible;
+    transition: all 0.2s ease;
+    animation: fadeIn 0.3s ease-out;
     animation-fill-mode: both;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    display: flex;
+    align-items: center;
+    padding: 2px 4px;
+    gap: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    min-width: 0;
+    position: relative;
+    z-index: 1;
 }
 
 .blog-card:hover {
-    transform: translateY(-5px);
+    background: rgba(255, 69, 252, 0.1);
     border-color: var(--accent-pink);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transform: translateX(4px);
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 .blog-image {
-    width: 100%;
-    height: 180px;
-    background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%);
+    width: auto;
+    height: auto;
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 48px;
+    font-size: 0.9rem;
     color: var(--text-secondary);
+    flex-shrink: 0;
+    line-height: 1;
 }
 
 .blog-content {
-    padding: 20px;
+    padding: 0;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: visible;
 }
 
 .blog-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 10px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-bottom: 0;
     color: var(--text-primary);
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    word-wrap: break-word;
+    line-height: 1.1;
+    max-width: none;
 }
 
 .blog-excerpt {
-    font-size: 14px;
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin-bottom: 15px;
+    display: none;
 }
 
 .blog-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 12px;
+    font-size: 0.6rem;
     color: var(--text-secondary);
-    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.1;
 }
 
-.blog-date {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 4px 10px;
-    border-radius: 3px;
-    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+/* Mobile responsive - compact list */
+@media (max-width: 900px) {
+    .blog-post-selector-grid {
+        gap: 3px;
+        margin: 3px 0;
+    }
+    
+    .blog-card {
+        padding: 2px 3px;
+        gap: 3px;
+    }
+    
+    .blog-image {
+        font-size: 0.85rem;
+    }
+    
+    .blog-title {
+        font-size: 0.7rem;
+    }
+    
+    .blog-meta {
+        font-size: 0.55rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .blog-post-selector-grid {
+        gap: 2px;
+        margin: 2px 0;
+    }
+    
+    .blog-card {
+        padding: 2px 3px;
+        gap: 2px;
+    }
+    
+    .blog-image {
+        font-size: 0.8rem;
+    }
+    
+    .blog-title {
+        font-size: 0.65rem;
+    }
+    
+    .blog-meta {
+        font-size: 0.5rem;
+    }
 }
 
 .read-more {

@@ -717,6 +717,46 @@ function renderPostSelector(posts) {
     });
 }
 
+// Render blog post selector grid in main content area
+function renderBlogPostSelectorGrid(posts) {
+    const container = document.getElementById('blog-post-selector-grid');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    if (posts.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-secondary);">No posts found.</p>';
+        return;
+    }
+    
+    posts.forEach((post, index) => {
+        const card = document.createElement('div');
+        card.className = 'blog-card';
+        card.style.animationDelay = (index * 0.03) + 's';
+        
+        card.innerHTML = `
+            <div class="blog-image">${post.icon}</div>
+            <div class="blog-content">
+                <h3 class="blog-title">${post.title}</h3>
+                <p class="blog-meta">${post.category} • ${post.date}</p>
+            </div>
+        `;
+        
+        // Make entire card clickable
+        card.style.cursor = 'pointer';
+        card.onclick = () => {
+            openBlogPostLazy(post.id);
+        };
+        
+        // Prefetch on hover
+        card.onmouseenter = () => {
+            preloadBlogPostContent(post.id);
+        };
+        
+        container.appendChild(card);
+    });
+}
+
 // Render category filter - REMOVED (categories no longer in sidebar)
 
 // Filter posts by category - REMOVED (categories no longer in sidebar)
@@ -853,8 +893,8 @@ function showBlogIntro() {
         item.classList.remove('active');
     });
     
-    // Load blog introduction content if not already loaded
-    loadBlogIntroduction();
+    // Render the blog post selector grid
+    renderBlogPostSelectorGrid(blogPostMetadata);
     
     // Save state after going back to intro
     setTimeout(saveAppState, 100);
@@ -901,11 +941,6 @@ function setupNavigation() {
                 }
             });
             
-            // Prefetch blog introduction when navigating to blogs page
-            if (page === 'blogs') {
-                prefetchBlogIntroduction();
-            }
-            
             // Show/hide "All Posts" in sidebar on Home, About, and Blogs pages
             if (blogSidebarSection) {
                 if (page === 'blogs' || page === 'home' || page === 'about') {
@@ -921,13 +956,6 @@ function setupNavigation() {
             // Save state after navigation
             setTimeout(saveAppState, 100);
         });
-        
-        // Add hover listener to prefetch blog introduction only when hovering over Blogs nav item
-        if (item.dataset.page === 'blogs') {
-            item.addEventListener('mouseenter', () => {
-                prefetchBlogIntroduction();
-            });
-        }
     });
 }
 
@@ -1211,13 +1239,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fetch only blog post metadata (lazy load content on demand)
     fetchBlogPostMetadata().then(posts => {
         if (posts.length > 0) {
-            // Introduction view is already visible by default in HTML
-            // Just render the sidebar components with lazy loading support
+            // Render the sidebar components with lazy loading support
             renderPostSelector(posts);
             // Categories removed from sidebar - no longer rendering
             
             // Render blog buttons on home page (kamikami.eu style) with lazy loading
             renderBlogButtonsLazy(posts);
+            
+            // Render the blog post selector grid in the main content area
+            renderBlogPostSelectorGrid(posts);
             
             // Show post selector sidebar on Home page by default (since it's the active page on load)
             const blogSidebarSection = document.getElementById('blog-sidebar-section');
