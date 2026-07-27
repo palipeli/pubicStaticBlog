@@ -618,36 +618,34 @@ body {
     gap: 25px;
 }
 
-/* Back to List Button - Styled exactly like blog buttons in app.js */
+/* Back to List Button - Styled exactly like sidebar nav items */
 .back-to-list-btn,
 .back-to-intro-btn {
-    font-size: 0.7rem;
-    padding: 8px 15px;
-    background: linear-gradient(135deg, var(--accent-pink) 0%, #3a5a8f 100%);
-    color: white;
+    color: var(--text-secondary);
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 3px;
+    transition: all 0.2s ease, color var(--theme-transition-duration) ease, background var(--theme-transition-duration) ease;
+    font-size: 13px;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+    cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    text-decoration: none;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(71, 114, 179, 0.4);
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
 }
 
 .back-to-list-btn:hover,
 .back-to-intro-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(71, 114, 179, 0.6);
-    filter: brightness(1.1);
+    color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .back-to-list-btn:active,
 .back-to-intro-btn:active {
-    transform: translateY(-1px);
+    transform: translateY(0);
+    box-shadow: none;
 }
 
 /* Blog Introduction View */
