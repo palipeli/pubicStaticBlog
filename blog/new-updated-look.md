@@ -1,5 +1,3 @@
-# New Updated Look
-
 We've given the site a fresh coat of paint with some serious performance upgrades under the hood.
 
 **What's new:**
