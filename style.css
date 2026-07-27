@@ -618,25 +618,27 @@ body {
     gap: 25px;
 }
 
-/* Back to List Button */
+/* Back to List Button - Styled like sidebar buttons */
 .back-to-list-btn,
 .back-to-intro-btn {
-    background: rgba(71, 114, 179, 0.3);
-    border: 1px solid var(--accent-pink);
-    color: var(--text-primary);
-    padding: 10px 20px;
-    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: 3px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     margin-bottom: 20px;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease, color var(--theme-transition-duration) ease, background var(--theme-transition-duration) ease;
+    opacity: 0.9;
 }
 
 .back-to-list-btn:hover,
 .back-to-intro-btn:hover {
-    background: rgba(71, 114, 179, 0.5);
-    transform: translateX(-5px);
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    transform: none;
 }
 
 /* Blog Introduction View */
