@@ -10,15 +10,7 @@ It has been known that installing apps from outside the Apple's Appstore ecosyst
 ## Bypassing iOS certificate checking mechanism
 When iOS apps are installed through official Apple developer provisioned certificates, certain domains are contacted by iOS to do verification of apps as follows:
 
-```
-appattest.apple.com  
-certs.apple.com  
-crl.apple.com  
-ocsp.apple.com  
-ocsp2.apple.com  
-valid.apple.com  
-vpp.itunes.apple.com
-```
+`appattest.apple.com`, `certs.apple.com`, `crl.apple.com`, `ocsp.apple.com`, `ocsp2.apple.com`, `valid.apple.com`, `vpp.itunes.apple.com`
 
 (courtesy to Khoindvn.io Discord server and r/sideloaded)
 
