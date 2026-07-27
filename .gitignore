@@ -4,19 +4,18 @@
 __pycache__/
 *.o
 *.obj
-*.exe
-*.dll
-*.so
-*.a
-*.out
+dist/
+build/
+target/
 
 # Dependencies
 .venv/
 venv/
 node_modules/
-dist/
-build/
-target/
+.julia/
+zig*/
+.mypy_cache/
+.pytest_cache/
 .gradle/
 
 # Logs and temp files
@@ -28,13 +27,11 @@ target/
 # Environment
 .env
 .env.local
-.env.*
+*.env.*
 
 # Editors
 .vscode/
 .idea/
-*.swp
-*.swo
 
 # System files
 .DS_Store
@@ -64,4 +61,8 @@ htmlcov/
 *.Z
 *.lz
 *.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
 ```
