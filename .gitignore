@@ -1,1 +1,1 @@
-(js/app.js, js/blog.js, js/devotional.js, js/home.js, js/lazyload.js, js/markdown.js, js/state.js, js/ui.js, index.html)
+(js/mobile-tray.js, media/background.webp, media/favicon-circle.webp, media/logo.webp are not build artifacts, dependencies, or temp files - they are source files being moved/renamed, so no ignores needed)
