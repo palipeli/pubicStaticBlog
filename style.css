@@ -618,27 +618,26 @@ body {
     gap: 25px;
 }
 
-/* Back to List Button - Styled like sidebar buttons */
+/* Back to List Button - Styled exactly like sidebar nav items */
 .back-to-list-btn,
 .back-to-intro-btn {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--border-color);
     color: var(--text-secondary);
+    text-decoration: none;
     padding: 8px 16px;
     border-radius: 3px;
-    cursor: pointer;
+    transition: all 0.2s ease, color var(--theme-transition-duration) ease, background var(--theme-transition-duration) ease;
     font-size: 13px;
     font-weight: 500;
-    margin-bottom: 20px;
-    transition: all 0.2s ease, color var(--theme-transition-duration) ease, background var(--theme-transition-duration) ease;
-    opacity: 0.9;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    opacity: 1;
 }
 
 .back-to-list-btn:hover,
 .back-to-intro-btn:hover {
-    background: rgba(255, 255, 255, 0.05);
     color: var(--text-primary);
-    transform: none;
+    background: rgba(255, 255, 255, 0.05);
 }
 
 /* Blog Introduction View */
