@@ -358,7 +358,19 @@ function parseMarkdown(markdown) {
     html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
     
     // Images (must be before links since it uses similar syntax)
-    html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width: 100%; height: auto;">');
+    // Add lazy-loading with data-src for hover-based loading
+    html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
+        // Check if it's a media file or external image
+        const isMediaFile = src.includes('/media/') || src.endsWith('.webp') || src.endsWith('.png') || src.endsWith('.jpg') || src.endsWith('.jpeg') || src.endsWith('.gif') || src.endsWith('.svg');
+        
+        if (isMediaFile) {
+            // Use data-src for lazy loading on hover, use a tiny transparent placeholder as initial src
+            return `<img data-src="${src}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="${alt}" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">`;
+        } else {
+            // For non-media images, load normally but still add lazy class for consistency
+            return `<img src="${src}" alt="${alt}" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">`;
+        }
+    });
 
     // Blockquotes
     html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
@@ -444,8 +456,8 @@ async function fetchBlogPostMetadata() {
         // Sync with window object for cross-module access
         window.blogPostMetadata = blogPostMetadata;
         
-        // Load the blog introduction content from markdown
-        loadBlogIntroduction();
+        // Note: Blog introduction content is now loaded lazily on hover or navigation
+        // loadBlogIntroduction() is no longer called here
         
         return blogPostMetadata;
     } catch (err) {
@@ -454,8 +466,14 @@ async function fetchBlogPostMetadata() {
     }
 }
 
-// Load blog introduction content from /blog/new-updated-look.md
+// Flag to track if blog introduction has been loaded
+let blogIntroductionLoaded = false;
+
+// Load blog introduction content from /blog/new-updated-look.md (lazy - called on hover or navigation)
 async function loadBlogIntroduction() {
+    // Prevent duplicate loading
+    if (blogIntroductionLoaded) return;
+    
     try {
         const response = await fetch('/blog/new-updated-look.md');
         if (!response.ok) {
@@ -468,6 +486,10 @@ async function loadBlogIntroduction() {
         const introContainer = document.getElementById('blog-intro-content');
         if (introContainer) {
             introContainer.innerHTML = htmlContent;
+            blogIntroductionLoaded = true;
+            
+            // Initialize lazy loading for images in the loaded content
+            initializeLazyLoading();
         }
     } catch (err) {
         console.error('Error loading blog introduction:', err);
@@ -477,6 +499,18 @@ async function loadBlogIntroduction() {
         }
     }
 }
+
+// Prefetch blog introduction on demand (called on hover)
+function prefetchBlogIntroduction() {
+    if (!blogIntroductionLoaded) {
+        loadBlogIntroduction();
+    }
+}
+
+// Expose prefetch function globally
+window.prefetchBlogIntroduction = prefetchBlogIntroduction;
+// Helper to check if blog introduction is loaded (for debugging)
+window.isBlogIntroductionLoaded = () => blogIntroductionLoaded;
 
 // Lazy load a single blog post's content on demand
 async function loadBlogPostContent(postId) {
@@ -665,8 +699,10 @@ function renderPostSelector(posts) {
         item.setAttribute('data-post-id', post.id);
         // Use metadata-only approach: load content on click, preload on hover
         item.onclick = () => openBlogPostLazy(post.id);
-        // Preload content on mouseenter (hover) with debounce
-        item.onmouseenter = () => preloadBlogPostContent(post.id);
+        // Only prefetch the specific post content on hover (not the blog introduction)
+        item.onmouseenter = () => {
+            preloadBlogPostContent(post.id);
+        };
         
         item.innerHTML = `
             <div class="post-selector-title">${post.icon} ${post.title}</div>
@@ -689,11 +725,8 @@ function openBlogPost(id) {
     // Check if we're currently on home or about page, and switch to blogs if so
     const currentPage = document.querySelector('.page-section.active');
     if (currentPage && (currentPage.id === 'home' || currentPage.id === 'about')) {
-        // Find and click the blogs nav item to switch to blogs page
-        const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
-        if (blogsNavItem) {
-            blogsNavItem.click();
-        }
+        // Navigate to blogs page without triggering prefetch
+        navigateToBlogsPageWithoutPrefetch();
     }
     
     // Update active state in sidebar
@@ -720,6 +753,36 @@ function openBlogPost(id) {
     window.scrollTo(0, 0);
 }
 
+// Navigate to blogs page without triggering blog introduction prefetch
+function navigateToBlogsPageWithoutPrefetch() {
+    const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
+    if (!blogsNavItem) return;
+    
+    const sections = document.querySelectorAll('.page-section');
+    const navItems = document.querySelectorAll('.nav-item');
+    const blogSidebarSection = document.getElementById('blog-sidebar-section');
+    
+    // Update active nav item
+    navItems.forEach(nav => nav.classList.remove('active'));
+    blogsNavItem.classList.add('active');
+    
+    // Show blogs section
+    sections.forEach(section => {
+        section.classList.remove('active');
+        if (section.id === 'blogs') {
+            section.classList.add('active');
+        }
+    });
+    
+    // Show/hide "All Posts" in sidebar
+    if (blogSidebarSection) {
+        blogSidebarSection.style.display = 'block';
+    }
+    
+    // Scroll to top
+    window.scrollTo(0, 0);
+}
+
 // Open a blog post with lazy loading (new approach - loads content on demand)
 async function openBlogPostLazy(id) {
     // Show loading state first
@@ -728,11 +791,8 @@ async function openBlogPostLazy(id) {
     // Check if we're currently on home or about page, and switch to blogs if so
     const currentPage = document.querySelector('.page-section.active');
     if (currentPage && (currentPage.id === 'home' || currentPage.id === 'about')) {
-        // Find and click the blogs nav item to switch to blogs page
-        const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
-        if (blogsNavItem) {
-            blogsNavItem.click();
-        }
+        // Navigate to blogs page without triggering blog introduction prefetch
+        navigateToBlogsPageWithoutPrefetch();
     }
     
     // Update active state in sidebar
@@ -769,6 +829,9 @@ async function openBlogPostLazy(id) {
         <div class="blog-post-content">${post.htmlContent}</div>
     `;
     
+    // Initialize lazy loading for images in the rendered content
+    initializeLazyLoading();
+    
     // Save state after opening a post
     setTimeout(saveAppState, 100);
     
@@ -785,6 +848,9 @@ function showBlogIntro() {
     document.querySelectorAll('.post-selector-item').forEach(item => {
         item.classList.remove('active');
     });
+    
+    // Load blog introduction content if not already loaded
+    loadBlogIntroduction();
     
     // Save state after going back to intro
     setTimeout(saveAppState, 100);
@@ -831,6 +897,11 @@ function setupNavigation() {
                 }
             });
             
+            // Prefetch blog introduction when navigating to blogs page
+            if (page === 'blogs') {
+                prefetchBlogIntroduction();
+            }
+            
             // Show/hide "All Posts" in sidebar on Home, About, and Blogs pages
             if (blogSidebarSection) {
                 if (page === 'blogs' || page === 'home' || page === 'about') {
@@ -846,6 +917,13 @@ function setupNavigation() {
             // Save state after navigation
             setTimeout(saveAppState, 100);
         });
+        
+        // Add hover listener to prefetch blog introduction only when hovering over Blogs nav item
+        if (item.dataset.page === 'blogs') {
+            item.addEventListener('mouseenter', () => {
+                prefetchBlogIntroduction();
+            });
+        }
     });
 }
 
@@ -1219,8 +1297,10 @@ function renderBlogButtonsLazy(posts) {
         const button = document.createElement('a');
         button.className = `blog-btn ${categoryClass}`;
         button.href = '#';
-        // Use lazy loading: preload on hover, load on click
-        button.onmouseenter = () => preloadBlogPostContent(post.id);
+        // Only prefetch the specific post content on hover (not the blog introduction)
+        button.onmouseenter = () => {
+            preloadBlogPostContent(post.id);
+        };
         button.onclick = (e) => {
             e.preventDefault();
             openBlogPostFromHomeLazy(post.id);
@@ -1251,11 +1331,8 @@ function renderBlogButtonsLazy(posts) {
 
 // Open a blog post from home page button (legacy)
 function openBlogPostFromHome(id) {
-    // Navigate to blogs page first
-    const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
-    if (blogsNavItem) {
-        blogsNavItem.click();
-    }
+    // Navigate to blogs page first without triggering prefetch
+    navigateToBlogsPageWithoutPrefetch();
     
     // Then open the specific post after a short delay
     setTimeout(() => {
@@ -1265,14 +1342,85 @@ function openBlogPostFromHome(id) {
 
 // Open a blog post from home page button with lazy loading (new)
 async function openBlogPostFromHomeLazy(id) {
-    // Navigate to blogs page first
-    const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
-    if (blogsNavItem) {
-        blogsNavItem.click();
-    }
+    // Navigate to blogs page first without triggering prefetch
+    navigateToBlogsPageWithoutPrefetch();
     
     // Then open the specific post with lazy loading after a short delay
     setTimeout(() => {
         openBlogPostLazy(id);
     }, 100);
+}
+
+// =====================
+// Lazy Loading for Images on Hover
+// =====================
+
+// Initialize lazy loading for all images with data-src attribute
+function initializeLazyLoading() {
+    const lazyImages = document.querySelectorAll('img.lazy-image[data-src]');
+    
+    lazyImages.forEach(img => {
+        // Skip if already initialized
+        if (img.dataset.lazyInitialized === 'true') return;
+        
+        img.dataset.lazyInitialized = 'true';
+        
+        // Load image on hover (mouseenter)
+        img.addEventListener('mouseenter', () => {
+            loadImageOnHover(img);
+        });
+        
+        // Also load on intersection (when scrolled into view) as a fallback
+        if ('IntersectionObserver' in window) {
+            const imgObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        loadImageOnHover(entry.target);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { rootMargin: '50px 0px' });
+            
+            imgObserver.observe(img);
+        }
+    });
+}
+
+// Load image source when triggered (hover or intersection)
+function loadImageOnHover(img) {
+    const dataSrc = img.getAttribute('data-src');
+    if (!dataSrc) return;
+    
+    // Check if already loaded or loading
+    if (img.src === dataSrc || img.classList.contains('loading')) return;
+    
+    // Add loading class for visual feedback
+    img.classList.add('loading');
+    
+    // Create a new image to preload
+    const preloadImg = new Image();
+    preloadImg.src = dataSrc;
+    
+    preloadImg.onload = () => {
+        img.src = dataSrc;
+        img.classList.remove('loading');
+        img.classList.add('loaded');
+        console.log(`Lazy-loaded image: ${dataSrc}`);
+    };
+    
+    preloadImg.onerror = () => {
+        console.error(`Failed to load lazy image: ${dataSrc}`);
+        img.classList.remove('loading');
+        img.classList.add('error');
+        // Fallback: try loading directly
+        img.src = dataSrc;
+    };
+}
+
+// Global initialization on DOMContentLoaded
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initial setup for any static lazy images
+        initializeLazyLoading();
+    });
 }

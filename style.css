@@ -1578,3 +1578,32 @@ footer p {
 .blog-post-content {
     animation: fadeInContent 0.3s ease-out;
 }
+
+/* Lazy Loading Image Styles */
+.lazy-image {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0.6;
+}
+
+.lazy-image.loaded {
+    opacity: 1;
+}
+
+.lazy-image.loading {
+    opacity: 0.5;
+    animation: pulse 1.5s infinite;
+}
+
+.lazy-image.error {
+    opacity: 0.3;
+    filter: grayscale(100%);
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
