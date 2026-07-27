@@ -20,11 +20,19 @@
     --blur-overlay-brightness: 1.0;
     --dark-overlay-color: rgba(0, 0, 0, 0.0);
     --theme-transition-duration: 0.4s;
+    --btn-bg: #ffffff;
+    --btn-text: #2e3436;
+    --btn-border: rgba(0, 0, 0, 0.2);
+    --btn-hover-bg: #f0f0f0;
 }
 
 [data-theme="dark"] {
     --blur-overlay-brightness: 0.6;
     --dark-overlay-color: rgba(0, 0, 0, 0.4);
+    --btn-bg: #4a4a4a;
+    --btn-text: #ffffff;
+    --btn-border: rgba(255, 255, 255, 0.2);
+    --btn-hover-bg: #5a5a5a;
 }
 
 body {
@@ -621,9 +629,9 @@ body {
 /* Back to List Button */
 .back-to-list-btn,
 .back-to-intro-btn {
-    background: rgba(255, 69, 252, 0.15);
-    border: 1px solid var(--accent-pink);
-    color: var(--accent-pink);
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    color: var(--btn-text);
     padding: 10px 20px;
     border-radius: 6px;
     cursor: pointer;
@@ -637,9 +645,7 @@ body {
 
 .back-to-list-btn:hover,
 .back-to-intro-btn:hover {
-    background: rgba(255, 69, 252, 0.25);
-    border-color: var(--accent-pink-hover);
-    color: var(--accent-pink-hover);
+    background: var(--btn-hover-bg);
     transform: translateX(-5px);
 }
 
