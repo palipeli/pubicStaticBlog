@@ -657,8 +657,9 @@ body {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 40px;
-    line-height: 1.8;
-    font-size: 14px;
+    line-height: 1.6;
+    font-size: 12px;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .blog-intro-view .blog-article {
@@ -668,36 +669,41 @@ body {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 40px;
-    line-height: 1.8;
-    font-size: 14px;
+    line-height: 1.6;
+    font-size: 12px;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
 
 .blog-intro-view h1 {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 400;
     margin-bottom: 15px;
     color: var(--text-primary);
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .blog-intro-view h2 {
-    font-size: 20px;
+    font-size: 17px;
     margin-top: 30px;
     margin-bottom: 15px;
     color: var(--text-primary);
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .blog-intro-view h3 {
-    font-size: 17px;
+    font-size: 15px;
     margin-top: 25px;
     margin-bottom: 10px;
     color: var(--text-primary);
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .blog-intro-view p {
     margin-bottom: 15px;
     color: var(--text-secondary);
-    font-size: 14px;
+    font-size: 12px;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .blog-intro-view blockquote {
@@ -706,12 +712,15 @@ body {
     margin: 20px 0;
     font-style: italic;
     color: var(--text-primary);
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    font-size: 12px;
 }
 
 .blog-meta {
     color: var(--text-secondary);
-    font-size: 14px;
+    font-size: 12px;
     margin-bottom: 20px;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 /* Blog Article */
@@ -722,53 +731,60 @@ body {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 30px;
-    line-height: 1.8;
-    font-size: 14px;
+    line-height: 1.6;
+    font-size: 12px;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
 
 .blog-article h1 {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 400;
     margin-bottom: 10px;
     color: var(--text-primary);
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .blog-article h2 {
-    font-size: 20px;
+    font-size: 17px;
     margin: 30px 0 15px;
     color: var(--text-primary);
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 10px;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .blog-article h3 {
-    font-size: 17px;
+    font-size: 15px;
     margin: 25px 0 12px;
     color: var(--text-primary);
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .blog-article p {
     margin-bottom: 15px;
     color: var(--text-secondary);
-    font-size: 14px;
+    font-size: 12px;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .blog-article ul, .blog-article ol {
     margin: 15px 0 15px 25px;
     color: var(--text-secondary);
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .blog-article li {
     margin-bottom: 8px;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .blog-article code {
     background: rgba(0, 0, 0, 0.3);
     padding: 2px 6px;
     border-radius: 3px;
-    font-family: 'Consolas', 'Monaco', monospace;
-    font-size: 14px;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    font-size: 12px;
     color: #e0e0e0;
 }
 
@@ -779,11 +795,14 @@ body {
     padding: 15px;
     overflow-x: auto;
     margin: 20px 0;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    font-size: 12px;
 }
 
 .blog-article pre code {
     background: transparent;
     padding: 0;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .blog-article blockquote {
@@ -792,11 +811,14 @@ body {
     margin: 20px 0;
     color: var(--text-secondary);
     font-style: italic;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    font-size: 12px;
 }
 
 .blog-article a {
     color: var(--accent-pink);
     text-decoration: none;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .blog-article a:hover {
@@ -807,6 +829,7 @@ body {
 .blog-article strong {
     color: var(--text-primary);
     font-weight: 600;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 /* Blog Sidebar (in main sidebar) */
@@ -923,12 +946,14 @@ body {
     align-items: center;
     font-size: 12px;
     color: var(--text-secondary);
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .blog-date {
     background: rgba(255, 255, 255, 0.05);
     padding: 4px 10px;
     border-radius: 3px;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .read-more {
@@ -937,6 +962,7 @@ body {
     font-weight: 600;
     font-size: 13px;
     transition: color 0.2s ease;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .read-more:hover {
