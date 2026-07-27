@@ -1129,8 +1129,11 @@ function handleClickMe() {
         ripple.remove();
     }, 600);
 
-    // Show friendly message
-    alert('🎉 Thanks for clicking! Explore the blogs using the navigation menu above.');
+    // Navigate to home page
+    const homeNavItem = document.querySelector('.nav-item[data-page="home"]');
+    if (homeNavItem) {
+        homeNavItem.click();
+    }
 }
 
 // Sidebar toggle functionality
