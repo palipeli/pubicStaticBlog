@@ -1,5 +1,3 @@
-# Oopsie! I Broke the Code Blocks (and Fixed Them!) 🙈
-
 Hi everyone, it's me again. So, you know how I was trying to be all smart and technical with the website? Yeah, well... I kind of made a huge mess. Like, a *really* big mess. 
 
 ## The "Wait, Why is Everything Code?" Disaster
