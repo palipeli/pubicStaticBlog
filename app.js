@@ -509,6 +509,8 @@ function prefetchBlogIntroduction() {
 
 // Expose prefetch function globally
 window.prefetchBlogIntroduction = prefetchBlogIntroduction;
+// Helper to check if blog introduction is loaded (for debugging)
+window.isBlogIntroductionLoaded = () => blogIntroductionLoaded;
 
 // Lazy load a single blog post's content on demand
 async function loadBlogPostContent(postId) {
@@ -697,9 +699,8 @@ function renderPostSelector(posts) {
         item.setAttribute('data-post-id', post.id);
         // Use metadata-only approach: load content on click, preload on hover
         item.onclick = () => openBlogPostLazy(post.id);
-        // Prefetch blog introduction and post content on mouseenter (hover)
+        // Only prefetch the specific post content on hover (not the blog introduction)
         item.onmouseenter = () => {
-            prefetchBlogIntroduction();
             preloadBlogPostContent(post.id);
         };
         
@@ -890,7 +891,7 @@ function setupNavigation() {
             setTimeout(saveAppState, 100);
         });
         
-        // Add hover listener to prefetch blog introduction when hovering over Blogs nav item
+        // Add hover listener to prefetch blog introduction only when hovering over Blogs nav item
         if (item.dataset.page === 'blogs') {
             item.addEventListener('mouseenter', () => {
                 prefetchBlogIntroduction();
@@ -1269,9 +1270,8 @@ function renderBlogButtonsLazy(posts) {
         const button = document.createElement('a');
         button.className = `blog-btn ${categoryClass}`;
         button.href = '#';
-        // Prefetch blog introduction and post content on hover
+        // Only prefetch the specific post content on hover (not the blog introduction)
         button.onmouseenter = () => {
-            prefetchBlogIntroduction();
             preloadBlogPostContent(post.id);
         };
         button.onclick = (e) => {
