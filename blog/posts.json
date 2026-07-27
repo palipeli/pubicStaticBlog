@@ -32,6 +32,14 @@
     "icon": "📱"
   },
   {
+    "id": "markdown-disaster-fixed",
+    "slug": "/blog/markdown-disaster-fixed.md",
+    "title": "Oopsie! I Broke the Code Blocks (and Fixed Them!)",
+    "date": "Dec 29 2025",
+    "category": "Blog",
+    "icon": "🙈"
+  },
+  {
     "id": "privacy-policy",
     "slug": "/blog/privacy-policy.md",
     "title": "Privacy Policy",
