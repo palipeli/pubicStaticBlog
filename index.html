@@ -151,10 +151,22 @@
         </aside>
     </div>
 
-    <!-- Scripts -->
+    <!-- Scripts - Modular Architecture with Lazy Loading -->
+    <!-- Core modules loaded in order of dependency -->
+    <script src="js/markdown.js" defer></script>
+    <script src="js/lazyload.js" defer></script>
+    <script src="js/state.js" defer></script>
+    <script src="js/devotional.js" defer></script>
+    <script src="js/ui.js" defer></script>
+    <script src="js/blog.js" defer></script>
+    <script src="js/home.js" defer></script>
+    
+    <!-- Legacy scripts -->
     <script src="warning.js"></script>
-    <script src="app.js"></script>
     <script src="mobile-tray.js"></script>
+    
+    <!-- Main app entry point (loads after all modules) -->
+    <script src="js/app.js" defer></script>
     
     <!-- Footer -->
     <footer>
