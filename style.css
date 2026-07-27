@@ -647,8 +647,9 @@ body {
     font-weight: 600;
     margin-bottom: 20px;
     transition: all 0.3s ease;
-    text-transform: uppercase;
     letter-spacing: 0.5px;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    text-transform: none;
 }
 
 .back-to-list-btn:hover,
