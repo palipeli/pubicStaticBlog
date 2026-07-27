@@ -24,6 +24,8 @@
     --btn-text: #2e3436;
     --btn-border: rgba(0, 0, 0, 0.2);
     --btn-hover-bg: #f0f0f0;
+    --content-bg: #ffffff;
+    --content-border: rgba(0, 0, 0, 0.2);
 }
 
 [data-theme="dark"] {
@@ -34,6 +36,8 @@
     --btn-text: #ffffff;
     --btn-border: rgba(255, 255, 255, 0.2);
     --btn-hover-bg: #0a0a0a;
+    --content-bg: #1a1a1a;
+    --content-border: rgba(255, 255, 255, 0.2);
 }
 
 [data-theme="light"] {
@@ -41,6 +45,8 @@
     --btn-text: #2e3436;
     --btn-border: rgba(0, 0, 0, 0.2);
     --btn-hover-bg: #f0f0f0;
+    --content-bg: #ffffff;
+    --content-border: rgba(0, 0, 0, 0.2);
 }
 
 body {
@@ -743,10 +749,10 @@ body {
 
 /* Blog Article */
 .blog-article {
-    background: var(--bg-panel);
+    background: var(--content-bg);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--content-border);
     border-radius: 8px;
     padding: 30px;
     line-height: 1.6;
@@ -901,10 +907,10 @@ body {
 /* Category Filter in Sidebar - REMOVED */
 
 .blog-card {
-    background: var(--bg-panel);
+    background: var(--content-bg);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--content-border);
     border-radius: 8px;
     overflow: hidden;
     transition: all 0.3s ease;
