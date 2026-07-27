@@ -228,7 +228,8 @@
                 e.target.closest('#mobile-nav-tray') ||
                 e.target.closest('#mobile-tray-overlay') ||
                 e.target.closest('.header-right') ||
-                e.target.closest('.back-to-intro-btn')
+                e.target.closest('.back-to-intro-btn') ||
+                e.target.closest('.blog-card')
             )) return;
         }
 

@@ -732,13 +732,13 @@ function renderBlogPostSelectorGrid(posts) {
     posts.forEach((post, index) => {
         const card = document.createElement('div');
         card.className = 'blog-card';
-        card.style.animationDelay = (index * 0.05) + 's';
+        card.style.animationDelay = (index * 0.03) + 's';
         
         card.innerHTML = `
             <div class="blog-image">${post.icon}</div>
             <div class="blog-content">
                 <h3 class="blog-title">${post.title}</h3>
-                <p class="blog-excerpt">${post.category} • ${post.date}</p>
+                <p class="blog-meta">${post.category} • ${post.date}</p>
             </div>
         `;
         
