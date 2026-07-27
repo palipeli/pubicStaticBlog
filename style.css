@@ -20,11 +20,26 @@
     --blur-overlay-brightness: 1.0;
     --dark-overlay-color: rgba(0, 0, 0, 0.0);
     --theme-transition-duration: 0.4s;
+    --btn-bg: #ffffff;
+    --btn-text: #2e3436;
+    --btn-border: rgba(0, 0, 0, 0.2);
+    --btn-hover-bg: #f0f0f0;
 }
 
 [data-theme="dark"] {
     --blur-overlay-brightness: 0.6;
     --dark-overlay-color: rgba(0, 0, 0, 0.4);
+    --btn-bg: #3a3a3a;
+    --btn-text: #ffffff;
+    --btn-border: rgba(255, 255, 255, 0.2);
+    --btn-hover-bg: #2a2a2a;
+}
+
+[data-theme="light"] {
+    --btn-bg: #ffffff;
+    --btn-text: #2e3436;
+    --btn-border: rgba(0, 0, 0, 0.2);
+    --btn-hover-bg: #f0f0f0;
 }
 
 body {
@@ -621,21 +636,23 @@ body {
 /* Back to List Button */
 .back-to-list-btn,
 .back-to-intro-btn {
-    background: rgba(71, 114, 179, 0.3);
-    border: 1px solid var(--accent-pink);
-    color: var(--text-primary);
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    color: var(--btn-text);
     padding: 10px 20px;
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     margin-bottom: 20px;
     transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .back-to-list-btn:hover,
 .back-to-intro-btn:hover {
-    background: rgba(71, 114, 179, 0.5);
+    background: var(--btn-hover-bg);
     transform: translateX(-5px);
 }
 

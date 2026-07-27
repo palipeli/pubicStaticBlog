@@ -983,6 +983,9 @@ function setupTemplates() {
 function applyTheme(themeName) {
     const root = document.documentElement;
     
+    // Set data-theme attribute for CSS selectors
+    root.setAttribute('data-theme', themeName);
+    
     if (themeName === 'auto') {
         // Auto theme - detect system preference
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
