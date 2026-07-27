@@ -2,7 +2,7 @@
   {
     "id": "getting-started",
     "slug": "/blog/getting-started.md",
-    "title": "Getting Started with Web Development",
+    "title": "Getting Started with Web Development, do not read this. Just a template",
     "date": "Dec 15, 2024",
     "category": "Tutorial",
     "icon": "🚀"
@@ -26,9 +26,9 @@
   {
     "id": "michelle-dns-for-ios-sideloading",
     "slug": "/blog/michelle-dns-for-ios-sideloading.md",
-    "title": "Introducing Michelle DNS Suite for iOS Sideloading",
+    "title": "Michelle's iOS Sideload DNS",
     "date": "Mar 6 2026",
-    "category": "Technology",
+    "category": "Sideloading",
     "icon": "📱"
   },
   {
