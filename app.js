@@ -725,11 +725,8 @@ function openBlogPost(id) {
     // Check if we're currently on home or about page, and switch to blogs if so
     const currentPage = document.querySelector('.page-section.active');
     if (currentPage && (currentPage.id === 'home' || currentPage.id === 'about')) {
-        // Find and click the blogs nav item to switch to blogs page
-        const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
-        if (blogsNavItem) {
-            blogsNavItem.click();
-        }
+        // Navigate to blogs page without triggering prefetch
+        navigateToBlogsPageWithoutPrefetch();
     }
     
     // Update active state in sidebar
@@ -756,6 +753,36 @@ function openBlogPost(id) {
     window.scrollTo(0, 0);
 }
 
+// Navigate to blogs page without triggering blog introduction prefetch
+function navigateToBlogsPageWithoutPrefetch() {
+    const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
+    if (!blogsNavItem) return;
+    
+    const sections = document.querySelectorAll('.page-section');
+    const navItems = document.querySelectorAll('.nav-item');
+    const blogSidebarSection = document.getElementById('blog-sidebar-section');
+    
+    // Update active nav item
+    navItems.forEach(nav => nav.classList.remove('active'));
+    blogsNavItem.classList.add('active');
+    
+    // Show blogs section
+    sections.forEach(section => {
+        section.classList.remove('active');
+        if (section.id === 'blogs') {
+            section.classList.add('active');
+        }
+    });
+    
+    // Show/hide "All Posts" in sidebar
+    if (blogSidebarSection) {
+        blogSidebarSection.style.display = 'block';
+    }
+    
+    // Scroll to top
+    window.scrollTo(0, 0);
+}
+
 // Open a blog post with lazy loading (new approach - loads content on demand)
 async function openBlogPostLazy(id) {
     // Show loading state first
@@ -764,11 +791,8 @@ async function openBlogPostLazy(id) {
     // Check if we're currently on home or about page, and switch to blogs if so
     const currentPage = document.querySelector('.page-section.active');
     if (currentPage && (currentPage.id === 'home' || currentPage.id === 'about')) {
-        // Find and click the blogs nav item to switch to blogs page
-        const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
-        if (blogsNavItem) {
-            blogsNavItem.click();
-        }
+        // Navigate to blogs page without triggering blog introduction prefetch
+        navigateToBlogsPageWithoutPrefetch();
     }
     
     // Update active state in sidebar
@@ -1304,11 +1328,8 @@ function renderBlogButtonsLazy(posts) {
 
 // Open a blog post from home page button (legacy)
 function openBlogPostFromHome(id) {
-    // Navigate to blogs page first
-    const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
-    if (blogsNavItem) {
-        blogsNavItem.click();
-    }
+    // Navigate to blogs page first without triggering prefetch
+    navigateToBlogsPageWithoutPrefetch();
     
     // Then open the specific post after a short delay
     setTimeout(() => {
@@ -1318,11 +1339,8 @@ function openBlogPostFromHome(id) {
 
 // Open a blog post from home page button with lazy loading (new)
 async function openBlogPostFromHomeLazy(id) {
-    // Navigate to blogs page first
-    const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
-    if (blogsNavItem) {
-        blogsNavItem.click();
-    }
+    // Navigate to blogs page first without triggering prefetch
+    navigateToBlogsPageWithoutPrefetch();
     
     // Then open the specific post with lazy loading after a short delay
     setTimeout(() => {

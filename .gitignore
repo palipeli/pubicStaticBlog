@@ -1,48 +1,25 @@
+# Examples 1:
+
+# Project with artifacts:
 # Compiled and build artifacts
 *.pyc
 __pycache__/
 *.o
 *.obj
-*.class
-*.exe
-*.dll
-*.so
-*.a
-*.out
-
+dist/
+build/
 # Dependencies
-node_modules/
-venv/
 .venv/
-.env
-.env.local
-.env.*
-
+venv/
+node_modules/
 # Logs and temp files
 *.log
 *.tmp
 *.swp
-*.swo
-
+# Environment
+.env
+.env.local
+.env.*
 # Editors
 .vscode/
 .idea/
-
-# Coverage
-coverage/
-htmlcov/
-.coverage
-
-# Distribution / Build
-dist/
-build/
-target/
-.gradle/
-
-# Python specific
-.mypy_cache/
-.pytest_cache/
-
-# System files
-.DS_Store
-Thumbs.db
