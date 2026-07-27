@@ -3,13 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blender-Style Blog Platform</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-    <link rel="icon" type="image/webp" href="media/favicon-circle.webp">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <meta name="description" content="Michelle's DNS and Blog - Posts about shitty and janky technology in audio, networking, and Linux technologies.">
+    <title>Michelle's DNS and Blog</title>
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    
+    <!-- DNS prefetch for faster resolution -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/webp" href="media/favicon-circle.webp">
+    
+    <!-- Preload critical font -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=VT323&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap"></noscript>
+    
+    <!-- Font Awesome (deferred) -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"></noscript>
+    
+    <!-- Critical inline CSS for above-the-fold content -->
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}html{height:100%;overflow:hidden}body{font-family:'MesloLGS NF','Fira Code',Consolas,monospace;background:#f6f5f4;color:#2e3436;min-height:100vh;overflow-y:auto;transition:background .4s ease,color .4s ease}.header{position:fixed;top:0;left:0;right:0;height:40px;background:rgba(246,245,244,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;justify-content:space-between;align-items:center;padding:0 20px;z-index:1000;border-bottom:1px solid rgba(0,0,0,.1);animation:slideDown .5s ease-out}.header-left,.header-right{display:flex;align-items:center;gap:15px}.nav-item{color:#5e5e5e;text-decoration:none;padding:8px 16px;border-radius:3px;transition:all .2s ease;font-size:13px;font-weight:500;background:transparent;border:none;cursor:pointer}.nav-item:hover{color:#2e3436;background:rgba(255,255,255,.05)}.nav-item.active{color:#ff45fc;background:rgba(255,69,252,.15)}.main-container{display:block;margin-top:40px;height:calc(100vh - 40px);position:relative;margin-right:280px;transition:margin-right .3s ease}.content-area{padding:30px;overflow-y:auto;height:100%;width:100%}@keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}.blue-button{background:linear-gradient(135deg,#ff1493 0%,#ff69b4 100%);color:white;border:none;padding:3px 8px;margin:0 10px;border-radius:4px;font-size:10px;font-weight:600;cursor:pointer;transition:all .3s ease;box-shadow:0 2px 8px rgba(255,20,147,.4)}.blue-button span{font-family:'VT323',monospace;font-style:italic;text-transform:lowercase;font-size:1.4rem}.blue-button:hover{background:linear-gradient(135deg,#ff69b4 0%,#ff1493 100%);transform:translateY(-2px);box-shadow:0 4px 12px rgba(255,20,147,.6)}
+    </style>
+    
+    <!-- Main stylesheet (deferred, using minified version for production) -->
+    <link rel="preload" href="style.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="style.min.css"></noscript>
+    <link rel="stylesheet" href="style.min.css" media="print" onload="this.media='all'">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -26,6 +51,9 @@
     <meta name="twitter:description" content="WELCOME TO MY SUPER-CUTE-BUT-SHITTY WEBSITE! TAKE VICODIN IF YOU CAME FROM WSFTEAM.XYZ. I'm running a website where I post about shitty and janky technology that I like and personally use. Especially in audio, networking, and Linux technologies.">
     <meta name="twitter:image" content="https://kamikami.eu/media/logo.webp">
     <meta name="twitter:site" content="@kamikamieu">
+    
+    <!-- Resource hints -->
+    <link rel="prefetch" href="blog/posts.json" as="fetch">
 </head>
 <body>
     <!-- Particles Background -->
@@ -151,22 +179,28 @@
         </aside>
     </div>
 
-    <!-- Scripts - Modular Architecture with Lazy Loading -->
-    <!-- Core modules loaded in order of dependency -->
-    <script src="js/markdown.js" defer></script>
-    <script src="js/lazyload.js" defer></script>
-    <script src="js/state.js" defer></script>
-    <script src="js/devotional.js" defer></script>
-    <script src="js/ui.js" defer></script>
-    <script src="js/blog.js" defer></script>
-    <script src="js/home.js" defer></script>
+    <!-- Scripts - Optimized Loading Strategy (using minified versions) -->
+    <!-- Critical inline scripts for immediate functionality -->
+    <script>
+        // Inline critical JS for theme initialization (prevents FOUC)
+        (function(){const t=localStorage.getItem('theme')||'auto';document.documentElement.setAttribute('data-theme',t);})();
+    </script>
     
-    <!-- Legacy scripts -->
-    <script src="warning.js"></script>
-    <script src="js/mobile-tray.js"></script>
+    <!-- Non-critical scripts deferred (using minified versions for production) -->
+    <script src="js/markdown.min.js" defer></script>
+    <script src="js/lazyload.min.js" defer></script>
+    <script src="js/state.min.js" defer></script>
+    <script src="js/devotional.min.js" defer></script>
+    <script src="js/ui.min.js" defer></script>
+    <script src="js/blog.min.js" defer></script>
+    <script src="js/home.min.js" defer></script>
+    
+    <!-- Legacy scripts (deferred for better load performance) -->
+    <script src="warning.js" defer></script>
+    <script src="js/mobile-tray.min.js" defer></script>
     
     <!-- Main app entry point (loads after all modules) -->
-    <script src="js/app.js" defer></script>
+    <script src="js/app.min.js" defer></script>
     
     <!-- Footer -->
     <footer>
