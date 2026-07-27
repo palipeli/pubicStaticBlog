@@ -1,5 +1,6 @@
 // lazyload.js - Image Lazy Loading on Hover
 // Handles lazy loading of images when hovered or scrolled into view
+// Optimized for performance with native lazy loading fallback
 
 (function() {
     // Initialize lazy loading for all images with data-src attribute
@@ -12,10 +13,18 @@
 
             img.dataset.lazyInitialized = 'true';
 
-            // Load image on hover (mouseenter)
+            // Use native lazy loading as primary method (better performance)
+            img.loading = 'lazy';
+            
+            // Add fetchpriority for above-fold images
+            if (img.getBoundingClientRect().top < window.innerHeight) {
+                img.fetchpriority = 'high';
+            }
+
+            // Load image on hover (mouseenter) for instant feedback
             img.addEventListener('mouseenter', () => {
                 loadImageOnHover(img);
-            });
+            }, { passive: true });
 
             // Also load on intersection (when scrolled into view) as a fallback
             if ('IntersectionObserver' in window) {
@@ -26,7 +35,7 @@
                             observer.unobserve(entry.target);
                         }
                     });
-                }, { rootMargin: '50px 0px' });
+                }, { rootMargin: '100px 0px' }); // Increased root margin for better UX
 
                 imgObserver.observe(img);
             }
@@ -52,11 +61,10 @@
             img.src = dataSrc;
             img.classList.remove('loading');
             img.classList.add('loaded');
-            console.log(`Lazy-loaded image: ${dataSrc}`);
+            // Remove console.log for production performance
         };
 
         preloadImg.onerror = () => {
-            console.error(`Failed to load lazy image: ${dataSrc}`);
             img.classList.remove('loading');
             img.classList.add('error');
             // Fallback: try loading directly

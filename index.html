@@ -4,12 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blender-Style Blog Platform</title>
+    <meta name="description" content="Michelle's DNS and Blog - Posts about shitty and janky technology, audio, networking, and Linux technologies.">
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    
+    <!-- DNS Prefetch for analytics/CDN -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Critical CSS inlined for faster FCP -->
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}html{height:100%;overflow:hidden}body{font-family:'MesloLGS NF','Fira Code',Consolas,Monaco,'Andale Mono','Ubuntu Mono',monospace;background:linear-gradient(135deg,rgba(246,245,244,0.85) 0%,rgba(255,255,255,0.85) 100%),url('media/background.webp');background-size:cover;background-position:center;background-attachment:fixed;color:#2e3436;min-height:100vh;position:relative;overflow-y:auto}:root{--bg-dark:#f6f5f4;--bg-panel:rgba(255,255,255,0.95);--bg-header:rgba(246,245,244,0.95);--accent-pink:#ff45fc;--text-primary:#2e3436;--text-secondary:#5e5e5e;--border-color:rgba(0,0,0,0.1);--header-height:40px;--font-main:'MesloLGS NF','Fira Code',Consolas,Monaco,'Andale Mono','Ubuntu Mono',monospace}
+        .particles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1}.header{position:fixed;top:0;left:0;right:0;height:var(--header-height);background:var(--bg-header);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;justify-content:space-between;align-items:center;padding:0 20px;z-index:1000;border-bottom:1px solid var(--border-color);animation:slideDown 0.5s ease-out}.main-container{display:block;margin-top:var(--header-height);height:calc(100vh - var(--header-height));position:relative;margin-right:280px;transition:margin-right 0.3s ease}.content-area{padding:30px;overflow-y:auto;height:100%;width:100%}.page-section{display:none}.page-section.active{display:block}@keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}@keyframes slideLeft{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+    </style>
+    
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="icon" type="image/webp" href="media/favicon-circle.webp">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Google Fonts with font-display=swap for better performance -->
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" as="image" href="media/logo.webp" fetchpriority="high">
+    <link rel="preload" as="image" href="media/favicon-circle.webp">
+    <link rel="preload" as="font" href="https://fonts.gstatic.com/s/vt323/v20/pWdTfvqXLVb1lSgQwRvK.ttf" type="font/ttf" crossorigin>
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -152,7 +175,7 @@
     </div>
 
     <!-- Scripts - Modular Architecture with Lazy Loading -->
-    <!-- Core modules loaded in order of dependency -->
+    <!-- Core modules loaded in order of dependency with defer for non-blocking loading -->
     <script src="js/markdown.js" defer></script>
     <script src="js/lazyload.js" defer></script>
     <script src="js/state.js" defer></script>
@@ -161,12 +184,41 @@
     <script src="js/blog.js" defer></script>
     <script src="js/home.js" defer></script>
     
-    <!-- Legacy scripts -->
+    <!-- Legacy scripts (sync, required immediately) -->
     <script src="warning.js"></script>
-    <script src="js/mobile-tray.js"></script>
+    <script src="js/mobile-tray.js" defer></script>
     
     <!-- Main app entry point (loads after all modules) -->
     <script src="js/app.js" defer></script>
+    
+    <!-- Inline critical JS for immediate interactivity -->
+    <script>
+        // Immediate theme restoration to prevent FOUC (Flash of Unstyled Content)
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('theme') || 'auto';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                
+                // Apply correct theme variables immediately
+                if (savedTheme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                } else if (savedTheme === 'light') {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                } else if (savedTheme === 'auto') {
+                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+                }
+            } catch(e) {}
+        })();
+        
+        // Preconnect to blog resources early
+        if ('link' in document) {
+            var link = document.createElement('link');
+            link.rel = 'prefetch';
+            link.href = '/blog/posts.json';
+            document.head.appendChild(link);
+        }
+    </script>
     
     <!-- Footer -->
     <footer>

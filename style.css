@@ -1,9 +1,23 @@
 /* style.css - Adwaita-Style Blog Platform */
+/* Optimized for performance with minimal repaints and GPU acceleration */
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+/* Performance: will-change for animated elements (use sparingly) */
+.particles,
+.header,
+.sidebar {
+    will-change: transform;
+}
+
+/* Remove will-change after animation completes to free memory */
+.header.loaded,
+.sidebar.loaded {
+    will-change: auto;
 }
 
 :root {
@@ -468,6 +482,9 @@ body {
 
 .sidebar-section {
     margin-bottom: 30px;
+    /* Performance: Skip rendering when off-screen */
+    content-visibility: auto;
+    contain-intrinsic-size: 0 150px;
 }
 
 /* Photo Placeholder and About Section Styles */
@@ -754,6 +771,9 @@ body {
     font-size: 12px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    /* Performance: Skip rendering when off-screen */
+    content-visibility: auto;
+    contain-intrinsic-size: 0 500px;
 }
 
 .blog-article h1 {
@@ -944,6 +964,9 @@ body {
     min-width: 0;
     position: relative;
     z-index: 1;
+    /* Performance: Skip rendering when off-screen */
+    content-visibility: auto;
+    contain-intrinsic-size: 0 100px;
 }
 
 .blog-card:hover {
@@ -1069,11 +1092,15 @@ body {
 /* Page Sections */
 .page-section {
     display: none;
+    /* Performance: Skip rendering when not visible */
+    content-visibility: hidden;
 }
 
 .page-section.active {
     display: block;
     animation: fadeIn 0.3s ease-out;
+    /* Performance: Enable rendering when active */
+    content-visibility: visible;
 }
 
 @keyframes fadeIn {

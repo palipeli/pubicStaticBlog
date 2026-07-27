@@ -201,16 +201,22 @@
             });
         });
 
-        // Load saved theme on initialization
+        // Load saved theme on initialization (already handled by inline script in HTML)
+        // This is a fallback if JS runs before inline script
         const savedTheme = getSavedTheme();
-        const savedBtn = document.querySelector(`.theme-btn[data-theme="${savedTheme}"]`);
-        if (savedBtn) {
-            themeBtns.forEach(b => b.classList.remove('active'));
-            savedBtn.classList.add('active');
-            applyTheme(savedTheme);
-        } else {
-            // Default to auto if no button matches
-            applyTheme('auto');
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        
+        // Only apply if not already set by inline script
+        if (!currentTheme || currentTheme === 'auto') {
+            const savedBtn = document.querySelector(`.theme-btn[data-theme="${savedTheme}"]`);
+            if (savedBtn) {
+                themeBtns.forEach(b => b.classList.remove('active'));
+                savedBtn.classList.add('active');
+                applyTheme(savedTheme);
+            } else {
+                // Default to auto if no button matches
+                applyTheme('auto');
+            }
         }
     }
 
@@ -296,10 +302,19 @@
                 sidebarToggle.setAttribute('aria-label', 'Collapse Sidebar');
                 sidebarToggle.setAttribute('title', 'Collapse Sidebar');
             }
+            
+            // Remove will-change after animation completes for performance
+            setTimeout(() => {
+                header.classList.add('loaded');
+                sidebar.classList.add('loaded');
+            }, 500);
         }
 
         // Call on load
         initSidebarState();
+        
+        // Get header reference for will-change optimization
+        const header = document.querySelector('.header');
 
         // Toggle sidebar on button click
         sidebarToggle.addEventListener('click', (e) => {
