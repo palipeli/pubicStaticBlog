@@ -29,10 +29,11 @@
 [data-theme="dark"] {
     --blur-overlay-brightness: 0.6;
     --dark-overlay-color: rgba(0, 0, 0, 0.4);
-    --btn-bg: #3a3a3a;
+    --bg-panel: rgba(30, 30, 30, 0.95);
+    --btn-bg: #1a1a1a;
     --btn-text: #ffffff;
     --btn-border: rgba(255, 255, 255, 0.2);
-    --btn-hover-bg: #2a2a2a;
+    --btn-hover-bg: #0a0a0a;
 }
 
 [data-theme="light"] {
