@@ -609,6 +609,108 @@ body {
     margin-top: 20px;
 }
 
+/* Blog Selector Gallery - Compact Grid Layout */
+.blog-selector-gallery {
+    width: 100%;
+}
+
+.blog-selector-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+}
+
+.blog-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+}
+
+.blog-selector-card {
+    background: var(--bg-panel);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.blog-selector-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent-pink);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 69, 252, 0.2);
+}
+
+.blog-selector-card.active {
+    background: rgba(255, 69, 252, 0.15);
+    border-color: var(--accent-pink);
+}
+
+.blog-selector-card.active .blog-selector-card-title {
+    color: var(--accent-pink);
+}
+
+.blog-selector-emoji {
+    font-size: 24px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.blog-selector-card-content {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.blog-selector-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+}
+
+.blog-selector-card-meta {
+    font-size: 11px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Mobile tray styling for blog selector */
+@media (max-width: 768px) {
+    .blog-selector-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .blog-selector-card {
+        padding: 12px 14px;
+    }
+    
+    .blog-selector-emoji {
+        font-size: 20px;
+    }
+    
+    .blog-selector-card-title {
+        font-size: 13px;
+        max-width: calc(100% - 30px);
+    }
+}
+
 /* Blog Layout Container - New Structure */
 .blog-layout-container {
     display: block;

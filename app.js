@@ -283,7 +283,7 @@ function setupStatePersistence() {
     // Save state when navigating between pages
     document.addEventListener('click', (e) => {
         const navItem = e.target.closest('.nav-item');
-        const postItem = e.target.closest('.post-selector-item');
+        const postItem = e.target.closest('.post-selector-item, .blog-selector-card');
         const backBtn = e.target.closest('.back-to-intro-btn');
         const themeBtn = e.target.closest('.theme-btn');
         const sidebarToggle = e.target.closest('.sidebar-toggle');
@@ -507,7 +507,7 @@ async function loadBlogIntroduction() {
 // Prefetch blog introduction on demand (called on hover)
 function prefetchBlogIntroduction() {
     if (!blogIntroductionLoaded) {
-        loadBlogIntroduction();
+        
     }
 }
 
@@ -698,7 +698,7 @@ function renderPostSelector(posts) {
     
     posts.forEach(post => {
         const item = document.createElement('div');
-        item.className = 'post-selector-item';
+        item.className = .post-selector-item, .blog-selector-card';
         // Add data attribute for state persistence
         item.setAttribute('data-post-id', post.id);
         // Use metadata-only approach: load content on click, preload on hover
@@ -714,6 +714,38 @@ function renderPostSelector(posts) {
         `;
         
         container.appendChild(item);
+    });
+
+    // Also render the blog selector gallery in the main content area
+    renderBlogSelectorGallery(posts);
+}
+
+// Render blog selector gallery in main content area (compact grid with emoji on left)
+function renderBlogSelectorGallery(posts) {
+    const container = document.getElementById('blog-selector-grid');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    posts.forEach(post => {
+        const card = document.createElement('div');
+        card.className = 'blog-selector-card';
+        card.setAttribute('data-post-id', post.id);
+        // Load content on click, preload on hover
+        card.onclick = () => openBlogPostLazy(post.id);
+        card.onmouseenter = () => {
+            preloadBlogPostContent(post.id);
+        };
+
+        card.innerHTML = `
+            <div class="blog-selector-emoji">${post.icon}</div>
+            <div class="blog-selector-card-content">
+                <div class="blog-selector-card-title">${post.title}</div>
+                <div class="blog-selector-card-meta">${post.date}</div>
+            </div>
+        `;
+
+        container.appendChild(card);
     });
 }
 
@@ -734,12 +766,12 @@ function openBlogPost(id) {
     }
     
     // Update active state in sidebar
-    document.querySelectorAll('.post-selector-item').forEach((item, index) => {
+    document.querySelectorAll('.post-selector-item, .blog-selector-card').forEach((item, index) => {
         item.classList.toggle('active', blogPosts[index]?.id === id);
     });
     
     // Hide intro view, show post view
-    document.getElementById('blog-intro-view').style.display = 'none';
+    document.getElementById('blog-selector-gallery').style.display = 'none';
     document.getElementById('blog-post-view').style.display = 'block';
     
     // Render post content
@@ -800,12 +832,12 @@ async function openBlogPostLazy(id) {
     }
     
     // Update active state in sidebar
-    document.querySelectorAll('.post-selector-item').forEach((item, index) => {
+    document.querySelectorAll('.post-selector-item, .blog-selector-card').forEach((item, index) => {
         item.classList.toggle('active', blogPostMetadata[index]?.id === id);
     });
     
     // Hide intro view, show post view with loading indicator
-    document.getElementById('blog-intro-view').style.display = 'none';
+    document.getElementById('blog-selector-gallery').style.display = 'none';
     document.getElementById('blog-post-view').style.display = 'block';
     
     // Show enhanced loading state with spinner
@@ -843,20 +875,17 @@ async function openBlogPostLazy(id) {
     window.scrollTo(0, 0);
 }
 
-// Show blog introduction (back from post view)
-function showBlogIntro() {
+// Show blog selector gallery (back from post view)
+function showBlogSelectorGallery() {
     document.getElementById('blog-post-view').style.display = 'none';
-    document.getElementById('blog-intro-view').style.display = 'block';
+    document.getElementById('blog-selector-gallery').style.display = 'block';
     
     // Clear active state
-    document.querySelectorAll('.post-selector-item').forEach(item => {
+    document.querySelectorAll('.post-selector-item, .blog-selector-card').forEach(item => {
         item.classList.remove('active');
     });
     
-    // Load blog introduction content if not already loaded
-    loadBlogIntroduction();
-    
-    // Save state after going back to intro
+    // Save state after going back to gallery
     setTimeout(saveAppState, 100);
 }
 
