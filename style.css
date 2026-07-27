@@ -676,8 +676,8 @@ body {
     background: var(--bg-panel);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border: 1px solid var(--btn-border);
+    border-radius: 6px;
     padding: 40px;
     line-height: 1.6;
     font-size: 12px;
@@ -688,8 +688,8 @@ body {
     background: var(--bg-panel);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border: 1px solid var(--btn-border);
+    border-radius: 6px;
     padding: 40px;
     line-height: 1.6;
     font-size: 12px;
@@ -750,8 +750,8 @@ body {
     background: var(--bg-panel);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border: 1px solid var(--btn-border);
+    border-radius: 6px;
     padding: 30px;
     line-height: 1.6;
     font-size: 12px;
@@ -1105,8 +1105,8 @@ body {
     background: var(--bg-panel);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--content-outline-light);
-    border-radius: 8px;
+    border: 1px solid var(--btn-border);
+    border-radius: 6px;
     padding: 30px;
     line-height: 1.8;
 }
