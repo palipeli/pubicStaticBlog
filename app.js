@@ -337,9 +337,13 @@ function parseMarkdown(markdown) {
     html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     
     // Code blocks (must be before other replacements)
-    html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+    // Handle code blocks with optional language specifier - must have newline after opening ```
+    html = html.replace(/```(\w*)\n([\s\S]*?)\n```/g, '<pre><code>$2</code></pre>');
     
-    // Inline code
+    // Inline code with triple backticks (must be before single backtick inline code)
+    html = html.replace(/```([^`\n]+)```/g, '<code>$1</code>');
+    
+    // Inline code with single backticks
     html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
     
     // Headers
@@ -383,12 +387,12 @@ function parseMarkdown(markdown) {
     html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
     
     // Paragraphs (simple approach - wrap remaining text blocks)
-    html = html.replace(/\n\n/g, '</p><p>');
+    html = html.replace(/\n\n/g, '</p>\n<p>');
     html = '<p>' + html + '</p>';
     
     // Clean up empty paragraphs and fix paragraph wrapping around block elements
     html = html.replace(/<p>\s*<(h[1-6]|ul|ol|li|pre|blockquote)/g, '<$1');
-    html = html.replace(/<(\/h[1-6]|\/ul|\/ol|\/li|\/pre|\/blockquote)>\s*<\/p>/g, '</$1>');
+    html = html.replace(/<(\/h[1-6]|\/ul|\/ol|\/li|\/pre|\/blockquote)>\s*<\/p>/g, '</$1>\n');
     html = html.replace(/<p><\/p>/g, '');
     
     return html;
