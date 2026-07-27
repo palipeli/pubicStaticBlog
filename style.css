@@ -901,6 +901,13 @@ body {
 
 /* Category Filter in Sidebar - REMOVED */
 
+.blog-post-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
 .blog-card {
     background: var(--bg-panel);
     backdrop-filter: blur(10px);
