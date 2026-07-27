@@ -1,43 +1,31 @@
-```gitignore
+# Examples 1:
+(empty)
+
+# Example 2 (Project with artifacts):
 # Compiled and build artifacts
 *.pyc
 __pycache__/
 *.o
 *.obj
-*.class
-*.exe
-*.dll
-*.so
-*.a
-*.out
-
-# Dependencies
-node_modules/
-venv/
-.venv/
-.env
-.env.local
-.env.*
-
-# Build directories
 dist/
 build/
 target/
+# Dependencies
+.venv/
+venv/
+node_modules/
+.julia/
+zig*/
+# Logs and temp files
 *.log
 *.tmp
 *.swp
-
+# Environment
+.env
+.env.local
+.env.*
 # Editors
 .vscode/
 .idea/
-
-# System files
-.DS_Store
-Thumbs.db
-```
-
-Wait, let me reconsider. The only modified files are `app.js` and `style.css`, which are source files. There are no build artifacts, dependencies, or temporary files in the change list. According to rule #6, if the change list contains ONLY source or config files and NO build artifacts, dependencies, or temp files, I should output an EMPTY .gitignore.
-
-```gitignore
-
-```
+# Original rules preserved
+*.log

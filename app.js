@@ -456,8 +456,8 @@ async function fetchBlogPostMetadata() {
         // Sync with window object for cross-module access
         window.blogPostMetadata = blogPostMetadata;
         
-        // Load the blog introduction content from markdown
-        loadBlogIntroduction();
+        // Note: Blog introduction content is now loaded lazily on hover or navigation
+        // loadBlogIntroduction() is no longer called here
         
         return blogPostMetadata;
     } catch (err) {
@@ -466,8 +466,14 @@ async function fetchBlogPostMetadata() {
     }
 }
 
-// Load blog introduction content from /blog/new-updated-look.md
+// Flag to track if blog introduction has been loaded
+let blogIntroductionLoaded = false;
+
+// Load blog introduction content from /blog/new-updated-look.md (lazy - called on hover or navigation)
 async function loadBlogIntroduction() {
+    // Prevent duplicate loading
+    if (blogIntroductionLoaded) return;
+    
     try {
         const response = await fetch('/blog/new-updated-look.md');
         if (!response.ok) {
@@ -480,6 +486,10 @@ async function loadBlogIntroduction() {
         const introContainer = document.getElementById('blog-intro-content');
         if (introContainer) {
             introContainer.innerHTML = htmlContent;
+            blogIntroductionLoaded = true;
+            
+            // Initialize lazy loading for images in the loaded content
+            initializeLazyLoading();
         }
     } catch (err) {
         console.error('Error loading blog introduction:', err);
@@ -489,6 +499,16 @@ async function loadBlogIntroduction() {
         }
     }
 }
+
+// Prefetch blog introduction on demand (called on hover)
+function prefetchBlogIntroduction() {
+    if (!blogIntroductionLoaded) {
+        loadBlogIntroduction();
+    }
+}
+
+// Expose prefetch function globally
+window.prefetchBlogIntroduction = prefetchBlogIntroduction;
 
 // Lazy load a single blog post's content on demand
 async function loadBlogPostContent(postId) {
@@ -677,8 +697,11 @@ function renderPostSelector(posts) {
         item.setAttribute('data-post-id', post.id);
         // Use metadata-only approach: load content on click, preload on hover
         item.onclick = () => openBlogPostLazy(post.id);
-        // Preload content on mouseenter (hover) with debounce
-        item.onmouseenter = () => preloadBlogPostContent(post.id);
+        // Prefetch blog introduction and post content on mouseenter (hover)
+        item.onmouseenter = () => {
+            prefetchBlogIntroduction();
+            preloadBlogPostContent(post.id);
+        };
         
         item.innerHTML = `
             <div class="post-selector-title">${post.icon} ${post.title}</div>
@@ -846,6 +869,11 @@ function setupNavigation() {
                 }
             });
             
+            // Prefetch blog introduction when navigating to blogs page
+            if (page === 'blogs') {
+                prefetchBlogIntroduction();
+            }
+            
             // Show/hide "All Posts" in sidebar on Home, About, and Blogs pages
             if (blogSidebarSection) {
                 if (page === 'blogs' || page === 'home' || page === 'about') {
@@ -861,6 +889,13 @@ function setupNavigation() {
             // Save state after navigation
             setTimeout(saveAppState, 100);
         });
+        
+        // Add hover listener to prefetch blog introduction when hovering over Blogs nav item
+        if (item.dataset.page === 'blogs') {
+            item.addEventListener('mouseenter', () => {
+                prefetchBlogIntroduction();
+            });
+        }
     });
 }
 
@@ -1234,8 +1269,11 @@ function renderBlogButtonsLazy(posts) {
         const button = document.createElement('a');
         button.className = `blog-btn ${categoryClass}`;
         button.href = '#';
-        // Use lazy loading: preload on hover, load on click
-        button.onmouseenter = () => preloadBlogPostContent(post.id);
+        // Prefetch blog introduction and post content on hover
+        button.onmouseenter = () => {
+            prefetchBlogIntroduction();
+            preloadBlogPostContent(post.id);
+        };
         button.onclick = (e) => {
             e.preventDefault();
             openBlogPostFromHomeLazy(post.id);
