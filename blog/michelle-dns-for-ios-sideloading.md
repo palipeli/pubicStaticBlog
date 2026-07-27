@@ -2,7 +2,7 @@
 title: "Introducing Michelle DNS Suite for iOS Sideloading"
 description: "Sideloading can a great way to obtain more functionality from a phone, albeit it needs a little bit of technique"
 pubDate: "Mar 6 2026"
-heroImage: "/apple.jpg"
+heroImage: "/media/apple.webp"
 ---
 <div style="display: flex; justify-content: center; margin: 40px 0;">
     <a href="https://cloud.kamikami.eu/s/michelledns" class="mc-btn" style="font-size: 2rem; padding: 25px 50px; background: var(--pink-neon); color: white; display: inline-flex; align-items: center; gap: 15px; text-shadow: 3px 3px 0 #000; text-decoration: none; border: 4px solid #000;">
