@@ -1394,6 +1394,14 @@ body {
     box-shadow: 0 6px 20px rgba(93, 191, 191, 0.6);
 }
 
+.blog-btn.category-monitoring {
+    background: linear-gradient(135deg, #5DBFBF 0%, #4A9E9E 100%);
+    box-shadow: 0 4px 15px rgba(93, 191, 191, 0.4);
+}
+.blog-btn.category-monitoring:hover {
+    box-shadow: 0 6px 20px rgba(93, 191, 191, 0.6);
+}
+
 @keyframes rippleEffect {
     0% {
         transform: translate(-50%, -50%) scale(1);

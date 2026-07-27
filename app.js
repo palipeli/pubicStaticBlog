@@ -1328,6 +1328,20 @@ function renderBlogButtons(posts) {
     `;
     
     container.appendChild(myBlogButton);
+    
+    // Add "Monitoring" button - redirects to stats.kamikami.eu/status/one
+    const monitoringButton = document.createElement('a');
+    monitoringButton.className = 'blog-btn category-monitoring';
+    monitoringButton.href = 'https://stats.kamikami.eu/status/one';
+    monitoringButton.target = '_blank';
+    monitoringButton.rel = 'noopener noreferrer';
+    
+    monitoringButton.innerHTML = `
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Monitoring</span>
+    `;
+    
+    container.appendChild(monitoringButton);
 }
 
 // Render blog buttons on home page with lazy loading support (new version)
@@ -1404,6 +1418,20 @@ function renderBlogButtonsLazy(posts) {
     `;
     
     container.appendChild(myBlogButton);
+    
+    // Add "Monitoring" button - redirects to stats.kamikami.eu/status/one
+    const monitoringButton = document.createElement('a');
+    monitoringButton.className = 'blog-btn category-monitoring';
+    monitoringButton.href = 'https://stats.kamikami.eu/status/one';
+    monitoringButton.target = '_blank';
+    monitoringButton.rel = 'noopener noreferrer';
+    
+    monitoringButton.innerHTML = `
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Monitoring</span>
+    `;
+    
+    container.appendChild(monitoringButton);
 }
 
 // Open a blog post from home page button (legacy)
