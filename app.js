@@ -357,6 +357,9 @@ function parseMarkdown(markdown) {
     // Links
     html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
     
+    // Images (must be before links since it uses similar syntax)
+    html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width: 100%; height: auto;">');
+
     // Blockquotes
     html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
     
