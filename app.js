@@ -358,7 +358,19 @@ function parseMarkdown(markdown) {
     html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
     
     // Images (must be before links since it uses similar syntax)
-    html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width: 100%; height: auto;">');
+    // Add lazy-loading with data-src for hover-based loading
+    html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
+        // Check if it's a media file or external image
+        const isMediaFile = src.includes('/media/') || src.endsWith('.webp') || src.endsWith('.png') || src.endsWith('.jpg') || src.endsWith('.jpeg') || src.endsWith('.gif') || src.endsWith('.svg');
+        
+        if (isMediaFile) {
+            // Use data-src for lazy loading on hover, use a tiny transparent placeholder as initial src
+            return `<img data-src="${src}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="${alt}" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">`;
+        } else {
+            // For non-media images, load normally but still add lazy class for consistency
+            return `<img src="${src}" alt="${alt}" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">`;
+        }
+    });
 
     // Blockquotes
     html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
@@ -768,6 +780,9 @@ async function openBlogPostLazy(id) {
         </div>
         <div class="blog-post-content">${post.htmlContent}</div>
     `;
+    
+    // Initialize lazy loading for images in the rendered content
+    initializeLazyLoading();
     
     // Save state after opening a post
     setTimeout(saveAppState, 100);
@@ -1275,4 +1290,78 @@ async function openBlogPostFromHomeLazy(id) {
     setTimeout(() => {
         openBlogPostLazy(id);
     }, 100);
+}
+
+// =====================
+// Lazy Loading for Images on Hover
+// =====================
+
+// Initialize lazy loading for all images with data-src attribute
+function initializeLazyLoading() {
+    const lazyImages = document.querySelectorAll('img.lazy-image[data-src]');
+    
+    lazyImages.forEach(img => {
+        // Skip if already initialized
+        if (img.dataset.lazyInitialized === 'true') return;
+        
+        img.dataset.lazyInitialized = 'true';
+        
+        // Load image on hover (mouseenter)
+        img.addEventListener('mouseenter', () => {
+            loadImageOnHover(img);
+        });
+        
+        // Also load on intersection (when scrolled into view) as a fallback
+        if ('IntersectionObserver' in window) {
+            const imgObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        loadImageOnHover(entry.target);
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { rootMargin: '50px 0px' });
+            
+            imgObserver.observe(img);
+        }
+    });
+}
+
+// Load image source when triggered (hover or intersection)
+function loadImageOnHover(img) {
+    const dataSrc = img.getAttribute('data-src');
+    if (!dataSrc) return;
+    
+    // Check if already loaded or loading
+    if (img.src === dataSrc || img.classList.contains('loading')) return;
+    
+    // Add loading class for visual feedback
+    img.classList.add('loading');
+    
+    // Create a new image to preload
+    const preloadImg = new Image();
+    preloadImg.src = dataSrc;
+    
+    preloadImg.onload = () => {
+        img.src = dataSrc;
+        img.classList.remove('loading');
+        img.classList.add('loaded');
+        console.log(`Lazy-loaded image: ${dataSrc}`);
+    };
+    
+    preloadImg.onerror = () => {
+        console.error(`Failed to load lazy image: ${dataSrc}`);
+        img.classList.remove('loading');
+        img.classList.add('error');
+        // Fallback: try loading directly
+        img.src = dataSrc;
+    };
+}
+
+// Global initialization on DOMContentLoaded
+if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initial setup for any static lazy images
+        initializeLazyLoading();
+    });
 }
