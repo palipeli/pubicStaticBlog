@@ -15,6 +15,7 @@
     --text-primary: #2e3436;
     --text-secondary: #5e5e5e;
     --border-color: rgba(0, 0, 0, 0.1);
+    --content-outline-light: rgba(255, 255, 255, 0.5);
     --header-height: 40px;
     --font-main: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
     --blur-overlay-brightness: 1.0;
@@ -30,6 +31,7 @@
     --blur-overlay-brightness: 0.6;
     --dark-overlay-color: rgba(0, 0, 0, 0.4);
     --bg-panel: rgba(30, 30, 30, 0.95);
+    --content-outline-light: rgba(255, 255, 255, 0.3);
     --btn-bg: #1a1a1a;
     --btn-text: #ffffff;
     --btn-border: rgba(255, 255, 255, 0.2);
@@ -37,6 +39,7 @@
 }
 
 [data-theme="light"] {
+    --content-outline-light: rgba(255, 255, 255, 0.5);
     --btn-bg: #ffffff;
     --btn-text: #2e3436;
     --btn-border: rgba(0, 0, 0, 0.2);
@@ -206,6 +209,7 @@ body {
     overflow-y: auto;
     height: 100%;
     width: 100%;
+    border: 1px solid var(--content-outline-light);
 }
 
 /* Home Hero Section */
@@ -225,7 +229,7 @@ body {
     background: var(--bg-panel);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--content-outline-light);
     border-radius: 8px;
     padding: 40px;
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
@@ -904,7 +908,7 @@ body {
     background: var(--bg-panel);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--content-outline-light);
     border-radius: 8px;
     overflow: hidden;
     transition: all 0.3s ease;
@@ -1098,7 +1102,7 @@ body {
     background: var(--bg-panel);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--content-outline-light);
     border-radius: 8px;
     padding: 30px;
     line-height: 1.8;
