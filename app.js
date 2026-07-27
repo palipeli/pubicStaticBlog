@@ -729,15 +729,23 @@ function renderBlogPostSelectorGrid(posts) {
         return;
     }
     
+    // Special mapping for specific titles
+    const specialTitles = {
+        "Introducing Michelle DNS Suite for iOS Sideloading": "Michelle's Sideloading DNS"
+    };
+    
     posts.forEach((post, index) => {
         const card = document.createElement('div');
         card.className = 'blog-card';
         card.style.animationDelay = (index * 0.03) + 's';
         
+        // Use special title if available, otherwise use post.title
+        const displayTitle = specialTitles[post.title] || post.title;
+        
         card.innerHTML = `
             <div class="blog-image">${post.icon}</div>
             <div class="blog-content">
-                <h3 class="blog-title">${post.title}</h3>
+                <h3 class="blog-title">${displayTitle}</h3>
                 <p class="blog-meta">${post.category} • ${post.date}</p>
             </div>
         `;
@@ -755,6 +763,22 @@ function renderBlogPostSelectorGrid(posts) {
         
         container.appendChild(card);
     });
+    
+    // Add "My Blog" button after the grid
+    const myBlogBtn = document.createElement('div');
+    myBlogBtn.className = 'blog-card my-blog-btn';
+    myBlogBtn.innerHTML = `
+        <div class="blog-image"><i class="fas fa-book"></i></div>
+        <div class="blog-content">
+            <h3 class="blog-title">My Blog</h3>
+            <p class="blog-meta">View all posts</p>
+        </div>
+    `;
+    myBlogBtn.style.cursor = 'pointer';
+    myBlogBtn.onclick = () => {
+        showBlogIntroduction();
+    };
+    container.appendChild(myBlogBtn);
 }
 
 // Render category filter - REMOVED (categories no longer in sidebar)
@@ -899,6 +923,51 @@ function showBlogIntro() {
     // Save state after going back to intro
     setTimeout(saveAppState, 100);
 }
+
+// Show blog introduction page / blog post selector (for My Blog button)
+function showBlogIntroduction() {
+    // Navigate to blogs page
+    const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
+    if (blogsNavItem) {
+        const sections = document.querySelectorAll('.page-section');
+        const navItems = document.querySelectorAll('.nav-item');
+        
+        // Update active nav item
+        navItems.forEach(nav => nav.classList.remove('active'));
+        blogsNavItem.classList.add('active');
+        
+        // Show blogs section
+        sections.forEach(section => {
+            section.classList.remove('active');
+            if (section.id === 'blogs') {
+                section.classList.add('active');
+            }
+        });
+    }
+    
+    // Hide post view, show intro view with selector grid
+    const postView = document.getElementById('blog-post-view');
+    const introView = document.getElementById('blog-intro-view');
+    if (postView) postView.style.display = 'none';
+    if (introView) introView.style.display = 'block';
+    
+    // Clear active state in sidebar
+    document.querySelectorAll('.post-selector-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // Render the blog post selector grid
+    renderBlogPostSelectorGrid(blogPostMetadata);
+    
+    // Scroll to top
+    window.scrollTo(0, 0);
+    
+    // Save state
+    setTimeout(saveAppState, 100);
+}
+
+// Expose globally for onclick handler
+window.showBlogIntroduction = showBlogIntroduction;
 
 // Initialize particles
 function createParticles() {

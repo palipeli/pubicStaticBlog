@@ -954,6 +954,38 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
+/* My Blog button with pastel teal styling */
+.my-blog-btn {
+    background: rgba(128, 222, 234, 0.2);
+    border-color: rgba(128, 222, 234, 0.5);
+}
+
+.my-blog-btn:hover {
+    background: rgba(128, 222, 234, 0.35);
+    border-color: #80DEEA;
+    transform: translateX(4px);
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(128, 222, 234, 0.3);
+}
+
+.my-blog-btn .blog-image {
+    color: #0097A7;
+}
+
+[data-theme="dark"] .my-blog-btn {
+    background: rgba(0, 151, 167, 0.2);
+    border-color: rgba(0, 151, 167, 0.5);
+}
+
+[data-theme="dark"] .my-blog-btn:hover {
+    background: rgba(0, 151, 167, 0.35);
+    border-color: #80DEEA;
+}
+
+[data-theme="dark"] .my-blog-btn .blog-image {
+    color: #80DEEA;
+}
+
 .blog-image {
     width: auto;
     height: auto;

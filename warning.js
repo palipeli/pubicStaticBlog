@@ -32,7 +32,8 @@
             e.target.closest('#mobile-tray-overlay') ||
             e.target.closest('.header-right') ||
             e.target.closest('.back-to-intro-btn') ||
-            e.target.closest('.blog-card')) {
+            e.target.closest('.blog-card') ||
+            e.target.closest('.my-blog-btn')) {
             bypassWarning = true;
             setTimeout(() => { bypassWarning = false; }, 1000);
         }
@@ -229,7 +230,8 @@
                 e.target.closest('#mobile-tray-overlay') ||
                 e.target.closest('.header-right') ||
                 e.target.closest('.back-to-intro-btn') ||
-                e.target.closest('.blog-card')
+                e.target.closest('.blog-card') ||
+                e.target.closest('.my-blog-btn')
             )) return;
         }
 
