@@ -392,7 +392,7 @@ function parseMarkdown(markdown) {
     
     // Clean up empty paragraphs and fix paragraph wrapping around block elements
     html = html.replace(/<p>\s*<(h[1-6]|ul|ol|li|pre|blockquote)/g, '<$1');
-    html = html.replace(/<(\/h[1-6]|\/ul|\/ol|\/li|\/pre|\/blockquote)>\s*<\/p>/g, '</$1>\n');
+    html = html.replace(/<(\/h[1-6]|\/ul|\/ol|\/li|\/pre|\/blockquote)>\s*<\/p>/g, '<$1>');
     html = html.replace(/<p><\/p>/g, '');
     
     return html;
