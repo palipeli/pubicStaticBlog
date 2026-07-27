@@ -649,6 +649,16 @@ body {
     transform: translateX(-5px);
 }
 
+[data-theme="dark"] .back-to-intro-btn {
+    background: #4a4a4a;
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .back-to-intro-btn:hover {
+    background: #5a5a5a;
+}
+
 /* Blog Introduction View */
 .blog-intro-view {
     width: 100%;
