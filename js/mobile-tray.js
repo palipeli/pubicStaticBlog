@@ -41,9 +41,9 @@
                 <div class="mobile-tray-section">
                     <h3 class="mobile-tray-section-title">Theme</h3>
                     <div class="mobile-theme-chooser">
-                        <button class="mobile-theme-btn" data-theme="auto">Auto</button>
-                        <button class="mobile-theme-btn" data-theme="light">Light</button>
-                        <button class="mobile-theme-btn" data-theme="dark">Dark</button>
+                        <button class="mobile-theme-btn" data-theme="auto"><i class="fa-solid fa-desktop"></i> Auto</button>
+                        <button class="mobile-theme-btn" data-theme="light"><i class="fa-solid fa-sun"></i> Light</button>
+                        <button class="mobile-theme-btn" data-theme="dark"><i class="fa-solid fa-moon"></i> Dark</button>
                     </div>
                 </div>
                 

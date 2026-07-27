@@ -588,6 +588,7 @@ body {
     font-size: 13px;
     font-weight: 500;
     text-align: left;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .theme-btn:hover {
@@ -1531,6 +1532,7 @@ body {
     font-weight: 500;
     text-align: left;
     width: 100%;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .mobile-theme-btn:hover {
