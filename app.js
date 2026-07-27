@@ -849,6 +849,9 @@ function showBlogIntro() {
         item.classList.remove('active');
     });
     
+    // Load blog introduction content if not already loaded
+    loadBlogIntroduction();
+    
     // Save state after going back to intro
     setTimeout(saveAppState, 100);
 }
