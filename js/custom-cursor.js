@@ -1,24 +1,8 @@
-// custom-cursor.js - Cute Pink Circle Cursor with Star Trail
+// custom-cursor.js - Star Trail Cursor Effect
 (function() {
-    let cursor = null;
     let lastX = 0;
     let lastY = 0;
     let moveTimeout = null;
-
-    // Create custom cursor element
-    function createCursor() {
-        cursor = document.createElement('div');
-        cursor.className = 'custom-cursor';
-        document.body.appendChild(cursor);
-
-        // Position cursor initially at center
-        const centerX = window.innerWidth / 2;
-        const centerY = window.innerHeight / 2;
-        cursor.style.left = centerX + 'px';
-        cursor.style.top = centerY + 'px';
-        lastX = centerX;
-        lastY = centerY;
-    }
 
     // Create star trail element
     function createStar(x, y) {
@@ -37,11 +21,6 @@
 
     // Handle mouse move
     function handleMouseMove(e) {
-        if (!cursor) return;
-
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top = e.clientY + 'px';
-
         // Create star trail on movement (throttled)
         const distance = Math.sqrt(Math.pow(e.clientX - lastX, 2) + Math.pow(e.clientY - lastY, 2));
         
@@ -62,28 +41,10 @@
         }, 50);
     }
 
-    // Handle mouse down
-    function handleMouseDown() {
-        if (cursor) {
-            cursor.classList.add('clicked');
-        }
-    }
-
-    // Handle mouse up
-    function handleMouseUp() {
-        if (cursor) {
-            cursor.classList.remove('clicked');
-        }
-    }
-
     // Initialize cursor when DOM is ready
     document.addEventListener('DOMContentLoaded', function() {
-        createCursor();
-
         // Add event listeners
         document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mousedown', handleMouseDown);
-        document.addEventListener('mouseup', handleMouseUp);
 
         // Hide default cursor on interactive elements
         const interactiveSelector = 'a, button, .nav-item, .blue-button, .theme-btn, .template-card, .all-post-btn, .back-to-list-btn, .back-to-intro-btn, input, textarea, [role="button"], [onclick]';
@@ -100,6 +61,6 @@
             }
         });
 
-        console.log('Custom cursor initialized');
+        console.log('Star trail cursor initialized');
     });
 })();
