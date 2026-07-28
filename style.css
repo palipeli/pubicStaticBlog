@@ -8,8 +8,8 @@
 
 :root {
     --bg-dark: #f6f5f4;
-    --bg-panel: rgba(255, 255, 255, 0.95);
-    --bg-header: rgba(246, 245, 244, 0.95);
+    --bg-panel: rgba(255, 255, 255, 0.98);
+    --bg-header: rgba(246, 245, 244, 0.98);
     --accent-pink: #ff45fc;
     --accent-pink-hover: #e031e0;
     --text-primary: #2e3436;
@@ -29,7 +29,7 @@
 [data-theme="dark"] {
     --blur-overlay-brightness: 0.6;
     --dark-overlay-color: rgba(0, 0, 0, 0.4);
-    --bg-panel: rgba(30, 30, 30, 0.95);
+    --bg-panel: rgba(30, 30, 30, 0.98);
     --btn-bg: #1a1a1a;
     --btn-text: #ffffff;
     --btn-border: rgba(255, 255, 255, 0.2);
