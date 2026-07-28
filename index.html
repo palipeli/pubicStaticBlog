@@ -4,12 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blender-Style Blog Platform</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-    <link rel="icon" type="image/webp" href="media/favicon-circle.webp">
+    
+    <!-- Preconnect to external origins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Critical CSS inlined for faster FCP -->
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}html{height:100%;overflow:hidden}body{font-family:'MesloLGS NF','Fira Code',Consolas,Monaco,'Andale Mono','Ubuntu Mono',monospace;background:linear-gradient(135deg,rgba(246,245,244,.85),rgba(255,255,255,.85)),url('media/background.webp');background-size:cover;background-position:center;background-attachment:fixed;color:#2e3436;min-height:100vh;position:relative;overflow-y:auto}:root{--bg-dark:#f6f5f4;--bg-panel:rgba(255,255,255,.95);--bg-header:rgba(246,245,244,.95);--accent-pink:#ff45fc;--text-primary:#2e3436;--text-secondary:#5e5e5e;--border-color:rgba(0,0,0,.1);--header-height:40px;--blur-overlay-brightness:1;--dark-overlay-color:rgba(0,0,0,0);--theme-transition-duration:.4s;--btn-bg:#fff;--btn-text:#2e3436;--btn-border:rgba(0,0,0,.2);--btn-hover-bg:#f0f0f0}[data-theme="dark"]{--blur-overlay-brightness:.6;--dark-overlay-color:rgba(0,0,0,.4);--bg-panel:rgba(30,30,30,.95);--btn-bg:#1a1a1a;--btn-text:#fff;--btn-border:rgba(255,255,255,.2);--btn-hover-bg:#0a0a0a}.header{position:fixed;top:0;left:0;right:0;height:var(--header-height);background:var(--bg-header);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;justify-content:space-between;align-items:center;padding:0 20px;z-index:1000;border-bottom:1px solid var(--border-color);animation:slideDown .5s ease-out;transition:background var(--theme-transition-duration) ease,border-color var(--theme-transition-duration) ease}@keyframes slideDown{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}.header-left{display:flex;align-items:center;gap:15px}.header-right{display:flex;align-items:center;gap:5px}.nav-item{color:var(--text-secondary);text-decoration:none;padding:8px 16px;border-radius:3px;transition:all .2s ease;font-size:13px;font-weight:500;background:transparent;border:none;cursor:pointer}.nav-item:hover{color:var(--text-primary);background:rgba(255,255,255,.05)}.nav-item.active{color:var(--accent-pink);background:rgba(255,69,252,.15)}.main-container{display:block;margin-top:var(--header-height);height:calc(100vh - var(--header-height));position:relative;margin-right:280px;transition:margin-right .3s ease}.main-container.sidebar-collapsed{margin-right:0}.content-area{padding:30px;overflow-y:auto;height:100%;width:100%}.page-section{display:none}.page-section.active{display:block}.blue-button{background:linear-gradient(135deg,#ff1493,#ff69b4);color:#fff;border:none;padding:3px 8px;margin:0 10px;border-radius:4px;font-size:10px;font-weight:600;cursor:pointer;transition:all .3s ease;box-shadow:0 2px 8px rgba(255,20,147,.4)}.blue-button span{font-family:'VT323',monospace;font-style:italic;text-transform:lowercase;font-size:1.4rem}.particles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1;overflow:hidden}.particle{position:absolute;width:4px;height:4px;background:rgba(255,69,252,.6);border-radius:50%;animation:float 15s linear infinite}@keyframes float{0%{transform:translateY(100vh) scale(0);opacity:0}50%{opacity:.8}100%{transform:translateY(-100px) scale(1);opacity:0}}.sidebar{width:280px;background:var(--bg-panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-left:1px solid var(--border-color);padding:0;animation:slideLeft .5s ease-out;position:fixed;right:0;top:var(--header-height);height:calc(100vh - var(--header-height));box-sizing:border-box;z-index:999;transition:width .3s ease,opacity .3s ease,transform .3s ease;background var(--theme-transition-duration) ease,border-color var(--theme-transition-duration) ease}.sidebar-content-wrapper{padding:20px;height:100%;overflow-y:auto;opacity:1;transition:opacity .3s ease;width:100%;box-sizing:border-box}.sidebar.collapsed{width:0}.sidebar.collapsed .sidebar-content-wrapper{opacity:0;pointer-events:none}@media(max-width: 768px){.sidebar:not(.expanded){width:0;opacity:0;transform:translateX(20px);pointer-events:none}.sidebar:not(.expanded) .sidebar-content-wrapper{opacity:0;pointer-events:none}}@keyframes slideLeft{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+    </style>
+    
+    <!-- Load minified stylesheet asynchronously -->
+    <link rel="preload" href="style.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="style.min.css"></noscript>
+    
+    <!-- Fonts loaded asynchronously -->
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+    
+    <!-- Font Awesome with async loading -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
+    
+    <link rel="icon" type="image/webp" href="media/favicon-circle.webp">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -26,6 +47,9 @@
     <meta name="twitter:description" content="WELCOME TO MY SUPER-CUTE-BUT-SHITTY WEBSITE! TAKE VICODIN IF YOU CAME FROM WSFTEAM.XYZ. I'm running a website where I post about shitty and janky technology that I like and personally use. Especially in audio, networking, and Linux technologies.">
     <meta name="twitter:image" content="https://kamikami.eu/media/logo.webp">
     <meta name="twitter:site" content="@kamikamieu">
+    
+    <!-- Performance meta tags -->
+    <meta name="theme-color" content="#f6f5f4">
 </head>
 <body>
     <!-- Particles Background -->
@@ -151,22 +175,12 @@
         </aside>
     </div>
 
-    <!-- Scripts - Modular Architecture with Lazy Loading -->
-    <!-- Core modules loaded in order of dependency -->
-    <script src="js/markdown.js" defer></script>
-    <script src="js/lazyload.js" defer></script>
-    <script src="js/state.js" defer></script>
-    <script src="js/devotional.js" defer></script>
-    <script src="js/ui.js" defer></script>
-    <script src="js/blog.js" defer></script>
-    <script src="js/home.js" defer></script>
+    <!-- Scripts - Optimized Loading Order -->
+    <!-- Warning.js first (blocking) - required for consent overlay before any interaction -->
+    <script src="warning.min.js"></script>
     
-    <!-- Legacy scripts -->
-    <script src="warning.js"></script>
-    <script src="js/mobile-tray.js"></script>
-    
-    <!-- Main app entry point (loads after all modules) -->
-    <script src="js/app.js" defer></script>
+    <!-- Bundled and minified core modules (single HTTP request, deferred) -->
+    <script src="js/bundle.min.js" defer></script>
     
     <!-- Footer -->
     <footer>
