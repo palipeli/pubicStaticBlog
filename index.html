@@ -152,20 +152,22 @@
     </div>
 
     <!-- Scripts - Modular Architecture with Lazy Loading -->
-    <!-- Core modules loaded in order of dependency -->
+    <!-- Critical initialization scripts - preloaded for priority fetching -->
+    <link rel="preload" href="js/ui.js" as="script">
+    <link rel="preload" href="js/state.js" as="script">
+    
+    <!-- Non-critical scripts - standard deferred loading -->
     <script src="js/markdown.js" defer></script>
     <script src="js/lazyload.js" defer></script>
-    <script src="js/state.js" defer></script>
     <script src="js/devotional.js" defer></script>
-    <script src="js/ui.js" defer></script>
     <script src="js/blog.js" defer></script>
     <script src="js/home.js" defer></script>
     
-    <!-- Legacy scripts -->
-    <script src="warning.js"></script>
-    <script src="js/mobile-tray.js"></script>
+    <!-- Legacy scripts (non-module, deferred) -->
+    <script src="warning.js" defer></script>
+    <script src="js/mobile-tray.js" defer></script>
     
-    <!-- Main app entry point (loads after all modules) -->
+    <!-- Main app entry point - uses dynamic imports for route-specific code -->
     <script src="js/app.js" defer></script>
     
     <!-- Footer -->

@@ -1,40 +1,52 @@
-// lazyload.js - Image Lazy Loading on Hover
-// Handles lazy loading of images when hovered or scrolled into view
+// lazyload.js - Image Lazy Loading with Intersection Observer
+// Handles lazy loading of images when scrolled into view using IntersectionObserver
 
 (function() {
+    // Check for IntersectionObserver support
+    const hasIntersectionObserver = 'IntersectionObserver' in window;
+    
     // Initialize lazy loading for all images with data-src attribute
     function initializeLazyLoading() {
         const lazyImages = document.querySelectorAll('img.lazy-image[data-src]');
 
+        if (!hasIntersectionObserver) {
+            // Fallback: load all images immediately if no IntersectionObserver
+            lazyImages.forEach(img => loadImage(img));
+            return;
+        }
+
+        // Create a single IntersectionObserver for all lazy images
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    
+                    // Skip if already initialized or loading
+                    if (img.dataset.lazyInitialized === 'true') {
+                        observer.unobserve(img);
+                        return;
+                    }
+                    
+                    img.dataset.lazyInitialized = 'true';
+                    loadImage(img);
+                    observer.unobserve(img);
+                }
+            });
+        }, { 
+            rootMargin: '50px 0px',  // Start loading 50px before image enters viewport
+            threshold: 0.01          // Trigger when at least 1% of image is visible
+        });
+
         lazyImages.forEach(img => {
             // Skip if already initialized
             if (img.dataset.lazyInitialized === 'true') return;
-
-            img.dataset.lazyInitialized = 'true';
-
-            // Load image on hover (mouseenter)
-            img.addEventListener('mouseenter', () => {
-                loadImageOnHover(img);
-            });
-
-            // Also load on intersection (when scrolled into view) as a fallback
-            if ('IntersectionObserver' in window) {
-                const imgObserver = new IntersectionObserver((entries, observer) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            loadImageOnHover(entry.target);
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, { rootMargin: '50px 0px' });
-
-                imgObserver.observe(img);
-            }
+            
+            imageObserver.observe(img);
         });
     }
 
-    // Load image source when triggered (hover or intersection)
-    function loadImageOnHover(img) {
+    // Load image source when triggered by IntersectionObserver
+    function loadImage(img) {
         const dataSrc = img.getAttribute('data-src');
         if (!dataSrc) return;
 
@@ -66,13 +78,19 @@
 
     // Expose functions globally
     window.initializeLazyLoading = initializeLazyLoading;
-    window.loadImageOnHover = loadImageOnHover;
+    window.loadImage = loadImage;
 
     // Global initialization on DOMContentLoaded
     if (typeof document !== 'undefined') {
-        document.addEventListener('DOMContentLoaded', () => {
-            // Initial setup for any static lazy images
-            initializeLazyLoading();
-        });
+        // Use requestIdleCallback for non-critical initialization
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => {
+                initializeLazyLoading();
+            }, { timeout: 2000 });
+        } else {
+            document.addEventListener('DOMContentLoaded', () => {
+                initializeLazyLoading();
+            });
+        }
     }
 })();
