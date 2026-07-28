@@ -67,6 +67,46 @@
                 if (item.dataset.page === 'blogs') {
                     const currentPage = window.getCurrentPage ? window.getCurrentPage() : 'home';
                     
+                    // Check if user is currently reading a blog post
+                    const postView = document.getElementById('blog-post-view');
+                    const isReadingPost = postView && postView.style.display !== 'none' && postView.style.display !== '';
+                    
+                    // If already reading a blog post, show the blog intro grid
+                    if (isReadingPost) {
+                        // Navigate to blogs page and show intro grid
+                        navigateToBlogsPageWithoutPrefetch();
+                        
+                        // Show blog intro view (grid of all posts)
+                        const introView = document.getElementById('blog-intro-view');
+                        
+                        if (introView) {
+                            postView.style.display = 'none';
+                            introView.style.display = 'block';
+                        }
+                        
+                        // Clear active state in sidebar
+                        document.querySelectorAll('.post-selector-item').forEach(item => {
+                            item.classList.remove('active');
+                        });
+                        
+                        // Render the blog post selector grid
+                        if (typeof window.renderBlogPostSelectorGrid === 'function' && window.blogPostMetadata) {
+                            window.renderBlogPostSelectorGrid(window.blogPostMetadata);
+                        }
+                        
+                        // Update back button visibility
+                        if (typeof window.updateBlogIntroBackButton === 'function') {
+                            window.updateBlogIntroBackButton();
+                        }
+                        
+                        // Scroll to top
+                        window.scrollTo(0, 0);
+                        
+                        // Save state after navigation
+                        setTimeout(window.saveAppState, 100);
+                        return;
+                    }
+                    
                     // If clicking Blog from Home or About page
                     if (currentPage === 'home' || currentPage === 'about') {
                         // Check if there's a saved blog post to restore
@@ -101,7 +141,6 @@
                             navigateToBlogsPageWithoutPrefetch();
                             
                             // Show blog intro view (grid of all posts)
-                            const postView = document.getElementById('blog-post-view');
                             const introView = document.getElementById('blog-intro-view');
                             
                             if (postView && introView) {
