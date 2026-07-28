@@ -73,42 +73,6 @@
                 if (item.dataset.page === 'blogs') {
                     const currentPage = window.getCurrentPage ? window.getCurrentPage() : 'home';
                     
-                    // If already reading a blog post, show the blog intro grid
-                    if (isReadingPost) {
-                        // Navigate to blogs page and show intro grid
-                        navigateToBlogsPageWithoutPrefetch();
-                        
-                        // Show blog intro view (grid of all posts)
-                        const introView = document.getElementById('blog-intro-view');
-                        
-                        if (introView) {
-                            postView.style.display = 'none';
-                            introView.style.display = 'block';
-                        }
-                        
-                        // Clear active state in sidebar
-                        document.querySelectorAll('.post-selector-item').forEach(item => {
-                            item.classList.remove('active');
-                        });
-                        
-                        // Render the blog post selector grid
-                        if (typeof window.renderBlogPostSelectorGrid === 'function' && window.blogPostMetadata) {
-                            window.renderBlogPostSelectorGrid(window.blogPostMetadata);
-                        }
-                        
-                        // Update back button visibility
-                        if (typeof window.updateBlogIntroBackButton === 'function') {
-                            window.updateBlogIntroBackButton();
-                        }
-                        
-                        // Scroll to top
-                        window.scrollTo(0, 0);
-                        
-                        // Save state after navigation
-                        setTimeout(window.saveAppState, 100);
-                        return;
-                    }
-                    
                     // If clicking Blog from Home or About page
                     if (currentPage === 'home' || currentPage === 'about') {
                         // Check if there's a saved blog post to restore
@@ -175,6 +139,41 @@
                             return;
                         }
                     }
+                    // If already reading a blog post on blogs page, show the blog intro grid
+                    if (isReadingPost) {
+                        // Navigate to blogs page and show intro grid
+                        navigateToBlogsPageWithoutPrefetch();
+                        
+                        // Show blog intro view (grid of all posts)
+                        const introView = document.getElementById('blog-intro-view');
+                        
+                        if (introView) {
+                            postView.style.display = 'none';
+                            introView.style.display = 'block';
+                        }
+                        
+                        // Clear active state in sidebar
+                        document.querySelectorAll('.post-selector-item').forEach(item => {
+                            item.classList.remove('active');
+                        });
+                        
+                        // Render the blog post selector grid
+                        if (typeof window.renderBlogPostSelectorGrid === 'function' && window.blogPostMetadata) {
+                            window.renderBlogPostSelectorGrid(window.blogPostMetadata);
+                        }
+                        
+                        // Update back button visibility
+                        if (typeof window.updateBlogIntroBackButton === 'function') {
+                            window.updateBlogIntroBackButton();
+                        }
+                        
+                        // Scroll to top
+                        window.scrollTo(0, 0);
+                        
+                        // Save state after navigation
+                        setTimeout(window.saveAppState, 100);
+                        return;
+                    }
                     // If clicking Blog from elsewhere, just navigate normally
                 } else {
                     // For other nav items, track if user was reading a blog post
@@ -186,42 +185,39 @@
                     if (item.dataset.page === 'home' || item.dataset.page === 'about') {
                         hasRestoredBlogSession = false;
                     }
-                }
+                    
+                    // Update active nav item
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    item.classList.add('active');
 
-                // Update active nav item (skip if Blog button was already handled)
-                const currentPageBeforeClick = window.getCurrentPage ? window.getCurrentPage() : 'home';
-                if (item.dataset.page === 'blogs' && (currentPageBeforeClick === 'home' || currentPageBeforeClick === 'about')) {
-                    // Navigation already handled in the Blog button logic above
+                    // Show corresponding section
+                    const page = item.dataset.page;
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === page) {
+                            section.classList.add('active');
+                        }
+                    });
+
+                    // Show/hide "All Posts" in sidebar on Home, About, and Blogs pages
+                    if (blogSidebarSection) {
+                        if (page === 'blogs' || page === 'home' || page === 'about') {
+                            blogSidebarSection.style.display = 'block';
+                        } else {
+                            blogSidebarSection.style.display = 'none';
+                        }
+                    }
+
+                    // Scroll to top when changing pages
+                    window.scrollTo(0, 0);
+
+                    // Save state after navigation
+                    setTimeout(window.saveAppState, 100);
                     return;
                 }
 
-                // Update active nav item
-                navItems.forEach(nav => nav.classList.remove('active'));
-                item.classList.add('active');
-
-                // Show corresponding section
-                const page = item.dataset.page;
-                sections.forEach(section => {
-                    section.classList.remove('active');
-                    if (section.id === page) {
-                        section.classList.add('active');
-                    }
-                });
-
-                // Show/hide "All Posts" in sidebar on Home, About, and Blogs pages
-                if (blogSidebarSection) {
-                    if (page === 'blogs' || page === 'home' || page === 'about') {
-                        blogSidebarSection.style.display = 'block';
-                    } else {
-                        blogSidebarSection.style.display = 'none';
-                    }
-                }
-
-                // Scroll to top when changing pages
-                window.scrollTo(0, 0);
-
-                // Save state after navigation
-                setTimeout(window.saveAppState, 100);
+                // Navigation already handled in the Blog button logic above
+                return;
             });
         });
     }

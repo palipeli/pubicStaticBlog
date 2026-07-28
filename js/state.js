@@ -91,7 +91,9 @@
      */
     function isBlogIntroViewed() {
         const introView = document.getElementById('blog-intro-view');
-        return introView && introView.style.display !== 'none';
+        const postView = document.getElementById('blog-post-view');
+        // Blog intro is viewed when it's displayed AND post view is not displayed
+        return introView && introView.style.display !== 'none' && (!postView || postView.style.display === 'none');
     }
 
     /**
