@@ -79,20 +79,26 @@
             timestamp: Date.now()
         };
 
-        // Preserve previousPage only if we're currently viewing a blog post
+        // Preserve previousPage when navigating from home to blogs or about
         // This ensures the back button knows where to return to
-        if (activeBlogPost) {
-            try {
-                const savedState = localStorage.getItem(STATE_STORAGE_KEY);
-                if (savedState) {
-                    const parsed = JSON.parse(savedState);
-                    if (parsed.previousPage) {
+        try {
+            const savedState = localStorage.getItem(STATE_STORAGE_KEY);
+            if (savedState) {
+                const parsed = JSON.parse(savedState);
+                if (parsed.previousPage) {
+                    // Keep previousPage if we're on a blog-related view (intro or post)
+                    if (currentPage === 'blogs') {
                         currentState.previousPage = parsed.previousPage;
                     }
+                } else {
+                    // If there's no previousPage and we're coming from home, set it
+                    if (parsed.currentPage === 'home' && (currentPage === 'blogs' || currentPage === 'about')) {
+                        currentState.previousPage = 'home';
+                    }
                 }
-            } catch (err) {
-                console.warn('Failed to read existing state:', err);
             }
+        } catch (err) {
+            console.warn('Failed to read existing state:', err);
         }
 
         try {

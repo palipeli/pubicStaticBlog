@@ -73,6 +73,9 @@
             item.addEventListener('click', (e) => {
                 e.preventDefault();
 
+                // Get the current page before navigation for state tracking
+                const currentPage = window.getCurrentPage ? window.getCurrentPage() : null;
+
                 // Update active nav item
                 navItems.forEach(nav => nav.classList.remove('active'));
                 item.classList.add('active');

@@ -386,7 +386,7 @@
         // Load the saved state to determine where the user came from
         const savedState = window.loadAppState();
         
-        // Clear the previousPage from state since we're navigating away from the blog post
+        // Clear the previousPage from state since we're navigating away from the current view
         try {
             const STATE_STORAGE_KEY = 'blogPlatformState';
             if (savedState) {
@@ -397,10 +397,10 @@
             console.warn('Failed to clear previousPage:', err);
         }
 
-        // Check if we have a previous page stored (before viewing the blog post)
+        // Check if we have a previous page stored
         // The savedState.previousPage tells us where we should go back to
         if (savedState && savedState.previousPage && savedState.previousPage !== 'blogs') {
-            // User came from home or about page directly to a blog post
+            // User came from home or about page directly to a blog post, or navigated to blogs/about
             // Navigate back to that page
             const navItem = document.querySelector(`.nav-item[data-page="${savedState.previousPage}"]`);
             if (navItem) {
@@ -409,7 +409,38 @@
             }
         }
         
-        // Default behavior: go back to blog intro (post list)
+        // Default behavior based on current page:
+        const currentPage = window.getCurrentPage();
+        
+        // If on about page or blog intro, go back to home
+        if (currentPage === 'about') {
+            const homeNavItem = document.querySelector('.nav-item[data-page="home"]');
+            if (homeNavItem) {
+                homeNavItem.click();
+                return;
+            }
+        }
+        
+        // If on blog intro view (not viewing a post), go back to home
+        if (currentPage === 'blogs') {
+            const blogIntroView = document.getElementById('blog-intro-view');
+            const blogPostView = document.getElementById('blog-post-view');
+            
+            if (blogIntroView && blogIntroView.style.display !== 'none') {
+                // We're on the blog intro page (list of posts), go back to home
+                const homeNavItem = document.querySelector('.nav-item[data-page="home"]');
+                if (homeNavItem) {
+                    homeNavItem.click();
+                    return;
+                }
+            } else if (blogPostView && blogPostView.style.display !== 'none') {
+                // We're viewing a blog post without previousPage, go back to blog intro
+                showBlogIntro();
+                return;
+            }
+        }
+        
+        // Fallback: go back to blog intro
         showBlogIntro();
     }
 
