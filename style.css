@@ -338,10 +338,11 @@ body {
 }
 
 .home-content p {
-    font-size: 16px;
+    font-size: 12px;
     line-height: 1.8;
     color: var(--text-secondary);
     margin-bottom: 20px;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 .home-content strong {
@@ -1163,10 +1164,11 @@ body {
 }
 
 .about-hero .subtitle {
-    font-size: 16px;
+    font-size: 12px;
     line-height: 1.8;
     color: var(--text-secondary);
     margin-bottom: 20px;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
 @keyframes float {
