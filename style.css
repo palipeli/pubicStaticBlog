@@ -218,7 +218,7 @@ body {
 /* Home Layout Container - Same rectangle styling as blog and about pages */
 .home-layout-container {
     display: block;
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 .home-layout-container .home-hero {
@@ -227,7 +227,7 @@ body {
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 20px;
+    padding: 15px;
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
 
@@ -607,19 +607,19 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 25px;
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 /* Blog Layout Container - New Structure */
 .blog-layout-container {
     display: block;
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 /* About Layout Container - Same rectangle styling as blog */
 .about-layout-container {
     display: block;
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 /* Blog Main Content Area */
@@ -641,12 +641,12 @@ body {
     background: var(--btn-bg);
     border: 1px solid var(--btn-border);
     color: var(--btn-text);
-    padding: 10px 20px;
+    padding: 8px 15px;
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     transition: all 0.3s ease;
     letter-spacing: 0.5px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
@@ -676,7 +676,7 @@ body {
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 20px;
+    padding: 15px;
     line-height: 1.6;
     font-size: 12px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
@@ -688,7 +688,7 @@ body {
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 20px;
+    padding: 15px;
     line-height: 1.6;
     font-size: 12px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
