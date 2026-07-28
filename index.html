@@ -73,6 +73,7 @@
                     <div class="blog-main-content" id="blog-main-content">
                         <!-- Blog Post Selector (Default View) -->
                         <div class="blog-intro-view" id="blog-intro-view">
+                            <button class="back-to-intro-btn" id="blog-intro-back-btn" onclick="goBackFromBlogIntro()" style="display: none;">← Back</button>
                             <article class="blog-article">
                                 <h1>All Blog Posts</h1>
                                 <p class="blog-meta"><span class="blog-date">Select a post to read</span></p>
@@ -84,7 +85,7 @@
                         
                         <!-- Single Post View (Hidden by default) -->
                         <div class="blog-post-view" id="blog-post-view" style="display: none;">
-                            <button class="back-to-intro-btn" onclick="showBlogIntro()">← Back To Blog Home</button>
+                            <button class="back-to-intro-btn" onclick="goBack()">← Back</button>
                             <article class="blog-article" id="blog-article-content">
                                 <!-- Markdown content will be rendered here -->
                             </article>

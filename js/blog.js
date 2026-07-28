@@ -304,6 +304,9 @@
         window.scrollTo(0, 0);
     }
 
+    // Track navigation history for back button
+    const navigationHistory = [];
+    
     // Open a blog post with lazy loading (new approach - loads content on demand)
     async function openBlogPostLazy(id) {
         // Show loading state first
@@ -311,10 +314,35 @@
 
         // Check if we're currently on home or about page, and switch to blogs if so
         const currentPage = document.querySelector('.page-section.active');
+        let previousPage = null;
         if (currentPage && (currentPage.id === 'home' || currentPage.id === 'about')) {
+            // Save the previous page before navigating to blogs
+            previousPage = currentPage.id;
             // Navigate to blogs page without triggering blog introduction prefetch
             window.navigateToBlogsPageWithoutPrefetch();
+        } else if (currentPage && currentPage.id === 'blogs') {
+            // Check if we're in intro view or post view
+            const introView = document.getElementById('blog-intro-view');
+            if (introView && introView.style.display !== 'none') {
+                previousPage = 'blog-intro';
+            } else {
+                // Already viewing a post, save current post ID
+                const activeItem = document.querySelector('.post-selector-item.active');
+                if (activeItem) {
+                    previousPage = activeItem.getAttribute('data-post-id');
+                } else {
+                    previousPage = 'blog-intro';
+                }
+            }
         }
+        
+        // Push previous state to navigation history
+        if (previousPage) {
+            navigationHistory.push(previousPage);
+        }
+        
+        // Update the visibility of back button on blog intro based on history
+        updateBlogIntroBackButton();
 
         // Update active state in sidebar
         document.querySelectorAll('.post-selector-item').forEach((item, index) => {
@@ -361,8 +389,104 @@
         // Scroll to top
         window.scrollTo(0, 0);
     }
+    
+    // Update the visibility of the back button on blog intro page
+    function updateBlogIntroBackButton() {
+        const backBtn = document.getElementById('blog-intro-back-btn');
+        if (backBtn) {
+            // Show back button only if there's navigation history
+            backBtn.style.display = navigationHistory.length > 0 ? 'inline-block' : 'none';
+        }
+    }
+    
+    // Go back from blog intro page
+    function goBackFromBlogIntro() {
+        goBack();
+    }
 
-    // Show blog introduction (back from post view)
+    // Go back to previous page using navigation history
+    function goBack() {
+        const article = document.getElementById('blog-article-content');
+        const postView = document.getElementById('blog-post-view');
+        const introView = document.getElementById('blog-intro-view');
+        
+        // Pop the last state from navigation history
+        const previousState = navigationHistory.pop();
+        
+        if (!previousState) {
+            // No history, default to blog intro
+            showBlogIntro();
+            return;
+        }
+        
+        // Clear active state
+        document.querySelectorAll('.post-selector-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        if (previousState === 'home') {
+            // Navigate back to home page
+            const homeNavItem = document.querySelector('.nav-item[data-page="home"]');
+            if (homeNavItem) {
+                homeNavItem.click();
+            }
+        } else if (previousState === 'about') {
+            // Navigate back to about page
+            const aboutNavItem = document.querySelector('.nav-item[data-page="about"]');
+            if (aboutNavItem) {
+                aboutNavItem.click();
+            }
+        } else if (previousState === 'blog-intro') {
+            // Show blog introduction/grid
+            postView.style.display = 'none';
+            introView.style.display = 'block';
+            renderBlogPostSelectorGrid(blogPostMetadata);
+            // Update back button visibility after returning to intro
+            updateBlogIntroBackButton();
+        } else {
+            // Previous state is a post ID - navigate to that post
+            // First ensure we're on blogs page
+            const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
+            if (blogsNavItem && !document.querySelector('#blogs.page-section.active')) {
+                blogsNavItem.click();
+            }
+            
+            // Show post view and load the previous post
+            introView.style.display = 'none';
+            postView.style.display = 'block';
+            
+            // Load and render the previous post
+            loadBlogPostContent(previousState).then(post => {
+                if (post) {
+                    article.innerHTML = `
+                        <h1>${post.icon} ${post.title}</h1>
+                        <div class="blog-meta" style="margin-bottom: 20px;">
+                            <span class="blog-date">${post.date}</span>
+                            <span style="margin-left: 15px;">${post.category}</span>
+                        </div>
+                        <div class="blog-post-content">${post.htmlContent}</div>
+                    `;
+                    
+                    // Update active state in sidebar
+                    document.querySelectorAll('.post-selector-item').forEach((item, index) => {
+                        item.classList.toggle('active', blogPostMetadata[index]?.id === previousState);
+                    });
+                    
+                    if (typeof window.initializeLazyLoading === 'function') {
+                        window.initializeLazyLoading();
+                    }
+                } else {
+                    // Failed to load post, show intro instead
+                    showBlogIntro();
+                }
+            });
+        }
+        
+        // Save state after going back
+        setTimeout(window.saveAppState, 100);
+    }
+
+    // Show blog introduction (back from post view) - legacy function kept for compatibility
     function showBlogIntro() {
         document.getElementById('blog-post-view').style.display = 'none';
         document.getElementById('blog-intro-view').style.display = 'block';
@@ -374,6 +498,9 @@
 
         // Render the blog post selector grid
         renderBlogPostSelectorGrid(blogPostMetadata);
+
+        // Update back button visibility
+        updateBlogIntroBackButton();
 
         // Save state after going back to intro
         setTimeout(window.saveAppState, 100);
@@ -391,5 +518,8 @@
     window.openBlogPost = openBlogPost;
     window.openBlogPostLazy = openBlogPostLazy;
     window.showBlogIntro = showBlogIntro;
+    window.goBack = goBack;
+    window.goBackFromBlogIntro = goBackFromBlogIntro;
+    window.updateBlogIntroBackButton = updateBlogIntroBackButton;
     window.isBlogIntroductionLoaded = () => blogIntroductionLoaded;
 })();
