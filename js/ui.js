@@ -55,6 +55,8 @@
         
         // Track if user has already restored their blog session
         let hasRestoredBlogSession = false;
+        // Track if user was previously reading a blog post before navigating away
+        let wasReadingBlogPost = false;
 
         // Wrap home content in rectangle on initialization
         wrapHomeContentInRectangle();
@@ -63,13 +65,13 @@
             item.addEventListener('click', (e) => {
                 e.preventDefault();
 
+                // Track if user was reading a blog post before clicking nav
+                const postView = document.getElementById('blog-post-view');
+                const isReadingPost = postView && postView.style.display !== 'none' && postView.style.display !== '';
+                
                 // Handle Blog button behavior
                 if (item.dataset.page === 'blogs') {
                     const currentPage = window.getCurrentPage ? window.getCurrentPage() : 'home';
-                    
-                    // Check if user is currently reading a blog post
-                    const postView = document.getElementById('blog-post-view');
-                    const isReadingPost = postView && postView.style.display !== 'none' && postView.style.display !== '';
                     
                     // If already reading a blog post, show the blog intro grid
                     if (isReadingPost) {
@@ -113,9 +115,11 @@
                         const savedState = window.loadAppState ? window.loadAppState() : null;
                         const hasSavedPost = savedState && savedState.activeBlogPost;
                         
-                        if (hasSavedPost && !hasRestoredBlogSession) {
-                            // First click: Restore the blog post they were reading
+                        // First click: Restore the blog post if user was reading one before navigating away
+                        // OR if they haven't restored yet and there's a saved post
+                        if ((wasReadingBlogPost || !hasRestoredBlogSession) && hasSavedPost) {
                             hasRestoredBlogSession = true;
+                            wasReadingBlogPost = false; // Reset after restoration
                             
                             // Navigate to blogs page
                             navigateToBlogsPageWithoutPrefetch();
@@ -173,7 +177,12 @@
                     }
                     // If clicking Blog from elsewhere, just navigate normally
                 } else {
-                    // For other nav items, reset the blog session flag when going to Home or About
+                    // For other nav items, track if user was reading a blog post
+                    if (isReadingPost) {
+                        wasReadingBlogPost = true;
+                    }
+                    
+                    // Reset the blog session flag when going to Home or About
                     if (item.dataset.page === 'home' || item.dataset.page === 'about') {
                         hasRestoredBlogSession = false;
                     }
