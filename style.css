@@ -1414,6 +1414,47 @@ body {
     }
 }
 
+/* Splash Animation Keyframes */
+@keyframes splashExpand {
+    0% {
+        width: 20px;
+        height: 20px;
+        opacity: 1;
+        border-width: 4px;
+    }
+    100% {
+        width: 600px;
+        height: 600px;
+        opacity: 0;
+        border-width: 0px;
+    }
+}
+
+@keyframes particleFly {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(calc(-50% + cos(var(--angle)) * var(--velocity)), calc(-50% + sin(var(--angle)) * var(--velocity))) scale(0);
+        opacity: 0;
+    }
+}
+
+@keyframes sparkleAppear {
+    0% {
+        transform: translate(-50%, -50%) scale(0) rotate(0deg);
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(calc(-50% + cos(var(--angle)) * var(--distance)), calc(-50% + sin(var(--angle)) * var(--distance))) scale(1) rotate(180deg);
+        opacity: 0;
+    }
+}
+
 /* Mobile Navigation Tray Styles */
 .mobile-tray-toggle {
     display: none;

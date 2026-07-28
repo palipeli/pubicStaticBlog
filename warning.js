@@ -180,6 +180,12 @@
         
         acceptBtn.addEventListener('click', () => {
             localStorage.setItem(STORAGE_KEY, 'true');
+            
+            // Trigger splash animation before hiding consent overlay
+            if (typeof window.createSplashAnimation === 'function') {
+                window.createSplashAnimation();
+            }
+            
             consentOverlay.style.opacity = '0';
             setTimeout(() => {
                 consentOverlay.style.display = 'none';

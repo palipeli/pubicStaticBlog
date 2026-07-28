@@ -359,7 +359,7 @@
         });
     }
 
-    // Click me button handler
+    // Click me button handler with cute splash animation
     function handleClickMe() {
         const button = document.querySelector('.blue-button');
         if (!button) return;
@@ -370,33 +370,118 @@
             button.style.animation = '';
         }, 300);
 
-        // Create ripple effect
-        const ripple = document.createElement('div');
-        ripple.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 10px;
-            height: 10px;
-            background: rgba(71, 114, 179, 0.6);
-            border-radius: 50%;
-            animation: rippleEffect 0.6s ease-out forwards;
-            pointer-events: none;
-            z-index: 9999;
-        `;
-
-        document.body.appendChild(ripple);
-
-        setTimeout(() => {
-            ripple.remove();
-        }, 600);
+        // Create centered splash animation with particles
+        createSplashAnimation();
 
         // Navigate to home page
         const homeNavItem = document.querySelector('.nav-item[data-page="home"]');
         if (homeNavItem) {
             homeNavItem.click();
         }
+    }
+
+    // Create cute splash animation with particles - centered based on layout
+    function createSplashAnimation() {
+        // Check if sidebar exists and is expanded
+        const sidebar = document.getElementById('sidebar');
+        const sidebarCollapsed = sidebar && sidebar.classList.contains('collapsed');
+        const sidebarExists = sidebar && !sidebarCollapsed;
+        
+        // Calculate center position - adjust for sidebar
+        let centerX = 50;
+        if (sidebarExists && window.innerWidth > 768) {
+            // Sidebar is visible, shift center slightly right
+            const sidebarWidth = sidebar.offsetWidth || 250;
+            const mainContentWidth = window.innerWidth - sidebarWidth;
+            centerX = 50 + (sidebarWidth / window.innerWidth * 50);
+        }
+
+        // Create splash container
+        const splashContainer = document.createElement('div');
+        splashContainer.className = 'splash-container';
+        splashContainer.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: ${centerX}%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 10000;
+        `;
+
+        document.body.appendChild(splashContainer);
+
+        // Create expanding ring
+        const ring = document.createElement('div');
+        ring.className = 'splash-ring';
+        ring.style.cssText = `
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border: 4px solid #ff45fc;
+            border-radius: 50%;
+            animation: splashExpand 0.8s ease-out forwards;
+            box-shadow: 0 0 20px #ff45fc, 0 0 40px #ff69b4;
+        `;
+        splashContainer.appendChild(ring);
+
+        // Create particles
+        const particleCount = 16;
+        const colors = ['#ff45fc', '#ff69b4', '#ff1493', '#ffb6c1'];
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'splash-particle';
+            const angle = (i / particleCount) * Math.PI * 2;
+            const velocity = 80 + Math.random() * 40;
+            const size = 4 + Math.random() * 6;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            particle.style.cssText = `
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: ${size}px;
+                height: ${size}px;
+                background: ${color};
+                border-radius: 50%;
+                box-shadow: 0 0 10px ${color};
+                animation: particleFly 0.8s ease-out forwards;
+                --angle: ${angle}rad;
+                --velocity: ${velocity}px;
+            `;
+            splashContainer.appendChild(particle);
+        }
+
+        // Create sparkles
+        for (let i = 0; i < 8; i++) {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'splash-sparkle';
+            const angle = (i / 8) * Math.PI * 2 + Math.PI / 8;
+            const distance = 60 + Math.random() * 30;
+            
+            sparkle.style.cssText = `
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 8px;
+                height: 8px;
+                background: #fff;
+                clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+                animation: sparkleAppear 0.6s ease-out forwards;
+                --angle: ${angle}rad;
+                --distance: ${distance}px;
+                animation-delay: ${Math.random() * 0.2}s;
+            `;
+            splashContainer.appendChild(sparkle);
+        }
+
+        // Remove after animation completes
+        setTimeout(() => {
+            splashContainer.remove();
+        }, 1000);
     }
 
     // Sidebar toggle functionality
@@ -490,5 +575,6 @@
     window.setupTemplates = setupTemplates;
     window.setupSystemThemeListener = setupSystemThemeListener;
     window.handleClickMe = handleClickMe;
+    window.createSplashAnimation = createSplashAnimation;
     window.setupSidebarToggle = setupSidebarToggle;
 })();
