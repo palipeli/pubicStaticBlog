@@ -88,6 +88,47 @@ html {
 
 body {
     overflow-y: auto;
+    cursor: none;
+}
+
+/* Custom Cursor */
+.custom-cursor {
+    position: fixed;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ff69b4;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease-out;
+    box-shadow: 0 0 10px rgba(255, 105, 180, 0.5);
+}
+
+.custom-cursor.clicked {
+    transform: translate(-50%, -50%) scale(0.6);
+}
+
+/* Star Trail */
+.cursor-star {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    font-size: 12px;
+    color: #ffb6c1;
+    text-shadow: 0 0 5px rgba(255, 182, 193, 0.8);
+    animation: starFade 0.8s ease-out forwards;
+}
+
+@keyframes starFade {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.3) rotate(180deg);
+    }
 }
 
 /* Header */
