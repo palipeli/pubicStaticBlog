@@ -338,7 +338,7 @@ body {
 }
 
 .home-content p {
-    font-size: 16px;
+    font-size: 12px;
     line-height: 1.8;
     color: var(--text-secondary);
     margin-bottom: 20px;
@@ -1163,7 +1163,7 @@ body {
 }
 
 .about-hero .subtitle {
-    font-size: 16px;
+    font-size: 12px;
     line-height: 1.8;
     color: var(--text-secondary);
     margin-bottom: 20px;
