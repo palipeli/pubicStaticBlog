@@ -48,7 +48,7 @@
 
         catButton.innerHTML = `
             <i class="fa-solid fa-cat"></i>
-            <span>Send me cat pictures and files!</span>
+            <span>Send me cat pics!!!</span>
         `;
 
         container.appendChild(catButton);
@@ -138,7 +138,7 @@
 
         catButton.innerHTML = `
             <i class="fa-solid fa-cat"></i>
-            <span>Send me cat pictures and files!</span>
+            <span>Send me cat pics!!!</span>
         `;
 
         container.appendChild(catButton);

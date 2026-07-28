@@ -1,1 +1,5 @@
-(js/state.js and js/ui.js are source files, no build artifacts, dependencies, or temp files detected)
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
