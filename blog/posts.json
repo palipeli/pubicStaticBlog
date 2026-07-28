@@ -19,7 +19,7 @@
     "id": "new-updated-look",
     "slug": "/blog/new-updated-look.md",
     "title": "New Updated Look",
-    "date": "Jul 26 2025",
+    "date": "Jul 26 2026",
     "category": "Update",
     "icon": "✨"
   },
@@ -50,7 +50,7 @@
   {
     "id": "state-persistence",
     "slug": "/blog/state-persistence.md",
-    "title": "State Persistence Feature",
+    "title": "State Persistence Under Single Page Applications (SPAs) Design of The Rewrite",
     "date": "Jul 27 2026",
     "category": "Tutorial",
     "icon": "💾"
