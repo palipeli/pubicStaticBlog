@@ -46,21 +46,6 @@
         // Add event listeners
         document.addEventListener('mousemove', handleMouseMove);
 
-        // Hide default cursor on interactive elements
-        const interactiveSelector = 'a, button, .nav-item, .blue-button, .theme-btn, .template-card, .all-post-btn, .back-to-list-btn, .back-to-intro-btn, input, textarea, [role="button"], [onclick]';
-        
-        document.addEventListener('mouseover', function(e) {
-            if (e.target.closest(interactiveSelector)) {
-                document.body.style.cursor = 'none';
-            }
-        });
-
-        document.addEventListener('mouseout', function(e) {
-            if (e.target.closest(interactiveSelector)) {
-                document.body.style.cursor = '';
-            }
-        });
-
         console.log('Star trail cursor initialized');
     });
 })();
