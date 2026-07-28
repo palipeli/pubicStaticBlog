@@ -616,6 +616,12 @@ body {
     margin-top: 20px;
 }
 
+/* Blog back button positioned above the container */
+#blogs .back-to-intro-btn {
+    display: block;
+    margin: 0 auto 20px auto;
+}
+
 /* About Layout Container - Same rectangle styling as blog */
 .about-layout-container {
     display: block;
@@ -680,6 +686,7 @@ body {
     line-height: 1.6;
     font-size: 12px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    margin-top: 0;
 }
 
 .blog-intro-view .blog-article {
@@ -693,11 +700,13 @@ body {
     font-size: 12px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    margin-top: 0;
 }
 
-/* Ensure back button in blog intro view is properly positioned */
-.blog-intro-view .blog-article .back-to-intro-btn {
-    margin-bottom: 20px;
+/* Remove back button styling from inside blog-article since it's now outside the container */
+.blog-intro-view .blog-article .back-to-intro-btn,
+.blog-post-view .back-to-intro-btn {
+    display: none;
 }
 
 .blog-intro-view h1 {
@@ -1107,6 +1116,12 @@ body {
     margin-bottom: 30px;
 }
 
+/* About page layout - back button positioned above the card */
+#about .back-to-intro-btn {
+    display: block;
+    margin: 0 auto 20px auto;
+}
+
 /* About Hero Section */
 .about-hero {
     max-width: 800px;
@@ -1118,11 +1133,6 @@ body {
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 40px;
-}
-
-/* Back button in about page */
-.about-hero .back-to-intro-btn {
-    margin-bottom: 20px;
 }
 
 .profile-img {

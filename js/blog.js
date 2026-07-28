@@ -326,6 +326,12 @@
         // Hide intro view, show post view with loading indicator
         document.getElementById('blog-intro-view').style.display = 'none';
         document.getElementById('blog-post-view').style.display = 'block';
+        
+        // Show back button when viewing a post
+        const blogsBackBtn = document.getElementById('blogs-back-btn');
+        if (blogsBackBtn) {
+            blogsBackBtn.style.display = 'block';
+        }
 
         // Show enhanced loading state with spinner
         article.innerHTML = `
@@ -369,6 +375,12 @@
         document.getElementById('blog-post-view').style.display = 'none';
         document.getElementById('blog-intro-view').style.display = 'block';
 
+        // Hide back button when showing intro
+        const blogsBackBtn = document.getElementById('blogs-back-btn');
+        if (blogsBackBtn) {
+            blogsBackBtn.style.display = 'none';
+        }
+
         // Clear active state
         document.querySelectorAll('.post-selector-item').forEach(item => {
             item.classList.remove('active');
@@ -386,17 +398,13 @@
         // Load the saved state to determine where the user came from
         const savedState = window.loadAppState();
         
-        // Clear the previousPage from state since we're navigating away from the current view
-        try {
-            const STATE_STORAGE_KEY = 'blogPlatformState';
-            if (savedState) {
-                delete savedState.previousPage;
-                localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(savedState));
-            }
-        } catch (err) {
-            console.warn('Failed to clear previousPage:', err);
-        }
-
+        // Get the current page and view state BEFORE clearing anything
+        const currentPage = window.getCurrentPage();
+        const blogIntroView = document.getElementById('blog-intro-view');
+        const blogPostView = document.getElementById('blog-post-view');
+        const isViewingPost = blogPostView && blogPostView.style.display !== 'none';
+        const isOnBlogIntro = blogIntroView && blogIntroView.style.display !== 'none';
+        
         // Check if we have a previous page stored
         // The savedState.previousPage tells us where we should go back to
         if (savedState && savedState.previousPage && savedState.previousPage !== 'blogs') {
@@ -404,15 +412,22 @@
             // Navigate back to that page
             const navItem = document.querySelector(`.nav-item[data-page="${savedState.previousPage}"]`);
             if (navItem) {
+                // Clear the previousPage from state since we're navigating away
+                try {
+                    const STATE_STORAGE_KEY = 'blogPlatformState';
+                    delete savedState.previousPage;
+                    localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(savedState));
+                } catch (err) {
+                    console.warn('Failed to clear previousPage:', err);
+                }
                 navItem.click();
                 return;
             }
         }
         
-        // Default behavior based on current page:
-        const currentPage = window.getCurrentPage();
+        // Default behavior based on current page and view state:
         
-        // If on about page or blog intro, go back to home
+        // If on about page, go back to home
         if (currentPage === 'about') {
             const homeNavItem = document.querySelector('.nav-item[data-page="home"]');
             if (homeNavItem) {
@@ -421,27 +436,27 @@
             }
         }
         
-        // If on blog intro view (not viewing a post), go back to home
+        // If on blogs page
         if (currentPage === 'blogs') {
-            const blogIntroView = document.getElementById('blog-intro-view');
-            const blogPostView = document.getElementById('blog-post-view');
-            
-            if (blogIntroView && blogIntroView.style.display !== 'none') {
+            if (isViewingPost) {
+                // We're viewing a blog post, go back to blog intro (list of posts)
+                showBlogIntro();
+                return;
+            } else if (isOnBlogIntro) {
                 // We're on the blog intro page (list of posts), go back to home
                 const homeNavItem = document.querySelector('.nav-item[data-page="home"]');
                 if (homeNavItem) {
                     homeNavItem.click();
                     return;
                 }
-            } else if (blogPostView && blogPostView.style.display !== 'none') {
-                // We're viewing a blog post without previousPage, go back to blog intro
-                showBlogIntro();
-                return;
             }
         }
         
-        // Fallback: go back to blog intro
-        showBlogIntro();
+        // Fallback: go back to home
+        const homeNavItem = document.querySelector('.nav-item[data-page="home"]');
+        if (homeNavItem) {
+            homeNavItem.click();
+        }
     }
 
     // Expose functions globally

@@ -68,13 +68,13 @@
 
             <!-- Blogs Page -->
             <section id="blogs" class="page-section">
+                <button class="back-to-intro-btn" onclick="handleBackButtonClick()" style="display: none;" id="blogs-back-btn">← Back</button>
                 <div class="blog-layout-container">
                     <!-- Main Content Area (Left) -->
                     <div class="blog-main-content" id="blog-main-content">
                         <!-- Blog Post Selector (Default View) -->
                         <div class="blog-intro-view" id="blog-intro-view">
                             <article class="blog-article">
-                                <button class="back-to-intro-btn" onclick="handleBackButtonClick()">← Back</button>
                                 <h1>All Blog Posts</h1>
                                 <p class="blog-meta"><span class="blog-date">Select a post to read</span></p>
                                 <div class="blog-post-selector-grid" id="blog-post-selector-grid">
@@ -85,7 +85,6 @@
                         
                         <!-- Single Post View (Hidden by default) -->
                         <div class="blog-post-view" id="blog-post-view" style="display: none;">
-                            <button class="back-to-intro-btn" onclick="handleBackButtonClick()">← Back</button>
                             <article class="blog-article" id="blog-article-content">
                                 <!-- Markdown content will be rendered here -->
                             </article>
@@ -96,9 +95,9 @@
 
             <!-- About Page -->
             <section id="about" class="page-section">
+                <button class="back-to-intro-btn" onclick="handleBackButtonClick()">← Back</button>
                 <div class="about-layout-container">
                     <div class="about-hero">
-                        <button class="back-to-intro-btn" onclick="handleBackButtonClick()" style="margin-bottom: 20px;">← Back</button>
                         <img src="media/favicon-circle.webp" alt="Michelle" class="profile-img">
                         
                         <div class="social-links">
