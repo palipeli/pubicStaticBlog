@@ -202,7 +202,7 @@ body {
 }
 
 .content-area {
-    padding: 30px;
+    padding: 15px;
     overflow-y: auto;
     height: 100%;
     width: 100%;
@@ -227,7 +227,7 @@ body {
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 40px;
+    padding: 20px;
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
 
@@ -676,7 +676,7 @@ body {
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 40px;
+    padding: 20px;
     line-height: 1.6;
     font-size: 12px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
@@ -688,7 +688,7 @@ body {
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 40px;
+    padding: 20px;
     line-height: 1.6;
     font-size: 12px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
@@ -750,7 +750,7 @@ body {
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 30px;
+    padding: 15px;
     line-height: 1.6;
     font-size: 12px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
@@ -1180,7 +1180,7 @@ body {
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 30px;
+    padding: 15px;
     line-height: 1.8;
 }
 
