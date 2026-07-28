@@ -68,13 +68,32 @@
      * Save current application state to localStorage
      */
     function saveAppState() {
+        const currentPage = getCurrentPage();
+        const activeBlogPost = getActiveBlogPostId();
+        
         const currentState = {
-            currentPage: getCurrentPage(),
-            activeBlogPost: getActiveBlogPostId(),
+            currentPage: currentPage,
+            activeBlogPost: activeBlogPost,
             sidebarCollapsed: isSidebarCollapsed(),
             theme: getCurrentTheme(),
             timestamp: Date.now()
         };
+
+        // Preserve previousPage only if we're currently viewing a blog post
+        // This ensures the back button knows where to return to
+        if (activeBlogPost) {
+            try {
+                const savedState = localStorage.getItem(STATE_STORAGE_KEY);
+                if (savedState) {
+                    const parsed = JSON.parse(savedState);
+                    if (parsed.previousPage) {
+                        currentState.previousPage = parsed.previousPage;
+                    }
+                }
+            } catch (err) {
+                console.warn('Failed to read existing state:', err);
+            }
+        }
 
         try {
             localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(currentState));

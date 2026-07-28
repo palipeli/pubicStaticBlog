@@ -3,7 +3,7 @@
 
 (function() {
     // Navigate to blogs page without triggering blog introduction prefetch
-    function navigateToBlogsPageWithoutPrefetch() {
+    function navigateToBlogsPageWithoutPrefetch(fromPage) {
         const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
         if (!blogsNavItem) return;
 
@@ -26,6 +26,19 @@
         // Show/hide "All Posts" in sidebar
         if (blogSidebarSection) {
             blogSidebarSection.style.display = 'block';
+        }
+
+        // Save the page we're coming from for back button functionality
+        if (fromPage) {
+            try {
+                const STATE_STORAGE_KEY = 'blogPlatformState';
+                const savedState = localStorage.getItem(STATE_STORAGE_KEY);
+                let state = savedState ? JSON.parse(savedState) : {};
+                state.previousPage = fromPage;
+                localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(state));
+            } catch (err) {
+                console.warn('Failed to save previous page:', err);
+            }
         }
 
         // Scroll to top

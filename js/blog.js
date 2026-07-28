@@ -277,7 +277,8 @@
         const currentPage = document.querySelector('.page-section.active');
         if (currentPage && (currentPage.id === 'home' || currentPage.id === 'about')) {
             // Navigate to blogs page without triggering prefetch
-            window.navigateToBlogsPageWithoutPrefetch();
+            // Pass the current page ID so we can return to it with the back button
+            window.navigateToBlogsPageWithoutPrefetch(currentPage.id);
         }
 
         // Update active state in sidebar
@@ -313,7 +314,8 @@
         const currentPage = document.querySelector('.page-section.active');
         if (currentPage && (currentPage.id === 'home' || currentPage.id === 'about')) {
             // Navigate to blogs page without triggering blog introduction prefetch
-            window.navigateToBlogsPageWithoutPrefetch();
+            // Pass the current page ID so we can return to it with the back button
+            window.navigateToBlogsPageWithoutPrefetch(currentPage.id);
         }
 
         // Update active state in sidebar
@@ -362,7 +364,7 @@
         window.scrollTo(0, 0);
     }
 
-    // Show blog introduction (back from post view)
+    // Show blog introduction (back from post view) - legacy function for backward compatibility
     function showBlogIntro() {
         document.getElementById('blog-post-view').style.display = 'none';
         document.getElementById('blog-intro-view').style.display = 'block';
@@ -379,6 +381,38 @@
         setTimeout(window.saveAppState, 100);
     }
 
+    // Handle back button click - restore previous state using saved state
+    function handleBackButtonClick() {
+        // Load the saved state to determine where the user came from
+        const savedState = window.loadAppState();
+        
+        // Clear the previousPage from state since we're navigating away from the blog post
+        try {
+            const STATE_STORAGE_KEY = 'blogPlatformState';
+            if (savedState) {
+                delete savedState.previousPage;
+                localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(savedState));
+            }
+        } catch (err) {
+            console.warn('Failed to clear previousPage:', err);
+        }
+
+        // Check if we have a previous page stored (before viewing the blog post)
+        // The savedState.previousPage tells us where we should go back to
+        if (savedState && savedState.previousPage && savedState.previousPage !== 'blogs') {
+            // User came from home or about page directly to a blog post
+            // Navigate back to that page
+            const navItem = document.querySelector(`.nav-item[data-page="${savedState.previousPage}"]`);
+            if (navItem) {
+                navItem.click();
+                return;
+            }
+        }
+        
+        // Default behavior: go back to blog intro (post list)
+        showBlogIntro();
+    }
+
     // Expose functions globally
     window.fetchBlogPostMetadata = fetchBlogPostMetadata;
     window.loadBlogIntroduction = loadBlogIntroduction;
@@ -391,5 +425,6 @@
     window.openBlogPost = openBlogPost;
     window.openBlogPostLazy = openBlogPostLazy;
     window.showBlogIntro = showBlogIntro;
+    window.handleBackButtonClick = handleBackButtonClick;
     window.isBlogIntroductionLoaded = () => blogIntroductionLoaded;
 })();
