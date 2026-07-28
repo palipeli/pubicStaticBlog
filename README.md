@@ -1,10 +1,10 @@
-# pubicStaticBlogBlender
+# pubicStaticBlog
 
 A lightweight static blogging platform built for speed and simplicity.
 
 ## Overview
 
-pubicStaticBlogBlender is a minimal static site generator designed for performance. It uses pure HTML, CSS, and JavaScript with no database dependencies.
+pubicStaticBlog is a minimal static site generator designed for performance. It uses pure HTML, CSS, and JavaScript with no database dependencies.
 
 ## Key Features
 
