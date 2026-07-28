@@ -52,6 +52,10 @@
         const navItems = document.querySelectorAll('.nav-item');
         const sections = document.querySelectorAll('.page-section');
         const blogSidebarSection = document.getElementById('blog-sidebar-section');
+        
+        // Track blog button clicks for double-click behavior
+        let blogClickCount = 0;
+        let blogClickTimeout = null;
 
         // Wrap home content in rectangle on initialization
         wrapHomeContentInRectangle();
@@ -59,6 +63,67 @@
         navItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
+
+                // Handle Blog button double-click behavior
+                if (item.dataset.page === 'blogs') {
+                    blogClickCount++;
+                    
+                    // Clear any existing timeout
+                    if (blogClickTimeout) {
+                        clearTimeout(blogClickTimeout);
+                    }
+                    
+                    // If this is the second click, show blog intro grid
+                    if (blogClickCount === 2) {
+                        blogClickCount = 0; // Reset counter
+                        
+                        // Navigate to blogs page and show intro grid
+                        navigateToBlogsPageWithoutPrefetch();
+                        
+                        // Show blog intro view (grid of all posts)
+                        const postView = document.getElementById('blog-post-view');
+                        const introView = document.getElementById('blog-intro-view');
+                        
+                        if (postView && introView) {
+                            postView.style.display = 'none';
+                            introView.style.display = 'block';
+                        }
+                        
+                        // Clear active state in sidebar
+                        document.querySelectorAll('.post-selector-item').forEach(item => {
+                            item.classList.remove('active');
+                        });
+                        
+                        // Render the blog post selector grid
+                        if (typeof window.renderBlogPostSelectorGrid === 'function' && window.blogPostMetadata) {
+                            window.renderBlogPostSelectorGrid(window.blogPostMetadata);
+                        }
+                        
+                        // Update back button visibility
+                        if (typeof window.updateBlogIntroBackButton === 'function') {
+                            window.updateBlogIntroBackButton();
+                        }
+                        
+                        // Scroll to top
+                        window.scrollTo(0, 0);
+                        
+                        // Save state after navigation
+                        setTimeout(window.saveAppState, 100);
+                        return;
+                    }
+                    
+                    // Set timeout to reset counter if no second click within 500ms
+                    blogClickTimeout = setTimeout(() => {
+                        blogClickCount = 0;
+                    }, 500);
+                } else {
+                    // For other nav items, reset blog click counter
+                    blogClickCount = 0;
+                    if (blogClickTimeout) {
+                        clearTimeout(blogClickTimeout);
+                        blogClickTimeout = null;
+                    }
+                }
 
                 // Update active nav item
                 navItems.forEach(nav => nav.classList.remove('active'));
