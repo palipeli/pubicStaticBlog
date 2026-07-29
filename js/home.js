@@ -86,6 +86,22 @@
         `;
 
         container.appendChild(monitoringButton);
+
+        // Add "Install DNS profile" button - triggers iOS mobileconfig installation
+        const dnsProfileButton = document.createElement('button');
+        dnsProfileButton.className = 'blog-btn category-dns-profile';
+        dnsProfileButton.type = 'button';
+        dnsProfileButton.onclick = () => {
+            // For iOS Safari, navigate to the mobileconfig file which will prompt installation
+            window.location.href = 'media/Michelle\'s DNS v2.mobileconfig';
+        };
+
+        dnsProfileButton.innerHTML = `
+            <i class="fa-brands fa-apple"></i>
+            <span>Install DNS profile</span>
+        `;
+
+        container.appendChild(dnsProfileButton);
     }
 
     // Render blog buttons on home page with lazy loading support (new version)
@@ -176,6 +192,22 @@
         `;
 
         container.appendChild(monitoringButton);
+
+        // Add "Install DNS profile" button - triggers iOS mobileconfig installation
+        const dnsProfileButton = document.createElement('button');
+        dnsProfileButton.className = 'blog-btn category-dns-profile';
+        dnsProfileButton.type = 'button';
+        dnsProfileButton.onclick = () => {
+            // For iOS Safari, navigate to the mobileconfig file which will prompt installation
+            window.location.href = 'media/Michelle\'s DNS v2.mobileconfig';
+        };
+
+        dnsProfileButton.innerHTML = `
+            <i class="fa-brands fa-apple"></i>
+            <span>Install DNS profile</span>
+        `;
+
+        container.appendChild(dnsProfileButton);
     }
 
     // Open a blog post from home page button (legacy)
