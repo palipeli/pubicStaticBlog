@@ -1330,6 +1330,17 @@ body {
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
 }
 
+/* Ensure blog-btn works as both anchor and button elements */
+a.blog-btn, button.blog-btn {
+    text-decoration: none;
+    color: white;
+}
+
+a.blog-btn:hover, button.blog-btn:hover {
+    color: white;
+    text-decoration: none;
+}
+
 .blog-btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 20px rgba(71, 114, 179, 0.6);

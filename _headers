@@ -2,5 +2,4 @@
 for = "/media/Michelle's DNS v2.mobileconfig"
   [headers.values]
   Content-Type = "application/x-apple-aspen-config"
-  Content-Disposition = "inline"
   Cache-Control = "no-cache, no-store, must-revalidate"

@@ -88,13 +88,9 @@
         container.appendChild(monitoringButton);
 
         // Add "Install DNS profile" button - triggers iOS mobileconfig installation
-        const dnsProfileButton = document.createElement('button');
+        const dnsProfileButton = document.createElement('a');
         dnsProfileButton.className = 'blog-btn category-dns-profile';
-        dnsProfileButton.type = 'button';
-        dnsProfileButton.onclick = () => {
-            // For iOS Safari, navigate to the mobileconfig file which will prompt installation
-            window.location.href = 'media/Michelle\'s DNS v2.mobileconfig';
-        };
+        dnsProfileButton.href = "media/Michelle's DNS v2.mobileconfig";
 
         dnsProfileButton.innerHTML = `
             <i class="fa-brands fa-apple"></i>
@@ -194,13 +190,9 @@
         container.appendChild(monitoringButton);
 
         // Add "Install DNS profile" button - triggers iOS mobileconfig installation
-        const dnsProfileButton = document.createElement('button');
+        const dnsProfileButton = document.createElement('a');
         dnsProfileButton.className = 'blog-btn category-dns-profile';
-        dnsProfileButton.type = 'button';
-        dnsProfileButton.onclick = () => {
-            // For iOS Safari, navigate to the mobileconfig file which will prompt installation
-            window.location.href = 'media/Michelle\'s DNS v2.mobileconfig';
-        };
+        dnsProfileButton.href = "media/Michelle's DNS v2.mobileconfig";
 
         dnsProfileButton.innerHTML = `
             <i class="fa-brands fa-apple"></i>
