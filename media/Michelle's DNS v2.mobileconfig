@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>PayloadContent</key>
+    <array>
+      <dict>
+        <key>DNSSettings</key>
+        <dict>
+          <key>DNSProtocol</key>
+          <string>HTTPS</string>
+          <key>ServerAddresses</key>
+          <array/>
+          <key>ServerURL</key>
+          <string>https://sfuifipq3z.cloudflare-gateway.com/dns-query</string>
+        </dict>
+        <key>OnDemandRules</key>
+        <array>
+          <dict>
+            <key>Action</key>
+            <string>Connect</string>
+            <key>InterfaceTypeMatch</key>
+            <string>WiFi</string>
+          </dict>
+          <dict>
+            <key>Action</key>
+            <string>Connect</string>
+            <key>InterfaceTypeMatch</key>
+            <string>Cellular</string>
+          </dict>
+          <dict>
+            <key>Action</key>
+            <string>Connect</string>
+            <key>InterfaceTypeMatch</key>
+            <string>Ethernet</string>
+          </dict>
+          <dict>
+            <key>Action</key>
+            <string>Disconnect</string>
+          </dict>
+        </array>
+        <key>PayloadDescription</key>
+        <string>Only use this for adblocking purposes or using paid developer certificates</string>
+        <key>PayloadDisplayName</key>
+        <string>AB Only (AVOID SIDELOADING)</string>
+        <key>PayloadIdentifier</key>
+        <string>com.apple.dnsSettings.managed.cb82513e-c219-4deb-acac-0d4d8b294307</string>
+        <key>PayloadType</key>
+        <string>com.apple.dnsSettings.managed</string>
+        <key>PayloadUUID</key>
+        <string>6df4ee87-f5eb-44f1-b51a-5f5f0de47be5</string>
+        <key>PayloadVersion</key>
+        <integer>1</integer>
+        <key>ProhibitDisablement</key>
+        <false/>
+      </dict>
+      <dict>
+        <key>DNSSettings</key>
+        <dict>
+          <key>DNSProtocol</key>
+          <string>HTTPS</string>
+          <key>ServerAddresses</key>
+          <array/>
+          <key>ServerURL</key>
+          <string>https://mrkbyweej7.cloudflare-gateway.com/dns-query</string>
+        </dict>
+        <key>OnDemandRules</key>
+        <array>
+          <dict>
+            <key>Action</key>
+            <string>Connect</string>
+            <key>InterfaceTypeMatch</key>
+            <string>WiFi</string>
+          </dict>
+          <dict>
+            <key>Action</key>
+            <string>Connect</string>
+            <key>InterfaceTypeMatch</key>
+            <string>Cellular</string>
+          </dict>
+          <dict>
+            <key>Action</key>
+            <string>Connect</string>
+            <key>InterfaceTypeMatch</key>
+            <string>Ethernet</string>
+          </dict>
+          <dict>
+            <key>Action</key>
+            <string>Disconnect</string>
+          </dict>
+        </array>
+        <key>PayloadDescription</key>
+        <string>Keeps your apps from being blacklisted and prevents iOS updates with added adblocking</string>
+        <key>PayloadDisplayName</key>
+        <string>KEEP Apps (AB+UB after INSTALL)</string>
+        <key>PayloadIdentifier</key>
+        <string>com.apple.dnsSettings.managed.8ec2e402-464b-4f40-a2f8-deca1f44974a</string>
+        <key>PayloadType</key>
+        <string>com.apple.dnsSettings.managed</string>
+        <key>PayloadUUID</key>
+        <string>aed2d904-9705-4f81-b3c5-ceb3e08df61c</string>
+        <key>PayloadVersion</key>
+        <integer>1</integer>
+        <key>ProhibitDisablement</key>
+        <false/>
+      </dict>
+      <dict>
+        <key>DNSSettings</key>
+        <dict>
+          <key>DNSProtocol</key>
+          <string>HTTPS</string>
+          <key>ServerAddresses</key>
+          <array/>
+          <key>ServerURL</key>
+          <string>https://hjaqokrf2z.cloudflare-gateway.com/dns-query</string>
+        </dict>
+        <key>OnDemandRules</key>
+        <array>
+          <dict>
+            <key>Action</key>
+            <string>Connect</string>
+            <key>InterfaceTypeMatch</key>
+            <string>WiFi</string>
+          </dict>
+          <dict>
+            <key>Action</key>
+            <string>Connect</string>
+            <key>InterfaceTypeMatch</key>
+            <string>Cellular</string>
+          </dict>
+          <dict>
+            <key>Action</key>
+            <string>Connect</string>
+            <key>InterfaceTypeMatch</key>
+            <string>Ethernet</string>
+          </dict>
+          <dict>
+            <key>Action</key>
+            <string>Disconnect</string>
+          </dict>
+        </array>
+        <key>PayloadDescription</key>
+        <string>Keeps your apps from being blacklisted with added adblocking</string>
+        <key>PayloadDisplayName</key>
+        <string>KEEP Apps (AB after INSTALL)</string>
+        <key>PayloadIdentifier</key>
+        <string>com.apple.dnsSettings.managed.50691a35-badf-4fb6-a25f-41c29b2f3702</string>
+        <key>PayloadType</key>
+        <string>com.apple.dnsSettings.managed</string>
+        <key>PayloadUUID</key>
+        <string>91d99198-31a2-4cdc-875c-f041dd3177b2</string>
+        <key>PayloadVersion</key>
+        <integer>1</integer>
+        <key>ProhibitDisablement</key>
+        <false/>
+      </dict>
+      <dict>
+        <key>DNSSettings</key>
+        <dict>
+          <key>DNSProtocol</key>
+          <string>HTTPS</string>
+          <key>ServerAddresses</key>
+          <array/>
+          <key>ServerURL</key>
+          <string>https://naexksqofi.cloudflare-gateway.com/dns-query</string>
+        </dict>
+        <key>OnDemandRules</key>
+        <array>
+          <dict>
+            <key>Action</key>
+            <string>Connect</string>
+            <key>InterfaceTypeMatch</key>
+            <string>WiFi</string>
+          </dict>
+          <dict>
+            <key>Action</key>
+            <string>Connect</string>
+            <key>InterfaceTypeMatch</key>
+            <string>Cellular</string>
+          </dict>
+          <dict>
+            <key>Action</key>
+            <string>Connect</string>
+            <key>InterfaceTypeMatch</key>
+            <string>Ethernet</string>
+          </dict>
+          <dict>
+            <key>Action</key>
+            <string>Disconnect</string>
+          </dict>
+        </array>
+        <key>PayloadDescription</key>
+        <string>Install your apps safely without cert blacklist with Apple services blocked</string>
+        <key>PayloadDisplayName</key>
+        <string>INSTALL Apps (sideload) </string>
+        <key>PayloadIdentifier</key>
+        <string>com.apple.dnsSettings.managed.69afd83a-fb21-4b6f-83d6-576d4a584020</string>
+        <key>PayloadType</key>
+        <string>com.apple.dnsSettings.managed</string>
+        <key>PayloadUUID</key>
+        <string>11c7bd8f-33c6-4313-9041-62e767c0272d</string>
+        <key>PayloadVersion</key>
+        <integer>1</integer>
+        <key>ProhibitDisablement</key>
+        <false/>
+      </dict>
+    </array>
+    <key>PayloadDescription</key>
+    <string>Allows sideloading with revoked certificates and filters ads/trackers.
+
+LEGEND:
+
+• AB = Adblocking
+• UB = Block iOS updates
+• KEEP = Prevent blacklists
+• INSTALL = Use for installing IPAs
+
+USAGE:
+
+1. Ensure your certificate is not blacklisted.
+
+2. Go to Settings &gt; VPN &amp; Device Management &gt; DNS.
+
+3. Choose INSTALL (sideloading) to block Apple services.
+
+4. Toggle Airplane Mode ON and OFF to clear your DNS cache.
+
+5. Install your apps via WSF portal signer. Trust the certificates in Settings &gt; VPN &amp; Device Management &gt; [Your Cert Name] &gt; Trust.
+
+6. Launch your apps manually OR tap Verify apps under your cert settings.
+
+7. Return to Settings &gt; VPN &amp; Device Management &gt; DNS.
+
+8. Choose KEEP (AB = adblock, UB = block iOS updates).
+
+9. Toggle Airplane Mode ON and OFF to clear your DNS cache.
+
+Guides: wsfteam.xyz
+Support: sel@kamikami.eu
+Privacy Policy: https://kamikami.eu/blog/privacy-policy</string>
+    <key>PayloadDisplayName</key>
+    <string>Michelle's Sideloader DNS v2 (kamikami.eu)</string>
+    <key>PayloadIdentifier</key>
+    <string>eu.kamikami.16b6b70b-aa36-4219-b415-55ea2f2d913d</string>
+    <key>PayloadRemovalDisallowed</key>
+    <false/>
+    <key>PayloadType</key>
+    <string>Configuration</string>
+    <key>PayloadUUID</key>
+    <string>c286a737-7d6b-4c6a-a580-531d86afcc20</string>
+    <key>PayloadVersion</key>
+    <integer>1</integer>
+    <key>PayloadScope</key>
+    <string>System</string>
+  </dict>
+</plist>
