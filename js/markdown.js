@@ -34,54 +34,28 @@
 
         let html = markdown;
 
-        // Escape HTML
-        html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-        // Code blocks (must be before other replacements)
-        // Handle multi-line code blocks with optional language specifier - must have newline after opening ```
-        html = html.replace(/```(\w*)\n([\s\S]*?)\n```/g, '<pre><code>$2</code></pre>');
-
-        // Inline code with triple backticks (for short code spans without newlines, e.g., ```PPQCheck```)
-        // This must come AFTER multi-line code blocks to avoid conflicts
-        html = html.replace(/```([^`\n]+)```/g, '<code>$1</code>');
-
-        // Inline code with single backticks
-        html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-        // Headers
-        html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-        html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-        html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-        html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
-
-        // Bold
-        html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-
-        // Italic
-        html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-
-        // Images (must be before links since it uses similar syntax)
-        // Add lazy-loading with data-src for hover-based loading
-        html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
-            // Check if it's a media file or external image
-            const isMediaFile = src.includes('/media/') || src.endsWith('.webp') || src.endsWith('.png') || src.endsWith('.jpg') || src.endsWith('.jpeg') || src.endsWith('.gif') || src.endsWith('.svg');
-
-            if (isMediaFile) {
-                // Use data-src for lazy loading on hover, use a tiny transparent placeholder as initial src
-                return `<img data-src="${src}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="${alt}" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">`;
-            } else {
-                // For non-media images, load normally but still add lazy class for consistency
-                return `<img src="${src}" alt="${alt}" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">`;
-            }
+        // Extract and protect blockquotes BEFORE escaping HTML
+        // Blockquotes can start with > or be indented with 4 spaces + >
+        const blockquotes = [];
+        let bqIndex = 0;
+        
+        // First pass: find all blockquotes and replace with placeholders
+        html = html.replace(/^(    )?> (.+)$/gm, (match, indent, content) => {
+            blockquotes.push(content);
+            return `__BQ_${bqIndex++}__`;
         });
+        
+        // Now escape HTML
+        html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        
+        // Restore blockquotes and escape their content
+        for (let i = 0; i < blockquotes.length; i++) {
+            const escapedContent = blockquotes[i].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            html = html.replace(`__BQ_${i}__`, `<blockquote>${escapedContent}</blockquote>`);
+        }
 
-        // Links
-        html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
-
-        // Blockquotes
-        html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
-
-        // Process lists - need to handle them line by line first, then wrap
+        // Process lists FIRST before code blocks - this is critical for indented lists
+        // According to Daring Fireball, indented lists (4 spaces) should still be lists, not code
         const lines = html.split('\n');
         const processedLines = [];
         let inOrderedList = false;
@@ -90,10 +64,10 @@
         for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
             
-            // Check for ordered list item (number followed by period and space)
-            const orderedMatch = line.match(/^\d+\.\s+(.+)$/);
-            // Check for unordered list item (dash followed by space)
-            const unorderedMatch = line.match(/^-\s+(.+)$/);
+            // Check for ordered list item (number followed by period and space) - with optional leading indent
+            const orderedMatch = line.match(/^(\s*)\d+\.\s+(.+)$/);
+            // Check for unordered list item (dash or asterisk followed by space) - with optional leading indent
+            const unorderedMatch = line.match(/^(\s*)[-*]\s+(.+)$/);
             
             if (orderedMatch) {
                 // Close unordered list if open
@@ -106,7 +80,7 @@
                     processedLines.push('<ol>');
                     inOrderedList = true;
                 }
-                processedLines.push(`<li>${orderedMatch[1]}</li>`);
+                processedLines.push(`<li>${orderedMatch[2]}</li>`);
             } else if (unorderedMatch) {
                 // Close ordered list if open
                 if (inOrderedList) {
@@ -118,7 +92,7 @@
                     processedLines.push('<ul>');
                     inUnorderedList = true;
                 }
-                processedLines.push(`<li>${unorderedMatch[1]}</li>`);
+                processedLines.push(`<li>${unorderedMatch[2]}</li>`);
             } else if (line.trim() === '') {
                 // Blank line - don't close lists yet, check if next non-empty line continues the list
                 processedLines.push(line);
@@ -154,6 +128,134 @@
         finalHtml = finalHtml.replace(/(<\/li>)\n+(\n*)(<\/(?:ol|ul)>)/g, '$1$3');
         
         html = finalHtml;
+
+        // Code blocks (must be after list processing)
+        // Handle indented code blocks (4+ spaces or 1 tab) - but NOT list items
+        // Only treat as code block if the line starts with 4+ spaces AND the content doesn't look like a list item
+        const codeLines = html.split('\n');
+        const codeProcessedLines = [];
+        let inCodeBlock = false;
+        let codeBlockContent = [];
+        
+        for (let i = 0; i < codeLines.length; i++) {
+            const line = codeLines[i];
+            // Check if line starts with 4+ spaces or tab
+            const indentMatch = line.match(/^(    +|\t)(.+)$/);
+            
+            if (indentMatch && !inCodeBlock) {
+                const content = indentMatch[2];
+                // Don't treat as code if it looks like a list item marker or HTML tags
+                if (!/^[*-+]\s/.test(content) && !/^\d+\.\s/.test(content) && !content.startsWith('<')) {
+                    inCodeBlock = true;
+                    codeBlockContent.push(content);
+                } else {
+                    codeProcessedLines.push(line);
+                }
+            } else if (indentMatch && inCodeBlock) {
+                const content = indentMatch[2];
+                // Continue code block if still indented and not a list marker or HTML
+                if (!/^[*-+]\s/.test(content) && !/^\d+\.\s/.test(content) && !content.startsWith('<')) {
+                    codeBlockContent.push(content);
+                } else {
+                    // End code block and process this as a regular line
+                    codeProcessedLines.push('<pre><code>' + codeBlockContent.join('\n') + '</code></pre>');
+                    inCodeBlock = false;
+                    codeBlockContent = [];
+                    codeProcessedLines.push(line);
+                }
+            } else if (line.trim() === '' && inCodeBlock) {
+                // Empty line might end code block or be part of it
+                codeBlockContent.push('');
+            } else {
+                if (inCodeBlock) {
+                    codeProcessedLines.push('<pre><code>' + codeBlockContent.join('\n') + '</code></pre>');
+                    inCodeBlock = false;
+                    codeBlockContent = [];
+                }
+                codeProcessedLines.push(line);
+            }
+        }
+        
+        // Close any remaining code block
+        if (inCodeBlock) {
+            codeProcessedLines.push('<pre><code>' + codeBlockContent.join('\n') + '</code></pre>');
+        }
+        
+        html = codeProcessedLines.join('\n');
+
+        // Handle fenced multi-line code blocks with optional language specifier - must have newline after opening ```
+        html = html.replace(/```(\w*)\n([\s\S]*?)\n```/g, '<pre><code>$2</code></pre>');
+
+        // Inline code with triple backticks (for short code spans without newlines, e.g., ```PPQCheck```)
+        // This must come AFTER multi-line code blocks to avoid conflicts
+        html = html.replace(/```([^`\n]+)```/g, '<code>$1</code>');
+
+        // Inline code with single backticks
+        html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+        // Setext-style headers (must come before horizontal rules)
+        // H1: text followed by line of ===
+        html = html.replace(/^(.+)\n===+\s*$/gm, '<h1>$1</h1>');
+        // H2: text followed by line of ---
+        html = html.replace(/^(.+)\n---+\s*$/gm, '<h2>$1</h2>');
+
+        // ATX-style Headers
+        html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+        html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+        html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+        html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
+        html = html.replace(/^##### (.+)$/gm, '<h5>$1</h5>');
+        html = html.replace(/^###### (.+)$/gm, '<h6>$1</h6>');
+
+        // Horizontal rules (after headers to avoid conflict with --- underline)
+        html = html.replace(/^([-*_])\s*\1\s*\1[\s\1]*$/gm, '<hr>');
+
+        // Bold (must come before italic)
+        html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        html = html.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+
+        // Italic
+        html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        html = html.replace(/_([^_]+)_/g, '<em>$1</em>');
+
+        // Reference-style links: [text][id] and [id]: url
+        // First, extract reference definitions and store them
+        const linkRefs = {};
+        html = html.replace(/^\s*\[([^\]]+)\]:\s*(\S+)(?:\s+(?:"([^"]*)"|'([^']*)'|\(([^)]*)\)))?\s*$/gm, (match, id, url, title1, title2, title3) => {
+            linkRefs[id.toLowerCase()] = { url: url, title: title1 || title2 || title3 };
+            return ''; // Remove the definition from output
+        });
+        // Then replace reference-style links
+        html = html.replace(/\[([^\]]+)\]\[([^\]]*)\]/g, (match, text, refId) => {
+            const id = (refId || text).toLowerCase();
+            if (linkRefs[id]) {
+                return `<a href="${linkRefs[id].url}" target="_blank">${text}</a>`;
+            }
+            return match; // Keep original if no reference found
+        });
+
+        // Images (must be before links since it uses similar syntax)
+        // Add lazy-loading with data-src for hover-based loading
+        html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
+            // Check if it's a media file or external image
+            const isMediaFile = src.includes('/media/') || src.endsWith('.webp') || src.endsWith('.png') || src.endsWith('.jpg') || src.endsWith('.jpeg') || src.endsWith('.gif') || src.endsWith('.svg');
+
+            if (isMediaFile) {
+                // Use data-src for lazy loading on hover, use a tiny transparent placeholder as initial src
+                return `<img data-src="${src}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="${alt}" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">`;
+            } else {
+                // For non-media images, load normally but still add lazy class for consistency
+                return `<img src="${src}" alt="${alt}" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">`;
+            }
+        });
+
+        // Links (inline style)
+        html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+
+        // Blockquotes (handle both > at start of line and indented >)
+        html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+        html = html.replace(/^\s*> (.+)$/gm, '<blockquote>$1</blockquote>');
+
 
         // Paragraphs (simple approach - wrap remaining text blocks)
 
