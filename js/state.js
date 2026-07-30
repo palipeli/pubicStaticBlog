@@ -7,7 +7,6 @@
     // Constants
     const STATE_STORAGE_KEY = 'blogPlatformState';
     const STATE_SAVE_DELAY = 100;
-    const STATE_AUTO_SAVE_INTERVAL = 30000;
     const BLOG_POST_RESTORE_DELAY = 300;
 
     // Selectors
@@ -238,7 +237,7 @@
     }
 
     /**
-     * Auto-save state on various user actions
+     * Setup state persistence
      */
     function setupStatePersistence() {
         // Save state when navigating between pages
@@ -246,9 +245,6 @@
 
         // Also save before page unload
         window.addEventListener('beforeunload', saveAppState);
-
-        // Save state periodically (every 30 seconds) as backup
-        setInterval(saveAppState, STATE_AUTO_SAVE_INTERVAL);
     }
 
     // Expose functions globally

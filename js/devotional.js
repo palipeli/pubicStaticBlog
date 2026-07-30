@@ -86,34 +86,37 @@
         if (devotionalActive) return;
         devotionalActive = true;
 
-        // Load verses on-demand when animation starts (lightweight initial load)
-        await loadBibleVerses();
+        try {
+            // Load verses on-demand when animation starts (lightweight initial load)
+            await loadBibleVerses();
 
-        if (bibleVerses.length === 0) {
-            devotionalActive = false;
-            return;
-        }
+            if (bibleVerses.length === 0) {
+                return;
+            }
 
-        const heroElement = document.getElementById('home-hero-content');
-        if (!heroElement) return;
+            const heroElement = document.getElementById('home-hero-content');
+            if (!heroElement) return;
 
-        const leadParagraph = heroElement.querySelector('.home-lead');
-        if (!leadParagraph) return;
+            const leadParagraph = heroElement.querySelector('.home-lead');
+            if (!leadParagraph) return;
 
-        // Get random verse
-        const verse = getRandomShortVerse();
-        if (!verse) return;
+            // Get random verse
+            const verse = getRandomShortVerse();
+            if (!verse) return;
 
-        // Format: "Verse text — Book Chapter:Verse NRSVUE"
-        const displayText = `${verse.text} — ${verse.book} ${verse.chapter}:${verse.verse} NRSVUE`;
+            // Format: "Verse text — Book Chapter:Verse NRSVUE"
+            const displayText = `${verse.text} — ${verse.book} ${verse.chapter}:${verse.verse} NRSVUE`;
 
-        // First, delete the existing text
-        typeDeleteAnimation(leadParagraph, () => {
-            // Then type the new verse
-            typeWriteAnimation(leadParagraph, displayText, () => {
-                // Optional: could cycle to another verse after delay
+            // First, delete the existing text
+            typeDeleteAnimation(leadParagraph, () => {
+                // Then type the new verse
+                typeWriteAnimation(leadParagraph, displayText, () => {
+                    // Optional: could cycle to another verse after delay
+                });
             });
-        });
+        } finally {
+            devotionalActive = false;
+        }
     }
 
     // Check if warning has been accepted/cleared
@@ -126,17 +129,14 @@
         return hasConsent && isOverlayGone;
     }
 
-    // Monitor for warning clearance and trigger devotional
+    // Monitor for warning clearance and trigger devotional using event-based approach
     async function monitorWarningAndStartDevotional() {
-        const checkInterval = setInterval(async () => {
-            if (isWarningCleared()) {
-                clearInterval(checkInterval);
-                // Small delay to ensure UI is settled
-                setTimeout(async () => {
-                    await runDevotional();
-                }, 300);
-            }
-        }, 100);
+        // Use custom event instead of polling
+        document.addEventListener('warning:cleared', () => {
+            setTimeout(async () => {
+                await runDevotional();
+            }, 300);
+        }, { once: true });
     }
 
     // Expose functions globally

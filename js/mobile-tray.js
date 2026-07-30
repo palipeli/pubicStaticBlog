@@ -46,8 +46,6 @@
                         <button class="mobile-theme-btn" data-theme="dark"><i class="fa-solid fa-moon"></i> Dark</button>
                     </div>
                 </div>
-                
-                </div>
             </div>
         `;
         
@@ -296,13 +294,6 @@
                 }
             });
             
-            // Preload on mouseover as backup
-            item.addEventListener('mouseover', () => {
-                if (typeof window.preloadBlogPostContent === 'function') {
-                    window.preloadBlogPostContent(post.id);
-                }
-            });
-            
             item.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -357,26 +348,24 @@
         window.addEventListener('resize', handleResize);
         
         // Listen for page changes to update blog posts visibility
-        document.addEventListener('DOMContentLoaded', () => {
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    setTimeout(updateBlogPostsVisibility, 100);
-                });
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                setTimeout(updateBlogPostsVisibility, 100);
             });
-            
-            // Also listen for when blog metadata is loaded to render mobile post list
-            // This ensures the mobile tray can access window.blogPostMetadata once it's available
-            const checkAndRenderPosts = setInterval(() => {
-                if (typeof window.blogPostMetadata !== 'undefined' && window.blogPostMetadata.length > 0) {
-                    updateBlogPostsVisibility();
-                    clearInterval(checkAndRenderPosts);
-                }
-            }, 100);
-            
-            // Clear interval after 5 seconds to avoid infinite checking
-            setTimeout(() => clearInterval(checkAndRenderPosts), 5000);
         });
+        
+        // Also listen for when blog metadata is loaded to render mobile post list
+        // This ensures the mobile tray can access window.blogPostMetadata once it's available
+        const checkAndRenderPosts = setInterval(() => {
+            if (typeof window.blogPostMetadata !== 'undefined' && window.blogPostMetadata.length > 0) {
+                updateBlogPostsVisibility();
+                clearInterval(checkAndRenderPosts);
+            }
+        }, 100);
+        
+        // Clear interval after 5 seconds to avoid infinite checking
+        setTimeout(() => clearInterval(checkAndRenderPosts), 5000);
     }
     
     // Start initialization

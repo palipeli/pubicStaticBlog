@@ -926,9 +926,7 @@ body {
 }
 
 .blog-card {
-    background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(58, 58, 58, 0.95);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     overflow: visible;
@@ -1746,5 +1744,18 @@ footer p {
     }
     50% {
         opacity: 0.8;
+    }
+}
+
+/* Motion accessibility - reduce animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .particle {
+        display: none;
     }
 }

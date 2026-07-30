@@ -13,26 +13,18 @@
     let bypassWarning = false;
 
     // Global link bypass - only skip warning for actual links and interactive UI elements
+    const SAFE_SELECTORS = [
+        'a', '#themeToggle', '.menu-toggle', '.theme-btn', '.nav-item', '.blue-button',
+        '.mc-btn', '.post-selector-item', '.sidebar-toggle', '.mobile-tray-toggle',
+        '.mobile-tray-close', '.mobile-theme-btn', '.mobile-nav-item', '.mobile-post-item',
+        '#mobile-nav-tray', '#mobile-tray-overlay', '.header-right', '.back-to-intro-btn',
+        '.blog-card'
+    ];
+
+    const isSafeTarget = (el) => el && SAFE_SELECTORS.some(s => el.closest(s));
+
     window.addEventListener('click', (e) => {
-        if (e.target.closest('a') || 
-            e.target.closest('#themeToggle') || 
-            e.target.closest('.menu-toggle') ||
-            e.target.closest('.theme-btn') ||
-            e.target.closest('.nav-item') ||
-            e.target.closest('.blue-button') ||
-            e.target.closest('.mc-btn') ||
-            e.target.closest('.post-selector-item') ||
-            e.target.closest('.sidebar-toggle') ||
-            e.target.closest('.mobile-tray-toggle') ||
-            e.target.closest('.mobile-tray-close') ||
-            e.target.closest('.mobile-theme-btn') ||
-            e.target.closest('.mobile-nav-item') ||
-            e.target.closest('.mobile-post-item') ||
-            e.target.closest('#mobile-nav-tray') ||
-            e.target.closest('#mobile-tray-overlay') ||
-            e.target.closest('.header-right') ||
-            e.target.closest('.back-to-intro-btn') ||
-            e.target.closest('.blog-card')) {
+        if (isSafeTarget(e.target)) {
             bypassWarning = true;
             setTimeout(() => { bypassWarning = false; }, 1000);
         }
@@ -178,12 +170,15 @@
         acceptBtn.disabled = false;
         declineBtn.disabled = false;
         
+        // Accept handler - dispatch custom event for devotional to listen to
         acceptBtn.addEventListener('click', () => {
             localStorage.setItem(STORAGE_KEY, 'true');
             consentOverlay.style.opacity = '0';
             setTimeout(() => {
                 consentOverlay.style.display = 'none';
                 isAccepted = true;
+                // Dispatch custom event for devotional.js to listen to instead of polling
+                document.dispatchEvent(new CustomEvent('warning:cleared'));
             }, 300);
         });
 
@@ -209,28 +204,7 @@
         if (!force) {
             if (!isAccepted || !areAssetsLoaded) return; 
             // Don't trigger on clicks to interactive elements
-            if (e && e.target && (
-                e.target.closest('#consent-overlay') || 
-                e.target.closest('a') || 
-                e.target.closest('#themeToggle') || 
-                e.target.closest('.menu-toggle') ||
-                e.target.closest('.theme-btn') ||
-                e.target.closest('.nav-item') ||
-                e.target.closest('.blue-button') ||
-                e.target.closest('.mc-btn') ||
-                e.target.closest('.post-selector-item') ||
-                e.target.closest('.sidebar-toggle') ||
-                e.target.closest('.mobile-tray-toggle') ||
-                e.target.closest('.mobile-tray-close') ||
-                e.target.closest('.mobile-theme-btn') ||
-                e.target.closest('.mobile-nav-item') ||
-                e.target.closest('.mobile-post-item') ||
-                e.target.closest('#mobile-nav-tray') ||
-                e.target.closest('#mobile-tray-overlay') ||
-                e.target.closest('.header-right') ||
-                e.target.closest('.back-to-intro-btn') ||
-                e.target.closest('.blog-card')
-            )) return;
+            if (e && e.target && isSafeTarget(e.target)) return;
         }
 
         // Always allow multiple triggers - don't set isPlaying flag
