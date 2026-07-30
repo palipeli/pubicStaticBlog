@@ -16,7 +16,7 @@
         BQ: /^( {0,3})>([ \t]?)(.*)$/,
         UL: /^( {0,3})([-*+])[ \t]+(.*)$/,
         OL: /^( {0,3})(\d+)\.[ \t]+(.*)$/,
-        TABLE: /^ *\|? *([:?\-]+ *\|)+ *[:\-]* *$/,
+        TABLE: /^ *[|]? *:?[\\-]+ *:?(?:[|] *:?[\\-]+ *:?)*[|]? *$/,
         ENTITY: /^&([a-zA-Z]+|#\d+|#x[0-9a-fA-F]+);/,
         AUTO_URL: /^https?:\/\/[^\s]+$/,
         AUTO_EMAIL: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
@@ -188,7 +188,7 @@
             // Hard line breaks (two spaces at end of line followed by newline)
             if (ch === 32 && i + 2 < len && text.charCodeAt(i + 1) === 32 && text.charCodeAt(i + 2) === 10) {
                 out.push(HTML.BR);
-                i += 3;
+                i += 3; // Skip the two spaces AND the newline
                 continue;
             }
             
@@ -483,7 +483,8 @@
         if (start + 1 >= lines.length) return null;
         
         const delimiterLine = lines[start + 1];
-        const delimMatch = delimiterLine.match(/^ *\|? *([:?\-]+ *\|)+ *[:\-]* *$/);
+        // More lenient regex that allows spaces between pipes and dashes
+        const delimMatch = delimiterLine.match(/^ *[|]? *:?[\\-]+ *:?(?:[|] *:?[\\-]+ *:?)*[|]? *$/);
         if (!delimMatch) return null;
         
         // Parse alignments from delimiter row
@@ -705,13 +706,16 @@
             
             // Table (GFM extension) - must check before list items
             // A table starts with a header row containing |, followed by a delimiter row with | and ---
-            if (line.includes('|') && !line.match(/^ {4}/)) {
-                // Check if this could be a table header
-                const tableResult = parseTable(lines, i);
-                if (tableResult) {
-                    blocks.push(tableResult.block);
-                    i = tableResult.nextLine;
-                    continue;
+            // Check if next line is a valid table delimiter
+            if (i + 1 < lines.length) {
+                const nextLine = lines[i + 1];
+                if (nextLine.match(/^ *[|]? *:?[\\-]+ *:?(?:[|] *:?[\\-]+ *:?)*[|]? *$/)) {
+                    const tableResult = parseTable(lines, i);
+                    if (tableResult) {
+                        blocks.push(tableResult.block);
+                        i = tableResult.nextLine;
+                        continue;
+                    }
                 }
             }
             
