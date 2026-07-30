@@ -1718,6 +1718,10 @@ footer p {
 }
 
 .blog-post-content {
+    animation: none; /* Animation will be triggered via JavaScript when content is rendered */
+}
+
+.blog-post-content.animate {
     animation: fadeInContent 0.3s ease-out;
 }
 

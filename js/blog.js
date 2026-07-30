@@ -381,6 +381,17 @@
             <div class="blog-post-content">${post.htmlContent}</div>
         `;
 
+        // Trigger the fade-in animation by adding the animate class after a brief delay
+        // This ensures the animation plays only once when content is rendered
+        requestAnimationFrame(() => {
+            const blogPostContent = article.querySelector('.blog-post-content');
+            if (blogPostContent) {
+                // Force reflow to restart animation
+                void blogPostContent.offsetWidth;
+                blogPostContent.classList.add('animate');
+            }
+        });
+
         // Initialize lazy loading for images in the rendered content
         if (typeof window.initializeLazyLoading === 'function') {
             window.initializeLazyLoading();

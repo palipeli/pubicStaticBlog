@@ -133,6 +133,9 @@
     function applySavedState(state) {
         console.log('Applying saved state:', state);
 
+        // Mark that state has been restored to prevent duplicate restoration in ui.js
+        window.stateRestoreCompleted = true;
+
         // Restore theme first (before other UI updates)
         if (state.theme) {
             const themeBtn = document.querySelector(`${SELECTORS.THEME_BTN}[data-theme="${state.theme}"]`);

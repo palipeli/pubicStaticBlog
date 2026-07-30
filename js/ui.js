@@ -75,6 +75,44 @@
                     
                     // If clicking Blog from Home or About page
                     if (currentPage === 'home' || currentPage === 'about') {
+                        // Check if state was already restored on page load
+                        // If so, don't restore again - just show the current state
+                        if (window.stateRestoreCompleted) {
+                            // State already restored, just navigate to blogs page normally
+                            navigateToBlogsPageWithoutPrefetch();
+                            
+                            // Show blog intro view (grid of all posts)
+                            const postView = document.getElementById('blog-post-view');
+                            const introView = document.getElementById('blog-intro-view');
+                            
+                            if (postView && introView) {
+                                postView.style.display = 'none';
+                                introView.style.display = 'block';
+                            }
+                            
+                            // Clear active state in sidebar
+                            document.querySelectorAll('.post-selector-item').forEach(item => {
+                                item.classList.remove('active');
+                            });
+                            
+                            // Render the blog post selector grid
+                            if (typeof window.renderBlogPostSelectorGrid === 'function' && window.blogPostMetadata) {
+                                window.renderBlogPostSelectorGrid(window.blogPostMetadata);
+                            }
+                            
+                            // Update back button visibility
+                            if (typeof window.updateBlogIntroBackButton === 'function') {
+                                window.updateBlogIntroBackButton();
+                            }
+                            
+                            // Scroll to top
+                            window.scrollTo(0, 0);
+                            
+                            // Save state after navigation
+                            setTimeout(window.saveAppState, 100);
+                            return;
+                        }
+                        
                         // Check if there's a saved blog post to restore
                         const savedState = window.loadAppState ? window.loadAppState() : null;
                         const hasSavedPost = savedState && savedState.activeBlogPost;
@@ -181,9 +219,10 @@
                         wasReadingBlogPost = true;
                     }
                     
-                    // Reset the blog session flag when going to Home or About
+                    // Reset the blog session flag and state restore flag when going to Home or About
                     if (item.dataset.page === 'home' || item.dataset.page === 'about') {
                         hasRestoredBlogSession = false;
+                        window.stateRestoreCompleted = false; // Allow restoration again on next Blog click
                     }
                     
                     // Update active nav item
