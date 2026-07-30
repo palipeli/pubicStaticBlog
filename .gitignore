@@ -1,1 +1,3 @@
-(media/background.webp)
+(js/app.js, js/blog.js, js/state.js are source files, so no need to add them to .gitignore)
+
+Nothing to ignore since only JavaScript source files were modified.

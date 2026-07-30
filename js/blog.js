@@ -371,26 +371,48 @@
             return;
         }
 
-        // Render post content with fade-in animation
-        article.innerHTML = `
-            <h1>${post.icon} ${post.title}</h1>
-            <div class="blog-meta" style="margin-bottom: 20px;">
-                <span class="blog-date">${post.date}</span>
-                <span style="margin-left: 15px;">${post.category}</span>
-            </div>
-            <div class="blog-post-content">${post.htmlContent}</div>
-        `;
-
-        // Initialize lazy loading for images in the rendered content
-        if (typeof window.initializeLazyLoading === 'function') {
-            window.initializeLazyLoading();
+        // Double-check that metadata is still available (in case of race condition during refresh)
+        if (!blogPostMetadata || blogPostMetadata.length === 0) {
+            // Metadata not loaded yet, wait for it
+            await waitForBlogMetadata();
         }
+
+        // Render post content with fade-in animation (keep loading state visible until render completes)
+        requestAnimationFrame(() => {
+            article.innerHTML = `
+                <h1>${post.icon} ${post.title}</h1>
+                <div class="blog-meta" style="margin-bottom: 20px;">
+                    <span class="blog-date">${post.date}</span>
+                    <span style="margin-left: 15px;">${post.category}</span>
+                </div>
+                <div class="blog-post-content">${post.htmlContent}</div>
+            `;
+
+            // Initialize lazy loading for images in the rendered content
+            if (typeof window.initializeLazyLoading === 'function') {
+                window.initializeLazyLoading();
+            }
+        });
 
         // Save state after opening a post
         setTimeout(window.saveAppState, 100);
 
         // Scroll to top
         window.scrollTo(0, 0);
+    }
+    
+    // Helper function to wait for blog metadata to be loaded
+    function waitForBlogMetadata() {
+        return new Promise((resolve) => {
+            const checkMetadata = () => {
+                if (window.blogPostMetadata && window.blogPostMetadata.length > 0) {
+                    resolve();
+                } else {
+                    setTimeout(checkMetadata, 100);
+                }
+            };
+            checkMetadata();
+        });
     }
     
     // Update the visibility of the back button on blog intro page
@@ -525,4 +547,5 @@
     window.goBackFromBlogIntro = goBackFromBlogIntro;
     window.updateBlogIntroBackButton = updateBlogIntroBackButton;
     window.isBlogIntroductionLoaded = () => blogIntroductionLoaded;
+    window.waitForBlogMetadata = waitForBlogMetadata;
 })();

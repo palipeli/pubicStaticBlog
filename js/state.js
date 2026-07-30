@@ -160,16 +160,13 @@
             }
         }
 
-        // Restore blog post view or blog intro view (must be done after navigating to blogs page)
-        if (state.currentPage === 'blogs') {
+        // Store pending blog post restoration for later processing (after metadata is loaded)
+        if (state.currentPage === 'blogs' && state.activeBlogPost) {
+            window.pendingBlogPostRestore = state.activeBlogPost;
+        } else if (state.currentPage === 'blogs' && state.blogIntroViewed) {
+            // Show blog intro grid immediately if we have metadata
             setTimeout(() => {
-                if (state.activeBlogPost) {
-                    // Restore the post they were reading
-                    if (typeof window.openBlogPostLazy === 'function') {
-                        window.openBlogPostLazy(state.activeBlogPost);
-                    }
-                } else if (state.blogIntroViewed) {
-                    // Show blog intro grid instead of a post
+                if (window.blogPostMetadata && window.blogPostMetadata.length > 0) {
                     const postView = document.getElementById('blog-post-view');
                     const introView = document.getElementById('blog-intro-view');
                     
@@ -184,7 +181,7 @@
                     });
                     
                     // Render the blog post selector grid
-                    if (typeof window.renderBlogPostSelectorGrid === 'function' && window.blogPostMetadata) {
+                    if (typeof window.renderBlogPostSelectorGrid === 'function') {
                         window.renderBlogPostSelectorGrid(window.blogPostMetadata);
                     }
                     
@@ -194,6 +191,22 @@
                     }
                 }
             }, BLOG_POST_RESTORE_DELAY);
+        }
+    }
+    
+    /**
+     * Process pending blog post restoration after metadata is loaded
+     * Called from app.js after fetchBlogPostMetadata completes
+     */
+    function processPendingBlogPostRestore() {
+        if (window.pendingBlogPostRestore) {
+            const postId = window.pendingBlogPostRestore;
+            window.pendingBlogPostRestore = null;
+            
+            // Restore the post they were reading
+            if (typeof window.openBlogPostLazy === 'function') {
+                window.openBlogPostLazy(postId);
+            }
         }
     }
 
@@ -260,4 +273,5 @@
     window.isSidebarCollapsed = isSidebarCollapsed;
     window.getCurrentTheme = getCurrentTheme;
     window.isBlogIntroViewed = isBlogIntroViewed;
+    window.processPendingBlogPostRestore = processPendingBlogPostRestore;
 })();
