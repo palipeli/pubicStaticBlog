@@ -89,11 +89,9 @@
                             navigateToBlogsPageWithoutPrefetch();
                             
                             // Open the saved blog post
-                            setTimeout(() => {
-                                if (typeof window.openBlogPostLazy === 'function' && savedState.activeBlogPost) {
-                                    window.openBlogPostLazy(savedState.activeBlogPost);
-                                }
-                            }, 100);
+                            if (typeof window.openBlogPostLazy === 'function' && savedState.activeBlogPost) {
+                                window.openBlogPostLazy(savedState.activeBlogPost);
+                            }
                             
                             // Scroll to top
                             window.scrollTo(0, 0);

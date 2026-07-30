@@ -233,6 +233,9 @@
         const container = document.getElementById('blog-post-selector-grid');
         if (!container) return;
 
+        // Signature guard
+        if (typeof posts === 'undefined' || !Array.isArray(posts)) return;
+
         container.innerHTML = '';
 
         if (posts.length === 0) {

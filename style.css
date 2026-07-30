@@ -1074,7 +1074,6 @@ body {
 
 .page-section.active {
     display: block;
-    animation: fadeIn 0.3s ease-out;
 }
 
 @keyframes fadeIn {
