@@ -6,13 +6,13 @@
         "STOP", "PILIH PRABOWO GIBRAN", "PILIH NOMOR 2 2029", "HAIIIIIIII!", "ANTEK ANTEK ASING", "PALING NYAWIT"       
     ];
 
-    // Audio removed - no audio sources needed
+    
     const VOLUME_GAIN = 2.0; 
     const AUDIO_LAYERS = 6; 
 
     let bypassWarning = false;
 
-    // Global link bypass - only skip warning for actual links and interactive UI elements
+    
     window.addEventListener('click', (e) => {
         if (e.target.closest('a') || 
             e.target.closest('#themeToggle') || 
@@ -38,7 +38,7 @@
         }
     });
 
-    // The "Are you sure you want to leave?" logic
+    
     window.addEventListener('beforeunload', (e) => {
         if (!bypassWarning) {
             e.preventDefault(); 
@@ -166,12 +166,12 @@
     document.body.appendChild(consentOverlay);
 
     async function initAudio() {
-        // Audio initialization removed - assets are considered loaded immediately
+        
         const acceptBtn = document.getElementById('accept-btn');
         const declineBtn = document.getElementById('decline-btn');
         const loadText = document.getElementById('loading-status');
 
-        // Simulate asset loading completion without audio
+        
         areAssetsLoaded = true;
         loadText.innerText = "Assets Loaded.";
         acceptBtn.innerText = "ACCEPT";
@@ -202,13 +202,13 @@
     }
 
     function playSound(buffer) {
-        // Audio playback removed - no-op
+        
     }
 
     async function triggerWarning(e, force = false) {
         if (!force) {
             if (!isAccepted || !areAssetsLoaded) return; 
-            // Don't trigger on clicks to interactive elements
+            
             if (e && e.target && (
                 e.target.closest('#consent-overlay') || 
                 e.target.closest('a') || 
@@ -233,14 +233,14 @@
             )) return;
         }
 
-        // Always allow multiple triggers - don't set isPlaying flag
-        // Only use isPlaying for forced triggers to prevent recursion during flash
+        
+        
 
         preFlashOverlay.style.opacity = '1';
         setTimeout(() => {
             textSpan.innerText = phrases[Math.floor(Math.random() * phrases.length)];
             flashOverlay.style.opacity = '1';
-            // Audio playback removed
+            
             setTimeout(() => { flashOverlay.style.opacity = '0'; }, 100);
         }, 5);
         setTimeout(() => { preFlashOverlay.style.opacity = '0'; }, 25);
@@ -248,7 +248,7 @@
 
     initAudio();
 
-    // Trigger handlers
+    
     window.addEventListener('keydown', (e) => isAccepted && triggerWarning(e));
     window.addEventListener('mousedown', (e) => isAccepted && triggerWarning(e));
     window.addEventListener('touchstart', (e) => {

@@ -1,16 +1,16 @@
-// state.js - Application State Persistence
-// Handles saving and restoring application state to localStorage
+
+
 
 (function() {
     'use strict';
 
-    // Constants
+    
     const STATE_STORAGE_KEY = 'blogPlatformState';
     const STATE_SAVE_DELAY = 100;
     const STATE_AUTO_SAVE_INTERVAL = 30000;
     const BLOG_POST_RESTORE_DELAY = 300;
 
-    // Selectors
+    
     const SELECTORS = {
         ACTIVE_SECTION: '.page-section.active',
         POST_SELECTOR_ITEM: '.post-selector-item',
@@ -92,7 +92,7 @@
     function isBlogIntroViewed() {
         const introView = document.getElementById('blog-intro-view');
         const postView = document.getElementById('blog-post-view');
-        // Blog intro is viewed when it's displayed AND post view is not displayed
+        
         return introView && introView.style.display !== 'none' && (!postView || postView.style.display === 'none');
     }
 
@@ -133,7 +133,7 @@
     function applySavedState(state) {
         console.log('Applying saved state:', state);
 
-        // Restore theme first (before other UI updates)
+        
         if (state.theme) {
             const themeBtn = document.querySelector(`${SELECTORS.THEME_BTN}[data-theme="${state.theme}"]`);
             if (themeBtn && !themeBtn.classList.contains('active')) {
@@ -141,7 +141,7 @@
             }
         }
 
-        // Restore sidebar state
+        
         if (state.sidebarCollapsed) {
             const sidebar = document.getElementById(SELECTORS.SIDEBAR.substring(1));
             if (sidebar && !sidebar.classList.contains('collapsed')) {
@@ -152,7 +152,7 @@
             }
         }
 
-        // Restore page navigation
+        
         if (state.currentPage && state.currentPage !== 'home') {
             const navItem = document.querySelector(`${SELECTORS.NAV_ITEM}[data-page="${state.currentPage}"]`);
             if (navItem) {
@@ -160,16 +160,16 @@
             }
         }
 
-        // Restore blog post view or blog intro view (must be done after navigating to blogs page)
+        
         if (state.currentPage === 'blogs') {
             setTimeout(() => {
                 if (state.activeBlogPost) {
-                    // Restore the post they were reading
+                    
                     if (typeof window.openBlogPostLazy === 'function') {
                         window.openBlogPostLazy(state.activeBlogPost);
                     }
                 } else if (state.blogIntroViewed) {
-                    // Show blog intro grid instead of a post
+                    
                     const postView = document.getElementById('blog-post-view');
                     const introView = document.getElementById('blog-intro-view');
                     
@@ -178,17 +178,17 @@
                         introView.style.display = 'block';
                     }
                     
-                    // Clear active state in sidebar
+                    
                     document.querySelectorAll('.post-selector-item').forEach(item => {
                         item.classList.remove('active');
                     });
                     
-                    // Render the blog post selector grid
+                    
                     if (typeof window.renderBlogPostSelectorGrid === 'function' && window.blogPostMetadata) {
                         window.renderBlogPostSelectorGrid(window.blogPostMetadata);
                     }
                     
-                    // Update back button visibility
+                    
                     if (typeof window.updateBlogIntroBackButton === 'function') {
                         window.updateBlogIntroBackButton();
                     }
@@ -207,7 +207,7 @@
             return;
         }
 
-        // Wait for DOM to be ready and blog posts to be loaded
+        
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => applySavedState(savedState));
         } else {
@@ -241,17 +241,17 @@
      * Auto-save state on various user actions
      */
     function setupStatePersistence() {
-        // Save state when navigating between pages
+        
         document.addEventListener('click', handleInteraction);
 
-        // Also save before page unload
+        
         window.addEventListener('beforeunload', saveAppState);
 
-        // Save state periodically (every 30 seconds) as backup
+        
         setInterval(saveAppState, STATE_AUTO_SAVE_INTERVAL);
     }
 
-    // Expose functions globally
+    
     window.saveAppState = saveAppState;
     window.loadAppState = loadAppState;
     window.clearAppState = clearAppState;

@@ -1,15 +1,15 @@
-// home.js - Home Page Blog Buttons and Legacy Functions
-// Handles rendering of blog buttons on home page and legacy blog post functions
+
+
 
 (function() {
-    // Render blog buttons on home page (inspired by kamikami.eu) - legacy version
+    
     function renderBlogButtons(posts) {
         const container = document.getElementById('blog-buttons-container');
         if (!container) return;
 
         container.innerHTML = '';
 
-        // Filter posts to show only Michelle DNS and Privacy Policy on home page
+        
         const homePagePosts = posts.filter(post =>
             post.id === 'michelle-dns-for-ios-sideloading' ||
             post.id === 'privacy-policy'
@@ -39,10 +39,10 @@
             container.appendChild(button);
         });
 
-        // Add "Send me cat pictures and files!" button (kamikami.eu style)
+        
         const catButton = document.createElement('a');
         catButton.className = 'blog-btn category-fun';
-        catButton.href = 'https://cloud.kamikami.eu/s/send-me-cat-pics';
+        catButton.href = 'https:
         catButton.target = '_blank';
         catButton.rel = 'noopener noreferrer';
 
@@ -53,13 +53,13 @@
 
         container.appendChild(catButton);
 
-        // Add "My Blog" button - opens blog introduction page/blog post selector
+        
         const myBlogButton = document.createElement('a');
         myBlogButton.className = 'blog-btn category-blog-home';
         myBlogButton.href = '#';
         myBlogButton.onclick = (e) => {
             e.preventDefault();
-            // Navigate to blogs page to show blog post selector
+            
             const navItem = document.querySelector('.nav-item[data-page="blogs"]');
             if (navItem) {
                 navItem.click();
@@ -73,10 +73,10 @@
 
         container.appendChild(myBlogButton);
 
-        // Add "Monitoring" button - redirects to stats.kamikami.eu/status/one
+        
         const monitoringButton = document.createElement('a');
         monitoringButton.className = 'blog-btn category-monitoring';
-        monitoringButton.href = 'https://stats.kamikami.eu/status/one';
+        monitoringButton.href = 'https:
         monitoringButton.target = '_blank';
         monitoringButton.rel = 'noopener noreferrer';
 
@@ -88,14 +88,14 @@
         container.appendChild(monitoringButton);
     }
 
-    // Render blog buttons on home page with lazy loading support (new version)
+    
     function renderBlogButtonsLazy(posts) {
         const container = document.getElementById('blog-buttons-container');
         if (!container) return;
 
         container.innerHTML = '';
 
-        // Filter posts to show only Michelle DNS and Privacy Policy on home page
+        
         const homePagePosts = posts.filter(post =>
             post.id === 'michelle-dns-for-ios-sideloading' ||
             post.id === 'privacy-policy'
@@ -112,7 +112,7 @@
             const button = document.createElement('a');
             button.className = `blog-btn ${categoryClass}`;
             button.href = '#';
-            // Only prefetch the specific post content on hover (not the blog introduction)
+            
             button.onmouseenter = () => {
                 window.preloadBlogPostContent(post.id);
             };
@@ -129,10 +129,10 @@
             container.appendChild(button);
         });
 
-        // Add "Send me cat pictures and files!" button (kamikami.eu style)
+        
         const catButton = document.createElement('a');
         catButton.className = 'blog-btn category-fun';
-        catButton.href = 'https://cloud.kamikami.eu/s/send-me-cat-pics';
+        catButton.href = 'https:
         catButton.target = '_blank';
         catButton.rel = 'noopener noreferrer';
 
@@ -143,13 +143,13 @@
 
         container.appendChild(catButton);
 
-        // Add "My Blog" button - opens blog introduction page/blog post selector
+        
         const myBlogButton = document.createElement('a');
         myBlogButton.className = 'blog-btn category-blog-home';
         myBlogButton.href = '#';
         myBlogButton.onclick = (e) => {
             e.preventDefault();
-            // Navigate to blogs page to show blog post selector
+            
             const navItem = document.querySelector('.nav-item[data-page="blogs"]');
             if (navItem) {
                 navItem.click();
@@ -163,10 +163,10 @@
 
         container.appendChild(myBlogButton);
 
-        // Add "Monitoring" button - redirects to stats.kamikami.eu/status/one
+        
         const monitoringButton = document.createElement('a');
         monitoringButton.className = 'blog-btn category-monitoring';
-        monitoringButton.href = 'https://stats.kamikami.eu/status/one';
+        monitoringButton.href = 'https:
         monitoringButton.target = '_blank';
         monitoringButton.rel = 'noopener noreferrer';
 
@@ -178,32 +178,32 @@
         container.appendChild(monitoringButton);
     }
 
-    // Open a blog post from home page button (legacy)
+    
     function openBlogPostFromHome(id) {
-        // Navigate to blogs page first without triggering prefetch
+        
         window.navigateToBlogsPageWithoutPrefetch();
 
-        // Then open the specific post after a short delay
+        
         setTimeout(() => {
             window.openBlogPost(id);
         }, 100);
     }
 
-    // Open a blog post from home page button with lazy loading (new)
+    
     function openBlogPostFromHomeLazy(id) {
-        // Navigate to blogs page first without triggering prefetch
+        
         window.navigateToBlogsPageWithoutPrefetch();
 
-        // Then open the specific post with lazy loading after a short delay
+        
         setTimeout(() => {
             window.openBlogPostLazy(id);
         }, 100);
     }
 
-    // Fetch all markdown files from /blog/ using posts.json manifest (legacy - loads all content immediately)
+    
     async function fetchBlogPosts() {
         try {
-            // Fetch the posts.json manifest file
+            
             const response = await fetch('/blog/posts.json');
             if (!response.ok) {
                 throw new Error('Could not fetch blog manifest');
@@ -216,7 +216,7 @@
                 return [];
             }
 
-            // Fetch each markdown file content
+            
             const posts = await Promise.all(
                 postsMeta.map(async (meta) => {
                     try {
@@ -238,7 +238,7 @@
                         };
                     } catch (err) {
                         console.error(`Error fetching ${meta.slug}:`, err);
-                        // Return metadata even if content fetch fails
+                        
                         return {
                             id: meta.id,
                             slug: meta.slug,
@@ -253,7 +253,7 @@
                 })
             );
 
-            // Sort by date
+            
             window.blogPosts = posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
             return window.blogPosts;
@@ -263,7 +263,7 @@
         }
     }
 
-    // Expose functions globally
+    
     window.renderBlogButtons = renderBlogButtons;
     window.renderBlogButtonsLazy = renderBlogButtonsLazy;
     window.openBlogPostFromHome = openBlogPostFromHome;

@@ -1,14 +1,14 @@
-// devotional.js - Bible Devotional and Typing Animations
-// Lazy-loaded module for Bible verse display and typing effects
+
+
 
 (function() {
-    // Bible Devotional state
+    
     let bibleVerses = [];
     let devotionalActive = false;
     let versesLoaded = false;
 
-    // Load Bible verses from pre-extracted JSON (cleaned version without footnote markers)
-    // Only loads when needed to keep initial page load lightweight
+    
+    
     async function loadBibleVerses() {
         if (versesLoaded) return bibleVerses;
 
@@ -26,18 +26,18 @@
         }
     }
 
-    // Get a random short verse (under 150 chars for display)
+    
     function getRandomShortVerse() {
         if (bibleVerses.length === 0) return null;
 
-        // Filter for shorter verses
+        
         const shortVerses = bibleVerses.filter(v => v.text.length < 150);
         const pool = shortVerses.length > 0 ? shortVerses : bibleVerses;
 
         return pool[Math.floor(Math.random() * pool.length)];
     }
 
-    // Typing delete animation - removes text character by character
+    
     function typeDeleteAnimation(element, callback) {
         const text = element.textContent;
         let index = 0;
@@ -46,7 +46,7 @@
             if (index < text.length) {
                 element.textContent = text.substring(0, text.length - index - 1);
                 index++;
-                setTimeout(deleteChar, 15); // Fast deletion
+                setTimeout(deleteChar, 15); 
             } else {
                 if (callback) callback();
             }
@@ -55,7 +55,7 @@
         deleteChar();
     }
 
-    // Typing write animation - types text character by character
+    
     function typeWriteAnimation(element, text, callback) {
         let index = 0;
         element.textContent = '';
@@ -64,7 +64,7 @@
             if (index < text.length) {
                 element.textContent += text.charAt(index);
                 index++;
-                setTimeout(typeChar, 20); // Fast typing
+                setTimeout(typeChar, 20); 
             } else {
                 if (callback) callback();
             }
@@ -73,12 +73,12 @@
         typeChar();
     }
 
-    // Run the devotional - delete old text, type new verse
+    
     async function runDevotional() {
         if (devotionalActive) return;
         devotionalActive = true;
 
-        // Load verses on-demand when animation starts (lightweight initial load)
+        
         await loadBibleVerses();
 
         if (bibleVerses.length === 0) {
@@ -92,38 +92,38 @@
         const leadParagraph = heroElement.querySelector('.home-lead');
         if (!leadParagraph) return;
 
-        // Get random verse
+        
         const verse = getRandomShortVerse();
         if (!verse) return;
 
-        // Format: "Verse text — Book Chapter:Verse NRSVUE"
+        
         const displayText = `${verse.text} — ${verse.book} ${verse.chapter}:${verse.verse} NRSVUE`;
 
-        // First, delete the existing text
+        
         typeDeleteAnimation(leadParagraph, () => {
-            // Then type the new verse
+            
             typeWriteAnimation(leadParagraph, displayText, () => {
-                // Optional: could cycle to another verse after delay
+                
             });
         });
     }
 
-    // Check if warning has been accepted/cleared
+    
     function isWarningCleared() {
-        // Check localStorage for consent
+        
         const hasConsent = localStorage.getItem('system_warning_consent') === 'true';
-        // Also check if consent overlay is gone
+        
         const consentOverlay = document.getElementById('consent-overlay');
         const isOverlayGone = !consentOverlay || consentOverlay.style.display === 'none';
         return hasConsent && isOverlayGone;
     }
 
-    // Monitor for warning clearance and trigger devotional
+    
     async function monitorWarningAndStartDevotional() {
         const checkInterval = setInterval(async () => {
             if (isWarningCleared()) {
                 clearInterval(checkInterval);
-                // Small delay to ensure UI is settled
+                
                 setTimeout(async () => {
                     await runDevotional();
                 }, 300);
@@ -131,7 +131,7 @@
         }, 100);
     }
 
-    // Expose functions globally
+    
     window.runDevotional = runDevotional;
     window.monitorWarningAndStartDevotional = monitorWarningAndStartDevotional;
     window.isWarningCleared = isWarningCleared;

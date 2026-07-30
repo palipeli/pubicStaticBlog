@@ -1,18 +1,18 @@
-// mobile-tray.js - Mobile Navigation Tray for Constrained Spaces
-// Only activates on mobile screens (max-width: 768px)
+
+
 
 (function() {
     const MOBILE_BREAKPOINT = 768;
     let isTrayOpen = false;
     
-    // Check if we're in mobile view
+    
     function isMobileView() {
         return window.innerWidth <= MOBILE_BREAKPOINT;
     }
     
-    // Create the mobile tray element
+    
     function createMobileTray() {
-        // Don't create tray on desktop
+        
         if (!isMobileView()) {
             const existingTray = document.getElementById('mobile-nav-tray');
             if (existingTray) {
@@ -21,7 +21,7 @@
             return;
         }
         
-        // Don't create if already exists
+        
         if (document.getElementById('mobile-nav-tray')) return;
         
         const tray = document.createElement('div');
@@ -53,16 +53,16 @@
         
         document.body.appendChild(tray);
         
-        // Setup event listeners
+        
         setupTrayEventListeners(tray);
         syncThemeButtons();
     }
     
-    // Setup event listeners for the tray
+    
     function setupTrayEventListeners(tray) {
         const overlay = document.getElementById('mobile-tray-overlay');
         
-        // Overlay click - close tray without triggering warning
+        
         if (overlay) {
             overlay.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -71,7 +71,7 @@
             });
         }
         
-        // Theme buttons
+        
         const themeBtns = tray.querySelectorAll('.mobile-theme-btn');
         themeBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -79,26 +79,26 @@
                 e.stopPropagation();
                 const theme = btn.dataset.theme;
                 
-                // Update active state
+                
                 themeBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 
-                // Apply theme using global function if available
+                
                 if (typeof applyTheme === 'function') {
                     applyTheme(theme);
                 }
                 
-                // Save preference
+                
                 if (typeof saveThemePreference === 'function') {
                     saveThemePreference(theme);
                 }
                 
-                // Sync with sidebar theme buttons
+                
                 syncSidebarThemeButtons(theme);
             });
         });
         
-        // Navigation links
+        
         const navItems = tray.querySelectorAll('.mobile-nav-item');
         navItems.forEach(item => {
             item.addEventListener('click', (e) => {
@@ -107,7 +107,7 @@
                 
                 const page = item.dataset.page;
                 
-                // Trigger navigation using existing system
+                
                 const desktopNavItem = document.querySelector(`.nav-item[data-page="${page}"]`);
                 if (desktopNavItem) {
                     desktopNavItem.click();
@@ -117,13 +117,13 @@
             });
         });
         
-        // Prevent clicks inside tray from propagating
+        
         tray.addEventListener('click', (e) => {
             e.stopPropagation();
         });
     }
     
-    // Close the tray
+    
     function closeTray() {
         const tray = document.getElementById('mobile-nav-tray');
         const overlay = document.getElementById('mobile-tray-overlay');
@@ -135,7 +135,7 @@
         document.body.classList.remove('mobile-tray-open');
     }
     
-    // Open the tray (used for auto-expand on blogs page)
+    
     function openTray() {
         if (!isMobileView()) return;
         
@@ -144,20 +144,20 @@
         
         if (!tray) return;
         
-        // Only open if not already open
+        
         if (tray.classList.contains('open')) return;
         
-        // Open tray
+        
         tray.classList.add('open');
         if (overlay) overlay.classList.add('open');
         isTrayOpen = true;
         document.body.classList.add('mobile-tray-open');
         
-        // Update blog posts section visibility
+        
         updateBlogPostsVisibility();
     }
     
-    // Create the overlay
+    
     function createOverlay() {
         if (!isMobileView()) {
             const existingOverlay = document.getElementById('mobile-tray-overlay');
@@ -173,7 +173,7 @@
         document.body.appendChild(overlay);
     }
     
-    // Create the toggle button in header
+    
     function createToggleButton() {
         if (!isMobileView()) {
             const existingToggle = document.getElementById('mobile-tray-toggle');
@@ -193,13 +193,13 @@
             </svg>
         `;
         
-        // Insert into header-right, after all nav items (rightmost position)
+        
         const headerRight = document.querySelector('.header-right');
         if (headerRight) {
             headerRight.appendChild(toggleBtn);
         }
         
-        // Add click event listener directly when creating button
+        
         toggleBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -212,36 +212,36 @@
             const isOpen = tray.classList.contains('open');
             
             if (isOpen) {
-                // Close tray
+                
                 tray.classList.remove('open');
                 if (overlay) overlay.classList.remove('open');
                 isTrayOpen = false;
                 document.body.classList.remove('mobile-tray-open');
             } else {
-                // Open tray
+                
                 tray.classList.add('open');
                 if (overlay) overlay.classList.add('open');
                 isTrayOpen = true;
                 document.body.classList.add('mobile-tray-open');
                 
-                // Update blog posts section visibility
+                
                 updateBlogPostsVisibility();
             }
         });
     }
     
-    // Sync theme buttons between mobile tray and sidebar
+    
     function syncThemeButtons() {
         const savedTheme = typeof getSavedTheme === 'function' ? getSavedTheme() : 'auto';
         
-        // Update mobile tray buttons
+        
         const mobileThemeBtns = document.querySelectorAll('.mobile-theme-btn');
         mobileThemeBtns.forEach(btn => {
             btn.classList.toggle('active', btn.dataset.theme === savedTheme);
         });
     }
     
-    // Sync sidebar theme buttons when mobile tray changes
+    
     function syncSidebarThemeButtons(theme) {
         const sidebarThemeBtns = document.querySelectorAll('.theme-btn');
         sidebarThemeBtns.forEach(btn => {
@@ -249,23 +249,23 @@
         });
     }
     
-    // Update blog posts visibility based on current page
+    
     function updateBlogPostsVisibility() {
         const blogSection = document.getElementById('mobile-blog-posts-section');
         
-        // Always show blog posts section in mobile tray (like in sidebar)
+        
         if (blogSection) {
             blogSection.style.display = 'block';
             renderMobilePostList();
         }
     }
     
-    // Render post list in mobile tray
+    
     function renderMobilePostList() {
         const container = document.getElementById('mobile-post-list');
         if (!container) return;
         
-        // Get posts from global window.blogPostMetadata array (lazy loading - metadata only)
+        
         const posts = typeof window.blogPostMetadata !== 'undefined' ? window.blogPostMetadata : [];
         
         if (posts.length === 0) {
@@ -282,21 +282,21 @@
                 <div class="mobile-post-meta">${post.date}</div>
             `;
             
-            // Preload content on touch start for faster response
+            
             item.addEventListener('touchstart', () => {
                 if (typeof window.preloadBlogPostContent === 'function') {
                     window.preloadBlogPostContent(post.id);
                 }
             }, { passive: true });
             
-            // Also preload on mouseenter/hover for devices that support it
+            
             item.addEventListener('mouseenter', () => {
                 if (typeof window.preloadBlogPostContent === 'function') {
                     window.preloadBlogPostContent(post.id);
                 }
             });
             
-            // Preload on mouseover as backup
+            
             item.addEventListener('mouseover', () => {
                 if (typeof window.preloadBlogPostContent === 'function') {
                     window.preloadBlogPostContent(post.id);
@@ -307,7 +307,7 @@
                 e.preventDefault();
                 e.stopPropagation();
                 
-                // Use global openBlogPostLazy function for lazy loading
+                
                 if (typeof window.openBlogPostLazy === 'function') {
                     window.openBlogPostLazy(post.id);
                 } else if (typeof openBlogPost === 'function') {
@@ -321,7 +321,7 @@
         });
     }
     
-    // Handle resize events
+    
     let resizeTimeout;
     function handleResize() {
         clearTimeout(resizeTimeout);
@@ -332,7 +332,7 @@
                 createToggleButton();
                 syncThemeButtons();
             } else {
-                // Remove mobile elements on desktop
+                
                 const tray = document.getElementById('mobile-nav-tray');
                 const overlay = document.getElementById('mobile-tray-overlay');
                 const toggleBtn = document.getElementById('mobile-tray-toggle');
@@ -346,7 +346,7 @@
         }, 100);
     }
     
-    // Initialize
+    
     function init() {
         if (isMobileView()) {
             createToggleButton();
@@ -356,7 +356,7 @@
         
         window.addEventListener('resize', handleResize);
         
-        // Listen for page changes to update blog posts visibility
+        
         document.addEventListener('DOMContentLoaded', () => {
             const navItems = document.querySelectorAll('.nav-item');
             navItems.forEach(item => {
@@ -365,8 +365,8 @@
                 });
             });
             
-            // Also listen for when blog metadata is loaded to render mobile post list
-            // This ensures the mobile tray can access window.blogPostMetadata once it's available
+            
+            
             const checkAndRenderPosts = setInterval(() => {
                 if (typeof window.blogPostMetadata !== 'undefined' && window.blogPostMetadata.length > 0) {
                     updateBlogPostsVisibility();
@@ -374,12 +374,12 @@
                 }
             }, 100);
             
-            // Clear interval after 5 seconds to avoid infinite checking
+            
             setTimeout(() => clearInterval(checkAndRenderPosts), 5000);
         });
     }
     
-    // Start initialization
+    
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
