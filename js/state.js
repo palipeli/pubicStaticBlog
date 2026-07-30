@@ -164,9 +164,9 @@
         if (state.currentPage === 'blogs') {
             setTimeout(() => {
                 if (state.activeBlogPost) {
-                    // Restore the post they were reading
+                    // Restore the post they were reading (skip navigation since we already navigated above)
                     if (typeof window.openBlogPostLazy === 'function') {
-                        window.openBlogPostLazy(state.activeBlogPost);
+                        window.openBlogPostLazy(state.activeBlogPost, true);
                     }
                 } else if (state.blogIntroViewed) {
                     // Show blog intro grid instead of a post

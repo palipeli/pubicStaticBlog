@@ -184,8 +184,9 @@
         window.navigateToBlogsPageWithoutPrefetch();
 
         // Then open the specific post after a short delay
+        // Pass true to skipNavigation since we already navigated above
         setTimeout(() => {
-            window.openBlogPost(id);
+            window.openBlogPost(id, true);
         }, 100);
     }
 
@@ -195,8 +196,9 @@
         window.navigateToBlogsPageWithoutPrefetch();
 
         // Then open the specific post with lazy loading after a short delay
+        // Pass true to skipNavigation since we already navigated above
         setTimeout(() => {
-            window.openBlogPostLazy(id);
+            window.openBlogPostLazy(id, true);
         }, 100);
     }
 

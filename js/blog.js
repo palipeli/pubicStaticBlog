@@ -213,7 +213,7 @@
             // Add data attribute for state persistence
             item.setAttribute('data-post-id', post.id);
             // Use metadata-only approach: load content on click, preload on hover
-            item.onclick = () => window.openBlogPostLazy(post.id);
+            item.onclick = () => window.openBlogPostLazy(post.id, false);
             // Only prefetch the specific post content on hover (not the blog introduction)
             item.onmouseenter = () => {
                 preloadBlogPostContent(post.id);
@@ -256,7 +256,7 @@
             // Make entire card clickable
             card.style.cursor = 'pointer';
             card.onclick = () => {
-                window.openBlogPostLazy(post.id);
+                window.openBlogPostLazy(post.id, false);
             };
 
             // Prefetch on hover
@@ -269,13 +269,14 @@
     }
 
     // Open a blog post (legacy - uses pre-loaded posts)
-    function openBlogPost(id) {
+    function openBlogPost(id, skipNavigation = false) {
         const post = blogPosts.find(p => p.id === id);
         if (!post) return;
 
         // Check if we're currently on home or about page, and switch to blogs if so
+        // Skip this if skipNavigation is true (e.g., when called from home.js after manual navigation)
         const currentPage = document.querySelector('.page-section.active');
-        if (currentPage && (currentPage.id === 'home' || currentPage.id === 'about')) {
+        if (!skipNavigation && currentPage && (currentPage.id === 'home' || currentPage.id === 'about')) {
             // Navigate to blogs page without triggering prefetch
             window.navigateToBlogsPageWithoutPrefetch();
         }
@@ -308,14 +309,16 @@
     const navigationHistory = [];
     
     // Open a blog post with lazy loading (new approach - loads content on demand)
-    async function openBlogPostLazy(id) {
+    // Optional skipNavigation parameter to prevent duplicate navigation when restoring state
+    async function openBlogPostLazy(id, skipNavigation = false) {
         // Show loading state first
         const article = document.getElementById('blog-article-content');
 
         // Check if we're currently on home or about page, and switch to blogs if so
+        // Skip this if skipNavigation is true (e.g., when restoring state from ui.js)
         const currentPage = document.querySelector('.page-section.active');
         let previousPage = null;
-        if (currentPage && (currentPage.id === 'home' || currentPage.id === 'about')) {
+        if (!skipNavigation && currentPage && (currentPage.id === 'home' || currentPage.id === 'about')) {
             // Save the previous page before navigating to blogs
             previousPage = currentPage.id;
             // Navigate to blogs page without triggering blog introduction prefetch

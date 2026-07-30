@@ -307,11 +307,11 @@
                 e.preventDefault();
                 e.stopPropagation();
                 
-                // Use global openBlogPostLazy function for lazy loading
+                // Use global openBlogPostLazy function for lazy loading (skip navigation since mobile tray handles its own navigation)
                 if (typeof window.openBlogPostLazy === 'function') {
-                    window.openBlogPostLazy(post.id);
+                    window.openBlogPostLazy(post.id, false);
                 } else if (typeof openBlogPost === 'function') {
-                    openBlogPost(post.id);
+                    openBlogPost(post.id, false);
                 }
                 
                 closeTray();
