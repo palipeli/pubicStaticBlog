@@ -83,8 +83,12 @@
 
         // Check if marked library is available
         if (typeof marked === 'undefined') {
-            console.error('Marked library not loaded. Please ensure marked.js is included before markdown.js');
-            return '<p>Error: Markdown parser not available.</p>';
+            console.warn('Marked library not loaded. Attempting to load from CDN...');
+            // Return raw markdown as fallback if marked is not available
+            return '<div class="markdown-content">' + 
+                   markdown.replace(/\n/g, '<br>').replace(/#/g, '') + 
+                   '<p style="color: var(--text-secondary); font-size: 0.9em;">Note: Markdown parser unavailable. Showing raw content.</p>' +
+                   '</div>';
         }
 
         // Ensure marked is configured
