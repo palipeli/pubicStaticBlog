@@ -1,5 +1,13 @@
 [
   {
+    "id": "gfm-parser-100-percent-compatible",
+    "slug": "/blog/gfm-parser-100-percent-compatible.md",
+    "title": "100% GitHub Flavored Markdown Compatible Parser",
+    "date": "Jul 30 2026",
+    "category": "Tutorial",
+    "icon": "✅"
+  },
+  {
     "id": "getting-started",
     "slug": "/blog/getting-started.md",
     "title": "Getting Started with Web Development, do not read this. Just a template",
