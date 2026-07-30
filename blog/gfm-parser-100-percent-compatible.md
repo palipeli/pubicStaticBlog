@@ -1,101 +1,245 @@
-The markdown parser in `/workspace/js/markdown.js` has been completely rewritten to achieve **100% compatibility** with the GitHub Flavored Markdown specification according to https://github.github.com/gfm/.
+---
+__Advertisement :)__
 
-## Before Fixes - Incompatibilities Found
+- __[pica](https://nodeca.github.io/pica/demo/)__ - high quality and fast image
+  resize in browser.
+- __[babelfish](https://github.com/nodeca/babelfish/)__ - developer friendly
+  i18n with plurals support and easy syntax.
 
-The original parser had the following GFM incompatibilities:
+You will like those projects!
 
-1. **Missing H5/H6 Headers**: Only supported H1-H4
-2. **Missing Underscore Emphasis**: Didn't support `__bold__` and `_italic_`
-3. **Missing Strikethrough**: No `~~deleted~~` support (GFM extension)
-4. **Limited Thematic Breaks**: Only some HR patterns worked
-5. **Limited List Markers**: Only `-` for unordered lists, not `*` or `+`
-6. **No Setext Headings**: Missing `Header\n===` and `Header\n---` styles
-7. **No Link Titles**: Couldn't parse `[text](url "title")`
-8. **No Autolinks**: Missing `<https://example.com>` and `<email@example.com>`
-9. **No Backslash Escapes**: `\*` wasn't treated as literal asterisk
-10. **No Hard Line Breaks**: `  \n` didn't produce `<br />`
-11. **No HTML Entity Support**: Entities like `&nbsp;` weren't decoded
-12. **Poor Code Span Handling**: Nested backticks not supported
-13. **Blockquote Issues**: Content not properly wrapped in paragraphs
+---
 
-## After Fixes - Features Implemented
+# h1 Heading 8-)
+## h2 Heading
+### h3 Heading
+#### h4 Heading
+##### h5 Heading
+###### h6 Heading
 
-The new parser now supports all core GFM features:
 
-### Block Structures
-- ✅ ATX Headings (H1-H6): `#` through `######`
-- ✅ Setext Headings: Underlined with `===` and `---`
-- ✅ Thematic Breaks: `---`, `***`, `___` (with optional spaces)
-- ✅ Fenced Code Blocks: Triple backticks/tildes with optional language
-- ✅ Indented Code Blocks: 4-space indentation
-- ✅ Blockquotes: `>` with nested content support
-- ✅ Unordered Lists: `-`, `*`, `+` markers
-- ✅ Ordered Lists: `1.`, `2.`, etc.
-- ✅ HTML Blocks: Basic HTML tag support
+## Horizontal Rules
 
-### Inline Elements
-- ✅ Strong Emphasis: `**text**` and `__text__`
-- ✅ Emphasis: `*text*` and `_text_`
-- ✅ Strong+Emphasis: `***text***` and `___text___`
-- ✅ Strikethrough: `~~text~~` (GFM extension)
-- ✅ Code Spans: `` `code` `` with nested backtick support
-- ✅ Links: `[text](url)` with optional title
-- ✅ Images: `![alt](src)` with lazy loading
-- ✅ Autolinks: `<URL>` and `<email@domain.com>`
-- ✅ Backslash Escapes: `\*`, `\[`, etc.
-- ✅ HTML Entities: `&amp;`, `&lt;`, `&nbsp;`, etc.
-- ✅ Hard Line Breaks: Two spaces + newline → `<br />`
+___
 
-### Test Results
+---
 
-Comparing against the `marked` library (reference GFM implementation):
+***
+
+
+## Typographic replacements
+
+Enable typographer option to see result.
+
+(c) (C) (r) (R) (tm) (TM) +-
+
+test.. test... test..... test?..... test!....
+
+!!!!!! ???? ,,  -- ---
+
+"Smartypants, double quotes" and 'single quotes'
+
+
+## Emphasis
+
+**This is bold text**
+
+__This is bold text__
+
+*This is italic text*
+
+_This is italic text_
+
+~~Strikethrough~~
+
+
+## Blockquotes
+
+
+> Blockquotes can also be nested...
+>> ...by using additional greater-than signs right next to each other...
+> > > ...or with spaces between arrows.
+
+
+## Lists
+
+Unordered
+
++ Create a list by starting a line with `+`, `-`, or `*`
++ Sub-lists are made by indenting 2 spaces:
+  - Marker character change forces new list start:
+    * Ac tristique libero volutpat at
+    + Facilisis in pretium nisl aliquet
+    - Nulla volutpat aliquam velit
++ Very easy!
+
+Ordered
+
+1. Lorem ipsum dolor sit amet
+2. Consectetur adipiscing elit
+3. Integer molestie lorem at massa
+
+
+1. You can use sequential numbers...
+1. ...or keep all the numbers as `1.`
+
+Start numbering with offset:
+
+57. foo
+1. bar
+
+
+## Code
+
+Inline `code`
+
+Indented code
+
+    // Some comments
+    line 1 of code
+    line 2 of code
+    line 3 of code
+
+
+Block code "fences"
 
 ```
-Test Results: 33 / 33 passed (100%)
+Sample text here...
 ```
 
-All tested GFM features now produce output compatible with the specification.
+Syntax highlighting
 
-## Implementation Details
+``` js
+const foo = function (bar) {
+  return bar++;
+};
 
-The parser uses a proper two-phase approach:
-
-1. **Block-level parsing**: Splits input into blocks (headings, paragraphs, lists, code blocks, etc.)
-2. **Inline parsing**: Processes inline elements within each block (emphasis, links, code spans, etc.)
-
-Key improvements:
-- Proper handling of tabs as 4-space equivalents
-- Correct precedence rules for inline elements
-- Balanced bracket/parenthesis matching for links
-- Multi-character delimiter tracking for emphasis
-- HTML entity decoding
-- Backslash escape processing
-
-## Remaining Limitations
-
-While the parser achieves 100% compatibility on all tested core features, some edge cases from the full GFM spec may need future work:
-
-- Reference-style links `[text][ref]` with definition lookup
-- Complex nested list structures with continuation paragraphs
-- Full HTML block parsing (currently limited set of tags)
-- Task list items (`- [x]` and `- [ ]`)
-- Tables (GFM extension)
-- Disallowed raw HTML tags in certain contexts
-
-For production use requiring 100% spec compliance including all edge cases, consider using established libraries like `marked`, `markdown-it`, or `commonmark.js`.
-
-## Files Modified
-
-- `/workspace/js/markdown.js` - Complete rewrite with GFM-compliant parser
-
-## Testing
-
-Run tests with:
-```bash
-node -e "const { parseMarkdown } = require('./js/markdown.js'); console.log(parseMarkdown('# Hello'));"
+console.log(foo(5));
 ```
 
-Compare with marked:
-```bash
-node -e "const { parseMarkdown } = require('./js/markdown.js'); const { marked } = require('marked'); console.log('Ours:', parseMarkdown('**bold**')); console.log('Marked:', marked.parse('**bold**'));"
-```
+## Tables
+
+| Option | Description |
+| ------ | ----------- |
+| data   | path to data files to supply the data that will be passed into templates. |
+| engine | engine to be used for processing templates. Handlebars is the default. |
+| ext    | extension to be used for dest files. |
+
+Right aligned columns
+
+| Option | Description |
+| ------:| -----------:|
+| data   | path to data files to supply the data that will be passed into templates. |
+| engine | engine to be used for processing templates. Handlebars is the default. |
+| ext    | extension to be used for dest files. |
+
+
+## Links
+
+[link text](http://dev.nodeca.com)
+
+[link with title](http://nodeca.github.io/pica/demo/ "title text!")
+
+Autoconverted link https://github.com/nodeca/pica (enable linkify to see)
+
+
+## Images
+
+![Minion](https://octodex.github.com/images/minion.png)
+![Stormtroopocat](https://octodex.github.com/images/stormtroopocat.jpg "The Stormtroopocat")
+
+Like links, Images also have a footnote style syntax
+
+![Alt text][id]
+
+With a reference later in the document defining the URL location:
+
+[id]: https://octodex.github.com/images/dojocat.jpg  "The Dojocat"
+
+
+## Plugins
+
+The killer feature of `markdown-it` is very effective support of
+[syntax plugins](https://www.npmjs.org/browse/keyword/markdown-it-plugin).
+
+
+### [Emojies](https://github.com/markdown-it/markdown-it-emoji)
+
+> Classic markup: :wink: :cry: :laughing: :yum:
+>
+> Shortcuts (emoticons): :-) :-( 8-) ;)
+
+see [how to change output](https://github.com/markdown-it/markdown-it-emoji#change-output) with twemoji.
+
+
+### [Subscript](https://github.com/markdown-it/markdown-it-sub) / [Superscript](https://github.com/markdown-it/markdown-it-sup)
+
+- 19^th^
+- H~2~O
+
+
+### [\<ins>](https://github.com/markdown-it/markdown-it-ins)
+
+++Inserted text++
+
+
+### [\<mark>](https://github.com/markdown-it/markdown-it-mark)
+
+==Marked text==
+
+
+### [Footnotes](https://github.com/markdown-it/markdown-it-footnote)
+
+Footnote 1 link[^first].
+
+Footnote 2 link[^second].
+
+Inline footnote^[Text of inline footnote] definition.
+
+Duplicated footnote reference[^second].
+
+[^first]: Footnote **can have markup**
+
+    and multiple paragraphs.
+
+[^second]: Footnote text.
+
+
+### [Definition lists](https://github.com/markdown-it/markdown-it-deflist)
+
+Term 1
+
+:   Definition 1
+with lazy continuation.
+
+Term 2 with *inline markup*
+
+:   Definition 2
+
+        { some code, part of Definition 2 }
+
+    Third paragraph of definition 2.
+
+_Compact style:_
+
+Term 1
+  ~ Definition 1
+
+Term 2
+  ~ Definition 2a
+  ~ Definition 2b
+
+
+### [Abbreviations](https://github.com/markdown-it/markdown-it-abbr)
+
+This is HTML abbreviation example.
+
+It converts "HTML", but keep intact partial entries like "xxxHTMLyyy" and so on.
+
+*[HTML]: Hyper Text Markup Language
+
+### [Custom containers](https://github.com/markdown-it/markdown-it-container)
+
+::: warning
+*here be dragons*
+:::
