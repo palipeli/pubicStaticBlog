@@ -137,6 +137,17 @@
 
     // Monitor for warning clearance and trigger devotional using event-based approach
     async function monitorWarningAndStartDevotional() {
+        // Check if user has already given consent
+        const hasConsent = localStorage.getItem('system_warning_consent') === 'true';
+        
+        if (hasConsent) {
+            // User already accepted, start devotional after a short delay
+            setTimeout(async () => {
+                await runDevotional();
+            }, 500);
+            return;
+        }
+        
         // Listen for the warning:cleared event from warning.js
         document.addEventListener('warning:cleared', () => {
             // Small delay to ensure UI is settled
