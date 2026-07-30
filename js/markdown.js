@@ -1,5 +1,6 @@
-// markdown.js - Markdown Parser and Blog Content Utilities
+// markdown.js - Markdown Parser using Marked library
 // Handles parsing markdown, frontmatter, and rendering blog content
+// Uses marked library for improved GFM compatibility and performance
 
 (function() {
     // Default introduction content shown before selecting a post
@@ -21,148 +22,83 @@
             <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet.</p>
             
             <blockquote>
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut dolore magna aliqua."
             </blockquote>
             
             <p>Select a post from the sidebar to start reading.</p>
         `
     };
 
-    // Simple Markdown parser
-    function parseMarkdown(markdown) {
-        if (!markdown) return '';
+    // Configure marked options for GFM compatibility
+    function configureMarked() {
+        if (typeof marked !== 'undefined') {
+            marked.setOptions({
+                gfm: true,              // Enable GitHub Flavored Markdown
+                breaks: false,          // Don't convert line breaks to <br> (require double space or newline)
+                headerIds: true,        // Add IDs to headers
+                mangle: false,          // Don't mangle email addresses
+                sanitize: false,        // Don't sanitize HTML (we trust our content)
+                silent: false           // Throw errors on invalid markdown
+            });
+        }
+    }
 
-        let html = markdown;
-
-        // Escape HTML
-        html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-        // Code blocks (must be before other replacements)
-        // Handle multi-line code blocks with optional language specifier - must have newline after opening ```
-        html = html.replace(/```(\w*)\n([\s\S]*?)\n```/g, '<pre><code>$2</code></pre>');
-
-        // Inline code with triple backticks (for short code spans without newlines, e.g., ```PPQCheck```)
-        // This must come AFTER multi-line code blocks to avoid conflicts
-        html = html.replace(/```([^`\n]+)```/g, '<code>$1</code>');
-
-        // Inline code with single backticks
-        html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-        // Headers
-        html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-        html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-        html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-        html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
-
-        // Bold
-        html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-
-        // Italic
-        html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-
-        // Images (must be before links since it uses similar syntax)
-        // Add lazy-loading with data-src for hover-based loading
-        html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
+    // Custom renderer to add lazy loading to images
+    function createCustomRenderer() {
+        if (typeof marked === 'undefined') return null;
+        
+        const renderer = new marked.Renderer();
+        
+        // Override image rendering to add lazy loading
+        renderer.image = function(href, title, text) {
             // Check if it's a media file or external image
-            const isMediaFile = src.includes('/media/') || src.endsWith('.webp') || src.endsWith('.png') || src.endsWith('.jpg') || src.endsWith('.jpeg') || src.endsWith('.gif') || src.endsWith('.svg');
+            const isMediaFile = href.includes('/media/') || 
+                               href.endsWith('.webp') || 
+                               href.endsWith('.png') || 
+                               href.endsWith('.jpg') || 
+                               href.endsWith('.jpeg') || 
+                               href.endsWith('.gif') || 
+                               href.endsWith('.svg');
 
             if (isMediaFile) {
                 // Use data-src for lazy loading on hover, use a tiny transparent placeholder as initial src
-                return `<img data-src="${src}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="${alt}" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">`;
+                return `<img data-src="${href}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="${text}" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">`;
             } else {
                 // For non-media images, load normally but still add lazy class for consistency
-                return `<img src="${src}" alt="${alt}" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">`;
+                return `<img src="${href}" alt="${text}" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">`;
             }
-        });
-
-        // Links
-        html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
-
-        // Blockquotes
-        html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
-
-        // Process lists - need to handle them line by line first, then wrap
-        const lines = html.split('\n');
-        const processedLines = [];
-        let inOrderedList = false;
-        let inUnorderedList = false;
+        };
         
-        for (let i = 0; i < lines.length; i++) {
-            let line = lines[i];
-            
-            // Check for ordered list item (number followed by period and space)
-            const orderedMatch = line.match(/^\d+\.\s+(.+)$/);
-            // Check for unordered list item (dash followed by space)
-            const unorderedMatch = line.match(/^-\s+(.+)$/);
-            
-            if (orderedMatch) {
-                // Close unordered list if open
-                if (inUnorderedList) {
-                    processedLines.push('</ul>');
-                    inUnorderedList = false;
-                }
-                // Open ordered list if not already open
-                if (!inOrderedList) {
-                    processedLines.push('<ol>');
-                    inOrderedList = true;
-                }
-                processedLines.push(`<li>${orderedMatch[1]}</li>`);
-            } else if (unorderedMatch) {
-                // Close ordered list if open
-                if (inOrderedList) {
-                    processedLines.push('</ol>');
-                    inOrderedList = false;
-                }
-                // Open unordered list if not already open
-                if (!inUnorderedList) {
-                    processedLines.push('<ul>');
-                    inUnorderedList = true;
-                }
-                processedLines.push(`<li>${unorderedMatch[1]}</li>`);
-            } else if (line.trim() === '') {
-                // Blank line - don't close lists yet, check if next non-empty line continues the list
-                processedLines.push(line);
-            } else {
-                // Non-list, non-blank line - close any open lists
-                if (inOrderedList) {
-                    processedLines.push('</ol>');
-                    inOrderedList = false;
-                }
-                if (inUnorderedList) {
-                    processedLines.push('</ul>');
-                    inUnorderedList = false;
-                }
-                processedLines.push(line);
-            }
+        // Override link rendering to open in new tab
+        renderer.link = function(href, title, text) {
+            return `<a href="${href}" target="_blank">${text}</a>`;
+        };
+        
+        return renderer;
+    }
+
+    // Simple Markdown parser using marked library
+    function parseMarkdown(markdown) {
+        if (!markdown) return '';
+
+        // Check if marked library is available
+        if (typeof marked === 'undefined') {
+            console.error('Marked library not loaded. Please ensure marked.js is included before markdown.js');
+            return '<p>Error: Markdown parser not available.</p>';
         }
+
+        // Ensure marked is configured
+        configureMarked();
         
-        // Close any remaining open lists
-        if (inOrderedList) {
-            processedLines.push('</ol>');
+        // Create custom renderer with lazy loading support
+        const customRenderer = createCustomRenderer();
+        
+        // Parse markdown using marked with custom renderer
+        if (customRenderer) {
+            return marked.parse(markdown, { renderer: customRenderer });
+        } else {
+            return marked.parse(markdown);
         }
-        if (inUnorderedList) {
-            processedLines.push('</ul>');
-        }
-        
-        // Second pass: remove blank lines inside lists that break continuity
-        let finalHtml = processedLines.join('\n');
-        // Remove blank lines between </li> and <li> within the same list
-        finalHtml = finalHtml.replace(/(<\/li>)\n+(\n*)(<li>)/g, '$1$3');
-        // Remove blank lines between opening tag and first li
-        finalHtml = finalHtml.replace(/(<(?:ol|ul)>)\n+(\n*)(<li>)/g, '$1$3');
-        // Remove blank lines between last li and closing tag
-        finalHtml = finalHtml.replace(/(<\/li>)\n+(\n*)(<\/(?:ol|ul)>)/g, '$1$3');
-        
-        html = finalHtml;
-
-        // Paragraphs (simple approach - wrap remaining text blocks)
-
-        // Clean up empty paragraphs and fix paragraph wrapping around block elements
-        html = html.replace(/<p>\s*<(h[1-6]|ul|ol|li|pre|blockquote)/g, '<$1');
-        html = html.replace(/<(\/h[1-6]|\/ul|\/ol|\/li|\/pre|\/blockquote)>\s*<\/p>/g, '<$1>');
-        html = html.replace(/<p><\/p>/g, '');
-
-        return html;
     }
 
     // Parse frontmatter from markdown
@@ -193,6 +129,19 @@
 
         return { frontmatter, content: body };
     }
+
+    // Initialize marked configuration when script loads
+    function init() {
+        // Wait for marked to be available if loaded asynchronously
+        if (typeof marked === 'undefined') {
+            console.warn('Marked library not yet loaded. Will configure on first parse.');
+        } else {
+            configureMarked();
+        }
+    }
+
+    // Run initialization
+    init();
 
     // Expose functions globally
     window.parseMarkdown = parseMarkdown;
