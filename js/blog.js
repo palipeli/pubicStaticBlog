@@ -315,6 +315,11 @@
         // Show loading state first
         const article = document.getElementById('blog-article-content');
 
+        // Wait for metadata to be loaded first (critical for refresh scenario)
+        if (!window.blogPostMetadata || window.blogPostMetadata.length === 0) {
+            await waitForBlogMetadata();
+        }
+
         // Check if we're currently on home or about page, and switch to blogs if so
         const currentPage = document.querySelector('.page-section.active');
         let previousPage = null;
@@ -347,9 +352,10 @@
         // Update the visibility of back button on blog intro based on history
         updateBlogIntroBackButton();
 
-        // Update active state in sidebar
-        document.querySelectorAll('.post-selector-item').forEach((item, index) => {
-            item.classList.toggle('active', blogPostMetadata[index]?.id === id);
+        // Update active state in sidebar (use window.blogPostMetadata to ensure we have latest data)
+        document.querySelectorAll('.post-selector-item').forEach((item) => {
+            const postId = item.getAttribute('data-post-id');
+            item.classList.toggle('active', postId === id);
         });
 
         // Hide intro view, show post view with loading indicator
@@ -369,12 +375,6 @@
         if (!post) {
             article.innerHTML = '<p style="color: var(--text-secondary);">Error loading post.</p>';
             return;
-        }
-
-        // Double-check that metadata is still available (in case of race condition during refresh)
-        if (!blogPostMetadata || blogPostMetadata.length === 0) {
-            // Metadata not loaded yet, wait for it
-            await waitForBlogMetadata();
         }
 
         // Render post content with fade-in animation (keep loading state visible until render completes)
