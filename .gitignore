@@ -1,1 +1,7 @@
-Nothing to output - the change list contains only a markdown file (.md) which is a source/config file, and there are no build artifacts, dependencies, or temp files to ignore.
+```json
+{
+  "title": "My Blog Post",
+  "content": "This is the content of my blog post...",
+  "date": "2026-09-14T10:00:00Z"
+}
+```
