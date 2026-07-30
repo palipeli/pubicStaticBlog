@@ -137,14 +137,31 @@
 
     // Monitor for warning clearance and trigger devotional using event-based approach
     async function monitorWarningAndStartDevotional() {
+        // Helper function to check if conditions are met to start devotional
+        function canStartDevotional() {
+            const consentNow = localStorage.getItem('system_warning_consent') === 'true';
+            const consentOverlay = document.getElementById('consent-overlay');
+            const isOverlayGone = !consentOverlay || consentOverlay.style.display === 'none';
+            const heroElement = document.getElementById('home-hero-content');
+            return consentNow && isOverlayGone && heroElement;
+        }
+        
         // Check if user has already given consent
         const hasConsent = localStorage.getItem('system_warning_consent') === 'true';
         
         if (hasConsent) {
             // User already accepted, start devotional after a short delay
-            setTimeout(async () => {
-                await runDevotional();
-            }, 500);
+            // Ensure DOM is fully loaded before starting
+            const tryStart = async () => {
+                const heroElement = document.getElementById('home-hero-content');
+                if (heroElement) {
+                    await runDevotional();
+                } else {
+                    // Retry if hero element not found yet
+                    setTimeout(tryStart, 300);
+                }
+            };
+            setTimeout(tryStart, 400);
             return;
         }
         
@@ -155,6 +172,20 @@
                 await runDevotional();
             }, 300);
         }, { once: true });
+        
+        // Polling mechanism: check periodically if conditions are met
+        // This handles the case where warning.js clears consent before devotional.js loads
+        let pollCount = 0;
+        const maxPolls = 10; // Check up to 10 times (5 seconds total)
+        const pollInterval = setInterval(() => {
+            pollCount++;
+            if (canStartDevotional() && !devotionalActive) {
+                clearInterval(pollInterval);
+                runDevotional();
+            } else if (pollCount >= maxPolls) {
+                clearInterval(pollInterval);
+            }
+        }, 500);
     }
 
     // Expose functions globally
