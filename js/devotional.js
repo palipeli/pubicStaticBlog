@@ -7,15 +7,23 @@
     let devotionalActive = false;
     let versesLoaded = false;
 
-    // Load Bible verses from pre-extracted JSON (cleaned version without footnote markers)
+    // Load Bible verses from pre-extracted JSON (compact array format for smaller size)
     // Only loads when needed to keep initial page load lightweight
+    // Format: [book, chapter, verse, text]
     async function loadBibleVerses() {
         if (versesLoaded) return bibleVerses;
 
         try {
-            const response = await fetch('/blog/nt_verses_clean.json');
+            const response = await fetch('/blog/nt_verses_compact.json');
             if (!response.ok) throw new Error('Could not fetch Bible verses');
-            bibleVerses = await response.json();
+            const rawData = await response.json();
+            // Convert array format back to objects for compatibility
+            bibleVerses = rawData.map(v => ({
+                book: v[0],
+                chapter: v[1],
+                verse: v[2],
+                text: v[3]
+            }));
             versesLoaded = true;
             console.log(`Loaded ${bibleVerses.length} Bible verses`);
             return bibleVerses;

@@ -1,1 +1,55 @@
-Nothing should be ignored based on the provided file changes, as only a README.md file was modified and no build artifacts, dependencies, or temporary files were detected.
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+
+# Dependencies
+.venv/
+venv/
+node_modules/
+pip-tools/
+*.egg-info/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+.coverage
+coverage/
+htmlcov/
+
+# Distribution
+dist/
+build/
+*.tar.gz
+*.whl
+*.egg
+
+# Python specific
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.sqlite3
+
+# Backup files
+*~
+*.bak
+*.backup
