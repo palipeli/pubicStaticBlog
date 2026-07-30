@@ -118,8 +118,11 @@
                     inUnorderedList = true;
                 }
                 processedLines.push(`<li>${unorderedMatch[1]}</li>`);
+            } else if (line.trim() === '') {
+                // Blank line - don't close lists yet, check if next non-empty line continues the list
+                processedLines.push(line);
             } else {
-                // Close any open lists
+                // Non-list, non-blank line - close any open lists
                 if (inOrderedList) {
                     processedLines.push('</ol>');
                     inOrderedList = false;
@@ -140,7 +143,16 @@
             processedLines.push('</ul>');
         }
         
-        html = processedLines.join('\n');
+        // Second pass: remove blank lines inside lists that break continuity
+        let finalHtml = processedLines.join('\n');
+        // Remove blank lines between </li> and <li> within the same list
+        finalHtml = finalHtml.replace(/(<\/li>)\n+(\n*)(<li>)/g, '$1$3');
+        // Remove blank lines between opening tag and first li
+        finalHtml = finalHtml.replace(/(<(?:ol|ul)>)\n+(\n*)(<li>)/g, '$1$3');
+        // Remove blank lines between last li and closing tag
+        finalHtml = finalHtml.replace(/(<\/li>)\n+(\n*)(<\/(?:ol|ul)>)/g, '$1$3');
+        
+        html = finalHtml;
 
         // Paragraphs (simple approach - wrap remaining text blocks)
 
