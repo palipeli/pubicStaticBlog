@@ -59,9 +59,6 @@
         // Italic
         html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
 
-        // Links
-        html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
-
         // Images (must be before links since it uses similar syntax)
         // Add lazy-loading with data-src for hover-based loading
         html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
@@ -77,15 +74,26 @@
             }
         });
 
+        // Links
+        html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+
         // Blockquotes
         html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
 
-        // Unordered lists
-        html = html.replace(/^\- (.+)$/gm, '<li>$1</li>');
-        html = html.replace(/^(<li>.+<\/li>\n?)+/gm, '<ul>$&</ul>');
+        // Ordered lists - convert first with data-ol marker
+        html = html.replace(/^\d+\. (.+)$/gm, '<li data-ol>$1</li>');
 
-        // Ordered lists
-        html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+        // Unordered lists - convert after ordered lists
+        html = html.replace(/^\- (.+)$/gm, '<li>$1</li>');
+
+        // Wrap consecutive ordered list items
+        html = html.replace(/^(<li data-ol>.+<\/li>\n?)+/gm, '<ol>$&</ol>');
+
+        // Remove the data-ol attribute after wrapping
+        html = html.replace(/<li data-ol>/g, '<li>');
+
+        // Wrap consecutive unordered list items
+        html = html.replace(/^(<li>.+<\/li>\n?)+/gm, '<ul>$&</ul>');
 
         // Paragraphs (simple approach - wrap remaining text blocks)
         html = html.replace(/\n\n/g, '</p>\n<p>');
