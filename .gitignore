@@ -1,11 +1,1 @@
-```
-# Dependencies
-node_modules/
-
-# Logs and temp files
-*.log
-
-# Environment
-.env
-.env.
-```
+Nothing to output - the change list contains only a markdown file (.md) which is a source/config file, and there are no build artifacts, dependencies, or temp files to ignore.
