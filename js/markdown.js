@@ -1,6 +1,6 @@
-// markdown.js - Markdown Parser and Blog Content Utilities
-// Handles parsing markdown, frontmatter, and rendering blog content
-// Updated for GitHub Flavored Markdown (GFM) compatibility
+// markdown.js - GitHub Flavored Markdown (GFM) Compatible Parser
+// Full implementation following https://github.github.com/gfm/ spec
+// Uses a proper block-level and inline-level parsing approach
 
 (function() {
     // Default introduction content shown before selecting a post
@@ -29,167 +29,833 @@
         `
     };
 
+    // HTML entity map for common entities
+    const htmlEntities = {
+        '&nbsp;': '\u00A0', '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"',
+        '&#39;': "'", '&apos;': "'", '&copy;': '\u00A9', '&reg;': '\u00AE', '&trade;': '\u2122',
+        '&mdash;': '\u2014', '&ndash;': '\u2013', '&hellip;': '\u2026', '&lsquo;': '\u2018', '&rsquo;': '\u2019',
+        '&ldquo;': '\u201C', '&rdquo;': '\u201D', '&bull;': '\u2022', '&middot;': '\u00B7', '&larr;': '\u2190',
+        '&uarr;': '\u2191', '&rarr;': '\u2192', '&darr;': '\u2193', '&harr;': '\u2194', '&hearts;': '\u2665',
+        '&diams;': '\u2666', '&clubs;': '\u2663', '&spades;': '\u2660', '&euro;': '\u20AC', '&pound;': '\u00A3',
+        '&yen;': '\u00A5', '&cent;': '\u00A2'
+    };
+
+    // Decode HTML entities
+    function decodeHtmlEntities(text) {
+        return text.replace(/&(?:[a-zA-Z]+|#\d+|#x[0-9a-fA-F]+);/g, function(match) {
+            if (htmlEntities[match]) return htmlEntities[match];
+            // Handle numeric entities
+            if (match.startsWith('&#')) {
+                const code = match.startsWith('&#x') ? parseInt(match.slice(3, -1), 16) : parseInt(match.slice(2, -1));
+                if (!isNaN(code)) return String.fromCharCode(code);
+            }
+            return match;
+        });
+    }
+
+    // Check if character is a whitespace character (space, tab, newline, etc.)
+    function isWhitespace(ch) {
+        return ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r';
+    }
+
+    // Check if string is blank (only whitespace)
+    function isBlank(line) {
+        return /^[ \t]*$/.test(line);
+    }
+
+    // Get indent level (number of spaces, treating tabs as 4 spaces)
+    function getIndentLevel(line) {
+        let level = 0;
+        for (let i = 0; i < line.length; i++) {
+            if (line[i] === ' ') level++;
+            else if (line[i] === '\t') level += 4;
+            else break;
+        }
+        return level;
+    }
+
+    // Remove leading indentation (spaces/tabs)
+    function removeLeadingIndent(line, count) {
+        let removed = 0;
+        let result = line;
+        for (let i = 0; i < line.length && removed < count; i++) {
+            if (line[i] === ' ') { removed++; }
+            else if (line[i] === '\t') { removed += 4; }
+            else { break; }
+        }
+        return line.substring(Math.min(result.indexOf(result.trimStart()), line.length));
+    }
+
+    // Parse inline elements (bold, italic, links, images, code spans, etc.)
+    function parseInline(text, options = {}) {
+        if (!text) return '';
+        
+        let result = '';
+        let i = 0;
+        
+        while (i < text.length) {
+            // Try to match various inline patterns
+            
+            // Backslash escapes (GFM section 6.1)
+            if (text[i] === '\\' && i + 1 < text.length) {
+                const nextChar = text[i + 1];
+                if ('\\`*_{}[]()<>#+-.!|'.includes(nextChar)) {
+                    result += nextChar;
+                    i += 2;
+                    continue;
+                }
+            }
+            
+            // HTML entities (GFM section 6.2)
+            if (text[i] === '&') {
+                const entityMatch = text.slice(i).match(/^&([a-zA-Z]+|#\d+|#x[0-9a-fA-F]+);/);
+                if (entityMatch) {
+                    result += decodeHtmlEntities(entityMatch[0]);
+                    i += entityMatch[0].length;
+                    continue;
+                }
+            }
+            
+            // Code spans (backticks) - GFM section 6.3
+            if (text[i] === '`') {
+                // Count backticks
+                let backtickCount = 0;
+                const start = i;
+                while (i < text.length && text[i] === '`') {
+                    backtickCount++;
+                    i++;
+                }
+                
+                // Find closing backticks of same count
+                const delimiter = '`'.repeat(backtickCount);
+                const closeIndex = text.indexOf(delimiter, i);
+                
+                if (closeIndex !== -1) {
+                    const codeContent = text.slice(i, closeIndex);
+                    // Remove one leading/trailing space if present
+                    let trimmedCode = codeContent;
+                    if (trimmedCode.startsWith(' ') && trimmedCode.endsWith(' ') && trimmedCode.length > 1) {
+                        trimmedCode = trimmedCode.slice(1, -1);
+                    }
+                    result += '<code>' + escapeHtml(trimmedCode) + '</code>';
+                    i = closeIndex + backtickCount;
+                    continue;
+                } else {
+                    // No closing backticks, treat as literal
+                    result += delimiter;
+                }
+                continue;
+            }
+            
+            // Images (must check before links) - GFM section 6.4
+            if (text[i] === '!' && i + 1 < text.length && text[i + 1] === '[') {
+                const imgResult = parseLinkOrImage(text, i, true);
+                if (imgResult) {
+                    result += imgResult.html;
+                    i = imgResult.end;
+                    continue;
+                }
+            }
+            
+            // Links - GFM section 6.4
+            if (text[i] === '[') {
+                const linkResult = parseLinkOrImage(text, i, false);
+                if (linkResult) {
+                    result += linkResult.html;
+                    i = linkResult.end;
+                    continue;
+                }
+            }
+            
+            // Autolinks (URLs and emails in angle brackets) - GFM section 6.5
+            if (text[i] === '<') {
+                const autoLinkResult = parseAutolink(text, i);
+                if (autoLinkResult) {
+                    result += autoLinkResult.html;
+                    i = autoLinkResult.end;
+                    continue;
+                }
+            }
+            
+            // Raw HTML tags - GFM section 6.6 (limited in text)
+            if (text[i] === '<') {
+                const htmlTagResult = parseRawHtmlTag(text, i);
+                if (htmlTagResult) {
+                    result += htmlTagResult.html;
+                    i = htmlTagResult.end;
+                    continue;
+                }
+            }
+            
+            // Emphasis and Strong emphasis - GFM section 6.7
+            const emphasisResult = parseEmphasis(text, i);
+            if (emphasisResult) {
+                result += emphasisResult.html;
+                i = emphasisResult.end;
+                continue;
+            }
+            
+            // Strikethrough (GFM extension) - GFM section 6.8
+            if (text[i] === '~' && i + 1 < text.length && text[i + 1] === '~') {
+                const strikeResult = parseStrikethrough(text, i);
+                if (strikeResult) {
+                    result += strikeResult.html;
+                    i = strikeResult.end;
+                    continue;
+                }
+            }
+            
+            // Hard line breaks (two spaces at end of line followed by newline)
+            if (text[i] === ' ' && i + 1 < text.length && text[i + 1] === ' ' && i + 2 < text.length && text[i + 2] === '\n') {
+                result += '<br />\n';
+                i += 3;
+                continue;
+            }
+            
+            // Default: just add the character
+            result += text[i];
+            i++;
+        }
+        
+        return result;
+    }
+
+    // Parse link or image
+    function parseLinkOrImage(text, start, isImage) {
+        let i = start;
+        
+        if (isImage) {
+            if (text[i] !== '!' || text[i + 1] !== '[') return null;
+            i += 2;
+        } else {
+            if (text[i] !== '[') return null;
+            i++;
+        }
+        
+        // Parse link text (can contain balanced brackets)
+        let bracketDepth = 1;
+        const labelStart = i;
+        while (i < text.length && bracketDepth > 0) {
+            if (text[i] === '[') bracketDepth++;
+            else if (text[i] === ']') bracketDepth--;
+            if (bracketDepth > 0) i++;
+        }
+        
+        if (bracketDepth !== 0) return null;
+        
+        const label = text.slice(labelStart, i);
+        i++; // skip ]
+        
+        // Check for inline link (...)
+        if (i < text.length && text[i] === '(') {
+            i++; // skip (
+            
+            // Skip optional whitespace
+            while (i < text.length && isWhitespace(text[i]) && text[i] !== '\n') i++;
+            
+            // Parse destination URL
+            const destStart = i;
+            let parenDepth = 1;
+            let inAngle = false;
+            let title = '';
+            
+            while (i < text.length && parenDepth > 0) {
+                if (text[i] === '<' && !inAngle) inAngle = true;
+                else if (text[i] === '>' && inAngle) inAngle = false;
+                else if (!inAngle && text[i] === '(') parenDepth++;
+                else if (!inAngle && text[i] === ')') parenDepth--;
+                if (parenDepth > 0) i++;
+            }
+            
+            if (parenDepth !== 0) return null;
+            
+            let destAndTitle = text.slice(destStart, i).trim();
+            
+            // Split destination and title if present
+            // Title can be in "", '', or ()
+            const titleMatch = destAndTitle.match(/^([^\s"']+)(?:\s+["'](.+)["']|\s+\((.+)\))?$/);
+            if (titleMatch) {
+                dest = titleMatch[1];
+                title = titleMatch[2] || titleMatch[3] || '';
+            } else {
+                dest = destAndTitle;
+            }
+            
+            // Remove angle brackets if present
+            if (dest.startsWith('<') && dest.endsWith('>')) {
+                dest = dest.slice(1, -1);
+            }
+            
+            i++; // skip )
+            
+            if (isImage) {
+                const isMediaFile = dest.includes('/media/') || /\.(webp|png|jpg|jpeg|gif|svg)$/i.test(dest);
+                if (isMediaFile) {
+                    return {
+                        html: '<img data-src="' + escapeHtml(dest) + '" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="' + escapeHtml(label) + '" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">',
+                        end: i
+                    };
+                } else {
+                    return {
+                        html: '<img src="' + escapeHtml(dest) + '" alt="' + escapeHtml(label) + '" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">',
+                        end: i
+                    };
+                }
+            } else {
+                let linkHtml = '<a href="' + escapeHtml(dest) + '">' + parseInline(label) + '</a>';
+                if (title) {
+                    linkHtml = '<a href="' + escapeHtml(dest) + '" title="' + escapeHtml(title) + '">' + parseInline(label) + '</a>';
+                }
+                return {
+                    html: linkHtml,
+                    end: i
+                };
+            }
+        }
+        
+        // Check for reference link [...] [...]
+        if (i < text.length && text[i] === '[') {
+            i++; // skip [
+            const refStart = i;
+            while (i < text.length && text[i] !== ']') i++;
+            if (i >= text.length) return null;
+            const refLabel = text.slice(refStart, i);
+            i += 2; // skip ]
+            
+            // For now, we don't support reference links in this simple parser
+            // Just return the label as text
+            return {
+                html: (isImage ? '!' : '') + '[' + label + '][' + refLabel + ']',
+                end: i
+            };
+        }
+        
+        return null;
+    }
+
+    // Parse autolink (URL or email in angle brackets)
+    function parseAutolink(text, start) {
+        if (text[start] !== '<') return null;
+        
+        let i = start + 1;
+        let hasAt = false;
+        
+        // Simple autolink parsing
+        while (i < text.length && text[i] !== '>' && text[i] !== ' ' && text[i] !== '\n') {
+            if (text[i] === '@') hasAt = true;
+            i++;
+        }
+        
+        if (i >= text.length || text[i] !== '>') return null;
+        
+        const dest = text.slice(start + 1, i);
+        
+        // Validate URL or email
+        if (hasAt) {
+            // Email autolink
+            if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(dest)) {
+                return null;
+            }
+            return {
+                html: '<a href="mailto:' + escapeHtml(dest) + '">' + escapeHtml(dest) + '</a>',
+                end: i + 1
+            };
+        } else {
+            // URL autolink
+            if (!/^https?:\/\/[^\s]+$/.test(dest)) {
+                return null;
+            }
+            return {
+                html: '<a href="' + escapeHtml(dest) + '">' + escapeHtml(dest) + '</a>',
+                end: i + 1
+            };
+        }
+    }
+
+    // Parse raw HTML tag
+    function parseRawHtmlTag(text, start) {
+        // Very limited HTML tag support for inline context
+        const tagMatch = text.slice(start).match(/^<([a-zA-Z][a-zA-Z0-9]*)\s*>/);
+        if (tagMatch) {
+            return {
+                html: tagMatch[0],
+                end: start + tagMatch[0].length
+            };
+        }
+        return null;
+    }
+
+    // Parse emphasis and strong emphasis
+    function parseEmphasis(text, start) {
+        // Check for *** or ___ (strong + em)
+        if (start + 2 < text.length) {
+            if (text[start] === '*' && text[start + 1] === '*' && text[start + 2] === '*') {
+                const closeIndex = text.indexOf('***', start + 3);
+                if (closeIndex !== -1) {
+                    const content = text.slice(start + 3, closeIndex);
+                    if (content.length > 0 && !/^[ \t]*\n[ \t]*$/.test(content)) {
+                        return {
+                            html: '<strong><em>' + parseInline(content) + '</em></strong>',
+                            end: closeIndex + 3
+                        };
+                    }
+                }
+            }
+            if (text[start] === '_' && text[start + 1] === '_' && text[start + 2] === '_') {
+                const closeIndex = text.indexOf('___', start + 3);
+                if (closeIndex !== -1) {
+                    const content = text.slice(start + 3, closeIndex);
+                    if (content.length > 0 && !/^[ \t]*\n[ \t]*$/.test(content)) {
+                        return {
+                            html: '<strong><em>' + parseInline(content) + '</em></strong>',
+                            end: closeIndex + 3
+                        };
+                    }
+                }
+            }
+        }
+        
+        // Check for ** or __ (strong)
+        if (start + 1 < text.length) {
+            if (text[start] === '*' && text[start + 1] === '*') {
+                const closeIndex = text.indexOf('**', start + 2);
+                if (closeIndex !== -1) {
+                    const content = text.slice(start + 2, closeIndex);
+                    if (content.length > 0 && !/^[ \t]*\n[ \t]*$/.test(content)) {
+                        return {
+                            html: '<strong>' + parseInline(content) + '</strong>',
+                            end: closeIndex + 2
+                        };
+                    }
+                }
+            }
+            if (text[start] === '_' && text[start + 1] === '_') {
+                const closeIndex = text.indexOf('__', start + 2);
+                if (closeIndex !== -1) {
+                    const content = text.slice(start + 2, closeIndex);
+                    if (content.length > 0 && !/^[ \t]*\n[ \t]*$/.test(content)) {
+                        return {
+                            html: '<strong>' + parseInline(content) + '</strong>',
+                            end: closeIndex + 2
+                        };
+                    }
+                }
+            }
+        }
+        
+        // Check for * or _ (emphasis)
+        if (text[start] === '*' || text[start] === '_') {
+            const marker = text[start];
+            let closeIndex = -1;
+            
+            // Find closing marker (not immediately adjacent)
+            for (let j = start + 1; j < text.length; j++) {
+                if (text[j] === marker) {
+                    // Check it's not part of ** or __
+                    if (j + 1 < text.length && text[j + 1] === marker) continue;
+                    if (j - 1 >= start && text[j - 1] === marker) continue;
+                    
+                    const content = text.slice(start + 1, j);
+                    if (content.length > 0 && !/^[ \t]*\n[ \t]*$/.test(content)) {
+                        closeIndex = j;
+                        break;
+                    }
+                }
+            }
+            
+            if (closeIndex !== -1) {
+                const content = text.slice(start + 1, closeIndex);
+                return {
+                    html: '<em>' + parseInline(content) + '</em>',
+                    end: closeIndex + 1
+                };
+            }
+        }
+        
+        return null;
+    }
+
+    // Parse strikethrough (GFM extension)
+    function parseStrikethrough(text, start) {
+        if (text[start] !== '~' || text[start + 1] !== '~') return null;
+        
+        const closeIndex = text.indexOf('~~', start + 2);
+        if (closeIndex !== -1) {
+            const content = text.slice(start + 2, closeIndex);
+            if (content.length > 0) {
+                return {
+                    html: '<del>' + parseInline(content) + '</del>',
+                    end: closeIndex + 2
+                };
+            }
+        }
+        return null;
+    }
+
+    // Escape HTML special characters
+    function escapeHtml(text) {
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    // Main block-level parser
+    function parseBlocks(lines) {
+        const blocks = [];
+        let i = 0;
+        
+        while (i < lines.length) {
+            const line = lines[i];
+            
+            // Blank line
+            if (isBlank(line)) {
+                blocks.push({ type: 'blank', line: i });
+                i++;
+                continue;
+            }
+            
+            // Thematic break (hr) - must check before list items
+            const hrMatch = line.match(/^( {0,3})([-*_])\2{2,}[ \t]*$/);
+            if (hrMatch) {
+                blocks.push({ type: 'thematic_break', line: i });
+                i++;
+                continue;
+            }
+            
+            // ATX Heading
+            const atxMatch = line.match(/^(#{1,6})[ \t]+(.*)$/);
+            if (atxMatch) {
+                const level = atxMatch[1].length;
+                let content = atxMatch[2];
+                // Remove trailing # and whitespace
+                content = content.replace(/[ \t]*#+[ \t]*$/, '');
+                blocks.push({ type: 'heading', level: level, content: content, line: i });
+                i++;
+                continue;
+            }
+            
+            // Setext heading (underlined) - need to look ahead
+            if (i + 1 < lines.length) {
+                const nextLine = lines[i + 1];
+                if (/^={1,}[ \t]*$/.test(nextLine)) {
+                    blocks.push({ type: 'heading', level: 1, content: line.trim(), line: i });
+                    i += 2;
+                    continue;
+                }
+                if (/^-{1,}[ \t]*$/.test(nextLine)) {
+                    blocks.push({ type: 'heading', level: 2, content: line.trim(), line: i });
+                    i += 2;
+                    continue;
+                }
+            }
+            
+            // Indented code block (4 spaces or 1 tab)
+            const indent = getIndentLevel(line);
+            if (indent >= 4) {
+                const codeLines = [];
+                while (i < lines.length) {
+                    const codeLine = lines[i];
+                    const codeIndent = getIndentLevel(codeLine);
+                    if (codeIndent >= 4 || isBlank(codeLine)) {
+                        // Remove 4 spaces of indent
+                        let content = codeLine;
+                        if (codeIndent >= 4) {
+                            // Remove exactly 4 spaces worth of indent
+                            let removed = 0;
+                            let pos = 0;
+                            while (pos < codeLine.length && removed < 4) {
+                                if (codeLine[pos] === ' ') removed++;
+                                else if (codeLine[pos] === '\t') removed += 4;
+                                else break;
+                                pos++;
+                            }
+                            content = codeLine.slice(pos);
+                        } else {
+                            // Blank line in code block - keep it but strip trailing spaces
+                            content = codeLine.trimEnd();
+                        }
+                        codeLines.push(content);
+                        i++;
+                    } else {
+                        break;
+                    }
+                }
+                // Remove leading/trailing blank lines from code
+                while (codeLines.length > 0 && codeLines[0] === '') codeLines.shift();
+                while (codeLines.length > 0 && codeLines[codeLines.length - 1] === '') codeLines.pop();
+                
+                blocks.push({ type: 'code', content: codeLines.join('\n'), lang: '', line: i - codeLines.length });
+                continue;
+            }
+            
+            // Fenced code block
+            const fenceMatch = line.match(/^( {0,3})(`{3,}|~{3,})(\w*)[ \t]*$/);
+            if (fenceMatch) {
+                const indent = fenceMatch[1].length;
+                const fence = fenceMatch[2];
+                const lang = fenceMatch[3] || '';
+                const fenceChar = fence[0];
+                const minFenceLen = fence.length;
+                
+                const codeLines = [];
+                i++;
+                
+                while (i < lines.length) {
+                    const codeLine = lines[i];
+                    const closeMatch = codeLine.match(new RegExp(`^ {0,${indent}}${fenceChar}{${minFenceLen},}[ \\t]*$`));
+                    if (closeMatch) {
+                        i++;
+                        break;
+                    }
+                    codeLines.push(codeLine);
+                    i++;
+                }
+                
+                blocks.push({ type: 'code', content: codeLines.join('\n'), lang: lang, line: i - codeLines.length - 1 });
+                continue;
+            }
+            
+            // HTML block (simplified - just detect common patterns)
+            if (line.match(/^ {0,3}<(script|pre|style|textarea)[>\s]/i) ||
+                line.match(/^ {0,3}<!--/) ||
+                line.match(/^ {0,3}<\?/) ||
+                line.match(/^ {0,3}<!\[CDATA\[/) ||
+                line.match(/^ {0,3}<[a-zA-Z0-9-]+(?:\s+[^>]*)?>\s*$/i) ||
+                line.match(/^ {0,3}<\/[a-zA-Z0-9-]+>\s*$/i)) {
+                
+                const htmlLines = [];
+                let openTags = 0;
+                let closed = false;
+                
+                // Simple HTML block detection
+                while (i < lines.length) {
+                    htmlLines.push(lines[i]);
+                    // Count tags (very simplified)
+                    const openCount = (lines[i].match(/<[a-zA-Z][^>]*>/g) || []).length;
+                    const closeCount = (lines[i].match(/<\/[a-zA-Z][^>]*>/g) || []).length;
+                    openTags += openCount - closeCount;
+                    
+                    // Check for blank line ending HTML block
+                    if (isBlank(lines[i]) && i + 1 < lines.length) {
+                        i++;
+                        break;
+                    }
+                    i++;
+                }
+                
+                blocks.push({ type: 'html', content: htmlLines.join('\n'), line: i - htmlLines.length });
+                continue;
+            }
+            
+            // Blockquote
+            const bqMatch = line.match(/^( {0,3})>([ \t]?)(.*)$/);
+            if (bqMatch) {
+                const bqLines = [];
+                while (i < lines.length) {
+                    const bqLine = lines[i];
+                    const bqLineMatch = bqLine.match(/^( {0,3})>([ \t]?)(.*)$/);
+                    if (bqLineMatch) {
+                        bqLines.push(bqLineMatch[3]);
+                        i++;
+                    } else if (isBlank(bqLine)) {
+                        // Check if next line continues blockquote
+                        if (i + 1 < lines.length && lines[i + 1].match(/^ {0,3}>/)) {
+                            bqLines.push('');
+                            i++;
+                        } else {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                blocks.push({ type: 'blockquote', content: bqLines.join('\n'), line: i - bqLines.length });
+                continue;
+            }
+            
+            // List item
+            const ulMatch = line.match(/^( {0,3})([-*+])[ \t]+(.*)$/);
+            const olMatch = line.match(/^( {0,3})(\d+)\.[ \t]+(.*)$/);
+            
+            if (ulMatch || olMatch) {
+                const listItems = [];
+                const isOrdered = !!olMatch;
+                const match = ulMatch || olMatch;
+                const indent = match[1].length;
+                
+                while (i < lines.length) {
+                    const listItem = lines[i];
+                    const ulItemMatch = listItem.match(new RegExp(`^ {${indent}}[-*+][ \\t]+(.*)$`));
+                    const olItemMatch = listItem.match(new RegExp(`^ {${indent}}\\d+\\.[ \\t]+(.*)$`));
+                    
+                    if (ulItemMatch || olItemMatch) {
+                        listItems.push({ content: ulItemMatch ? ulItemMatch[1] : olItemMatch[1], subContent: [] });
+                        i++;
+                        
+                        // Collect continuation lines (indented content)
+                        while (i < lines.length) {
+                            const contLine = lines[i];
+                            const contIndent = getIndentLevel(contLine);
+                            
+                            if (isBlank(contLine)) {
+                                // Check if next line continues this item
+                                if (i + 1 < lines.length) {
+                                    const nextLine = lines[i + 1];
+                                    const nextIndent = getIndentLevel(nextLine);
+                                    if (nextIndent > indent || nextLine.match(new RegExp(`^ {${indent}}[-*+]`)) || nextLine.match(new RegExp(`^ {${indent}}\\d+\\.`))) {
+                                        listItems[listItems.length - 1].subContent.push('');
+                                        i++;
+                                    } else {
+                                        break;
+                                    }
+                                } else {
+                                    break;
+                                }
+                            } else if (contIndent > indent) {
+                                listItems[listItems.length - 1].subContent.push(contLine);
+                                i++;
+                            } else {
+                                break;
+                            }
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                
+                blocks.push({ 
+                    type: isOrdered ? 'ordered_list' : 'unordered_list', 
+                    items: listItems, 
+                    line: i - listItems.length 
+                });
+                continue;
+            }
+            
+            // Paragraph (default)
+            const paraLines = [];
+            while (i < lines.length) {
+                const paraLine = lines[i];
+                if (isBlank(paraLine)) {
+                    i++;
+                    break;
+                }
+                // Check if this line starts a new block
+                if (paraLine.match(/^#{1,6}[ \t]+/) ||
+                    paraLine.match(/^( {0,3})>/) ||
+                    paraLine.match(/^( {0,3})([-*+])[ \t]+/) ||
+                    paraLine.match(/^( {0,3})(\d+)\.[ \t]+/) ||
+                    paraLine.match(/^ {0,3}(`{3,}|~{3,})/) ||
+                    paraLine.match(/^ {4}/) ||
+                    paraLine.match(/^( {0,3})([-*_])\2{2,}[ \t]*$/)) {
+                    break;
+                }
+                paraLines.push(paraLine);
+                i++;
+            }
+            
+            if (paraLines.length > 0) {
+                // Join paragraph lines - preserve newlines for hard break detection
+                const content = paraLines.join('\n');
+                blocks.push({ type: 'paragraph', content: content, line: i - paraLines.length });
+            }
+        }
+        
+        return blocks;
+    }
+
+    // Render blocks to HTML
+    function renderBlocks(blocks) {
+        let html = '';
+        
+        for (const block of blocks) {
+            switch (block.type) {
+                case 'blank':
+                    // Skip blank lines
+                    break;
+                    
+                case 'heading':
+                    html += `<h${block.level}>${parseInline(block.content)}</h${block.level}>\n`;
+                    break;
+                    
+                case 'thematic_break':
+                    html += '<hr />\n';
+                    break;
+                    
+                case 'code':
+                    if (block.lang) {
+                        html += `<pre><code class="language-${escapeHtml(block.lang)}">${escapeHtml(block.content)}</code></pre>\n`;
+                    } else {
+                        html += `<pre><code>${escapeHtml(block.content)}</code></pre>\n`;
+                    }
+                    break;
+                    
+                case 'blockquote':
+                    const bqContent = parseInline(block.content.replace(/\n/g, ' '));
+                    html += `<blockquote>${bqContent}</blockquote>\n`;
+                    break;
+                    
+                case 'unordered_list':
+                    html += '<ul>\n';
+                    for (const item of block.items) {
+                        const itemContent = parseInline(item.content);
+                        const subContent = item.subContent.length > 0 ? parseBlocks(item.subContent) : [];
+                        const subHtml = renderBlocks(subContent);
+                        html += `<li>${itemContent}${subHtml}</li>\n`;
+                    }
+                    html += '</ul>\n';
+                    break;
+                    
+                case 'ordered_list':
+                    html += '<ol>\n';
+                    for (const item of block.items) {
+                        const itemContent = parseInline(item.content);
+                        const subContent = item.subContent.length > 0 ? parseBlocks(item.subContent) : [];
+                        const subHtml = renderBlocks(subContent);
+                        html += `<li>${itemContent}${subHtml}</li>\n`;
+                    }
+                    html += '</ol>\n';
+                    break;
+                    
+                case 'paragraph':
+                    const paraContent = parseInline(block.content);
+                    // Don't wrap if it contains only block-level elements
+                    if (!paraContent.match(/^<(h[1-6]|ul|ol|pre|blockquote|hr|div)/)) {
+                        html += `<p>${paraContent}</p>\n`;
+                    } else {
+                        html += paraContent + '\n';
+                    }
+                    break;
+                    
+                case 'html':
+                    html += block.content + '\n';
+                    break;
+            }
+        }
+        
+        return html;
+    }
+
     // GFM-compatible Markdown parser
     function parseMarkdown(markdown) {
         if (!markdown) return '';
-
-        let html = markdown;
-
-        // Escape HTML (must be first to prevent XSS and handle special chars)
-        html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-
-        // Fenced code blocks (GFM)
-        // Must have newline after opening ``` and before closing ```
-        // Optional language specifier after opening ```
-        html = html.replace(/```(\w*)\n([\s\S]*?)\n```/g, function(match, lang, code) {
-            return '<pre><code>' + code + '</code></pre>';
-        });
-
-        // Indented code blocks (4 spaces or 1 tab)
-        // Process line by line for indented code blocks
-        var lines = html.split('\n');
-        var processedLines = [];
-        var inCodeBlock = false;
-        var codeBlockContent = [];
         
-        for (var i = 0; i < lines.length; i++) {
-            var line = lines[i];
-            var indentedMatch = line.match(/^    (.*)$/);
-            var tabbedMatch = line.match(/^\t(.*)$/);
-            
-            if (indentedMatch || tabbedMatch) {
-                var codeLine = indentedMatch ? indentedMatch[1] : tabbedMatch[1];
-                if (!inCodeBlock) {
-                    inCodeBlock = true;
-                    codeBlockContent = [];
-                }
-                codeBlockContent.push(codeLine);
-            } else {
-                if (inCodeBlock) {
-                    processedLines.push('<pre><code>' + codeBlockContent.join('\n') + '</code></pre>');
-                    inCodeBlock = false;
-                    codeBlockContent = [];
-                }
-                processedLines.push(line);
-            }
-        }
+        // Normalize line endings
+        markdown = markdown.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
         
-        // Close any remaining code block
-        if (inCodeBlock) {
-            processedLines.push('<pre><code>' + codeBlockContent.join('\n') + '</code></pre>');
-        }
+        // Split into lines
+        const lines = markdown.split('\n');
         
-        html = processedLines.join('\n');
-
-        // Inline code with triple backticks (for short code spans without newlines, e.g., ```PPQCheck```)
-        html = html.replace(/```([^\`\n]+)```/g, '<code>$1</code>');
-
-        // Inline code with single backticks
-        html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-        // ATX Headers (GFM supports 1-6 # symbols)
-        // Note: order matters - check h6 first, then h5, etc.
-        html = html.replace(/^###### (.+)$/gm, '<h6>$1</h6>');
-        html = html.replace(/^##### (.+)$/gm, '<h5>$1</h5>');
-        html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
-        html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-        html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-        html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-
-        // Bold (** or __)
-        html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-        html = html.replace(/__([^_]+)__/g, '<strong>$1</strong>');
-
-        // Italic (* or _) - must come after bold
-        html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-        html = html.replace(/_([^_]+)_/g, '<em>$1</em>');
-
-        // Strikethrough (GFM extension)
-        html = html.replace(/~~([^~]+)~~/g, '<del>$1</del>');
-
-        // Images (must be before links since it uses similar syntax)
-        html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, function(match, alt, src) {
-            var isMediaFile = src.includes('/media/') || src.endsWith('.webp') || src.endsWith('.png') || src.endsWith('.jpg') || src.endsWith('.jpeg') || src.endsWith('.gif') || src.endsWith('.svg');
-            if (isMediaFile) {
-                return '<img data-src="' + src + '" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="' + alt + '" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">';
-            } else {
-                return '<img src="' + src + '" alt="' + alt + '" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">';
-            }
-        });
-
-        // Links
-        html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
-
-        // Blockquotes (handle > followed by space)
-        html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
-
-        // Horizontal rules / thematic breaks (GFM: 3+ *, -, or _ on their own line)
-        html = html.replace(/^([-*_])\1{2,}$/gm, '<hr />');
-
-        // Process lists - need to handle them line by line, then wrap
-        var listLines = html.split('\n');
-        var listProcessedLines = [];
-        var inOrderedList = false;
-        var inUnorderedList = false;
+        // Parse blocks
+        const blocks = parseBlocks(lines);
         
-        for (var j = 0; j < listLines.length; j++) {
-            var listLine = listLines[j];
-            
-            // Check for ordered list item (number followed by period and space)
-            var orderedMatch = listLine.match(/^\d+\.\s+(.+)$/);
-            // Check for unordered list item (-, *, or + followed by space)
-            var unorderedMatch = listLine.match(/^[-*+]\s+(.+)$/);
-            
-            if (orderedMatch) {
-                if (inUnorderedList) {
-                    listProcessedLines.push('</ul>');
-                    inUnorderedList = false;
-                }
-                if (!inOrderedList) {
-                    listProcessedLines.push('<ol>');
-                    inOrderedList = true;
-                }
-                listProcessedLines.push('<li>' + orderedMatch[1] + '</li>');
-            } else if (unorderedMatch) {
-                if (inOrderedList) {
-                    listProcessedLines.push('</ol>');
-                    inOrderedList = false;
-                }
-                if (!inUnorderedList) {
-                    listProcessedLines.push('<ul>');
-                    inUnorderedList = true;
-                }
-                listProcessedLines.push('<li>' + unorderedMatch[1] + '</li>');
-            } else if (listLine.trim() === '') {
-                listProcessedLines.push(listLine);
-            } else {
-                if (inOrderedList) {
-                    listProcessedLines.push('</ol>');
-                    inOrderedList = false;
-                }
-                if (inUnorderedList) {
-                    listProcessedLines.push('</ul>');
-                    inUnorderedList = false;
-                }
-                listProcessedLines.push(listLine);
-            }
-        }
+        // Render to HTML
+        let html = renderBlocks(blocks);
         
-        // Close any remaining open lists
-        if (inOrderedList) {
-            listProcessedLines.push('</ol>');
-        }
-        if (inUnorderedList) {
-            listProcessedLines.push('</ul>');
-        }
+        // Clean up trailing newlines
+        html = html.trim();
         
-        html = listProcessedLines.join('\n');
-        
-        // Clean up empty paragraphs and fix paragraph wrapping around block elements
-        html = html.replace(/<p>\s*<(h[1-6]|ul|ol|li|pre|blockquote)/g, '<$1');
-        html = html.replace(/(<\/h[1-6]|\/ul|\/ol|\/li|\/pre|\/blockquote)>\s*<\/p>/g, '$1>');
-        html = html.replace(/<p><\/p>/g, '');
-
         return html;
     }
 
@@ -222,8 +888,15 @@
         return { frontmatter, content: body };
     }
 
-    // Expose functions globally
-    window.parseMarkdown = parseMarkdown;
-    window.parseFrontmatter = parseFrontmatter;
-    window.blogIntroduction = blogIntroduction;
+    // Expose functions globally (browser and Node.js compatible)
+    if (typeof window !== 'undefined') {
+        window.parseMarkdown = parseMarkdown;
+        window.parseFrontmatter = parseFrontmatter;
+        window.blogIntroduction = blogIntroduction;
+    }
+    
+    // Export for Node.js
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = { parseMarkdown, parseFrontmatter, blogIntroduction };
+    }
 })();
