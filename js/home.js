@@ -42,9 +42,7 @@
         
         const catButton = document.createElement('a');
         catButton.className = 'blog-btn category-fun';
-        catButton.href = 'https:
-        catButton.target = '_blank';
-        catButton.rel = 'noopener noreferrer';
+        catButton.href = 'https://example.com/cat-pictures'; //
 
         catButton.innerHTML = `
             <i class="fa-solid fa-cat"></i>
@@ -76,9 +74,7 @@
         
         const monitoringButton = document.createElement('a');
         monitoringButton.className = 'blog-btn category-monitoring';
-        monitoringButton.href = 'https:
-        monitoringButton.target = '_blank';
-        monitoringButton.rel = 'noopener noreferrer';
+        monitoringButton.href = 'https://example.com/monitoring'; //
 
         monitoringButton.innerHTML = `
             <i class="fa-solid fa-chart-line"></i>
@@ -132,9 +128,7 @@
         
         const catButton = document.createElement('a');
         catButton.className = 'blog-btn category-fun';
-        catButton.href = 'https:
-        catButton.target = '_blank';
-        catButton.rel = 'noopener noreferrer';
+        catButton.href = 'https://example.com/cat-pictures'; //
 
         catButton.innerHTML = `
             <i class="fa-solid fa-cat"></i>
@@ -166,9 +160,7 @@
         
         const monitoringButton = document.createElement('a');
         monitoringButton.className = 'blog-btn category-monitoring';
-        monitoringButton.href = 'https:
-        monitoringButton.target = '_blank';
-        monitoringButton.rel = 'noopener noreferrer';
+        monitoringButton.href = 'https://example.com/monitoring'; //
 
         monitoringButton.innerHTML = `
             <i class="fa-solid fa-chart-line"></i>

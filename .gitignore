@@ -1,1 +1,13 @@
-(js/app.js, js/blog.js, js/devotional.js, js/home.js, js/lazyload.js, js/markdown.js, js/mobile-tray.js, js/state.js, js/ui.js, warning.js)
+```
+# Dependencies
+node_modules/
+
+# Build artifacts
+js/minified/
+
+# Package lock file
+package-lock.json
+
+# Source map files
+*.map
+```
