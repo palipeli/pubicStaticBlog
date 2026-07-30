@@ -8,8 +8,8 @@
 
 :root {
     --bg-dark: #f6f5f4;
-    --bg-panel: rgba(255, 255, 255, 0.5);
-    --bg-header: rgba(246, 245, 244, 0.7);
+    --bg-panel: rgba(255, 255, 255, 0.2);
+    --bg-header: rgba(246, 245, 244, 0.3);
     --accent-pink: #ff45fc;
     --accent-pink-hover: #e031e0;
     --text-primary: #2e3436;
@@ -29,7 +29,7 @@
 [data-theme="dark"] {
     --blur-overlay-brightness: 0.6;
     --dark-overlay-color: rgba(0, 0, 0, 0.4);
-    --bg-panel: rgba(30, 30, 30, 0.5);
+    --bg-panel: rgba(30, 30, 30, 0.2);
     --btn-bg: rgba(26, 26, 26, 0.7);
     --btn-text: #ffffff;
     --btn-border: rgba(255, 255, 255, 0.2);
@@ -179,12 +179,12 @@ body {
 
 .nav-item:hover {
     color: var(--text-primary);
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.015);
 }
 
 .nav-item.active {
     color: var(--accent-pink);
-    background: rgba(255, 69, 252, 0.1);
+    background: rgba(255, 69, 252, 0.05);
 }
 
 /* Main Content */
@@ -477,7 +477,7 @@ body {
     align-items: center;
     margin-bottom: 15px;
     padding: 10px;
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.01);
     border: 1px solid var(--border-color);
     border-radius: 6px;
 }
@@ -513,7 +513,7 @@ body {
 }
 
 .template-card {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.01);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 15px;
@@ -522,13 +522,13 @@ body {
 }
 
 .template-card:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.02);
     border-color: var(--accent-pink);
     transform: translateX(-5px);
 }
 
 .template-card.active {
-    background: rgba(255, 69, 252, 0.08);
+    background: rgba(255, 69, 252, 0.04);
     border-color: var(--accent-pink);
 }
 
@@ -550,7 +550,7 @@ body {
 /* ALL POST Button */
 .all-post-btn {
     display: inline-block;
-    background: rgba(53, 132, 228, 0.08);
+    background: rgba(53, 132, 228, 0.04);
     border: 1px solid var(--accent-pink);
     border-radius: 6px;
     padding: 12px 30px;
@@ -565,7 +565,7 @@ body {
 }
 
 .all-post-btn:hover {
-    background: rgba(53, 132, 228, 0.06);
+    background: rgba(53, 132, 228, 0.03);
     border-color: var(--accent-pink-hover);
     color: var(--accent-pink-hover);
 }
@@ -578,7 +578,7 @@ body {
 }
 
 .theme-btn {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.01);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 12px 15px;
@@ -592,12 +592,12 @@ body {
 }
 
 .theme-btn:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.02);
     border-color: var(--accent-pink);
 }
 
 .theme-btn.active {
-    background: rgba(255, 69, 252, 0.08);
+    background: rgba(255, 69, 252, 0.04);
     border-color: var(--accent-pink);
     color: var(--accent-pink);
 }
@@ -865,7 +865,7 @@ body {
 }
 
 .post-selector-item {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.015);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 12px 15px;
@@ -874,13 +874,13 @@ body {
 }
 
 .post-selector-item:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.03);
     border-color: var(--accent-pink);
     transform: translateX(-5px);
 }
 
 .post-selector-item.active {
-    background: rgba(255, 69, 252, 0.1);
+    background: rgba(255, 69, 252, 0.05);
     border-color: var(--accent-pink);
 }
 
@@ -946,7 +946,7 @@ body {
 }
 
 .blog-card:hover {
-    background: rgba(255, 69, 252, 0.08);
+    background: rgba(255, 69, 252, 0.04);
     border-color: var(--accent-pink);
     transform: translateX(4px);
     z-index: 10;
@@ -1425,7 +1425,7 @@ body {
 }
 
 .mobile-tray-toggle:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.03);
 }
 
 @media (max-width: 768px) {
@@ -1518,7 +1518,7 @@ body {
 }
 
 .mobile-theme-btn {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.01);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 14px 16px;
@@ -1533,12 +1533,12 @@ body {
 }
 
 .mobile-theme-btn:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.02);
     border-color: var(--accent-pink);
 }
 
 .mobile-theme-btn.active {
-    background: rgba(255, 69, 252, 0.08);
+    background: rgba(255, 69, 252, 0.04);
     border-color: var(--accent-pink);
     color: var(--accent-pink);
 }
@@ -1550,7 +1550,7 @@ body {
     align-items: center;
     margin-bottom: 15px;
     padding: 10px;
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.01);
     border: 1px solid var(--border-color);
     border-radius: 6px;
 }
@@ -1574,7 +1574,7 @@ body {
 }
 
 .mobile-post-item {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.015);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 14px 16px;
@@ -1583,12 +1583,12 @@ body {
 }
 
 .mobile-post-item:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.03);
     border-color: var(--accent-pink);
 }
 
 .mobile-post-item.active {
-    background: rgba(255, 69, 252, 0.1);
+    background: rgba(255, 69, 252, 0.05);
     border-color: var(--accent-pink);
 }
 
@@ -1616,7 +1616,7 @@ body {
 }
 
 .mobile-nav-item {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.015);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 14px 16px;
@@ -1629,12 +1629,12 @@ body {
 }
 
 .mobile-nav-item:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.03);
     border-color: var(--accent-pink);
 }
 
 .mobile-nav-item.active {
-    background: rgba(255, 69, 252, 0.1);
+    background: rgba(255, 69, 252, 0.05);
     border-color: var(--accent-pink);
     color: var(--accent-pink);
 }
