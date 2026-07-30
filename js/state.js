@@ -161,7 +161,8 @@
         }
 
         // Restore blog post view or blog intro view (must be done after navigating to blogs page)
-        if (state.currentPage === 'blogs') {
+        // Only restore on initial page load, not when user manually navigates via Blogs button
+        if (state.currentPage === 'blogs' && window.__isInitialPageLoad) {
             setTimeout(() => {
                 if (state.activeBlogPost) {
                     // Restore the post they were reading

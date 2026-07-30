@@ -1,0 +1,16 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "description": "A lightweight single page application (SPA) static blogger completely written with JS, CSS, and HTML.",
+  "main": "warning.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.62.0",
+    "http-server": "^14.1.1"
+  }
+}

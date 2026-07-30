@@ -308,7 +308,7 @@
     const navigationHistory = [];
     
     // Open a blog post with lazy loading (new approach - loads content on demand)
-    async function openBlogPostLazy(id) {
+    async function openBlogPostLazy(id, skipAnimation = false) {
         // Show loading state first
         const article = document.getElementById('blog-article-content');
 
@@ -368,15 +368,27 @@
             return;
         }
 
-        // Render post content with fade-in animation
-        article.innerHTML = `
-            <h1>${post.icon} ${post.title}</h1>
-            <div class="blog-meta" style="margin-bottom: 20px;">
-                <span class="blog-date">${post.date}</span>
-                <span style="margin-left: 15px;">${post.category}</span>
-            </div>
-            <div class="blog-post-content">${post.htmlContent}</div>
-        `;
+        // Render post content with fade-in animation (unless skipping animation for state restoration)
+        if (skipAnimation) {
+            // Skip animation by not letting CSS animate it
+            article.innerHTML = `
+                <h1>${post.icon} ${post.title}</h1>
+                <div class="blog-meta" style="margin-bottom: 20px;">
+                    <span class="blog-date">${post.date}</span>
+                    <span style="margin-left: 15px;">${post.category}</span>
+                </div>
+                <div class="blog-post-content" style="animation: none;">${post.htmlContent}</div>
+            `;
+        } else {
+            article.innerHTML = `
+                <h1>${post.icon} ${post.title}</h1>
+                <div class="blog-meta" style="margin-bottom: 20px;">
+                    <span class="blog-date">${post.date}</span>
+                    <span style="margin-left: 15px;">${post.category}</span>
+                </div>
+                <div class="blog-post-content">${post.htmlContent}</div>
+            `;
+        }
 
         // Initialize lazy loading for images in the rendered content
         if (typeof window.initializeLazyLoading === 'function') {
