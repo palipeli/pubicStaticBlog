@@ -1,5 +1,6 @@
 // markdown.js - Markdown Parser and Blog Content Utilities
 // Handles parsing markdown, frontmatter, and rendering blog content
+// Updated for GitHub Flavored Markdown (GFM) compatibility
 
 (function() {
     // Default introduction content shown before selecting a post
@@ -28,138 +29,165 @@
         `
     };
 
-    // Simple Markdown parser
+    // GFM-compatible Markdown parser
     function parseMarkdown(markdown) {
         if (!markdown) return '';
 
         let html = markdown;
 
-        // Escape HTML
+        // Escape HTML (must be first to prevent XSS and handle special chars)
         html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-        // Code blocks (must be before other replacements)
-        // Handle multi-line code blocks with optional language specifier - must have newline after opening ```
-        html = html.replace(/```(\w*)\n([\s\S]*?)\n```/g, '<pre><code>$2</code></pre>');
+        // Fenced code blocks (GFM)
+        // Must have newline after opening ``` and before closing ```
+        // Optional language specifier after opening ```
+        html = html.replace(/```(\w*)\n([\s\S]*?)\n```/g, function(match, lang, code) {
+            return '<pre><code>' + code + '</code></pre>';
+        });
+
+        // Indented code blocks (4 spaces or 1 tab)
+        // Process line by line for indented code blocks
+        var lines = html.split('\n');
+        var processedLines = [];
+        var inCodeBlock = false;
+        var codeBlockContent = [];
+        
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i];
+            var indentedMatch = line.match(/^    (.*)$/);
+            var tabbedMatch = line.match(/^\t(.*)$/);
+            
+            if (indentedMatch || tabbedMatch) {
+                var codeLine = indentedMatch ? indentedMatch[1] : tabbedMatch[1];
+                if (!inCodeBlock) {
+                    inCodeBlock = true;
+                    codeBlockContent = [];
+                }
+                codeBlockContent.push(codeLine);
+            } else {
+                if (inCodeBlock) {
+                    processedLines.push('<pre><code>' + codeBlockContent.join('\n') + '</code></pre>');
+                    inCodeBlock = false;
+                    codeBlockContent = [];
+                }
+                processedLines.push(line);
+            }
+        }
+        
+        // Close any remaining code block
+        if (inCodeBlock) {
+            processedLines.push('<pre><code>' + codeBlockContent.join('\n') + '</code></pre>');
+        }
+        
+        html = processedLines.join('\n');
 
         // Inline code with triple backticks (for short code spans without newlines, e.g., ```PPQCheck```)
-        // This must come AFTER multi-line code blocks to avoid conflicts
-        html = html.replace(/```([^`\n]+)```/g, '<code>$1</code>');
+        html = html.replace(/```([^\`\n]+)```/g, '<code>$1</code>');
 
         // Inline code with single backticks
         html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-        // Headers
-        html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-        html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-        html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+        // ATX Headers (GFM supports 1-6 # symbols)
+        // Note: order matters - check h6 first, then h5, etc.
+        html = html.replace(/^###### (.+)$/gm, '<h6>$1</h6>');
+        html = html.replace(/^##### (.+)$/gm, '<h5>$1</h5>');
         html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
+        html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+        html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+        html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
 
-        // Bold
+        // Bold (** or __)
         html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        html = html.replace(/__([^_]+)__/g, '<strong>$1</strong>');
 
-        // Italic
+        // Italic (* or _) - must come after bold
         html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+        html = html.replace(/_([^_]+)_/g, '<em>$1</em>');
+
+        // Strikethrough (GFM extension)
+        html = html.replace(/~~([^~]+)~~/g, '<del>$1</del>');
 
         // Images (must be before links since it uses similar syntax)
-        // Add lazy-loading with data-src for hover-based loading
-        html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
-            // Check if it's a media file or external image
-            const isMediaFile = src.includes('/media/') || src.endsWith('.webp') || src.endsWith('.png') || src.endsWith('.jpg') || src.endsWith('.jpeg') || src.endsWith('.gif') || src.endsWith('.svg');
-
+        html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, function(match, alt, src) {
+            var isMediaFile = src.includes('/media/') || src.endsWith('.webp') || src.endsWith('.png') || src.endsWith('.jpg') || src.endsWith('.jpeg') || src.endsWith('.gif') || src.endsWith('.svg');
             if (isMediaFile) {
-                // Use data-src for lazy loading on hover, use a tiny transparent placeholder as initial src
-                return `<img data-src="${src}" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="${alt}" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">`;
+                return '<img data-src="' + src + '" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="' + alt + '" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">';
             } else {
-                // For non-media images, load normally but still add lazy class for consistency
-                return `<img src="${src}" alt="${alt}" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">`;
+                return '<img src="' + src + '" alt="' + alt + '" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">';
             }
         });
 
         // Links
         html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
 
-        // Blockquotes
-        html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
+        // Blockquotes (handle > followed by space)
+        html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
 
-        // Process lists - need to handle them line by line first, then wrap
-        const lines = html.split('\n');
-        const processedLines = [];
-        let inOrderedList = false;
-        let inUnorderedList = false;
+        // Horizontal rules / thematic breaks (GFM: 3+ *, -, or _ on their own line)
+        html = html.replace(/^([-*_])\1{2,}$/gm, '<hr />');
+
+        // Process lists - need to handle them line by line, then wrap
+        var listLines = html.split('\n');
+        var listProcessedLines = [];
+        var inOrderedList = false;
+        var inUnorderedList = false;
         
-        for (let i = 0; i < lines.length; i++) {
-            let line = lines[i];
+        for (var j = 0; j < listLines.length; j++) {
+            var listLine = listLines[j];
             
             // Check for ordered list item (number followed by period and space)
-            const orderedMatch = line.match(/^\d+\.\s+(.+)$/);
-            // Check for unordered list item (dash followed by space)
-            const unorderedMatch = line.match(/^-\s+(.+)$/);
+            var orderedMatch = listLine.match(/^\d+\.\s+(.+)$/);
+            // Check for unordered list item (-, *, or + followed by space)
+            var unorderedMatch = listLine.match(/^[-*+]\s+(.+)$/);
             
             if (orderedMatch) {
-                // Close unordered list if open
                 if (inUnorderedList) {
-                    processedLines.push('</ul>');
+                    listProcessedLines.push('</ul>');
                     inUnorderedList = false;
                 }
-                // Open ordered list if not already open
                 if (!inOrderedList) {
-                    processedLines.push('<ol>');
+                    listProcessedLines.push('<ol>');
                     inOrderedList = true;
                 }
-                processedLines.push(`<li>${orderedMatch[1]}</li>`);
+                listProcessedLines.push('<li>' + orderedMatch[1] + '</li>');
             } else if (unorderedMatch) {
-                // Close ordered list if open
                 if (inOrderedList) {
-                    processedLines.push('</ol>');
+                    listProcessedLines.push('</ol>');
                     inOrderedList = false;
                 }
-                // Open unordered list if not already open
                 if (!inUnorderedList) {
-                    processedLines.push('<ul>');
+                    listProcessedLines.push('<ul>');
                     inUnorderedList = true;
                 }
-                processedLines.push(`<li>${unorderedMatch[1]}</li>`);
-            } else if (line.trim() === '') {
-                // Blank line - don't close lists yet, check if next non-empty line continues the list
-                processedLines.push(line);
+                listProcessedLines.push('<li>' + unorderedMatch[1] + '</li>');
+            } else if (listLine.trim() === '') {
+                listProcessedLines.push(listLine);
             } else {
-                // Non-list, non-blank line - close any open lists
                 if (inOrderedList) {
-                    processedLines.push('</ol>');
+                    listProcessedLines.push('</ol>');
                     inOrderedList = false;
                 }
                 if (inUnorderedList) {
-                    processedLines.push('</ul>');
+                    listProcessedLines.push('</ul>');
                     inUnorderedList = false;
                 }
-                processedLines.push(line);
+                listProcessedLines.push(listLine);
             }
         }
         
         // Close any remaining open lists
         if (inOrderedList) {
-            processedLines.push('</ol>');
+            listProcessedLines.push('</ol>');
         }
         if (inUnorderedList) {
-            processedLines.push('</ul>');
+            listProcessedLines.push('</ul>');
         }
         
-        // Second pass: remove blank lines inside lists that break continuity
-        let finalHtml = processedLines.join('\n');
-        // Remove blank lines between </li> and <li> within the same list
-        finalHtml = finalHtml.replace(/(<\/li>)\n+(\n*)(<li>)/g, '$1$3');
-        // Remove blank lines between opening tag and first li
-        finalHtml = finalHtml.replace(/(<(?:ol|ul)>)\n+(\n*)(<li>)/g, '$1$3');
-        // Remove blank lines between last li and closing tag
-        finalHtml = finalHtml.replace(/(<\/li>)\n+(\n*)(<\/(?:ol|ul)>)/g, '$1$3');
+        html = listProcessedLines.join('\n');
         
-        html = finalHtml;
-
-        // Paragraphs (simple approach - wrap remaining text blocks)
-
         // Clean up empty paragraphs and fix paragraph wrapping around block elements
         html = html.replace(/<p>\s*<(h[1-6]|ul|ol|li|pre|blockquote)/g, '<$1');
-        html = html.replace(/<(\/h[1-6]|\/ul|\/ol|\/li|\/pre|\/blockquote)>\s*<\/p>/g, '<$1>');
+        html = html.replace(/(<\/h[1-6]|\/ul|\/ol|\/li|\/pre|\/blockquote)>\s*<\/p>/g, '$1>');
         html = html.replace(/<p><\/p>/g, '');
 
         return html;
