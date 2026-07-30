@@ -38,10 +38,11 @@
         html = html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
         // Code blocks (must be before other replacements)
-        // Handle code blocks with optional language specifier - must have newline after opening ```
+        // Handle multi-line code blocks with optional language specifier - must have newline after opening ```
         html = html.replace(/```(\w*)\n([\s\S]*?)\n```/g, '<pre><code>$2</code></pre>');
 
-        // Inline code with triple backticks (must be before single backtick inline code)
+        // Inline code with triple backticks (for short code spans without newlines, e.g., ```PPQCheck```)
+        // This must come AFTER multi-line code blocks to avoid conflicts
         html = html.replace(/```([^`\n]+)```/g, '<code>$1</code>');
 
         // Inline code with single backticks
