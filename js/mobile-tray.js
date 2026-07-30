@@ -309,7 +309,7 @@
                 
                 // Use global openBlogPostLazy function for lazy loading
                 if (typeof window.openBlogPostLazy === 'function') {
-                    window.openBlogPostLazy(post.id);
+                    window.openBlogPostLazy(post.id, false);
                 } else if (typeof openBlogPost === 'function') {
                     openBlogPost(post.id);
                 }

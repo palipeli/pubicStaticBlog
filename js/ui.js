@@ -88,10 +88,10 @@
                             // Navigate to blogs page
                             navigateToBlogsPageWithoutPrefetch();
                             
-                            // Open the saved blog post
+                            // Open the saved blog post (skipNavigation=true to prevent double navigation)
                             setTimeout(() => {
                                 if (typeof window.openBlogPostLazy === 'function' && savedState.activeBlogPost) {
-                                    window.openBlogPostLazy(savedState.activeBlogPost);
+                                    window.openBlogPostLazy(savedState.activeBlogPost, true);
                                 }
                             }, 100);
                             

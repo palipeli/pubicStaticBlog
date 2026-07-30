@@ -194,9 +194,9 @@
         // Navigate to blogs page first without triggering prefetch
         window.navigateToBlogsPageWithoutPrefetch();
 
-        // Then open the specific post with lazy loading after a short delay
+        // Then open the specific post with lazy loading after a short delay (skipNavigation=true since nav already handled)
         setTimeout(() => {
-            window.openBlogPostLazy(id);
+            window.openBlogPostLazy(id, true);
         }, 100);
     }
 
