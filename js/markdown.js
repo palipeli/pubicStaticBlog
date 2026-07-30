@@ -29,7 +29,7 @@
         `
     };
 
-    // HTML entity map for common entities
+    // HTML entity map for common entities - we preserve these, not decode
     const htmlEntities = {
         '&nbsp;': '\u00A0', '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"',
         '&#39;': "'", '&apos;': "'", '&copy;': '\u00A9', '&reg;': '\u00AE', '&trade;': '\u2122',
@@ -40,7 +40,7 @@
         '&yen;': '\u00A5', '&cent;': '\u00A2'
     };
 
-    // Decode HTML entities
+    // Decode HTML entities (for internal processing only, output preserves original)
     function decodeHtmlEntities(text) {
         return text.replace(/&(?:[a-zA-Z]+|#\d+|#x[0-9a-fA-F]+);/g, function(match) {
             if (htmlEntities[match]) return htmlEntities[match];
@@ -106,11 +106,11 @@
                 }
             }
             
-            // HTML entities (GFM section 6.2)
+            // HTML entities (GFM section 6.2) - preserve them, don't decode
             if (text[i] === '&') {
                 const entityMatch = text.slice(i).match(/^&([a-zA-Z]+|#\d+|#x[0-9a-fA-F]+);/);
                 if (entityMatch) {
-                    result += decodeHtmlEntities(entityMatch[0]);
+                    result += entityMatch[0];  // Preserve entity as-is
                     i += entityMatch[0].length;
                     continue;
                 }
@@ -207,7 +207,7 @@
             
             // Hard line breaks (two spaces at end of line followed by newline)
             if (text[i] === ' ' && i + 1 < text.length && text[i + 1] === ' ' && i + 2 < text.length && text[i + 2] === '\n') {
-                result += '<br />\n';
+                result += '<br>';
                 i += 3;
                 continue;
             }
@@ -289,18 +289,10 @@
             i++; // skip )
             
             if (isImage) {
-                const isMediaFile = dest.includes('/media/') || /\.(webp|png|jpg|jpeg|gif|svg)$/i.test(dest);
-                if (isMediaFile) {
-                    return {
-                        html: '<img data-src="' + escapeHtml(dest) + '" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="' + escapeHtml(label) + '" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">',
-                        end: i
-                    };
-                } else {
-                    return {
-                        html: '<img src="' + escapeHtml(dest) + '" alt="' + escapeHtml(label) + '" style="max-width: 100%; height: auto;" class="lazy-image" loading="lazy">',
-                        end: i
-                    };
-                }
+                return {
+                    html: '<img src="' + escapeHtml(dest) + '" alt="' + escapeHtml(label) + '">',
+                    end: i
+                };
             } else {
                 let linkHtml = '<a href="' + escapeHtml(dest) + '">' + parseInline(label) + '</a>';
                 if (title) {
@@ -387,7 +379,7 @@
 
     // Parse emphasis and strong emphasis
     function parseEmphasis(text, start) {
-        // Check for *** or ___ (strong + em)
+        // Check for *** or ___ (strong + em) - marked uses <em><strong> order
         if (start + 2 < text.length) {
             if (text[start] === '*' && text[start + 1] === '*' && text[start + 2] === '*') {
                 const closeIndex = text.indexOf('***', start + 3);
@@ -395,7 +387,7 @@
                     const content = text.slice(start + 3, closeIndex);
                     if (content.length > 0 && !/^[ \t]*\n[ \t]*$/.test(content)) {
                         return {
-                            html: '<strong><em>' + parseInline(content) + '</em></strong>',
+                            html: '<em><strong>' + parseInline(content) + '</strong></em>',
                             end: closeIndex + 3
                         };
                     }
@@ -407,7 +399,7 @@
                     const content = text.slice(start + 3, closeIndex);
                     if (content.length > 0 && !/^[ \t]*\n[ \t]*$/.test(content)) {
                         return {
-                            html: '<strong><em>' + parseInline(content) + '</em></strong>',
+                            html: '<em><strong>' + parseInline(content) + '</strong></em>',
                             end: closeIndex + 3
                         };
                     }
@@ -501,6 +493,59 @@
             .replace(/"/g, '&quot;');
     }
 
+    // Parse GFM table
+    function parseTable(lines, start) {
+        const headerLine = lines[start];
+        
+        // Check if next line is a delimiter line (contains | and ---)
+        if (start + 1 >= lines.length) return null;
+        
+        const delimiterLine = lines[start + 1];
+        const delimMatch = delimiterLine.match(/^ *\|? *([:?\-]+ *\|)+ *[:\-]* *$/);
+        if (!delimMatch) return null;
+        
+        // Parse alignments from delimiter row
+        const alignParts = delimiterLine.split('|').map(p => p.trim()).filter(p => p !== '');
+        const alignments = alignParts.map(p => {
+            if (p.startsWith(':') && p.endsWith(':')) return 'center';
+            if (p.endsWith(':')) return 'right';
+            return 'left';
+        });
+        
+        // Parse header cells
+        const headerCells = headerLine.split('|').map(c => c.trim());
+        // Remove empty first/last cells if line starts/ends with |
+        if (headerCells[0] === '') headerCells.shift();
+        if (headerCells[headerCells.length - 1] === '') headerCells.pop();
+        
+        // Parse body rows
+        const bodyRows = [];
+        let rowIdx = start + 2;
+        
+        while (rowIdx < lines.length) {
+            const rowLine = lines[rowIdx];
+            if (!rowLine.includes('|')) break;
+            if (isBlank(rowLine)) break;
+            
+            const cells = rowLine.split('|').map(c => c.trim());
+            if (cells[0] === '') cells.shift();
+            if (cells[cells.length - 1] === '') cells.pop();
+            
+            bodyRows.push(cells);
+            rowIdx++;
+        }
+        
+        return {
+            block: {
+                type: 'table',
+                headers: headerCells,
+                alignments: alignments,
+                rows: bodyRows
+            },
+            nextLine: rowIdx
+        };
+    }
+
     // Main block-level parser
     function parseBlocks(lines) {
         const blocks = [];
@@ -517,7 +562,8 @@
             }
             
             // Thematic break (hr) - must check before list items
-            const hrMatch = line.match(/^( {0,3})([-*_])\2{2,}[ \t]*$/);
+            // GFM: 3+ of -, *, or _ with optional spaces between, on a line by itself
+            const hrMatch = line.match(/^( {0,3})([-*_])([ ]?\2)*[ ]*$/);
             if (hrMatch) {
                 blocks.push({ type: 'thematic_break', line: i });
                 i++;
@@ -675,7 +721,19 @@
                 continue;
             }
             
-            // List item
+            // Table (GFM extension) - must check before list items
+            // A table starts with a header row containing |, followed by a delimiter row with | and ---
+            if (line.includes('|') && !line.match(/^ {4}/)) {
+                // Check if this could be a table header
+                const tableResult = parseTable(lines, i);
+                if (tableResult) {
+                    blocks.push(tableResult.block);
+                    i = tableResult.nextLine;
+                    continue;
+                }
+            }
+            
+            // List item - check for task list items first (GFM extension)
             const ulMatch = line.match(/^( {0,3})([-*+])[ \t]+(.*)$/);
             const olMatch = line.match(/^( {0,3})(\d+)\.[ \t]+(.*)$/);
             
@@ -691,7 +749,26 @@
                     const olItemMatch = listItem.match(new RegExp(`^ {${indent}}\\d+\\.[ \\t]+(.*)$`));
                     
                     if (ulItemMatch || olItemMatch) {
-                        listItems.push({ content: ulItemMatch ? ulItemMatch[1] : olItemMatch[1], subContent: [] });
+                        let content = ulItemMatch ? ulItemMatch[1] : olItemMatch[1];
+                        
+                        // Check for task list item: [ ] or [x] or [X]
+                        const taskMatch = content.match(/^\[([ xX])\][ \t]+(.*)$/);
+                        let isTask = false;
+                        let isChecked = false;
+                        let taskContent = content;
+                        
+                        if (taskMatch) {
+                            isTask = true;
+                            isChecked = taskMatch[1].toLowerCase() === 'x';
+                            taskContent = taskMatch[2];
+                        }
+                        
+                        listItems.push({ 
+                            content: taskContent, 
+                            subContent: [],
+                            isTask: isTask,
+                            isChecked: isChecked
+                        });
                         i++;
                         
                         // Collect continuation lines (indented content)
@@ -780,20 +857,20 @@
                     break;
                     
                 case 'thematic_break':
-                    html += '<hr />\n';
+                    html += '<hr>\n';
                     break;
                     
                 case 'code':
                     if (block.lang) {
-                        html += `<pre><code class="language-${escapeHtml(block.lang)}">${escapeHtml(block.content)}</code></pre>\n`;
+                        html += `<pre><code class="language-${escapeHtml(block.lang)}">${escapeHtml(block.content)}\n</code></pre>\n`;
                     } else {
-                        html += `<pre><code>${escapeHtml(block.content)}</code></pre>\n`;
+                        html += `<pre><code>${escapeHtml(block.content)}\n</code></pre>\n`;
                     }
                     break;
                     
                 case 'blockquote':
-                    const bqContent = parseInline(block.content.replace(/\n/g, ' '));
-                    html += `<blockquote>${bqContent}</blockquote>\n`;
+                    const bqContent = parseInline(block.content.replace(/\n/g, '\n'));
+                    html += `<blockquote>\n<p>${bqContent}</p>\n</blockquote>\n`;
                     break;
                     
                 case 'unordered_list':
@@ -802,7 +879,12 @@
                         const itemContent = parseInline(item.content);
                         const subContent = item.subContent.length > 0 ? parseBlocks(item.subContent) : [];
                         const subHtml = renderBlocks(subContent);
-                        html += `<li>${itemContent}${subHtml}</li>\n`;
+                        if (item.isTask) {
+                            const checkedAttr = item.isChecked ? ' checked=""' : '';
+                            html += `<li><input${checkedAttr} disabled="" type="checkbox"> ${itemContent}${subHtml}</li>\n`;
+                        } else {
+                            html += `<li>${itemContent}${subHtml}</li>\n`;
+                        }
                     }
                     html += '</ul>\n';
                     break;
@@ -830,6 +912,22 @@
                     
                 case 'html':
                     html += block.content + '\n';
+                    break;
+                    
+                case 'table':
+                    html += '<table>\n<thead>\n<tr>\n';
+                    for (const header of block.headers) {
+                        html += `<th>${parseInline(header)}</th>\n`;
+                    }
+                    html += '</tr>\n</thead>\n<tbody>';
+                    for (const row of block.rows) {
+                        html += '<tr>\n';
+                        for (let i = 0; i < row.length; i++) {
+                            html += `<td>${parseInline(row[i])}</td>\n`;
+                        }
+                        html += '</tr>\n';
+                    }
+                    html += '</tbody></table>\n';
                     break;
             }
         }
