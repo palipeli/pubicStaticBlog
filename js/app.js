@@ -68,6 +68,11 @@
                     if (blogSidebarSection) {
                         blogSidebarSection.style.display = 'block';
                     }
+                    
+                    // Process any pending blog post restoration after metadata is loaded
+                    if (typeof window.processPendingBlogPostRestore === 'function') {
+                        window.processPendingBlogPostRestore();
+                    }
                 }
             });
         }
