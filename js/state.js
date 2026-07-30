@@ -161,14 +161,10 @@
         }
 
         // Restore blog post view or blog intro view (must be done after navigating to blogs page)
-        if (state.currentPage === 'blogs') {
+        // Note: Blog post restoration is now handled by ui.js navigation to avoid double animation
+        if (state.currentPage === 'blogs' && !state.activeBlogPost) {
             setTimeout(() => {
-                if (state.activeBlogPost) {
-                    // Restore the post they were reading
-                    if (typeof window.openBlogPostLazy === 'function') {
-                        window.openBlogPostLazy(state.activeBlogPost);
-                    }
-                } else if (state.blogIntroViewed) {
+                if (state.blogIntroViewed) {
                     // Show blog intro grid instead of a post
                     const postView = document.getElementById('blog-post-view');
                     const introView = document.getElementById('blog-intro-view');
