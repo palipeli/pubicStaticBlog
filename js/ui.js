@@ -81,7 +81,7 @@
                             // State already restored, just navigate to blogs page normally
                             navigateToBlogsPageWithoutPrefetch();
                             
-                            // Show blog intro view (grid of all posts)
+                            // Show blog intro view (grid of all posts) - NOT the saved post
                             const postView = document.getElementById('blog-post-view');
                             const introView = document.getElementById('blog-intro-view');
                             
@@ -122,6 +122,9 @@
                         if ((wasReadingBlogPost || !hasRestoredBlogSession) && hasSavedPost) {
                             hasRestoredBlogSession = true;
                             wasReadingBlogPost = false; // Reset after restoration
+                            
+                            // Mark state as restored to prevent duplicate restoration
+                            window.stateRestoreCompleted = true;
                             
                             // Navigate to blogs page
                             navigateToBlogsPageWithoutPrefetch();
