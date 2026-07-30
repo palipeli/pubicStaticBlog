@@ -80,24 +80,69 @@
         // Blockquotes
         html = html.replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>');
 
-        // Ordered lists - convert first with data-ol marker
-        html = html.replace(/^\d+\. (.+)$/gm, '<li data-ol>$1</li>');
-
-        // Unordered lists - convert after ordered lists
-        html = html.replace(/^\- (.+)$/gm, '<li>$1</li>');
-
-        // Wrap consecutive ordered list items
-        html = html.replace(/^(<li data-ol>.+<\/li>\n?)+/gm, '<ol>$&</ol>');
-
-        // Remove the data-ol attribute after wrapping
-        html = html.replace(/<li data-ol>/g, '<li>');
-
-        // Wrap consecutive unordered list items
-        html = html.replace(/^(<li>.+<\/li>\n?)+/gm, '<ul>$&</ul>');
+        // Process lists - need to handle them line by line first, then wrap
+        const lines = html.split('\n');
+        const processedLines = [];
+        let inOrderedList = false;
+        let inUnorderedList = false;
+        
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i];
+            
+            // Check for ordered list item (number followed by period and space)
+            const orderedMatch = line.match(/^\d+\.\s+(.+)$/);
+            // Check for unordered list item (dash followed by space)
+            const unorderedMatch = line.match(/^-\s+(.+)$/);
+            
+            if (orderedMatch) {
+                // Close unordered list if open
+                if (inUnorderedList) {
+                    processedLines.push('</ul>');
+                    inUnorderedList = false;
+                }
+                // Open ordered list if not already open
+                if (!inOrderedList) {
+                    processedLines.push('<ol>');
+                    inOrderedList = true;
+                }
+                processedLines.push(`<li>${orderedMatch[1]}</li>`);
+            } else if (unorderedMatch) {
+                // Close ordered list if open
+                if (inOrderedList) {
+                    processedLines.push('</ol>');
+                    inOrderedList = false;
+                }
+                // Open unordered list if not already open
+                if (!inUnorderedList) {
+                    processedLines.push('<ul>');
+                    inUnorderedList = true;
+                }
+                processedLines.push(`<li>${unorderedMatch[1]}</li>`);
+            } else {
+                // Close any open lists
+                if (inOrderedList) {
+                    processedLines.push('</ol>');
+                    inOrderedList = false;
+                }
+                if (inUnorderedList) {
+                    processedLines.push('</ul>');
+                    inUnorderedList = false;
+                }
+                processedLines.push(line);
+            }
+        }
+        
+        // Close any remaining open lists
+        if (inOrderedList) {
+            processedLines.push('</ol>');
+        }
+        if (inUnorderedList) {
+            processedLines.push('</ul>');
+        }
+        
+        html = processedLines.join('\n');
 
         // Paragraphs (simple approach - wrap remaining text blocks)
-        html = html.replace(/\n\n/g, '</p>\n<p>');
-        html = '<p>' + html + '</p>';
 
         // Clean up empty paragraphs and fix paragraph wrapping around block elements
         html = html.replace(/<p>\s*<(h[1-6]|ul|ol|li|pre|blockquote)/g, '<$1');
