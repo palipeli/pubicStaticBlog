@@ -246,9 +246,6 @@
 
         // Also save before page unload
         window.addEventListener('beforeunload', saveAppState);
-
-        // Save state periodically (every 30 seconds) as backup
-        setInterval(saveAppState, STATE_AUTO_SAVE_INTERVAL);
     }
 
     // Expose functions globally

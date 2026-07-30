@@ -181,6 +181,10 @@
         acceptBtn.addEventListener('click', () => {
             localStorage.setItem(STORAGE_KEY, 'true');
             consentOverlay.style.opacity = '0';
+            
+            // Dispatch custom event for devotional.js to listen to
+            document.dispatchEvent(new CustomEvent('warning:cleared'));
+            
             setTimeout(() => {
                 consentOverlay.style.display = 'none';
                 isAccepted = true;
