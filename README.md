@@ -1,27 +1,22 @@
-# pubicStaticBlogBlender
+# pubicStaticBlog
 
-A lightweight static blogging platform built for speed and simplicity.
+A lightweight single page application (SPA) static blogger completely written with JS, CSS, and HTML.
 
-## Overview
+## Why the fuck do I/you need this?
 
-pubicStaticBlogBlender is a minimal static site generator designed for performance. It uses pure HTML, CSS, and JavaScript with no database dependencies.
-
-## Key Features
-
-- **Fast load times**: Optimized WebP images, minimal CSS, and compressed assets (background image under 10KB)
+- **Ridiculously fast**: Uses multiple fetching and rendering technique to keep things fast.
 - **Responsive design**: Mobile-first layout that works across devices
 - **No database**: Deploy anywhere – Netlify, Vercel, GitHub Pages, or S3
-- **SEO ready**: Semantic HTML and performance-focused structure
 - **Easy customization**: Straightforward file structure for styles and content
 
 ## Technical Details
-
-- Blurred and darkened background effects
-- Circular favicon support
-- WebP image format with transparency
-- VT323 font integration
-- Markdown-based blog posts
+- Markdown-based blog posts with 100% compatibility to known convention
 - Automatic post generation from `blog/posts.json`
+- Cursor hover prefetching mechanism
+- Image Lazyloading mechanism to reduce bandwith usage
+- Fast initial load times with dynamic fetching of resources
+- VT323 font integration and pink theme
+
 
 ## Getting Started
 
@@ -35,5 +30,3 @@ pubicStaticBlogBlender is a minimal static site generator designed for performan
 See it live at [kamikami.eu](https://kamikami.eu)
 
 ---
-
-Built for speed. Designed for simplicity.
