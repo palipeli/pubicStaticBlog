@@ -121,8 +121,10 @@
                                 item.classList.remove('active');
                             });
                             
-                            // Render the blog post selector grid
-                            if (typeof window.renderBlogPostSelectorGrid === 'function' && window.blogPostMetadata) {
+                            // Render the blog post selector grid ONLY if not already rendered
+                            // Check if grid already has content to avoid double animation
+                            const gridContainer = document.getElementById('blog-post-selector-grid');
+                            if (typeof window.renderBlogPostSelectorGrid === 'function' && window.blogPostMetadata && (!gridContainer || gridContainer.children.length === 0)) {
                                 window.renderBlogPostSelectorGrid(window.blogPostMetadata);
                             }
                             

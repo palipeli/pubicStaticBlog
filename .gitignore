@@ -1,55 +1,42 @@
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-
+```
 # Dependencies
-.venv/
-venv/
 node_modules/
-pip-tools/
-*.egg-info/
-
-# Logs and temp files
-*.log
-*.tmp
-*.swp
-*.swo
 
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
+
+# Logs and temp files
+*.log
+*.tmp
 
 # Editors
 .vscode/
 .idea/
-*.sublime-project
-*.sublime-workspace
 
-# OS
-.DS_Store
-Thumbs.db
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+env/
+ENV/
 
-# Coverage
-.coverage
-coverage/
-htmlcov/
-
-# Distribution
+# Build outputs
 dist/
 build/
-*.tar.gz
-*.whl
-*.egg
-
-# Python specific
-*.py[cod]
-*$py.class
-*.so
-.Python
-*.sqlite3
-
-# Backup files
-*~
-*.bak
-*.backup
+*.egg-info/
+.coverage
+htmlcov/
+coverage/
+.mypy_cache/
+.pytest_cache/
+.tox/
+.nyc_output/
+istanbul/
+.nyc-output/
+```
