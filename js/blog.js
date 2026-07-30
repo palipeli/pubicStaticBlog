@@ -308,14 +308,16 @@
     const navigationHistory = [];
     
     // Open a blog post with lazy loading (new approach - loads content on demand)
-    async function openBlogPostLazy(id) {
+    // skipNavigation parameter prevents double navigation when called from ui.js navigation handler
+    async function openBlogPostLazy(id, skipNavigation = false) {
         // Show loading state first
         const article = document.getElementById('blog-article-content');
 
         // Check if we're currently on home or about page, and switch to blogs if so
+        // Skip this if navigation is already handled by the caller
         const currentPage = document.querySelector('.page-section.active');
         let previousPage = null;
-        if (currentPage && (currentPage.id === 'home' || currentPage.id === 'about')) {
+        if (!skipNavigation && currentPage && (currentPage.id === 'home' || currentPage.id === 'about')) {
             // Save the previous page before navigating to blogs
             previousPage = currentPage.id;
             // Navigate to blogs page without triggering blog introduction prefetch
