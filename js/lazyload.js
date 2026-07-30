@@ -39,7 +39,7 @@
         if (!dataSrc) return;
 
         // Check if already loaded or loading
-        if (img.src === dataSrc || img.classList.contains('loading')) return;
+        if (img.classList.contains('loaded') || img.classList.contains('loading')) return;
 
         // Add loading class for visual feedback
         img.classList.add('loading');

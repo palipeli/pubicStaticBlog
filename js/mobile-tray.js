@@ -29,6 +29,16 @@
         tray.className = 'mobile-nav-tray';
         tray.innerHTML = `
             <div class="mobile-tray-content">
+                <!-- Navigation Links Section -->
+                <div class="mobile-tray-section">
+                    <h3 class="mobile-tray-section-title">Navigation</h3>
+                    <div class="mobile-nav-links">
+                        <button class="mobile-nav-item" data-page="home"><i class="fa-solid fa-house"></i> Home</button>
+                        <button class="mobile-nav-item" data-page="about"><i class="fa-solid fa-user"></i> About</button>
+                        <button class="mobile-nav-item" data-page="blog"><i class="fa-solid fa-book"></i> Blog</button>
+                    </div>
+                </div>
+                
                 <!-- Blog Posts Section (always visible when on blogs page, expanded by default) -->
                 <div class="mobile-tray-section blog-only" id="mobile-blog-posts-section" style="display: none;">
                     <h3 class="mobile-tray-section-title">All Posts</h3>
@@ -45,8 +55,6 @@
                         <button class="mobile-theme-btn" data-theme="light"><i class="fa-solid fa-sun"></i> Light</button>
                         <button class="mobile-theme-btn" data-theme="dark"><i class="fa-solid fa-moon"></i> Dark</button>
                     </div>
-                </div>
-                
                 </div>
             </div>
         `;
@@ -357,26 +365,24 @@
         window.addEventListener('resize', handleResize);
         
         // Listen for page changes to update blog posts visibility
-        document.addEventListener('DOMContentLoaded', () => {
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    setTimeout(updateBlogPostsVisibility, 100);
-                });
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                setTimeout(updateBlogPostsVisibility, 100);
             });
-            
-            // Also listen for when blog metadata is loaded to render mobile post list
-            // This ensures the mobile tray can access window.blogPostMetadata once it's available
-            const checkAndRenderPosts = setInterval(() => {
-                if (typeof window.blogPostMetadata !== 'undefined' && window.blogPostMetadata.length > 0) {
-                    updateBlogPostsVisibility();
-                    clearInterval(checkAndRenderPosts);
-                }
-            }, 100);
-            
-            // Clear interval after 5 seconds to avoid infinite checking
-            setTimeout(() => clearInterval(checkAndRenderPosts), 5000);
         });
+        
+        // Also listen for when blog metadata is loaded to render mobile post list
+        // This ensures the mobile tray can access window.blogPostMetadata once it's available
+        const checkAndRenderPosts = setInterval(() => {
+            if (typeof window.blogPostMetadata !== 'undefined' && window.blogPostMetadata.length > 0) {
+                updateBlogPostsVisibility();
+                clearInterval(checkAndRenderPosts);
+            }
+        }, 100);
+        
+        // Clear interval after 5 seconds to avoid infinite checking
+        setTimeout(() => clearInterval(checkAndRenderPosts), 5000);
     }
     
     // Start initialization
