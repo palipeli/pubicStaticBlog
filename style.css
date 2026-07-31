@@ -809,8 +809,10 @@ body {
 }
 
 [data-theme="light"] .blog-article code {
-    background: transparent;
-    color: var(--text-primary);
+    background: rgba(0, 0, 0, 0.08);
+    color: #c41a16;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    padding: 2px 7px;
 }
 
 .blog-article pre {
