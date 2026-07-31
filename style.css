@@ -805,6 +805,7 @@ body {
 .blog-article li {
     margin-bottom: 8px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    display: list-item;
 }
 
 .blog-article code {
