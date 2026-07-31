@@ -830,8 +830,13 @@
                     const listItem = lines[i];
                     
                     // Check for items at the current indent level
-                    const ulItemMatch = listItem.match(new RegExp(`^ {${baseIndent}}[-*+][ \t]+(.*)$`));
-                    const olItemMatch = listItem.match(new RegExp(`^ {${baseIndent}}\d+\.[ \t]+(.*)$`));
+                    // For baseIndent=0, we need to match 0-3 spaces; for baseIndent>0, match exactly that many
+                    const ulItemMatch = baseIndent === 0 
+                        ? listItem.match(/^( {0,3})[-*+][ \t]+(.*)$/)
+                        : listItem.match(new RegExp(`^ {${baseIndent}}[-*+][ \\t]+(.*)$`));
+                    const olItemMatch = baseIndent === 0
+                        ? listItem.match(/^( {0,3})\d+\.[ \t]+(.*)$/)
+                        : listItem.match(new RegExp(`^ {${baseIndent}}\\d+\\.[ \\t]+(.*)$`));
                     
                     if (ulItemMatch || olItemMatch) {
                         let content = ulItemMatch ? ulItemMatch[1] : olItemMatch[1];
