@@ -14,7 +14,7 @@
         if (versesLoaded) return bibleVerses;
 
         try {
-            const response = await fetch('/blog/nt_verses_compact.json');
+            const response = await fetch('/blog/bible_verses_compact.json');
             if (!response.ok) throw new Error('Could not fetch Bible verses');
             const rawData = await response.json();
             // Convert array format back to objects for compatibility
