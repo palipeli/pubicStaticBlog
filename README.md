@@ -10,7 +10,7 @@ A lightweight single page application (SPA) static blogger completely written wi
 - **Easy customization**: Straightforward file structure for styles and content
 
 ## Technical Details
-- Markdown-based blog posts with 100% compatibility to known convention
+- Markdown-based blog posts with attempts at compatibility to known conventions
 - Automatic post generation from `blog/posts.json`
 - Cursor hover prefetching mechanism
 - Image Lazyloading mechanism to reduce bandwith usage
