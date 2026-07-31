@@ -45,40 +45,64 @@
         return pool[Math.floor(Math.random() * pool.length)];
     }
 
-    // Typing delete animation - removes text character by character
+    // Typing delete animation - removes text character by character using rAF
     function typeDeleteAnimation(element, callback) {
         const text = element.textContent;
         let index = 0;
+        let lastTime = 0;
+        const interval = 15; // ms target interval
 
-        function deleteChar() {
-            if (index < text.length) {
-                element.textContent = text.substring(0, text.length - index - 1);
-                index++;
-                setTimeout(deleteChar, 15); // Fast deletion
-            } else {
-                if (callback) callback();
+        function step(timestamp) {
+            if (!lastTime) lastTime = timestamp;
+            const delta = timestamp - lastTime;
+
+            if (delta >= interval) {
+                const charsToDelete = Math.max(1, Math.floor(delta / interval));
+                index += charsToDelete;
+                lastTime = timestamp;
+
+                if (index < text.length) {
+                    element.textContent = text.substring(0, text.length - index);
+                } else {
+                    element.textContent = '';
+                    if (callback) callback();
+                    return;
+                }
             }
+            requestAnimationFrame(step);
         }
 
-        deleteChar();
+        requestAnimationFrame(step);
     }
 
-    // Typing write animation - types text character by character
+    // Typing write animation - types text character by character using rAF
     function typeWriteAnimation(element, text, callback) {
         let index = 0;
+        let lastTime = 0;
+        const interval = 20; // ms target interval
         element.textContent = '';
 
-        function typeChar() {
-            if (index < text.length) {
-                element.textContent += text.charAt(index);
-                index++;
-                setTimeout(typeChar, 20); // Fast typing
-            } else {
-                if (callback) callback();
+        function step(timestamp) {
+            if (!lastTime) lastTime = timestamp;
+            const delta = timestamp - lastTime;
+
+            if (delta >= interval) {
+                const charsToAdd = Math.max(1, Math.floor(delta / interval));
+                index += charsToAdd;
+                lastTime = timestamp;
+
+                if (index <= text.length) {
+                    element.textContent = text.substring(0, index);
+                } else {
+                    element.textContent = text;
+                    if (callback) callback();
+                    return;
+                }
             }
+            requestAnimationFrame(step);
         }
 
-        typeChar();
+        requestAnimationFrame(step);
     }
 
     // Prevent concurrent animations from running
