@@ -291,10 +291,10 @@
             applyTheme(prefersDark ? 'dark' : 'light');
             return;
         } else if (themeName === 'light') {
-            // Adwaita Light Theme (GNOME default) - Translucent Glass
+            // Adwaita Light Theme (GNOME default) - Subtle Glass
             root.style.setProperty('--bg-dark', '#f6f5f4');
-            root.style.setProperty('--bg-panel', 'rgba(255, 255, 255, 0.4)');
-            root.style.setProperty('--bg-header', 'rgba(246, 245, 244, 0.65)');
+            root.style.setProperty('--bg-panel', 'rgba(255, 255, 255, 0.72)');
+            root.style.setProperty('--bg-header', 'rgba(246, 245, 244, 0.85)');
             root.style.setProperty('--accent-pink', '#ff45fc');
             root.style.setProperty('--accent-pink-hover', '#e031e0');
             root.style.setProperty('--text-primary', '#2e3436');
@@ -302,15 +302,15 @@
             root.style.setProperty('--border-color', 'rgba(0, 0, 0, 0.1)');
             root.style.setProperty('--blur-overlay-brightness', '1.0');
             root.style.setProperty('--dark-overlay-color', 'rgba(0, 0, 0, 0.0)');
-            document.body.style.background = 'linear-gradient(135deg, rgba(246, 245, 244, 0.4) 0%, rgba(255, 255, 255, 0.4) 100%), url("media/background.webp")';
+            document.body.style.background = 'linear-gradient(135deg, rgba(246, 245, 244, 0.6) 0%, rgba(255, 255, 255, 0.6) 100%), url("media/background.webp")';
             document.body.style.backgroundSize = 'cover';
             document.body.style.backgroundPosition = 'center';
             document.body.style.backgroundAttachment = 'fixed';
         } else if (themeName === 'dark') {
-            // Adwaita Dark Theme (GNOME) - Translucent Dark Glass
+            // Adwaita Dark Theme (GNOME) - Subtle Dark Glass
             root.style.setProperty('--bg-dark', '#121212');
-            root.style.setProperty('--bg-panel', 'rgba(18, 18, 18, 0.45)');
-            root.style.setProperty('--bg-header', 'rgba(12, 12, 12, 0.65)');
+            root.style.setProperty('--bg-panel', 'rgba(26, 26, 26, 0.75)');
+            root.style.setProperty('--bg-header', 'rgba(18, 18, 18, 0.85)');
             root.style.setProperty('--accent-pink', '#ff45fc');
             root.style.setProperty('--accent-pink-hover', '#e031e0');
             root.style.setProperty('--text-primary', '#ffffff');
@@ -318,7 +318,7 @@
             root.style.setProperty('--border-color', 'rgba(255, 255, 255, 0.12)');
             root.style.setProperty('--blur-overlay-brightness', '0.6');
             root.style.setProperty('--dark-overlay-color', 'rgba(0, 0, 0, 0.4)');
-            document.body.style.background = 'linear-gradient(135deg, rgba(26, 26, 26, 0.4) 0%, rgba(13, 13, 13, 0.4) 100%), url("media/background.webp")';
+            document.body.style.background = 'linear-gradient(135deg, rgba(26, 26, 26, 0.6) 0%, rgba(13, 13, 13, 0.6) 100%), url("media/background.webp")';
             document.body.style.backgroundSize = 'cover';
             document.body.style.backgroundPosition = 'center';
             document.body.style.backgroundAttachment = 'fixed';
