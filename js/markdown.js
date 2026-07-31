@@ -862,12 +862,18 @@
                             const contIndent = getIndentLevel(contLine);
                             
                             if (isBlank(contLine)) {
-                                // Check if next line continues this item or has a nested list
+                                // Check if next line continues this item, has a nested list, or is another list item at same level
                                 if (i + 1 < lines.length) {
                                     const nextLine = lines[i + 1];
                                     const nextIndent = getIndentLevel(nextLine);
-                                    // Continue if next line is indented more OR is a list item at deeper level
-                                    if (nextIndent > baseIndent) {
+                                    // Check if next line is a list item at the same base indent level
+                                    const nextIsUl = nextLine.match(new RegExp(`^ {${baseIndent}}[-*+][ \\t]+`));
+                                    const nextIsOl = nextLine.match(new RegExp(`^ {${baseIndent}}\\d+\\.[ \\t]+`));
+                                    // Only continue the current list if the next item is the same type (ul vs ol)
+                                    const nextIsSameTypeList = nextIndent === baseIndent && 
+                                        (isOrdered ? nextIsOl : nextIsUl);
+                                    // Continue if next line is indented more OR is a list item at deeper level OR is same type list item at same level
+                                    if (nextIndent > baseIndent || nextIsSameTypeList) {
                                         listItems[listItems.length - 1].subContent.push('');
                                         i++;
                                     } else {
