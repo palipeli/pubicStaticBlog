@@ -549,7 +549,7 @@
         if (start + 1 >= lines.length) return null;
         
         const delimiterLine = lines[start + 1];
-        const delimMatch = delimiterLine.match(/^ *\|? *([:?\-]+ *\|)+ *[:\-]* *$/);
+        const delimMatch = delimiterLine.match(/^\|? *([:\-]+)( *\| *[:\-]+)* *\|? *$/);
         if (!delimMatch) return null;
         
         // Parse alignments from delimiter row
