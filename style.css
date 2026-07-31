@@ -64,7 +64,7 @@ body::before {
     height: 100%;
     background: url('media/background.webp') no-repeat center center;
     background-size: cover;
-    filter: blur(10px) brightness(var(--blur-overlay-brightness));
+    filter: blur(1.5px) brightness(var(--blur-overlay-brightness));
     transition: filter var(--theme-transition-duration) ease;
     z-index: -2;
 }
@@ -98,8 +98,8 @@ body {
     right: 0;
     height: var(--header-height);
     background: var(--bg-header);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -223,8 +223,8 @@ body {
 
 .home-layout-container .home-hero {
     background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
@@ -268,8 +268,8 @@ body {
     position: absolute;
     border-radius: 8px;
     opacity: 0.8;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
 }
 
 .shape-1 {
@@ -352,8 +352,8 @@ body {
 .sidebar {
     width: 280px;
     background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
     border-left: 1px solid var(--border-color);
     padding: 0;
     animation: slideLeft 0.5s ease-out;
@@ -411,8 +411,8 @@ body {
     height: 48px;
     border-radius: 12px 0 0 12px;
     background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
     border: 1px solid var(--border-color);
     border-right: none;
     cursor: pointer;
@@ -672,8 +672,8 @@ body {
 
 .blog-post-view .blog-article {
     background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
@@ -684,8 +684,8 @@ body {
 
 .blog-intro-view .blog-article {
     background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
@@ -746,8 +746,8 @@ body {
 /* Blog Article */
 .blog-article {
     background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 15px;
@@ -901,25 +901,25 @@ body {
 }
 
 /* Default alignment */
-.blog-article th:not([align]),
-.blog-article td:not([align]) {
+.blog-article th,
+.blog-article td {
     text-align: left;
 }
 
-/* Respect align attribute for table cells */
-.blog-article th[align="left"],
-.blog-article td[align="left"] {
-    text-align: left !important;
+/* CSS class-based alignment (replaces deprecated align attribute) */
+.blog-article th.text-left,
+.blog-article td.text-left {
+    text-align: left;
 }
 
-.blog-article th[align="center"],
-.blog-article td[align="center"] {
-    text-align: center !important;
+.blog-article th.text-center,
+.blog-article td.text-center {
+    text-align: center;
 }
 
-.blog-article th[align="right"],
-.blog-article td[align="right"] {
-    text-align: right !important;
+.blog-article th.text-right,
+.blog-article td.text-right {
+    text-align: right;
 }
 
 .blog-article th {
@@ -1209,8 +1209,8 @@ body {
     margin: 0 auto;
     text-align: center;
     background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 40px;
@@ -1277,8 +1277,8 @@ body {
 
 .about-content {
     background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 15px;
@@ -1576,8 +1576,8 @@ body {
     left: 0;
     right: 0;
     background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
     border-bottom: 1px solid var(--border-color);
     z-index: 999;
     max-height: calc(100vh - var(--header-height));
@@ -1751,8 +1751,8 @@ body.mobile-tray-open {
 /* Footer Styles */
 footer {
     background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
     border-top: 1px solid var(--border-color);
     padding: 30px 20px;
     text-align: center;

@@ -1,5 +1,17 @@
-(js/devotional.js is a source file, so no ignores needed)
+```
+# Dependencies
+node_modules/
 
-```javascript
+# Editors
+.vscode/
 
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+
+# Environment
+.env
+.env.local
+*.env.*
 ```

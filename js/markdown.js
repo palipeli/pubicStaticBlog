@@ -3,6 +3,18 @@
 // Uses a proper block-level and inline-level parsing approach
 
 (function() {
+    // Cached regex patterns for performance
+    const regexCache = {
+        whitespace: /^[ \t]*$/,
+        htmlEntity: /^&([a-zA-Z]+|#\d+|#x[0-9a-fA-F]+);/,
+        urlProtocol: /^https?:\/\/[^\s<>]+$/i,
+        email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        thematicBreak: /^( {0,3})([-*_])([ ]?\2){2,}[ ]*$/,
+        tableDelimiter: /^\|? *(:?-+:?)( *\| *:?-+:?)* *\|? *$/,
+        unicodeWhitespace: /[ \t\n\r\u00a0\u1680\u2000-\u200b\u2028\u2029\u202f\u205f\u3000\ufeff]/,
+        unicodePunctuation: /[!"#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~\u00a1-\u00bf\u2010-\u2027\u2030-\u205e\u2e00-\u2e7f]/
+    };
+
     // Default introduction content shown before selecting a post
     const blogIntroduction = {
         title: "Welcome to Our Blog",
@@ -60,7 +72,7 @@
 
     // Check if string is blank (only whitespace)
     function isBlank(line) {
-        return /^[ \t]*$/.test(line);
+        return regexCache.whitespace.test(line);
     }
 
     // Get indent level (number of spaces, treating tabs as 4 spaces)
@@ -90,7 +102,7 @@
     function parseInline(text, options = {}) {
         if (!text) return '';
         
-        let result = '';
+        const result = [];
         let i = 0;
         
         while (i < text.length) {
@@ -100,7 +112,7 @@
             if (text[i] === '\\' && i + 1 < text.length) {
                 const nextChar = text[i + 1];
                 if ('\\`*_{}[]()<>#+-.!|'.includes(nextChar)) {
-                    result += nextChar;
+                    result.push(nextChar);
                     i += 2;
                     continue;
                 }
@@ -110,7 +122,7 @@
             if (text[i] === '&') {
                 const entityMatch = text.slice(i).match(/^&([a-zA-Z]+|#\d+|#x[0-9a-fA-F]+);/);
                 if (entityMatch) {
-                    result += entityMatch[0];  // Preserve entity as-is
+                    result.push(entityMatch[0]);  // Preserve entity as-is
                     i += entityMatch[0].length;
                     continue;
                 }
@@ -137,12 +149,12 @@
                     if (trimmedCode.startsWith(' ') && trimmedCode.endsWith(' ') && trimmedCode.length > 1) {
                         trimmedCode = trimmedCode.slice(1, -1);
                     }
-                    result += '<code>' + escapeHtml(trimmedCode) + '</code>';
+                    result.push('<code>' + escapeHtml(trimmedCode) + '</code>');
                     i = closeIndex + backtickCount;
                     continue;
                 } else {
                     // No closing backticks, treat as literal
-                    result += delimiter;
+                    result.push(delimiter);
                 }
                 continue;
             }
@@ -151,7 +163,7 @@
             if (text[i] === '!' && i + 1 < text.length && text[i + 1] === '[') {
                 const imgResult = parseLinkOrImage(text, i, true);
                 if (imgResult) {
-                    result += imgResult.html;
+                    result.push(imgResult.html);
                     i = imgResult.end;
                     continue;
                 }
@@ -161,7 +173,7 @@
             if (text[i] === '[') {
                 const linkResult = parseLinkOrImage(text, i, false);
                 if (linkResult) {
-                    result += linkResult.html;
+                    result.push(linkResult.html);
                     i = linkResult.end;
                     continue;
                 }
@@ -171,7 +183,7 @@
             if (text[i] === '<') {
                 const autoLinkResult = parseAutolink(text, i);
                 if (autoLinkResult) {
-                    result += autoLinkResult.html;
+                    result.push(autoLinkResult.html);
                     i = autoLinkResult.end;
                     continue;
                 }
@@ -181,7 +193,7 @@
             if (text[i] === '<') {
                 const htmlTagResult = parseRawHtmlTag(text, i);
                 if (htmlTagResult) {
-                    result += htmlTagResult.html;
+                    result.push(htmlTagResult.html);
                     i = htmlTagResult.end;
                     continue;
                 }
@@ -192,7 +204,7 @@
             if (text[i] === 'h' && text.slice(i, i + 8) === 'https://' || text.slice(i, i + 7) === 'http://') {
                 const urlResult = parseExtendedAutolink(text, i);
                 if (urlResult) {
-                    result += urlResult.html;
+                    result.push(urlResult.html);
                     i = urlResult.end;
                     continue;
                 }
@@ -201,7 +213,7 @@
             // Emphasis and Strong emphasis - GFM section 6.7
             const emphasisResult = parseEmphasis(text, i);
             if (emphasisResult) {
-                result += emphasisResult.html;
+                result.push(emphasisResult.html);
                 i = emphasisResult.end;
                 continue;
             }
@@ -210,7 +222,7 @@
             if (text[i] === '~' && i + 1 < text.length && text[i + 1] === '~') {
                 const strikeResult = parseStrikethrough(text, i);
                 if (strikeResult) {
-                    result += strikeResult.html;
+                    result.push(strikeResult.html);
                     i = strikeResult.end;
                     continue;
                 }
@@ -218,17 +230,17 @@
             
             // Hard line breaks (two spaces at end of line followed by newline)
             if (text[i] === ' ' && i + 1 < text.length && text[i + 1] === ' ' && i + 2 < text.length && text[i + 2] === '\n') {
-                result += '<br>';
+                result.push('<br>');
                 i += 3;
                 continue;
             }
             
             // Default: just add the character
-            result += text[i];
+            result.push(text[i]);
             i++;
         }
         
-        return result;
+        return result.join("");
     }
 
     // Parse link or image
@@ -268,6 +280,7 @@
             const destStart = i;
             let parenDepth = 1;
             let inAngle = false;
+            let dest = '';
             let title = '';
             
             while (i < text.length && parenDepth > 0) {
@@ -284,10 +297,10 @@
             
             // Split destination and title if present
             // Title can be in "", '', or ()
-            const titleMatch = destAndTitle.match(/^([^\s"']+)(?:\s+["'](.+)["']|\s+\((.+)\))?$/);
+            const titleMatch = destAndTitle.match(/^([^\s"']+)(?:\s+"([^"]*)"|\s+'([^']*)'|\s+\(([^)]*)\))?$/);
             if (titleMatch) {
                 dest = titleMatch[1];
-                title = titleMatch[2] || titleMatch[3] || '';
+                title = titleMatch[2] || titleMatch[3] || titleMatch[4] || '';
             } else {
                 dest = destAndTitle;
             }
@@ -300,8 +313,13 @@
             i++; // skip )
             
             if (isImage) {
+                let imgHtml = '<img src="' + escapeHtml(dest) + '" alt="' + escapeHtml(label) + '"';
+                if (title) {
+                    imgHtml += ' title="' + escapeHtml(title) + '"';
+                }
+                imgHtml += '>';
                 return {
-                    html: '<img src="' + escapeHtml(dest) + '" alt="' + escapeHtml(label) + '">',
+                    html: imgHtml,
                     end: i
                 };
             } else {
@@ -356,7 +374,7 @@
         // Validate URL or email
         if (hasAt) {
             // Email autolink
-            if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(dest)) {
+            if (!regexCache.email.test(dest)) {
                 return null;
             }
             return {
@@ -364,8 +382,8 @@
                 end: i + 1
             };
         } else {
-            // URL autolink
-            if (!/^https?:\/\/[^\s]+$/.test(dest)) {
+            // URL autolink - must have valid protocol (http:// or https://)
+            if (!regexCache.urlProtocol.test(dest)) {
                 return null;
             }
             return {
@@ -425,94 +443,148 @@
         };
     }
 
-    // Parse emphasis and strong emphasis
+    // Parse emphasis and strong emphasis - GFM section 6.7 compliant
+    // Key rules: opening/closing delimiters must match (* with *, _ with _)
+    // Delimiter run properties determine if it can open/close emphasis
     function parseEmphasis(text, start) {
-        // Check for *** or ___ (strong + em) - marked uses <em><strong> order
-        if (start + 2 < text.length) {
-            if (text[start] === '*' && text[start + 1] === '*' && text[start + 2] === '*') {
-                const closeIndex = text.indexOf('***', start + 3);
-                if (closeIndex !== -1) {
-                    const content = text.slice(start + 3, closeIndex);
-                    if (content.length > 0 && !/^[ \t]*\n[ \t]*$/.test(content)) {
-                        return {
-                            html: '<em><strong>' + parseInline(content) + '</strong></em>',
-                            end: closeIndex + 3
-                        };
-                    }
-                }
-            }
-            if (text[start] === '_' && text[start + 1] === '_' && text[start + 2] === '_') {
-                const closeIndex = text.indexOf('___', start + 3);
-                if (closeIndex !== -1) {
-                    const content = text.slice(start + 3, closeIndex);
-                    if (content.length > 0 && !/^[ \t]*\n[ \t]*$/.test(content)) {
-                        return {
-                            html: '<em><strong>' + parseInline(content) + '</strong></em>',
-                            end: closeIndex + 3
-                        };
-                    }
-                }
+        const marker = text[start];
+        
+        // Only process if this is * or _
+        if (marker !== '*' && marker !== '_') return null;
+        
+        // Count consecutive markers at start position
+        let startCount = 0;
+        let i = start;
+        while (i < text.length && text[i] === marker) {
+            startCount++;
+            i++;
+        }
+        
+        // Determine delimiter run properties (GFM section 6.7)
+        // Note: "before" means character immediately before the delimiter run
+        // "after" means character immediately after the delimiter run
+        const charBefore = start > 0 ? text[start - 1] : null;
+        const charAfter = i < text.length ? text[i] : null;
+        
+        // Unicode whitespace categories (simplified for ASCII)
+        function isUnicodeWhitespace(ch) {
+            if (ch === null) return false;
+            return regexCache.unicodeWhitespace.test(ch);
+        }
+        
+        // Unicode punctuation categories (simplified)
+        function isUnicodePunctuation(ch) {
+            if (ch === null) return false;
+            // Include ASCII punctuation and common Unicode punctuation
+            return regexCache.unicodePunctuation.test(ch);
+        }
+        
+        const isWhitespaceBefore = isUnicodeWhitespace(charBefore);
+        const isWhitespaceAfter = isUnicodeWhitespace(charAfter);
+        const isPunctuationBefore = isUnicodePunctuation(charBefore);
+        const isPunctuationAfter = isUnicodePunctuation(charAfter);
+        
+        // A delimiter can open emphasis if:
+        // - It's not followed by whitespace AND (not preceded by whitespace OR preceded by punctuation)
+        // A delimiter can close emphasis if:
+        // - It's not preceded by whitespace AND (not followed by whitespace OR followed by punctuation)
+        const canOpen = !isWhitespaceAfter && (!isWhitespaceBefore || isPunctuationBefore);
+        const canClose = !isWhitespaceBefore && (!isWhitespaceAfter || isPunctuationAfter);
+        
+        // For single delimiters with special cases
+        if (startCount === 1) {
+            // Single underscore cannot open/close emphasis if both before and after are letters (non-whitespace, non-punctuation)
+            if (marker === '_' && !isPunctuationBefore && !isWhitespaceBefore && 
+                !isPunctuationAfter && !isWhitespaceAfter) {
+                return null;
             }
         }
         
-        // Check for ** or __ (strong)
-        if (start + 1 < text.length) {
-            if (text[start] === '*' && text[start + 1] === '*') {
-                const closeIndex = text.indexOf('**', start + 2);
-                if (closeIndex !== -1) {
-                    const content = text.slice(start + 2, closeIndex);
-                    if (content.length > 0 && !/^[ \t]*\n[ \t]*$/.test(content)) {
-                        return {
-                            html: '<strong>' + parseInline(content) + '</strong>',
-                            end: closeIndex + 2
-                        };
-                    }
-                }
-            }
-            if (text[start] === '_' && text[start + 1] === '_') {
-                const closeIndex = text.indexOf('__', start + 2);
-                if (closeIndex !== -1) {
-                    const content = text.slice(start + 2, closeIndex);
-                    if (content.length > 0 && !/^[ \t]*\n[ \t]*$/.test(content)) {
-                        return {
-                            html: '<strong>' + parseInline(content) + '</strong>',
-                            end: closeIndex + 2
-                        };
-                    }
-                }
-            }
-        }
+        // If we can't open, return null
+        if (!canOpen) return null;
         
-        // Check for * or _ (emphasis)
-        if (text[start] === '*' || text[start] === '_') {
-            const marker = text[start];
-            let closeIndex = -1;
-            
-            // Find closing marker (not immediately adjacent)
-            for (let j = start + 1; j < text.length; j++) {
-                if (text[j] === marker) {
-                    // Check it's not part of ** or __
-                    if (j + 1 < text.length && text[j + 1] === marker) continue;
-                    if (j - 1 >= start && text[j - 1] === marker) continue;
-                    
-                    const content = text.slice(start + 1, j);
-                    if (content.length > 0 && !/^[ \t]*\n[ \t]*$/.test(content)) {
-                        closeIndex = j;
+        // GFM spec: For emphasis with mixed markers (* and _), 
+        // a run of * cannot close emphasis opened by _ and vice versa
+        // Also, for single * delimiters, they cannot close if part of a longer run when original was single
+        
+        // Find matching closing delimiter run
+        // Must match the same marker character
+        let foundClose = false;
+        let closePos = -1;
+        let closeCount = 0;
+        
+        while (i < text.length) {
+            if (text[i] === marker) {
+                // Count this run of markers
+                closeCount = 0;
+                const closeStart = i;
+                while (i < text.length && text[i] === marker) {
+                    closeCount++;
+                    i++;
+                }
+                
+                const charBeforeClose = text[closeStart - 1] || null;
+                const charAfterClose = text[i] || null;
+                
+                const isWb = isUnicodeWhitespace(charBeforeClose);
+                const isWa = isUnicodeWhitespace(charAfterClose);
+                const isPb = isUnicodePunctuation(charBeforeClose);
+                const isPa = isUnicodePunctuation(charAfterClose);
+                
+                const closeCanClose = !isWb && (!isWa || isPa);
+                
+                // Match based on count and properties (GFM section 6.7)
+                if (closeCanClose) {
+                    // Check if marker counts are compatible
+                    // Key GFM rule: sum of delimiter lengths must be multiple of 3 for *** case
+                    // For ** and *: standard rules apply
+                    if (startCount >= 3 && closeCount >= 3) {
+                        closePos = closeStart;
+                        foundClose = true;
+                        break;
+                    } else if (startCount === 2 && closeCount >= 2) {
+                        // Special GFM rule: if both are exactly 2, or one is more than 2
+                        closePos = closeStart;
+                        foundClose = true;
+                        break;
+                    } else if (startCount === 1 && closeCount >= 1) {
+                        // GFM rule: single delimiter can close with any count >= 1
+                        // BUT: if the closing run is part of a longer sequence that could form **, 
+                        // and the opening was single *, we need to check right flank
+                        closePos = closeStart;
+                        foundClose = true;
                         break;
                     }
                 }
-            }
-            
-            if (closeIndex !== -1) {
-                const content = text.slice(start + 1, closeIndex);
-                return {
-                    html: '<em>' + parseInline(content) + '</em>',
-                    end: closeIndex + 1
-                };
+            } else {
+                i++;
             }
         }
         
-        return null;
+        if (!foundClose || closePos === -1) return null;
+        
+        // Extract content between delimiters
+        const contentStart = start + startCount;
+        const contentEnd = closePos;
+        const content = text.slice(contentStart, contentEnd);
+        
+        // Check for blank content (only whitespace/newlines)
+        if (/^[ \t]*\n[ \t]*$/.test(content) || content === '') return null;
+        
+        // Generate appropriate HTML based on marker count
+        let html;
+        if (startCount >= 3) {
+            html = '<em><strong>' + parseInline(content) + '</strong></em>';
+        } else if (startCount >= 2) {
+            html = '<strong>' + parseInline(content) + '</strong>';
+        } else {
+            html = '<em>' + parseInline(content) + '</em>';
+        }
+        
+        return {
+            html: html,
+            end: closePos + Math.min(closeCount, startCount >= 3 ? 3 : (startCount >= 2 ? 2 : 1))
+        };
     }
 
     // Parse strikethrough (GFM extension)
@@ -611,8 +683,12 @@
             
             // Thematic break (hr) - must check before list items
             // GFM: 3+ of -, *, or _ with optional spaces between, on a line by itself
-            const hrMatch = line.match(/^( {0,3})([-*_])([ ]?\2)*[ ]*$/);
+            // Must be at least 3 characters, not just 2 (so ** alone is NOT a thematic break)
+            // Also must be only one type of character (not mixed like *-*)
+            const hrMatch = line.match(regexCache.thematicBreak);
             if (hrMatch) {
+                // Additional GFM check: ensure it's not part of another construct
+                // The regex already ensures 3+ identical chars with optional spaces
                 blocks.push({ type: 'thematic_break', line: i });
                 i++;
                 continue;
@@ -1123,15 +1199,15 @@
                     html += '<table>\n<thead>\n<tr>\n';
                     for (let i = 0; i < block.headers.length; i++) {
                         const header = block.headers[i];
-                        const align = block.alignments && block.alignments[i] ? ` align="${block.alignments[i]}"` : '';
-                        html += `<th${align}>${parseInline(header)}</th>\n`;
+                        const alignClass = block.alignments && block.alignments[i] ? ` class="text-${block.alignments[i]}"` : '';
+                        html += `<th${alignClass}>${parseInline(header)}</th>\n`;
                     }
                     html += '</tr>\n</thead>\n<tbody>';
                     for (const row of block.rows) {
                         html += '<tr>\n';
                         for (let i = 0; i < row.length; i++) {
-                            const align = block.alignments && block.alignments[i] ? ` align="${block.alignments[i]}"` : '';
-                            html += `<td${align}>${parseInline(row[i])}</td>\n`;
+                            const alignClass = block.alignments && block.alignments[i] ? ` class="text-${block.alignments[i]}"` : '';
+                            html += `<td${alignClass}>${parseInline(row[i])}</td>\n`;
                         }
                         html += '</tr>\n';
                     }
