@@ -809,8 +809,8 @@ body {
 }
 
 [data-theme="light"] .blog-article code {
-    background: rgba(200, 200, 200, 0.4);
-    color: #1a1a1a;
+    background: transparent;
+    color: var(--text-primary);
 }
 
 .blog-article pre {
@@ -825,7 +825,7 @@ body {
 }
 
 [data-theme="light"] .blog-article pre {
-    background: rgba(220, 220, 220, 0.5);
+    background: transparent;
 }
 
 .blog-article pre code {
