@@ -849,33 +849,48 @@
                                 }
                             } else if (contIndent > baseIndent) {
                                 // Check if this is a nested list item (at a deeper indent level)
-                                const nestedUlMatch = contLine.match(/^ {2,}([-*+])[ \t]+(.*)$/);
-                                const nestedOlMatch = contLine.match(/^ {2,}(\d+)\.[ \t]+(.*)$/);
+                                const nestedUlMatch = contLine.match(/^ +([-*+])[ \t]+(.*)$/);
+                                const nestedOlMatch = contLine.match(/^ +(\d+)\.[ \t]+(.*)$/);
                                 
                                 // If it's a nested list item, we need to handle it specially
                                 // by recursively parsing the nested portion
                                 if (nestedUlMatch || nestedOlMatch) {
                                     // This is a nested list - collect all nested list lines
                                     const nestedLines = [];
-                                    const nestedBaseIndent = nestedUlMatch ? nestedUlMatch[0].match(/^ */)[0].length : nestedOlMatch[0].match(/^ */)[0].length;
+                                    const nestedBaseIndent = nestedUlMatch ? nestedUlMatch[1].length : nestedOlMatch[1].length;
                                     
                                     while (i < lines.length) {
                                         const nestedLine = lines[i];
                                         const nestedIndent = getIndentLevel(nestedLine);
                                         
-                                        // Stop if we hit a line at or below our base indent
+                                        // Stop if we hit a line at or below our base indent (the parent list's indent)
                                         if (nestedIndent <= baseIndent && !isBlank(nestedLine)) {
                                             break;
                                         }
                                         
-                                        // Check if this is a sibling nested list item at same level
-                                        const siblingUlMatch = nestedLine.match(new RegExp(`^ {${nestedBaseIndent}}[-*+][ \\t]+`));
-                                        const siblingOlMatch = nestedLine.match(new RegExp(`^ {${nestedBaseIndent}}\\d+\\.[ \\t]+`));
+                                        // Check for any list item marker at this line
+                                        const anyUlMatch = nestedLine.match(/^( +)([-*+])[ \t]+/);
+                                        const anyOlMatch = nestedLine.match(/^( +)(\d+)\.[ \t]+/);
                                         
-                                        if (siblingUlMatch || siblingOlMatch || nestedIndent > nestedBaseIndent || isBlank(nestedLine)) {
-                                            nestedLines.push(nestedLine);
+                                        if (anyUlMatch || anyOlMatch) {
+                                            // This is a list item at some nesting level
+                                            // Normalize indentation: subtract nestedBaseIndent so parseBlocks sees it as 0-3 spaces
+                                            const itemIndent = anyUlMatch ? anyUlMatch[1].length : anyOlMatch[1].length;
+                                            const normalizedIndent = Math.max(0, itemIndent - nestedBaseIndent);
+                                            const normalizedLine = ' '.repeat(normalizedIndent) + nestedLine.trimStart();
+                                            
+                                            // Include it - parseBlocks will handle the nested structure
+                                            nestedLines.push(normalizedLine);
+                                            i++;
+                                        } else if (nestedIndent > nestedBaseIndent || isBlank(nestedLine)) {
+                                            // Content indented more than the nested list base, or blank line
+                                            // Normalize: subtract nestedBaseIndent
+                                            const normalizedIndent = Math.max(0, nestedIndent - nestedBaseIndent);
+                                            const normalizedLine = ' '.repeat(normalizedIndent) + nestedLine.trimStart();
+                                            nestedLines.push(normalizedLine);
                                             i++;
                                         } else {
+                                            // Line at different level that's not a list item - stop
                                             break;
                                         }
                                     }
@@ -1043,8 +1058,20 @@
                     html += '<ul>\n';
                     for (const item of block.items) {
                         const itemContent = parseInline(item.content);
-                        const subContent = item.subContent.length > 0 ? parseBlocks(item.subContent) : [];
-                        const subHtml = renderBlocks(subContent);
+                        let subHtml = '';
+                        if (item.subContent.length > 0) {
+                            // Process subContent, handling __NESTED_LIST__: markers
+                            for (const sub of item.subContent) {
+                                if (typeof sub === 'string' && sub.startsWith('__NESTED_LIST__:')) {
+                                    // Directly append the nested list HTML
+                                    subHtml += sub.substring('__NESTED_LIST__:'.length);
+                                } else {
+                                    // Parse as regular blocks
+                                    const subBlocks = Array.isArray(sub) ? parseBlocks(sub) : parseBlocks([sub]);
+                                    subHtml += renderBlocks(subBlocks);
+                                }
+                            }
+                        }
                         if (item.isTask) {
                             const checkedAttr = item.isChecked ? ' checked=""' : '';
                             html += `<li><input${checkedAttr} disabled="" type="checkbox"> ${itemContent}${subHtml}</li>\n`;
@@ -1059,8 +1086,20 @@
                     html += '<ol>\n';
                     for (const item of block.items) {
                         const itemContent = parseInline(item.content);
-                        const subContent = item.subContent.length > 0 ? parseBlocks(item.subContent) : [];
-                        const subHtml = renderBlocks(subContent);
+                        let subHtml = '';
+                        if (item.subContent.length > 0) {
+                            // Process subContent, handling __NESTED_LIST__: markers
+                            for (const sub of item.subContent) {
+                                if (typeof sub === 'string' && sub.startsWith('__NESTED_LIST__:')) {
+                                    // Directly append the nested list HTML
+                                    subHtml += sub.substring('__NESTED_LIST__:'.length);
+                                } else {
+                                    // Parse as regular blocks
+                                    const subBlocks = Array.isArray(sub) ? parseBlocks(sub) : parseBlocks([sub]);
+                                    subHtml += renderBlocks(subBlocks);
+                                }
+                            }
+                        }
                         html += `<li>${itemContent}${subHtml}</li>\n`;
                     }
                     html += '</ol>\n';
