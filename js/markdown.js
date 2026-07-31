@@ -187,6 +187,17 @@
                 }
             }
             
+            // Extended autolinks - bare URLs (GFM extension)
+            // Check for URLs starting with https:// or http:// that are not inside angle brackets
+            if (text[i] === 'h' && text.slice(i, i + 8) === 'https://' || text.slice(i, i + 7) === 'http://') {
+                const urlResult = parseExtendedAutolink(text, i);
+                if (urlResult) {
+                    result += urlResult.html;
+                    i = urlResult.end;
+                    continue;
+                }
+            }
+            
             // Emphasis and Strong emphasis - GFM section 6.7
             const emphasisResult = parseEmphasis(text, i);
             if (emphasisResult) {
@@ -375,6 +386,43 @@
             };
         }
         return null;
+    }
+
+    // Parse extended autolink (bare URLs - GFM extension)
+    function parseExtendedAutolink(text, start) {
+        // Check for http:// or https://
+        let isHttps = false;
+        if (text.slice(start, start + 8) === 'https://') {
+            isHttps = true;
+        } else if (text.slice(start, start + 7) !== 'http://') {
+            return null;
+        }
+        
+        // Find the end of the URL - stop at whitespace, certain punctuation, or HTML entities
+        let i = start + (isHttps ? 8 : 7);
+        while (i < text.length) {
+            const ch = text[i];
+            // Stop at whitespace
+            if (ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r') break;
+            // Stop at certain punctuation that typically ends a URL in prose
+            if (ch === '"' || ch === "'" || ch === ')' || ch === ']' || ch === '}' || ch === '>') break;
+            // Stop at HTML entity start
+            if (ch === '&') break;
+            i++;
+        }
+        
+        // Make sure we have at least some URL content
+        if (i <= start + (isHttps ? 8 : 7)) return null;
+        
+        const url = text.slice(start, i);
+        
+        // Basic URL validation - must have at least one character after protocol
+        if (!/^https?:\/\/.+$/.test(url)) return null;
+        
+        return {
+            html: '<a href="' + escapeHtml(url) + '">' + escapeHtml(url) + '</a>',
+            end: i
+        };
     }
 
     // Parse emphasis and strong emphasis
@@ -695,20 +743,25 @@
                 continue;
             }
             
-            // Blockquote
+            // Blockquote (with nested support)
             const bqMatch = line.match(/^( {0,3})>([ \t]?)(.*)$/);
             if (bqMatch) {
                 const bqLines = [];
                 while (i < lines.length) {
                     const bqLine = lines[i];
-                    const bqLineMatch = bqLine.match(/^( {0,3})>([ \t]?)(.*)$/);
+                    // Match any level of blockquote (>, >>, >>>, etc.)
+                    const bqLineMatch = bqLine.match(/^( {0,3})(>+)([ \t]?)(.*)$/);
                     if (bqLineMatch) {
-                        bqLines.push(bqLineMatch[3]);
+                        // Preserve the > markers for nested blockquote processing
+                        const markers = bqLineMatch[2];
+                        const content = bqLineMatch[4];
+                        // Store with marker info for later processing
+                        bqLines.push({ markers: markers.length, content: content });
                         i++;
                     } else if (isBlank(bqLine)) {
                         // Check if next line continues blockquote
                         if (i + 1 < lines.length && lines[i + 1].match(/^ {0,3}>/)) {
-                            bqLines.push('');
+                            bqLines.push({ markers: 1, content: '' });
                             i++;
                         } else {
                             break;
@@ -717,7 +770,7 @@
                         break;
                     }
                 }
-                blocks.push({ type: 'blockquote', content: bqLines.join('\n'), line: i - bqLines.length });
+                blocks.push({ type: 'blockquote', content: bqLines, line: i - bqLines.length });
                 continue;
             }
             
@@ -842,6 +895,76 @@
         return blocks;
     }
 
+    // Render nested blockquotes
+    function renderNestedBlockquotes(bqLines) {
+        if (!bqLines || bqLines.length === 0) return '';
+        
+        // Group consecutive lines by their marker count (nesting level)
+        let html = '';
+        let i = 0;
+        
+        while (i < bqLines.length) {
+            const line = bqLines[i];
+            const level = line.markers;
+            
+            // Open blockquotes for this level
+            let openTags = '';
+            for (let l = 0; l < level; l++) {
+                openTags += '<blockquote>\n';
+            }
+            
+            // Collect all consecutive lines at this or deeper nesting
+            let contentLines = [];
+            let j = i;
+            while (j < bqLines.length) {
+                const currentLine = bqLines[j];
+                if (currentLine.markers >= level) {
+                    // Add content, stripping extra > markers for display
+                    const innerMarkers = currentLine.markers - level;
+                    let prefix = '';
+                    for (let m = 0; m < innerMarkers; m++) {
+                        prefix += '>';
+                    }
+                    if (prefix && currentLine.content) {
+                        contentLines.push(prefix + ' ' + currentLine.content);
+                    } else if (currentLine.content) {
+                        contentLines.push(currentLine.content);
+                    } else {
+                        contentLines.push('');
+                    }
+                    j++;
+                } else {
+                    break;
+                }
+            }
+            
+            // Process content and handle nested blockquotes recursively
+            const contentText = contentLines.join('\n');
+            
+            // Check if there are nested blockquote markers in the content
+            if (contentText.includes('\n>') || contentText.startsWith('>')) {
+                // Parse nested content as separate blocks
+                const nestedLines = contentText.split('\n');
+                const nestedBlocks = parseBlocks(nestedLines);
+                const nestedHtml = renderBlocks(nestedBlocks);
+                html += openTags + nestedHtml;
+            } else {
+                // Simple content - wrap in paragraph
+                const parsedContent = parseInline(contentText);
+                html += openTags + '<p>' + parsedContent + '</p>\n';
+            }
+            
+            // Close blockquotes
+            for (let l = 0; l < level; l++) {
+                html += '</blockquote>\n';
+            }
+            
+            i = j;
+        }
+        
+        return html;
+    }
+
     // Render blocks to HTML
     function renderBlocks(blocks) {
         let html = '';
@@ -869,8 +992,8 @@
                     break;
                     
                 case 'blockquote':
-                    const bqContent = parseInline(block.content.replace(/\n/g, '\n'));
-                    html += `<blockquote>\n<p>${bqContent}</p>\n</blockquote>\n`;
+                    // Handle nested blockquotes - block.content is now an array of {markers, content} objects
+                    html += renderNestedBlockquotes(block.content);
                     break;
                     
                 case 'unordered_list':
@@ -916,14 +1039,17 @@
                     
                 case 'table':
                     html += '<table>\n<thead>\n<tr>\n';
-                    for (const header of block.headers) {
-                        html += `<th>${parseInline(header)}</th>\n`;
+                    for (let i = 0; i < block.headers.length; i++) {
+                        const header = block.headers[i];
+                        const align = block.alignments && block.alignments[i] ? ` align="${block.alignments[i]}"` : '';
+                        html += `<th${align}>${parseInline(header)}</th>\n`;
                     }
                     html += '</tr>\n</thead>\n<tbody>';
                     for (const row of block.rows) {
                         html += '<tr>\n';
                         for (let i = 0; i < row.length; i++) {
-                            html += `<td>${parseInline(row[i])}</td>\n`;
+                            const align = block.alignments && block.alignments[i] ? ` align="${block.alignments[i]}"` : '';
+                            html += `<td${align}>${parseInline(row[i])}</td>\n`;
                         }
                         html += '</tr>\n';
                     }
