@@ -727,7 +727,7 @@
                 
                 while (i < lines.length) {
                     const codeLine = lines[i];
-                    const closeMatch = codeLine.match(new RegExp(`^ {0,${indent}}${fenceChar}{${minFenceLen},}[ \\t]*$`));
+                    const closeMatch = codeLine.match(new RegExp(`^ {0,${indent}}${fenceChar}{${minFenceLen},}[ \t]*$`));
                     if (closeMatch) {
                         i++;
                         break;
@@ -830,8 +830,8 @@
                     const listItem = lines[i];
                     
                     // Check for items at the current indent level
-                    const ulItemMatch = listItem.match(new RegExp(`^ {${baseIndent}}[-*+][ \\t]+(.*)$`));
-                    const olItemMatch = listItem.match(new RegExp(`^ {${baseIndent}}\\d+\\.[ \\t]+(.*)$`));
+                    const ulItemMatch = listItem.match(new RegExp(`^ {${baseIndent}}[-*+][ \t]+(.*)$`));
+                    const olItemMatch = listItem.match(new RegExp(`^ {${baseIndent}}\d+\.[ \t]+(.*)$`));
                     
                     if (ulItemMatch || olItemMatch) {
                         let content = ulItemMatch ? ulItemMatch[1] : olItemMatch[1];
