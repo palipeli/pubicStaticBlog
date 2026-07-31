@@ -29,18 +29,8 @@
         tray.className = 'mobile-nav-tray';
         tray.innerHTML = `
             <div class="mobile-tray-content">
-                <!-- Navigation Links Section -->
-                <div class="mobile-tray-section">
-                    <h3 class="mobile-tray-section-title">Navigation</h3>
-                    <div class="mobile-nav-links">
-                        <button class="mobile-nav-item" data-page="home"><i class="fa-solid fa-house"></i> Home</button>
-                        <button class="mobile-nav-item" data-page="about"><i class="fa-solid fa-user"></i> About</button>
-                        <button class="mobile-nav-item" data-page="blog"><i class="fa-solid fa-book"></i> Blog</button>
-                    </div>
-                </div>
-                
                 <!-- Blog Posts Section (always visible when on blogs page, expanded by default) -->
-                <div class="mobile-tray-section blog-only" id="mobile-blog-posts-section" style="display: none;">
+                <div class="mobile-tray-section blog-only" id="mobile-blog-posts-section">
                     <h3 class="mobile-tray-section-title">All Posts</h3>
                     <div class="mobile-post-list" id="mobile-post-list">
                         <!-- Posts will be rendered here -->
@@ -103,25 +93,6 @@
                 
                 // Sync with sidebar theme buttons
                 syncSidebarThemeButtons(theme);
-            });
-        });
-        
-        // Navigation links
-        const navItems = tray.querySelectorAll('.mobile-nav-item');
-        navItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const page = item.dataset.page;
-                
-                // Trigger navigation using existing system
-                const desktopNavItem = document.querySelector(`.nav-item[data-page="${page}"]`);
-                if (desktopNavItem) {
-                    desktopNavItem.click();
-                }
-                
-                closeTray();
             });
         });
         
