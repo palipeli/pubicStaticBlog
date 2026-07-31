@@ -11,9 +11,6 @@
     let blogPosts = window.blogPosts;
     let blogPostMetadata = window.blogPostMetadata;
 
-    // Flag to track if blog introduction has been loaded
-    let blogIntroductionLoaded = false;
-
     // Preload timeout for debouncing
     let preloadTimeout = null;
 
@@ -54,46 +51,6 @@
         } catch (err) {
             console.error('Error fetching blog post metadata:', err);
             return [];
-        }
-    }
-
-    // Load blog introduction content from /blog/new-updated-look.md (lazy - called on hover or navigation)
-    async function loadBlogIntroduction() {
-        // Prevent duplicate loading
-        if (blogIntroductionLoaded) return;
-
-        try {
-            const response = await fetch('/blog/new-updated-look.md');
-            if (!response.ok) {
-                throw new Error('Could not fetch blog introduction');
-            }
-
-            const mdContent = await response.text();
-            const htmlContent = window.parseMarkdown(mdContent);
-
-            const introContainer = document.getElementById('blog-intro-content');
-            if (introContainer) {
-                introContainer.innerHTML = htmlContent;
-                blogIntroductionLoaded = true;
-
-                // Initialize lazy loading for images in the loaded content
-                if (typeof window.initializeLazyLoading === 'function') {
-                    window.initializeLazyLoading();
-                }
-            }
-        } catch (err) {
-            console.error('Error loading blog introduction:', err);
-            const introContainer = document.getElementById('blog-intro-content');
-            if (introContainer) {
-                introContainer.innerHTML = '<p>Failed to load introduction. Please check the README.md for details.</p>';
-            }
-        }
-    }
-
-    // Prefetch blog introduction on demand (called on hover)
-    function prefetchBlogIntroduction() {
-        if (!blogIntroductionLoaded) {
-            loadBlogIntroduction();
         }
     }
 
@@ -165,39 +122,6 @@
                 });
             }
         }, 150); // 150ms delay before preloading on hover
-    }
-
-    // Render blog cards in the main content area
-    function renderBlogCards(posts) {
-        const container = document.getElementById('blog-posts-list');
-        if (!container) return;
-
-        container.innerHTML = '';
-
-        if (posts.length === 0) {
-            container.innerHTML = '<p style="color: var(--text-secondary);">No posts found.</p>';
-            return;
-        }
-
-        posts.forEach((post, index) => {
-            const card = document.createElement('div');
-            card.className = 'blog-card';
-            card.style.animationDelay = (index * 0.1) + 's';
-
-            card.innerHTML = `
-                <div class="blog-image">${post.icon}</div>
-                <div class="blog-content">
-                    <h3 class="blog-title">${post.title}</h3>
-                    <p class="blog-excerpt">${post.content.substring(0, 150)}...</p>
-                    <div class="blog-meta">
-                        <span class="blog-date">${post.date}</span>
-                        <a href="#" class="read-more" onclick="event.preventDefault(); window.openBlogPost('${post.id}')">Read More →</a>
-                    </div>
-                </div>
-            `;
-
-            container.appendChild(card);
-        });
     }
 
     // Render post selector in sidebar (with lazy loading and hover preload)
@@ -537,7 +461,6 @@
     window.prefetchBlogIntroduction = prefetchBlogIntroduction;
     window.loadBlogPostContent = loadBlogPostContent;
     window.preloadBlogPostContent = preloadBlogPostContent;
-    window.renderBlogCards = renderBlogCards;
     window.renderPostSelector = renderPostSelector;
     window.renderBlogPostSelectorGrid = renderBlogPostSelectorGrid;
     window.openBlogPost = openBlogPost;

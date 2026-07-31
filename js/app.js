@@ -53,9 +53,9 @@
                         window.renderPostSelector(posts);
                     }
 
-                    // Render blog buttons on home page (kamikami.eu style) with lazy loading
-                    if (typeof window.renderBlogButtonsLazy === 'function') {
-                        window.renderBlogButtonsLazy(posts);
+                    // Render blog buttons on home page (kamikami.eu style)
+                    if (typeof window.renderBlogButtons === 'function') {
+                        window.renderBlogButtons(posts);
                     }
 
                     // Render the blog post selector grid in the main content area
