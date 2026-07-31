@@ -873,19 +873,55 @@ body {
     margin: 20px 0;
     font-size: 12px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    display: table;
+}
+
+.blog-article thead {
+    display: table-header-group;
+}
+
+.blog-article tbody {
+    display: table-row-group;
 }
 
 .blog-article th,
 .blog-article td {
     border: 1px solid var(--border-color);
     padding: 10px 15px;
+    display: table-cell;
+}
+
+/* Default alignment */
+.blog-article th:not([align]),
+.blog-article td:not([align]) {
     text-align: left;
+}
+
+/* Respect align attribute for table cells */
+.blog-article th[align="left"],
+.blog-article td[align="left"] {
+    text-align: left !important;
+}
+
+.blog-article th[align="center"],
+.blog-article td[align="center"] {
+    text-align: center !important;
+}
+
+.blog-article th[align="right"],
+.blog-article td[align="right"] {
+    text-align: right !important;
 }
 
 .blog-article th {
     background: rgba(0, 0, 0, 0.2);
     color: var(--text-primary);
     font-weight: 600;
+}
+
+/* Ensure table cells are displayed as table cells */
+.blog-article tr {
+    display: table-row;
 }
 
 .blog-article tr:nth-child(even) {
