@@ -1,13 +1,5 @@
 [
   {
-    "id": "markdown-complete-reference",
-    "slug": "/blog/markdown-complete-reference.md",
-    "title": "The Complete Markdown Reference",
-    "date": "Jul 31 2026",
-    "category": "Tutorial",
-    "icon": "📝"
-  },
-  {
     "id": "markdown-feature-showcase",
     "slug": "/blog/markdown-feature-showcase.md",
     "title": "The Complete Markdown Feature Showcase",
