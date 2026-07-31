@@ -301,7 +301,7 @@
             
             if (isImage) {
                 return {
-                    html: '<img src="' + escapeHtml(dest) + '" alt="' + escapeHtml(label) + '">',
+                    html: '<img class="lazy-image" data-src="' + escapeHtml(dest) + '" alt="' + escapeHtml(label) + '">',
                     end: i
                 };
             } else {
