@@ -1822,6 +1822,35 @@ footer p {
     animation: fadeInContent 0.3s ease-out;
 }
 
+/* Markdown content styling */
+.blog-post-content hr {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 2em 0;
+}
+
+.blog-post-content img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 1em 0;
+}
+
+.blog-post-content del {
+    text-decoration: line-through;
+    color: var(--text-secondary);
+}
+
+.blog-post-content input[type="checkbox"] {
+    margin-right: 0.5em;
+    accent-color: var(--accent-pink);
+}
+
+.blog-post-content .task-list-item {
+    list-style: none;
+    padding-left: 0;
+}
+
 /* Lazy Loading Image Styles */
 .lazy-image {
     transition: opacity 0.3s ease, transform 0.3s ease;

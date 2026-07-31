@@ -486,6 +486,21 @@
         // Check for * or _ (emphasis)
         if (text[start] === '*' || text[start] === '_') {
             const marker = text[start];
+            
+            // For underscore: check left and right flanking conditions per GFM
+            // Underscore only works as delimiter if not surrounded by alphanumeric on both sides
+            if (marker === '_') {
+                const prevChar = start > 0 ? text[start - 1] : '';
+                const nextChar = start + 1 < text.length ? text[start + 1] : '';
+                const isPrevAlphaNum = /[a-zA-Z0-9]/.test(prevChar);
+                const isNextAlphaNum = /[a-zA-Z0-9]/.test(nextChar);
+                
+                // If underscore is between alphanumerics, it's not a valid delimiter
+                if (isPrevAlphaNum && isNextAlphaNum) {
+                    return null;
+                }
+            }
+            
             let closeIndex = -1;
             
             // Find closing marker (not immediately adjacent)
@@ -494,6 +509,20 @@
                     // Check it's not part of ** or __
                     if (j + 1 < text.length && text[j + 1] === marker) continue;
                     if (j - 1 >= start && text[j - 1] === marker) continue;
+                    
+                    // For underscore closing: check flanking conditions
+                    if (marker === '_') {
+                        const prevCloseChar = j > 0 ? text[j - 1] : '';
+                        const nextCloseChar = j + 1 < text.length ? text[j + 1] : '';
+                        const isPrevCloseAlphaNum = /[a-zA-Z0-9]/.test(prevCloseChar);
+                        const isNextCloseAlphaNum = /[a-zA-Z0-9]/.test(nextCloseChar);
+                        
+                        // Closing underscore must not be followed by alphanumeric if preceded by non-alphanumeric
+                        // Or must be preceded by alphanumeric if followed by non-alphanumeric
+                        if (!isPrevCloseAlphaNum && isNextCloseAlphaNum) {
+                            continue;
+                        }
+                    }
                     
                     const content = text.slice(start + 1, j);
                     if (content.length > 0 && !/^[ \t]*\n[ \t]*$/.test(content)) {
@@ -611,7 +640,7 @@
             
             // Thematic break (hr) - must check before list items
             // GFM: 3+ of -, *, or _ with optional spaces between, on a line by itself
-            const hrMatch = line.match(/^( {0,3})([-*_])([ ]?\2)*[ ]*$/);
+            const hrMatch = line.match(/^( {0,3})([-*_])([ ]?\2){2,}[ ]*$/);
             if (hrMatch) {
                 blocks.push({ type: 'thematic_break', line: i });
                 i++;
