@@ -794,12 +794,15 @@
                 const listItems = [];
                 const isOrdered = !!olMatch;
                 const match = ulMatch || olMatch;
-                const indent = match[1].length;
+                const baseIndent = match[1].length;
                 
+                // Parse list items with support for nested lists at deeper indent levels
                 while (i < lines.length) {
                     const listItem = lines[i];
-                    const ulItemMatch = listItem.match(new RegExp(`^ {${indent}}[-*+][ \\t]+(.*)$`));
-                    const olItemMatch = listItem.match(new RegExp(`^ {${indent}}\\d+\\.[ \\t]+(.*)$`));
+                    
+                    // Check for items at the current indent level
+                    const ulItemMatch = listItem.match(new RegExp(`^ {${baseIndent}}[-*+][ \\t]+(.*)$`));
+                    const olItemMatch = listItem.match(new RegExp(`^ {${baseIndent}}\\d+\\.[ \\t]+(.*)$`));
                     
                     if (ulItemMatch || olItemMatch) {
                         let content = ulItemMatch ? ulItemMatch[1] : olItemMatch[1];
@@ -824,17 +827,18 @@
                         });
                         i++;
                         
-                        // Collect continuation lines (indented content)
+                        // Collect continuation lines and nested lists (indented content)
                         while (i < lines.length) {
                             const contLine = lines[i];
                             const contIndent = getIndentLevel(contLine);
                             
                             if (isBlank(contLine)) {
-                                // Check if next line continues this item
+                                // Check if next line continues this item or has a nested list
                                 if (i + 1 < lines.length) {
                                     const nextLine = lines[i + 1];
                                     const nextIndent = getIndentLevel(nextLine);
-                                    if (nextIndent > indent || nextLine.match(new RegExp(`^ {${indent}}[-*+]`)) || nextLine.match(new RegExp(`^ {${indent}}\\d+\\.`))) {
+                                    // Continue if next line is indented more OR is a list item at deeper level
+                                    if (nextIndent > baseIndent) {
                                         listItems[listItems.length - 1].subContent.push('');
                                         i++;
                                     } else {
@@ -843,9 +847,48 @@
                                 } else {
                                     break;
                                 }
-                            } else if (contIndent > indent) {
-                                listItems[listItems.length - 1].subContent.push(contLine);
-                                i++;
+                            } else if (contIndent > baseIndent) {
+                                // Check if this is a nested list item (at a deeper indent level)
+                                const nestedUlMatch = contLine.match(/^ {2,}([-*+])[ \t]+(.*)$/);
+                                const nestedOlMatch = contLine.match(/^ {2,}(\d+)\.[ \t]+(.*)$/);
+                                
+                                // If it's a nested list item, we need to handle it specially
+                                // by recursively parsing the nested portion
+                                if (nestedUlMatch || nestedOlMatch) {
+                                    // This is a nested list - collect all nested list lines
+                                    const nestedLines = [];
+                                    const nestedBaseIndent = nestedUlMatch ? nestedUlMatch[0].match(/^ */)[0].length : nestedOlMatch[0].match(/^ */)[0].length;
+                                    
+                                    while (i < lines.length) {
+                                        const nestedLine = lines[i];
+                                        const nestedIndent = getIndentLevel(nestedLine);
+                                        
+                                        // Stop if we hit a line at or below our base indent
+                                        if (nestedIndent <= baseIndent && !isBlank(nestedLine)) {
+                                            break;
+                                        }
+                                        
+                                        // Check if this is a sibling nested list item at same level
+                                        const siblingUlMatch = nestedLine.match(new RegExp(`^ {${nestedBaseIndent}}[-*+][ \\t]+`));
+                                        const siblingOlMatch = nestedLine.match(new RegExp(`^ {${nestedBaseIndent}}\\d+\\.[ \\t]+`));
+                                        
+                                        if (siblingUlMatch || siblingOlMatch || nestedIndent > nestedBaseIndent || isBlank(nestedLine)) {
+                                            nestedLines.push(nestedLine);
+                                            i++;
+                                        } else {
+                                            break;
+                                        }
+                                    }
+                                    
+                                    // Recursively parse the nested list
+                                    const nestedBlocks = parseBlocks(nestedLines);
+                                    const nestedHtml = renderBlocks(nestedBlocks);
+                                    listItems[listItems.length - 1].subContent.push('__NESTED_LIST__:' + nestedHtml);
+                                } else {
+                                    // Regular continuation line
+                                    listItems[listItems.length - 1].subContent.push(contLine);
+                                    i++;
+                                }
                             } else {
                                 break;
                             }
