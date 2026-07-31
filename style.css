@@ -8,8 +8,8 @@
 
 :root {
     --bg-dark: #f6f5f4;
-    --bg-panel: rgba(255, 255, 255, 0.5);
-    --bg-header: rgba(246, 245, 244, 0.7);
+    --bg-panel: rgba(255, 255, 255, 0.4);
+    --bg-header: rgba(246, 245, 244, 0.65);
     --accent-pink: #ff45fc;
     --accent-pink-hover: #e031e0;
     --text-primary: #2e3436;
@@ -20,27 +20,29 @@
     --blur-overlay-brightness: 1.0;
     --dark-overlay-color: rgba(0, 0, 0, 0.0);
     --theme-transition-duration: 0.4s;
-    --btn-bg: rgba(255, 255, 255, 0.7);
+    --btn-bg: rgba(255, 255, 255, 0.5);
     --btn-text: #2e3436;
     --btn-border: rgba(0, 0, 0, 0.2);
-    --btn-hover-bg: rgba(240, 240, 240, 0.7);
+    --btn-hover-bg: rgba(240, 240, 240, 0.6);
 }
 
 [data-theme="dark"] {
     --blur-overlay-brightness: 0.6;
     --dark-overlay-color: rgba(0, 0, 0, 0.4);
-    --bg-panel: rgba(30, 30, 30, 0.5);
-    --btn-bg: rgba(26, 26, 26, 0.7);
+    --bg-panel: rgba(18, 18, 18, 0.45);
+    --btn-bg: rgba(26, 26, 26, 0.5);
     --btn-text: #ffffff;
     --btn-border: rgba(255, 255, 255, 0.2);
-    --btn-hover-bg: rgba(10, 10, 10, 0.7);
+    --btn-hover-bg: rgba(10, 10, 10, 0.6);
 }
 
 [data-theme="light"] {
-    --btn-bg: rgba(255, 255, 255, 0.7);
+    --bg-panel: rgba(255, 255, 255, 0.4);
+    --bg-header: rgba(246, 245, 244, 0.65);
+    --btn-bg: rgba(255, 255, 255, 0.5);
     --btn-text: #2e3436;
     --btn-border: rgba(0, 0, 0, 0.2);
-    --btn-hover-bg: rgba(240, 240, 240, 0.7);
+    --btn-hover-bg: rgba(240, 240, 240, 0.6);
 }
 
 body {
