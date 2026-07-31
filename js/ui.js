@@ -32,19 +32,26 @@
         window.scrollTo(0, 0);
     }
 
-    // Initialize particles
+    // Initialize particles (respecting reduced motion preferences)
     function createParticles() {
         const container = document.getElementById('particles');
         if (!container) return;
 
+        // Skip particle creation if user prefers reduced motion
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
         for (let i = 0; i < 20; i++) {
             const particle = document.createElement('div');
             particle.className = 'particle';
             particle.style.left = Math.random() * 100 + '%';
             particle.style.animationDelay = Math.random() * 15 + 's';
             particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
-            container.appendChild(particle);
+            fragment.appendChild(particle);
         }
+        container.appendChild(fragment);
     }
 
     // Navigation
