@@ -852,6 +852,51 @@ body {
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
+/* Tables */
+.blog-article table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 12px;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+}
+
+.blog-article th,
+.blog-article td {
+    border: 1px solid var(--border-color);
+    padding: 10px 15px;
+    text-align: left;
+}
+
+.blog-article th {
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.blog-article tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.blog-article tr:hover {
+    background: rgba(255, 69, 252, 0.05);
+}
+
+/* Raw HTML blocks - respect theme colors */
+.blog-article div,
+.blog-article span,
+.blog-article p[data-raw-html] {
+    color: inherit;
+}
+
+.blog-article [style*="background-color"] {
+    background-color: var(--bg-panel) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    border-radius: 6px;
+}
+
 /* Blog Sidebar (in main sidebar) */
 .sidebar-section.blog-only {
     /* Visibility controlled by JavaScript based on current page */
