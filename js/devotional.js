@@ -81,32 +81,44 @@
         typeChar();
     }
 
+    // Prevent concurrent animations from running
+    let isAnimating = false;
+
     // Run the devotional - delete old text, type new verse
     async function runDevotional() {
-        if (devotionalActive) return;
+        if (devotionalActive || isAnimating) return;
         devotionalActive = true;
+        isAnimating = true;
 
         try {
             // Load verses on-demand when animation starts (lightweight initial load)
             await loadBibleVerses();
 
             if (bibleVerses.length === 0) {
+                devotionalActive = false;
+                isAnimating = false;
                 return;
             }
 
             const heroElement = document.getElementById('home-hero-content');
             if (!heroElement) {
+                devotionalActive = false;
+                isAnimating = false;
                 return;
             }
 
             const leadParagraph = heroElement.querySelector('.home-lead');
             if (!leadParagraph) {
+                devotionalActive = false;
+                isAnimating = false;
                 return;
             }
 
             // Get random verse
             const verse = getRandomShortVerse();
             if (!verse) {
+                devotionalActive = false;
+                isAnimating = false;
                 return;
             }
 
@@ -117,11 +129,15 @@
             typeDeleteAnimation(leadParagraph, () => {
                 // Then type the new verse
                 typeWriteAnimation(leadParagraph, displayText, () => {
-                    // Optional: could cycle to another verse after delay
+                    // Animation complete - reset flags
+                    devotionalActive = false;
+                    isAnimating = false;
                 });
             });
-        } finally {
+        } catch (err) {
+            console.error('Error in runDevotional:', err);
             devotionalActive = false;
+            isAnimating = false;
         }
     }
 
@@ -154,14 +170,15 @@
             // Ensure DOM is fully loaded before starting
             const tryStart = async () => {
                 const heroElement = document.getElementById('home-hero-content');
-                if (heroElement) {
+                if (heroElement && !devotionalActive && !isAnimating) {
                     await runDevotional();
                 } else {
-                    // Retry if hero element not found yet
+                    // Retry if hero element not found yet or animation in progress
                     setTimeout(tryStart, 300);
                 }
             };
             setTimeout(tryStart, 400);
+            // Early return - don't set up event listener or polling since user already consented
             return;
         }
         
@@ -179,7 +196,7 @@
         const maxPolls = 10; // Check up to 10 times (5 seconds total)
         const pollInterval = setInterval(() => {
             pollCount++;
-            if (canStartDevotional() && !devotionalActive) {
+            if (canStartDevotional() && !devotionalActive && !isAnimating) {
                 clearInterval(pollInterval);
                 runDevotional();
             } else if (pollCount >= maxPolls) {
