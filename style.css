@@ -65,7 +65,8 @@ body::before {
     background: url('media/background.webp') no-repeat center center;
     background-size: cover;
     filter: blur(10px) brightness(var(--blur-overlay-brightness));
-    transition: filter var(--theme-transition-duration) ease;
+    transform: rotate(180deg);
+    transition: filter var(--theme-transition-duration) ease, transform var(--theme-transition-duration) ease;
     z-index: -2;
 }
 
