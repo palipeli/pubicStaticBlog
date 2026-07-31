@@ -1859,6 +1859,26 @@ footer p {
     padding-left: 0;
 }
 
+/* Blog post content list styling */
+.blog-post-content ul, .blog-post-content ol {
+    margin: 15px 0 15px 25px;
+    color: var(--text-secondary);
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+}
+
+.blog-post-content ul {
+    list-style-type: disc;
+}
+
+.blog-post-content ol {
+    list-style-type: decimal;
+}
+
+.blog-post-content li {
+    margin-bottom: 8px;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+}
+
 /* Lazy Loading Image Styles */
 .lazy-image {
     transition: opacity 0.3s ease, transform 0.3s ease;
