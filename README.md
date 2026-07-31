@@ -1,6 +1,6 @@
 # pubicStaticBlog
 
-A lightweight single page application (SPA) static blogger completely written with JS, CSS, and HTML.
+A fucking lightweight single page application (SPA) static blogger completely written with JS, CSS, and HTML.
 
 ## Why the fuck do I/you need this?
 
