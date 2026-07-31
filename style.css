@@ -794,6 +794,14 @@ body {
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
+.blog-article ul {
+    list-style-type: disc;
+}
+
+.blog-article ol {
+    list-style-type: decimal;
+}
+
 .blog-article li {
     margin-bottom: 8px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
