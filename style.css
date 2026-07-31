@@ -800,21 +800,30 @@ body {
 }
 
 .blog-article code {
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(255, 69, 252, 0.1);
     padding: 2px 6px;
     border-radius: 3px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
     font-size: 12px;
-    color: #e0e0e0;
-}
-
-[data-theme="light"] .blog-article code {
-    background: transparent;
     color: var(--text-primary);
 }
 
+.blog-article pre code {
+    background: transparent;
+    padding: 0;
+}
+
+[data-theme="dark"] .blog-article code {
+    background: rgba(255, 69, 252, 0.15);
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .blog-article pre code {
+    background: transparent;
+}
+
 .blog-article pre {
-    background: rgba(0, 0, 0, 0.4);
+    background: transparent;
     border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 15px;
