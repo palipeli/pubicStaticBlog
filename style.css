@@ -815,6 +815,13 @@ body {
     padding: 2px 7px;
 }
 
+[data-theme="dark"] .blog-article code {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ff7b72;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 2px 7px;
+}
+
 .blog-article pre {
     background: rgba(0, 0, 0, 0.4);
     border: 1px solid var(--border-color);
