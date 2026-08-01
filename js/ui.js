@@ -613,6 +613,70 @@
         });
     }
 
+    // Prefetch both background images when cursor approaches theme chooser
+    function setupThemePrefetch() {
+        // Only fire once per page session
+        let bgPrefetched = false;
+
+        function triggerPrefetch() {
+            if (bgPrefetched) return;
+            if (!navigator.serviceWorker || !navigator.serviceWorker.controller) return;
+
+            bgPrefetched = true;
+            navigator.serviceWorker.controller.postMessage({
+                type: 'prefetch-bg',
+                urls: ['/media/bg-dark.webp', '/media/bg-light.webp']
+            });
+        }
+
+        // Desktop: detect proximity to .theme-chooser inside #sidebar
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) {
+            sidebar.addEventListener('mousemove', function(e) {
+                if (bgPrefetched) return;
+                const chooser = sidebar.querySelector('.theme-chooser');
+                if (!chooser) return;
+
+                const rect = chooser.getBoundingClientRect();
+                const proximity = 100; // pixels
+                const isNear = (
+                    e.clientX >= rect.left - proximity &&
+                    e.clientX <= rect.right + proximity &&
+                    e.clientY >= rect.top - proximity &&
+                    e.clientY <= rect.bottom + proximity
+                );
+
+                if (isNear) {
+                    triggerPrefetch();
+                }
+            });
+        }
+
+        // Mobile: prefetch when the mobile tray opens (touchstart on tray area)
+        const mobileTray = document.querySelector('.mobile-tray');
+        if (mobileTray) {
+            mobileTray.addEventListener('touchstart', function() {
+                triggerPrefetch();
+            }, { once: true, passive: true });
+        }
+
+        // Fallback: also trigger if the mobile tray is created dynamically
+        // (mobile-tray.js creates it on DOMContentLoaded)
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                mutation.addedNodes.forEach(function(node) {
+                    if (node.nodeType === 1 && node.classList && node.classList.contains('mobile-tray')) {
+                        node.addEventListener('touchstart', function() {
+                            triggerPrefetch();
+                        }, { once: true, passive: true });
+                        observer.disconnect();
+                    }
+                });
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+
     // Expose functions globally
     window.navigateToBlogsPageWithoutPrefetch = navigateToBlogsPageWithoutPrefetch;
     window.createParticles = createParticles;
@@ -630,4 +694,5 @@
     window.setupSidebarToggle = setupSidebarToggle;
     window.setupHashRouting = setupHashRouting;
     window.updateHash = updateHash;
+    window.setupThemePrefetch = setupThemePrefetch;
 })();

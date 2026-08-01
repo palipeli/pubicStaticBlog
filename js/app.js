@@ -29,6 +29,11 @@
             window.setupSystemThemeListener();
         }
 
+        // Setup background image prefetch on cursor proximity to theme chooser
+        if (typeof window.setupThemePrefetch === 'function') {
+            window.setupThemePrefetch();
+        }
+
         // Setup sidebar toggle
         if (typeof window.setupSidebarToggle === 'function') {
             window.setupSidebarToggle();
