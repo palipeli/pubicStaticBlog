@@ -30,6 +30,98 @@
 
         // Scroll to top
         window.scrollTo(0, 0);
+        
+        // Update URL hash for blogs page
+        if (typeof window.updateHash === 'function') {
+            window.updateHash('blogs', null, true);
+        }
+    }
+
+    // Generate URL-safe hash for a blog post
+    function generateBlogPostHash(postId) {
+        return 'blog-' + postId;
+    }
+
+    // Extract blog post ID from hash
+    function getBlogPostIdFromHash(hash) {
+        if (hash && hash.startsWith('blog-')) {
+            return hash.substring(5); // Remove 'blog-' prefix
+        }
+        return null;
+    }
+
+    // Update URL hash without triggering scroll
+    function updateHash(newHash, postId, addToHistory = true) {
+        let hash = newHash;
+        if (postId) {
+            hash = generateBlogPostHash(postId);
+        }
+        if (window.location.hash !== '#' + hash) {
+            if (addToHistory) {
+                history.pushState(null, '', '#' + hash);
+            } else {
+                history.replaceState(null, '', '#' + hash);
+            }
+        }
+    }
+
+    // Handle hash change events
+    function handleHashChange() {
+        const hash = window.location.hash.substring(1); // Remove '#'
+        
+        if (!hash || hash === 'home') {
+            // Navigate to home
+            const homeNavItem = document.querySelector('.nav-item[data-page="home"]');
+            if (homeNavItem) homeNavItem.click();
+        } else if (hash === 'blogs') {
+            // Navigate to blogs intro
+            const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
+            if (blogsNavItem) {
+                blogsNavItem.click();
+                // Show intro view
+                const introView = document.getElementById('blog-intro-view');
+                const postView = document.getElementById('blog-post-view');
+                if (introView && postView) {
+                    postView.style.display = 'none';
+                    introView.style.display = 'block';
+                }
+            }
+        } else if (hash === 'about') {
+            // Navigate to about
+            const aboutNavItem = document.querySelector('.nav-item[data-page="about"]');
+            if (aboutNavItem) aboutNavItem.click();
+        } else if (hash && hash.startsWith('blog-')) {
+            // Open specific blog post
+            const postId = getBlogPostIdFromHash(hash);
+            if (postId && typeof window.openBlogPostLazy === 'function') {
+                // Wait for metadata if needed
+                if (!window.blogPostMetadata || window.blogPostMetadata.length === 0) {
+                    window.waitForBlogMetadata().then(() => {
+                        window.openBlogPostLazy(postId);
+                    });
+                } else {
+                    window.openBlogPostLazy(postId);
+                }
+            }
+        }
+    }
+
+    // Setup hash-based routing
+    function setupHashRouting() {
+        // Listen for hash changes
+        window.addEventListener('hashchange', handleHashChange);
+        
+        // Handle initial hash on page load
+        if (window.location.hash) {
+            // Wait for DOM and blog metadata to be ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    setTimeout(handleHashChange, 100);
+                });
+            } else {
+                setTimeout(handleHashChange, 100);
+            }
+        }
     }
 
     // Initialize particles (respecting reduced motion preferences)
@@ -95,6 +187,9 @@
                             // Navigate to blogs page
                             navigateToBlogsPageWithoutPrefetch();
                             
+                            // Update URL hash
+                            window.updateHash('blogs', null, true);
+                            
                             // Open the saved blog post
                             if (typeof window.openBlogPostLazy === 'function' && savedState.activeBlogPost) {
                                 window.openBlogPostLazy(savedState.activeBlogPost);
@@ -112,6 +207,9 @@
                             
                             // Navigate to blogs page and show intro grid
                             navigateToBlogsPageWithoutPrefetch();
+                            
+                            // Update URL hash
+                            window.updateHash('blogs', null, true);
                             
                             // Show blog intro view (grid of all posts)
                             const introView = document.getElementById('blog-intro-view');
@@ -148,6 +246,9 @@
                     if (isReadingPost) {
                         // Navigate to blogs page and show intro grid
                         navigateToBlogsPageWithoutPrefetch();
+                        
+                        // Update URL hash
+                        window.updateHash('blogs', null, true);
                         
                         // Show blog intro view (grid of all posts)
                         const introView = document.getElementById('blog-intro-view');
@@ -211,6 +312,15 @@
                         } else {
                             blogSidebarSection.style.display = 'none';
                         }
+                    }
+
+                    // Update URL hash based on page
+                    if (page === 'home') {
+                        window.updateHash('home', null, true);
+                    } else if (page === 'about') {
+                        window.updateHash('about', null, true);
+                    } else if (page === 'blogs') {
+                        window.updateHash('blogs', null, true);
                     }
 
                     // Scroll to top when changing pages
@@ -502,4 +612,6 @@
     window.setupSystemThemeListener = setupSystemThemeListener;
     window.handleClickMe = handleClickMe;
     window.setupSidebarToggle = setupSidebarToggle;
+    window.setupHashRouting = setupHashRouting;
+    window.updateHash = updateHash;
 })();
