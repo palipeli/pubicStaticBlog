@@ -60,9 +60,30 @@
             if (addToHistory) {
                 // Use pushState with a state object to prevent favicon re-fetch
                 history.pushState({ hash: hash }, '', '#' + hash);
+                // Prevent favicon re-fetch by preserving the current favicon link
+                preserveFavicon();
             } else {
                 history.replaceState({ hash: hash }, '', '#' + hash);
+                // Prevent favicon re-fetch by preserving the current favicon link
+                preserveFavicon();
             }
+        }
+    }
+
+    // Preserve favicon to prevent re-fetching on navigation
+    function preserveFavicon() {
+        const faviconLink = document.getElementById('favicon-link');
+        if (faviconLink) {
+            // Store current href
+            const currentHref = faviconLink.getAttribute('href');
+            // Temporarily remove and re-add to force cache usage
+            const parent = faviconLink.parentNode;
+            const nextSibling = faviconLink.nextSibling;
+            parent.removeChild(faviconLink);
+            // Re-insert the same element to maintain reference
+            setTimeout(() => {
+                parent.insertBefore(faviconLink, nextSibling);
+            }, 0);
         }
     }
 
@@ -621,7 +642,6 @@
     window.setCookie = setCookie;
     window.getCookie = getCookie;
     window.isFirstVisit = isFirstVisit;
-    window.getSavedTheme = getSavedTheme;
     window.saveThemePreference = saveThemePreference;
     window.applyTheme = applyTheme;
     window.setupTemplates = setupTemplates;
@@ -630,4 +650,5 @@
     window.setupSidebarToggle = setupSidebarToggle;
     window.setupHashRouting = setupHashRouting;
     window.updateHash = updateHash;
+    window.preserveFavicon = preserveFavicon;
 })();
