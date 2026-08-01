@@ -1,5 +1,5 @@
 /* 
- * Liquid Glass Effect - Local Implementation
+ * Liquid Glass Effect - Enhanced Implementation
  * Optimized for Chromium and Safari browsers
  * Inspired by: https://github.com/ybouane/liquidglass
  * 
@@ -8,6 +8,9 @@
  * - Hardware-accelerated transforms
  * - Dark/Light mode adaptive transparency
  * - Smooth animations with will-change hints
+ * - Enhanced edge refraction effects
+ * - Chromatic aberration simulation
+ * - Multi-layer specular highlights
  */
 
 /* ============================================
@@ -28,11 +31,36 @@
     --glass-brightness-dark: 0.95;
     --glass-radius: 16px;
     --glass-transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    /* Edge refraction effects */
-    --edge-highlight-light: rgba(255, 255, 255, 0.8);
-    --edge-highlight-dark: rgba(255, 255, 255, 0.25);
-    --edge-refraction-light: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 50%, rgba(255, 255, 255, 0.2) 100%);
-    --edge-refraction-dark: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%, rgba(255, 255, 255, 0.08) 100%);
+    
+    /* Enhanced Edge Refraction Effects */
+    --edge-highlight-light: rgba(255, 255, 255, 0.9);
+    --edge-highlight-dark: rgba(255, 255, 255, 0.3);
+    --edge-refraction-light: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.6) 0%, 
+        rgba(255, 255, 255, 0.3) 20%,
+        transparent 50%, 
+        rgba(255, 255, 255, 0.2) 80%,
+        rgba(255, 255, 255, 0.4) 100%);
+    --edge-refraction-dark: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.2) 0%, 
+        rgba(255, 255, 255, 0.1) 20%,
+        transparent 50%, 
+        rgba(255, 255, 255, 0.05) 80%,
+        rgba(255, 255, 255, 0.15) 100%);
+    
+    /* Chromatic Aberration Colors for Edge Refraction */
+    --chromatic-red: rgba(255, 100, 100, 0.15);
+    --chromatic-green: rgba(100, 255, 100, 0.1);
+    --chromatic-blue: rgba(100, 100, 255, 0.2);
+    
+    /* Multi-layer Specular Highlights */
+    --specular-primary: rgba(255, 255, 255, 0.8);
+    --specular-secondary: rgba(255, 255, 255, 0.4);
+    --specular-tertiary: rgba(255, 255, 255, 0.2);
+    
+    /* Rim Lighting */
+    --rim-light-top: rgba(255, 255, 255, 0.6);
+    --rim-light-bottom: rgba(255, 255, 255, 0.2);
 }
 
 [data-theme="dark"] {
@@ -71,6 +99,7 @@
 /* ============================================
    LIQUID GLASS PANEL CLASS
    Apply .liquid-glass class to any element
+   Enhanced with multi-layer refraction effects
    ============================================ */
 
 .liquid-glass {
@@ -83,8 +112,9 @@
     border: 2px solid var(--glass-border);
     box-shadow: 
         var(--glass-shadow),
-        inset 0 1px 2px rgba(255, 255, 255, 0.3),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+        inset 0 1px 2px var(--specular-primary),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+        inset 0 2px 8px rgba(255, 255, 255, 0.2);
     
     /* Rounded corners */
     border-radius: var(--glass-radius);
@@ -105,7 +135,7 @@
     isolation: isolate;
 }
 
-/* Edge refraction pseudo-element for stronger glass effect */
+/* Multi-layer edge refraction system */
 .liquid-glass::before {
     content: '';
     position: absolute;
@@ -116,30 +146,56 @@
     border-radius: var(--glass-radius);
     background: var(--edge-refraction-light);
     pointer-events: none;
-    opacity: 0.6;
+    opacity: 0.7;
     z-index: -1;
+    /* Chromatic aberration simulation */
+    box-shadow: 
+        inset 2px 0 4px var(--chromatic-red),
+        inset -2px 0 4px var(--chromatic-blue),
+        inset 0 2px 4px var(--chromatic-green);
 }
 
 [data-theme="dark"] .liquid-glass::before {
     background: var(--edge-refraction-dark);
 }
 
-/* Inner edge highlight for depth */
+/* Secondary refraction layer for depth */
 .liquid-glass::after {
     content: '';
     position: absolute;
-    top: 2px;
-    left: 2px;
-    right: 2px;
-    height: 40%;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
-    border-radius: calc(var(--glass-radius) - 2px) calc(var(--glass-radius) - 2px) 0 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: var(--glass-radius);
+    background: 
+        linear-gradient(180deg, 
+            var(--rim-light-top) 0%, 
+            transparent 30%, 
+            transparent 70%, 
+            var(--rim-light-bottom) 100%);
     pointer-events: none;
-    opacity: 0.8;
+    opacity: 0.5;
+    z-index: -1;
 }
 
-[data-theme="dark"] .liquid-glass::after {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
+/* Tertiary refraction layer using child element */
+.liquid-glass-inner-refraction {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    right: 1px;
+    bottom: 1px;
+    border-radius: calc(var(--glass-radius) - 1px);
+    background: 
+        linear-gradient(135deg, 
+            var(--specular-secondary) 0%, 
+            transparent 40%, 
+            transparent 60%, 
+            var(--specular-tertiary) 100%);
+    pointer-events: none;
+    opacity: 0.4;
+    z-index: -1;
 }
 
 /* Hover state for interactive glass panels */
@@ -154,6 +210,7 @@
 
 /* ============================================
    LIQUID GLASS BUTTON VARIANT
+   Enhanced with edge refraction effects
    ============================================ */
 
 .liquid-glass-btn {
@@ -162,15 +219,22 @@
     backdrop-filter: blur(var(--glass-blur-strength)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     -webkit-backdrop-filter: blur(var(--glass-blur-strength)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     
-    border: 1px solid var(--glass-border);
+    border: 2px solid var(--glass-border);
     border-radius: calc(var(--glass-radius) / 2);
-    box-shadow: var(--glass-shadow);
+    box-shadow: 
+        var(--glass-shadow),
+        inset 0 1px 2px var(--specular-primary),
+        inset 0 0 8px rgba(255, 255, 255, 0.15);
     
     /* Button-specific styles */
     padding: 10px 20px;
     cursor: pointer;
     font-weight: 600;
     color: var(--text-primary);
+    
+    /* Edge refraction layers */
+    position: relative;
+    overflow: hidden;
     
     /* Performance */
     will-change: transform, background-color;
@@ -180,15 +244,52 @@
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Button edge refraction - top highlight */
+.liquid-glass-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, 
+        var(--rim-light-top) 0%, 
+        transparent 100%);
+    border-radius: calc(var(--glass-radius) / 2) calc(var(--glass-radius) / 2) 0 0;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* Button edge refraction - chromatic edges */
+.liquid-glass-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: calc(var(--glass-radius) / 2);
+    box-shadow: 
+        inset 1px 0 3px var(--chromatic-red),
+        inset -1px 0 3px var(--chromatic-blue);
+    pointer-events: none;
+    opacity: 0.4;
+}
+
 .liquid-glass-btn:hover {
     transform: translateZ(0) translateY(-2px) scale(1.02);
     background: rgba(255, 255, 255, 0.75);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.2),
+        inset 0 1px 2px var(--specular-primary),
+        inset 0 0 12px rgba(255, 255, 255, 0.25);
 }
 
 [data-theme="dark"] .liquid-glass-btn:hover {
     background: rgba(40, 40, 40, 0.8);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.5),
+        inset 0 1px 2px rgba(255, 255, 255, 0.2);
 }
 
 .liquid-glass-btn:active {
@@ -197,7 +298,7 @@
 
 /* ============================================
    LIQUID GLASS CARD VARIANT
-   Enhanced card with subtle gradient overlay
+   Enhanced card with multi-layer refraction
    ============================================ */
 
 .liquid-glass-card {
@@ -209,9 +310,12 @@
     backdrop-filter: blur(var(--glass-blur-strength)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     -webkit-backdrop-filter: blur(var(--glass-blur-strength)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     
-    border: 1px solid var(--glass-border);
+    border: 2px solid var(--glass-border);
     border-radius: var(--glass-radius);
-    box-shadow: var(--glass-shadow);
+    box-shadow: 
+        var(--glass-shadow),
+        inset 0 1px 2px var(--specular-primary),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
     
     /* Subtle inner highlight */
     position: relative;
@@ -230,7 +334,27 @@
     );
 }
 
+/* Card edge refraction - multi-layer */
 .liquid-glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: var(--glass-radius);
+    background: var(--edge-refraction-light);
+    pointer-events: none;
+    opacity: 0.5;
+    z-index: 1;
+    box-shadow: 
+        inset 2px 0 4px var(--chromatic-red),
+        inset -2px 0 4px var(--chromatic-blue),
+        inset 0 2px 4px var(--chromatic-green);
+}
+
+/* Card shimmer effect on hover */
+.liquid-glass-card::after {
     content: '';
     position: absolute;
     top: 0;
@@ -240,15 +364,23 @@
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(255, 255, 255, 0.1),
+        rgba(255, 255, 255, 0.2),
         transparent
     );
     transition: left 0.6s ease;
     pointer-events: none;
+    z-index: 2;
 }
 
-.liquid-glass-card:hover::before {
+.liquid-glass-card:hover::after {
     left: 100%;
+}
+
+.liquid-glass-card:hover {
+    transform: translateZ(0) translateY(-3px);
+    box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.2),
+        inset 0 1px 2px var(--specular-primary);
 }
 
 /* ============================================
