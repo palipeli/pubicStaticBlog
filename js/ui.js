@@ -302,7 +302,7 @@
             root.style.setProperty('--border-color', 'rgba(0, 0, 0, 0.1)');
             root.style.setProperty('--blur-overlay-brightness', '1.0');
             root.style.setProperty('--dark-overlay-color', 'rgba(0, 0, 0, 0.0)');
-            document.body.style.background = 'linear-gradient(135deg, rgba(246, 245, 244, 0.6) 0%, rgba(255, 255, 255, 0.6) 100%), url("media/bg-light.webp")';
+            document.body.style.background = 'linear-gradient(135deg, rgba(246, 245, 244, 0.6) 0%, rgba(255, 255, 255, 0.6) 100%), url("bg-light.webp")';
             document.body.style.backgroundSize = 'cover';
             document.body.style.backgroundPosition = 'center';
             document.body.style.backgroundAttachment = 'fixed';
@@ -318,7 +318,7 @@
             root.style.setProperty('--border-color', 'rgba(255, 255, 255, 0.12)');
             root.style.setProperty('--blur-overlay-brightness', '0.6');
             root.style.setProperty('--dark-overlay-color', 'rgba(0, 0, 0, 0.4)');
-            document.body.style.background = 'linear-gradient(135deg, rgba(26, 26, 26, 0.6) 0%, rgba(13, 13, 13, 0.6) 100%), url("media/bg-dark.webp")';
+            document.body.style.background = 'linear-gradient(135deg, rgba(26, 26, 26, 0.6) 0%, rgba(13, 13, 13, 0.6) 100%), url("bg-dark.webp")';
             document.body.style.backgroundSize = 'cover';
             document.body.style.backgroundPosition = 'center';
             document.body.style.backgroundAttachment = 'fixed';
