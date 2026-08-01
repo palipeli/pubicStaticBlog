@@ -613,6 +613,88 @@
         });
     }
 
+    // Prefetch both background images when cursor approaches theme chooser
+    function setupThemePrefetch() {
+        // Only fire once per page session
+        let bgPrefetched = false;
+
+        function triggerPrefetch() {
+            if (bgPrefetched) return;
+            if (!navigator.serviceWorker || !navigator.serviceWorker.controller) return;
+
+            // Determine the alternate theme background to prefetch (not the already-loaded one)
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var cookieMatch = document.cookie.match(/theme_preference=([^;]+)/);
+            var savedTheme = cookieMatch ? cookieMatch[1] : null;
+            var currentBg, alternateBg;
+            
+            if (savedTheme === 'dark') {
+                currentBg = '/media/bg-dark.webp';
+                alternateBg = '/media/bg-light.webp';
+            } else if (savedTheme === 'light') {
+                currentBg = '/media/bg-light.webp';
+                alternateBg = '/media/bg-dark.webp';
+            } else {
+                // Auto mode - prefetch the opposite of system preference
+                currentBg = prefersDark ? '/media/bg-dark.webp' : '/media/bg-light.webp';
+                alternateBg = prefersDark ? '/media/bg-light.webp' : '/media/bg-dark.webp';
+            }
+
+            bgPrefetched = true;
+            navigator.serviceWorker.controller.postMessage({
+                type: 'prefetch-bg',
+                urls: [alternateBg]  // Only prefetch the alternate theme, not both
+            });
+        }
+
+        // Desktop: detect proximity to .theme-chooser inside #sidebar
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) {
+            sidebar.addEventListener('mousemove', function(e) {
+                if (bgPrefetched) return;
+                const chooser = sidebar.querySelector('.theme-chooser');
+                if (!chooser) return;
+
+                const rect = chooser.getBoundingClientRect();
+                const proximity = 100; // pixels
+                const isNear = (
+                    e.clientX >= rect.left - proximity &&
+                    e.clientX <= rect.right + proximity &&
+                    e.clientY >= rect.top - proximity &&
+                    e.clientY <= rect.bottom + proximity
+                );
+
+                if (isNear) {
+                    triggerPrefetch();
+                }
+            });
+        }
+
+        // Mobile: prefetch when the mobile tray opens (touchstart on tray area)
+        const mobileTray = document.querySelector('.mobile-tray');
+        if (mobileTray) {
+            mobileTray.addEventListener('touchstart', function() {
+                triggerPrefetch();
+            }, { once: true, passive: true });
+        }
+
+        // Fallback: also trigger if the mobile tray is created dynamically
+        // (mobile-tray.js creates it on DOMContentLoaded)
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                mutation.addedNodes.forEach(function(node) {
+                    if (node.nodeType === 1 && node.classList && node.classList.contains('mobile-tray')) {
+                        node.addEventListener('touchstart', function() {
+                            triggerPrefetch();
+                        }, { once: true, passive: true });
+                        observer.disconnect();
+                    }
+                });
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+
     // Expose functions globally
     window.navigateToBlogsPageWithoutPrefetch = navigateToBlogsPageWithoutPrefetch;
     window.createParticles = createParticles;
@@ -630,4 +712,5 @@
     window.setupSidebarToggle = setupSidebarToggle;
     window.setupHashRouting = setupHashRouting;
     window.updateHash = updateHash;
+    window.setupThemePrefetch = setupThemePrefetch;
 })();
