@@ -36,8 +36,8 @@
     --glass-radius: 16px;
     
     /* Background Images - Local files */
-    --bg-image-dark: url('bg-dark.webp');
-    --bg-image-light: url('bg-light.webp');
+    --bg-image-dark: url('/media/bg-dark.webp');
+    --bg-image-light: url('/media/bg-light.webp');
 }
 
 [data-theme="dark"] {
@@ -58,8 +58,8 @@
     --glass-brightness: 0.92;
     
     /* Background Images - Local files */
-    --bg-image-dark: url('bg-dark.webp');
-    --bg-image-light: url('bg-light.webp');
+    --bg-image-dark: url('/media/bg-dark.webp');
+    --bg-image-light: url('/media/bg-light.webp');
 }
 
 [data-theme="light"] {
