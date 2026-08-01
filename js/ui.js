@@ -30,6 +30,11 @@
 
         // Scroll to top
         window.scrollTo(0, 0);
+        
+        // Update URL hash for blogs page
+        if (typeof window.updateHash === 'function') {
+            window.updateHash('blogs', null, true);
+        }
     }
 
     // Generate URL-safe hash for a blog post
@@ -182,6 +187,9 @@
                             // Navigate to blogs page
                             navigateToBlogsPageWithoutPrefetch();
                             
+                            // Update URL hash
+                            window.updateHash('blogs', null, true);
+                            
                             // Open the saved blog post
                             if (typeof window.openBlogPostLazy === 'function' && savedState.activeBlogPost) {
                                 window.openBlogPostLazy(savedState.activeBlogPost);
@@ -199,6 +207,9 @@
                             
                             // Navigate to blogs page and show intro grid
                             navigateToBlogsPageWithoutPrefetch();
+                            
+                            // Update URL hash
+                            window.updateHash('blogs', null, true);
                             
                             // Show blog intro view (grid of all posts)
                             const introView = document.getElementById('blog-intro-view');
@@ -235,6 +246,9 @@
                     if (isReadingPost) {
                         // Navigate to blogs page and show intro grid
                         navigateToBlogsPageWithoutPrefetch();
+                        
+                        // Update URL hash
+                        window.updateHash('blogs', null, true);
                         
                         // Show blog intro view (grid of all posts)
                         const introView = document.getElementById('blog-intro-view');
