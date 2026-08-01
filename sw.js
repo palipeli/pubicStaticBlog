@@ -1,10 +1,14 @@
 // sw.js - Service Worker for Image Caching & Background Prefetch
-// Caches images with stale-while-revalidate strategy and supports
+// Caches images with cache-first strategy and supports
 // on-demand background image prefetching via postMessage from main thread.
+// Optimized to prevent duplicate fetches by tracking pending requests.
 
 'use strict';
 
 const CACHE_NAME = 'img-cache-v1';
+
+// Track pending fetches to prevent duplicate network requests
+const pendingFetches = new Set();
 
 // Image file extensions to intercept and cache
 const IMAGE_EXTENSIONS = /\.(webp|png|jpg|jpeg|gif|svg|ico)(\?.*)?$/i;
@@ -77,9 +81,11 @@ self.addEventListener('fetch', (event) => {
 // Accepted message types:
 //   { type: 'precache-bg', url: '/media/bg-dark.webp' }
 //       Pre-cache a single background image (sent on SW registration).
+//       Skips if already cached or currently being fetched.
 //
-//   { type: 'prefetch-bg', urls: ['/media/bg-dark.webp', '/media/bg-light.webp'] }
-//       Prefetch multiple background images (sent on cursor proximity).
+//   { type: 'prefetch-bg', urls: ['/media/bg-dark.webp'] }
+//       Prefetch background images (sent on cursor proximity).
+//       Only fetches URLs not already in cache or pending.
 // -------------------------------------------------------------------
 self.addEventListener('message', (event) => {
     const data = event.data;
@@ -88,10 +94,24 @@ self.addEventListener('message', (event) => {
     if (data.type === 'precache-bg' && data.url) {
         event.waitUntil(
             caches.open(CACHE_NAME).then((cache) => {
+                // Skip if already cached or currently being fetched
+                if (pendingFetches.has(data.url)) {
+                    return;
+                }
                 return cache.match(data.url).then((existing) => {
-                    if (!existing) {
-                        return cache.add(data.url);
+                    if (existing) {
+                        return; // Already cached, skip
                     }
+                    pendingFetches.add(data.url);
+                    return fetch(data.url)
+                        .then((response) => {
+                            if (response && response.ok) {
+                                return cache.put(data.url, response);
+                            }
+                        })
+                        .finally(() => {
+                            pendingFetches.delete(data.url);
+                        });
                 });
             })
         );
@@ -102,10 +122,24 @@ self.addEventListener('message', (event) => {
             caches.open(CACHE_NAME).then((cache) => {
                 return Promise.all(
                     data.urls.map((url) => {
+                        // Skip if already cached or currently being fetched
+                        if (pendingFetches.has(url)) {
+                            return Promise.resolve();
+                        }
                         return cache.match(url).then((existing) => {
-                            if (!existing) {
-                                return cache.add(url);
+                            if (existing) {
+                                return; // Already cached, skip
                             }
+                            pendingFetches.add(url);
+                            return fetch(url)
+                                .then((response) => {
+                                    if (response && response.ok) {
+                                        return cache.put(url, response);
+                                    }
+                                })
+                                .finally(() => {
+                                    pendingFetches.delete(url);
+                                });
                         });
                     })
                 );
