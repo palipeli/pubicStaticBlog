@@ -9,46 +9,46 @@
 
 :root {
     --bg-dark: #f6f5f4;
-    --bg-panel: rgba(255, 255, 255, 0.72);
-    --bg-header: rgba(246, 245, 244, 0.85);
+    --bg-panel: rgba(255, 255, 255, 0.55);
+    --bg-header: rgba(246, 245, 244, 0.75);
     --accent-pink: #ff45fc;
     --accent-pink-hover: #e031e0;
     --text-primary: #2e3436;
     --text-secondary: #5e5e5e;
-    --border-color: rgba(0, 0, 0, 0.08);
+    --border-color: rgba(0, 0, 0, 0.12);
     --header-height: 40px;
     --font-main: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
     --blur-overlay-brightness: 1.0;
     --dark-overlay-color: rgba(0, 0, 0, 0.0);
     --theme-transition-duration: 0.4s;
-    --btn-bg: rgba(255, 255, 255, 0.6);
+    --btn-bg: rgba(255, 255, 255, 0.5);
     --btn-text: #2e3436;
     --btn-border: rgba(0, 0, 0, 0.2);
-    --btn-hover-bg: rgba(240, 240, 240, 0.7);
-    /* Optimized blur values for better performance */
-    --blur-heavy: 8px;
-    --blur-medium: 6px;
-    --blur-light: 4px;
+    --btn-hover-bg: rgba(240, 240, 240, 0.6);
+    /* Enhanced blur values for stronger glass effect */
+    --blur-heavy: 16px;
+    --blur-medium: 12px;
+    --blur-light: 8px;
 }
 
 [data-theme="dark"] {
     --blur-overlay-brightness: 0.6;
     --dark-overlay-color: rgba(0, 0, 0, 0.4);
-    --bg-panel: rgba(26, 26, 26, 0.75);
-    --bg-header: rgba(18, 18, 18, 0.85);
-    --btn-bg: rgba(26, 26, 26, 0.6);
+    --bg-panel: rgba(26, 26, 26, 0.55);
+    --bg-header: rgba(18, 18, 18, 0.75);
+    --btn-bg: rgba(26, 26, 26, 0.5);
     --btn-text: #ffffff;
     --btn-border: rgba(255, 255, 255, 0.2);
-    --btn-hover-bg: rgba(10, 10, 10, 0.7);
+    --btn-hover-bg: rgba(10, 10, 10, 0.6);
 }
 
 [data-theme="light"] {
-    --bg-panel: rgba(255, 255, 255, 0.72);
-    --bg-header: rgba(246, 245, 244, 0.85);
-    --btn-bg: rgba(255, 255, 255, 0.6);
+    --bg-panel: rgba(255, 255, 255, 0.55);
+    --bg-header: rgba(246, 245, 244, 0.75);
+    --btn-bg: rgba(255, 255, 255, 0.5);
     --btn-text: #2e3436;
     --btn-border: rgba(0, 0, 0, 0.2);
-    --btn-hover-bg: rgba(240, 240, 240, 0.7);
+    --btn-hover-bg: rgba(240, 240, 240, 0.6);
 }
 
 body {
@@ -72,8 +72,8 @@ body::before {
     height: 100%;
     background: url('media/background.webp') no-repeat center center;
     background-size: cover;
-    /* Optimized blur: reduced from 13px to 8px for better performance on Chromium/Safari */
-    filter: blur(8px) brightness(var(--blur-overlay-brightness));
+    /* Enhanced blur for stronger glass effect while maintaining performance */
+    filter: blur(16px) brightness(var(--blur-overlay-brightness));
     /* Hardware acceleration hint for smoother transitions */
     will-change: filter;
     transform: translateZ(0);
@@ -111,9 +111,9 @@ body {
     right: 0;
     height: var(--header-height);
     background: var(--bg-header);
-    /* Optimized blur: reduced from 12px to 8px for better Chromium/Safari performance */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    /* Enhanced blur for stronger glass effect on Chromium/Safari */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     /* Hardware acceleration for smooth scrolling and animations */
     isolation: isolate;
     will-change: transform;
@@ -243,9 +243,9 @@ body {
 
 .home-layout-container .home-hero {
     background: var(--bg-panel);
-    /* Optimized blur for Chromium/Safari performance */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    /* Enhanced blur for stronger glass effect on Chromium/Safari */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
@@ -289,8 +289,8 @@ body {
     position: absolute;
     border-radius: 8px;
     opacity: 0.8;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     will-change: transform;
     transform: translateZ(0);
     backface-visibility: hidden;
@@ -376,9 +376,9 @@ body {
 .sidebar {
     width: 280px;
     background: var(--bg-panel);
-    /* Optimized blur for Chromium/Safari performance */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    /* Enhanced blur for stronger glass effect on Chromium/Safari */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-left: 1px solid var(--border-color);
     padding: 0;
     animation: slideLeft 0.5s ease-out;
@@ -439,9 +439,9 @@ body {
     height: 48px;
     border-radius: 12px 0 0 12px;
     background: var(--bg-panel);
-    /* Optimized blur for Chromium/Safari performance */
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    /* Enhanced blur for stronger glass effect on Chromium/Safari */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border-color);
     border-right: none;
     cursor: pointer;
@@ -693,8 +693,8 @@ body {
 .blog-post-view .blog-article {
     background: var(--bg-panel);
     /* Optimized blur for Chromium/Safari performance */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
@@ -706,8 +706,8 @@ body {
 .blog-intro-view .blog-article {
     background: var(--bg-panel);
     /* Optimized blur for Chromium/Safari performance */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
@@ -769,8 +769,8 @@ body {
 .blog-article {
     background: var(--bg-panel);
     /* Optimized blur for Chromium/Safari performance */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 15px;
@@ -1239,8 +1239,8 @@ body {
     text-align: center;
     background: var(--bg-panel);
     /* Optimized blur for Chromium/Safari performance */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 40px;
@@ -1308,8 +1308,8 @@ body {
 .about-content {
     background: var(--bg-panel);
     /* Optimized blur for Chromium/Safari performance */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 15px;
@@ -1598,8 +1598,8 @@ body {
     width: 100vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     z-index: 998;
     opacity: 0;
     visibility: hidden;
@@ -1619,8 +1619,8 @@ body {
     right: 0;
     background: var(--bg-panel);
     /* Optimized blur for Chromium/Safari performance */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--border-color);
     z-index: 999;
     max-height: calc(100vh - var(--header-height));
@@ -1795,8 +1795,8 @@ body.mobile-tray-open {
 footer {
     background: var(--bg-panel);
     /* Optimized blur for Chromium/Safari performance */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-top: 1px solid var(--border-color);
     padding: 30px 20px;
     text-align: center;
