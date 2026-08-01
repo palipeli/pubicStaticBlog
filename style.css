@@ -8,42 +8,57 @@
 
 :root {
     --bg-dark: #f6f5f4;
-    --bg-panel: rgba(255, 255, 255, 0.72);
+    --bg-panel: rgba(255, 255, 255, 0.65);
     --bg-header: rgba(246, 245, 244, 0.85);
+    --bg-glass: rgba(255, 255, 255, 0.55);
+    --bg-glass-strong: rgba(255, 255, 255, 0.75);
     --accent-pink: #ff45fc;
     --accent-pink-hover: #e031e0;
     --text-primary: #2e3436;
     --text-secondary: #5e5e5e;
     --border-color: rgba(0, 0, 0, 0.08);
+    --border-glass: rgba(255, 255, 255, 0.3);
     --header-height: 40px;
     --font-main: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
     --blur-overlay-brightness: 1.0;
     --dark-overlay-color: rgba(0, 0, 0, 0.0);
     --theme-transition-duration: 0.4s;
-    --btn-bg: rgba(255, 255, 255, 0.6);
+    --btn-bg: rgba(255, 255, 255, 0.55);
     --btn-text: #2e3436;
-    --btn-border: rgba(0, 0, 0, 0.2);
-    --btn-hover-bg: rgba(240, 240, 240, 0.7);
+    --btn-border: rgba(0, 0, 0, 0.15);
+    --btn-hover-bg: rgba(240, 240, 240, 0.65);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 [data-theme="dark"] {
     --blur-overlay-brightness: 0.6;
     --dark-overlay-color: rgba(0, 0, 0, 0.4);
-    --bg-panel: rgba(26, 26, 26, 0.75);
+    --bg-panel: rgba(26, 26, 26, 0.65);
+    --bg-glass: rgba(30, 30, 30, 0.55);
+    --bg-glass-strong: rgba(40, 40, 40, 0.75);
     --bg-header: rgba(18, 18, 18, 0.85);
-    --btn-bg: rgba(26, 26, 26, 0.6);
+    --btn-bg: rgba(30, 30, 30, 0.55);
     --btn-text: #ffffff;
-    --btn-border: rgba(255, 255, 255, 0.2);
-    --btn-hover-bg: rgba(10, 10, 10, 0.7);
+    --btn-border: rgba(255, 255, 255, 0.15);
+    --btn-hover-bg: rgba(10, 10, 10, 0.65);
+    --border-glass: rgba(255, 255, 255, 0.15);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 [data-theme="light"] {
-    --bg-panel: rgba(255, 255, 255, 0.72);
+    --bg-panel: rgba(255, 255, 255, 0.65);
+    --bg-glass: rgba(255, 255, 255, 0.55);
+    --bg-glass-strong: rgba(255, 255, 255, 0.75);
     --bg-header: rgba(246, 245, 244, 0.85);
-    --btn-bg: rgba(255, 255, 255, 0.6);
+    --btn-bg: rgba(255, 255, 255, 0.55);
     --btn-text: #2e3436;
-    --btn-border: rgba(0, 0, 0, 0.2);
-    --btn-hover-bg: rgba(240, 240, 240, 0.7);
+    --btn-border: rgba(0, 0, 0, 0.15);
+    --btn-hover-bg: rgba(240, 240, 240, 0.65);
+    --border-glass: rgba(255, 255, 255, 0.3);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 body {
@@ -101,8 +116,8 @@ body {
     right: 0;
     height: var(--header-height);
     background: var(--bg-header);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     isolation: isolate;
     will-change: transform;
     transform: translateZ(0);
@@ -229,13 +244,14 @@ body {
 }
 
 .home-layout-container .home-hero {
-    background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    background: var(--bg-glass-strong);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid var(--border-glass);
+    border-radius: 12px;
     padding: 20px;
-    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    box-shadow: var(--glass-shadow);
+    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
 }
 
 .home-title {
@@ -273,10 +289,10 @@ body {
 
 .geo-shape {
     position: absolute;
-    border-radius: 8px;
-    opacity: 0.8;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    border-radius: 12px;
+    opacity: 0.85;
+    backdrop-filter: blur(8px) saturate(140%);
+    -webkit-backdrop-filter: blur(8px) saturate(140%);
     will-change: transform;
     transform: translateZ(0);
     backface-visibility: hidden;
@@ -361,10 +377,10 @@ body {
 /* Sidebar */
 .sidebar {
     width: 280px;
-    background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-left: 1px solid var(--border-color);
+    background: var(--bg-glass-strong);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border-left: 1px solid var(--border-glass);
     padding: 0;
     animation: slideLeft 0.5s ease-out;
     position: fixed;
@@ -376,7 +392,8 @@ body {
     will-change: width, opacity, transform;
     backface-visibility: hidden;
     isolation: isolate;
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, transform 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    box-shadow: var(--glass-shadow);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, transform 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
 }
 
 /* Sidebar content wrapper */
@@ -423,10 +440,10 @@ body {
     width: 24px;
     height: 48px;
     border-radius: 12px 0 0 12px;
-    background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
+    background: var(--bg-glass);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    border: 1px solid var(--border-glass);
     border-right: none;
     cursor: pointer;
     display: flex;
@@ -434,7 +451,7 @@ body {
     justify-content: center;
     z-index: 1001;
     transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+    box-shadow: -2px 0 12px rgba(0, 0, 0, 0.12);
     color: var(--text-primary);
     padding: 0;
 }
@@ -526,23 +543,28 @@ body {
 }
 
 .template-card {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: 8px;
     padding: 15px;
     cursor: pointer;
-    transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .template-card:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--bg-glass-strong);
     border-color: var(--accent-pink);
     transform: translateX(-5px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .template-card.active {
-    background: rgba(255, 69, 252, 0.08);
+    background: rgba(255, 69, 252, 0.12);
     border-color: var(--accent-pink);
+    box-shadow: 0 2px 12px rgba(255, 69, 252, 0.15);
 }
 
 .template-card.active .template-name {
@@ -591,27 +613,32 @@ body {
 }
 
 .theme-btn {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: 8px;
     padding: 12px 15px;
     cursor: pointer;
-    transition: all 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, color var(--theme-transition-duration) ease;
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    transition: all 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, color var(--theme-transition-duration) ease, box-shadow 0.3s ease;
     color: var(--text-primary);
     font-size: 13px;
     font-weight: 500;
     text-align: left;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .theme-btn:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: var(--bg-glass-strong);
     border-color: var(--accent-pink);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .theme-btn.active {
-    background: rgba(255, 69, 252, 0.08);
+    background: rgba(255, 69, 252, 0.12);
     border-color: var(--accent-pink);
+    box-shadow: 0 2px 12px rgba(255, 69, 252, 0.15);
     color: var(--accent-pink);
 }
 
@@ -643,24 +670,28 @@ body {
 
 /* Back to Intro Button */
 .back-to-intro-btn {
-    background: var(--btn-bg);
-    border: 1px solid var(--btn-border);
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
     color: var(--btn-text);
     padding: 10px 20px;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
     margin-bottom: 20px;
-    transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
     letter-spacing: 0.5px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
     text-transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .back-to-intro-btn:hover {
-    background: var(--btn-hover-bg);
+    background: var(--bg-glass-strong);
     transform: translateX(-5px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 /* Blog Introduction View */
@@ -675,28 +706,30 @@ body {
 }
 
 .blog-post-view .blog-article {
-    background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    background: var(--bg-glass-strong);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid var(--border-glass);
+    border-radius: 12px;
     padding: 20px;
     line-height: 1.6;
     font-size: 12px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    box-shadow: var(--glass-shadow);
 }
 
 .blog-intro-view .blog-article {
-    background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    background: var(--bg-glass-strong);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid var(--border-glass);
+    border-radius: 12px;
     padding: 20px;
     line-height: 1.6;
     font-size: 12px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    box-shadow: var(--glass-shadow);
+    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
 }
 
 .blog-intro-view h1 {
@@ -749,16 +782,17 @@ body {
 
 /* Blog Article */
 .blog-article {
-    background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    background: var(--bg-glass-strong);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid var(--border-glass);
+    border-radius: 12px;
     padding: 15px;
     line-height: 1.6;
     font-size: 12px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    box-shadow: var(--glass-shadow);
+    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
 }
 
 .blog-article h1 {
@@ -1034,10 +1068,12 @@ body {
 }
 
 .blog-card {
-    background: var(--bg-panel);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    border-radius: 8px;
     overflow: visible;
+    backdrop-filter: blur(12px) saturate(140%);
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
     will-change: transform, background-color, border-color, box-shadow;
     transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     animation: fadeIn 0.3s ease-out;
@@ -1052,14 +1088,15 @@ body {
     min-width: 0;
     position: relative;
     z-index: 1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .blog-card:hover {
-    background: rgba(255, 69, 252, 0.08);
+    background: var(--bg-glass-strong);
     border-color: var(--accent-pink);
     transform: translateX(4px);
     z-index: 10;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--accent-pink);
 }
 
 .blog-image {
