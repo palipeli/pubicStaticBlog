@@ -5,7 +5,7 @@
 const CACHE_NAME = 'kamikami-cache-v1';
 const IMAGE_CACHE = 'kamikami-images-v1';
 
-// Assets to cache on install
+// Assets to cache on install (core assets only - backgrounds prefetched on demand)
 const ASSETS_TO_CACHE = [
     '/',
     '/index.html',
@@ -24,10 +24,9 @@ const ASSETS_TO_CACHE = [
     '/media/logo.webp',
     '/media/apple.webp',
     '/media/background.webp',
-    '/media/bg-dark.webp',
-    '/media/bg-light.webp',
-    '/media/dns.webp',
-    '/media/signing.webp',
+    // Note: bg-dark.webp and bg-light.webp are NOT cached here
+    // They are prefetched only when cursor approaches theme selector
+    // Blog images (dns.webp, signing.webp) are cached on-demand when blog loads
     'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css',
     'https://fonts.googleapis.com/css2?family=VT323&display=swap'
 ];
