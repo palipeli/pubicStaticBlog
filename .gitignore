@@ -1,2 +1,1 @@
-(js/markdown.js is a source file, and there are no build artifacts, dependencies, or temporary files in the changes)
-.DS_Store
+Nothing needs to be added to .gitignore since the changes only include webp image files and a CSS file, which are source files that should be tracked in version control.

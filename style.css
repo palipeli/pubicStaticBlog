@@ -8,47 +8,51 @@
 
 :root {
     --bg-dark: #f6f5f4;
-    --bg-panel: rgba(255, 255, 255, 0.72);
-    --bg-header: rgba(246, 245, 244, 0.85);
+    --bg-panel: rgba(255, 255, 255, 0.85);
+    --bg-header: rgba(255, 255, 255, 0.92);
     --accent-pink: #ff45fc;
     --accent-pink-hover: #e031e0;
     --text-primary: #2e3436;
     --text-secondary: #5e5e5e;
-    --border-color: rgba(0, 0, 0, 0.08);
+    --border-color: rgba(0, 0, 0, 0.12);
     --header-height: 40px;
     --font-main: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-    --blur-overlay-brightness: 1.0;
-    --dark-overlay-color: rgba(0, 0, 0, 0.0);
     --theme-transition-duration: 0.4s;
-    --btn-bg: rgba(255, 255, 255, 0.6);
+    --btn-bg: rgba(255, 255, 255, 0.7);
     --btn-text: #2e3436;
-    --btn-border: rgba(0, 0, 0, 0.2);
-    --btn-hover-bg: rgba(240, 240, 240, 0.7);
+    --btn-border: rgba(0, 0, 0, 0.15);
+    --btn-hover-bg: rgba(240, 240, 240, 0.8);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 [data-theme="dark"] {
-    --blur-overlay-brightness: 0.6;
-    --dark-overlay-color: rgba(0, 0, 0, 0.4);
-    --bg-panel: rgba(26, 26, 26, 0.75);
-    --bg-header: rgba(18, 18, 18, 0.85);
-    --btn-bg: rgba(26, 26, 26, 0.6);
+    --bg-panel: rgba(20, 20, 20, 0.85);
+    --bg-header: rgba(15, 15, 15, 0.92);
+    --btn-bg: rgba(30, 30, 30, 0.7);
     --btn-text: #ffffff;
-    --btn-border: rgba(255, 255, 255, 0.2);
-    --btn-hover-bg: rgba(10, 10, 10, 0.7);
+    --btn-border: rgba(255, 255, 255, 0.15);
+    --btn-hover-bg: rgba(40, 40, 40, 0.8);
+    --border-color: rgba(255, 255, 255, 0.12);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 [data-theme="light"] {
-    --bg-panel: rgba(255, 255, 255, 0.72);
-    --bg-header: rgba(246, 245, 244, 0.85);
-    --btn-bg: rgba(255, 255, 255, 0.6);
+    --bg-panel: rgba(255, 255, 255, 0.85);
+    --bg-header: rgba(255, 255, 255, 0.92);
+    --btn-bg: rgba(255, 255, 255, 0.7);
     --btn-text: #2e3436;
-    --btn-border: rgba(0, 0, 0, 0.2);
-    --btn-hover-bg: rgba(240, 240, 240, 0.7);
+    --btn-border: rgba(0, 0, 0, 0.15);
+    --btn-hover-bg: rgba(240, 240, 240, 0.8);
+    --border-color: rgba(0, 0, 0, 0.12);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
 body {
     font-family: var(--font-main);
-    background: linear-gradient(135deg, rgba(246, 245, 244, 0.6) 0%, rgba(255, 255, 255, 0.6) 100%), url('media/background.webp');
+    background: url('media/background-light.webp');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -58,30 +62,18 @@ body {
     transition: background var(--theme-transition-duration) ease, color var(--theme-transition-duration) ease;
 }
 
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url('media/background.webp') no-repeat center center;
+[data-theme="dark"] body {
+    background: url('media/background-dark.webp');
     background-size: cover;
-    filter: blur(13px) brightness(var(--blur-overlay-brightness));
-    transition: filter var(--theme-transition-duration) ease;
-    z-index: -2;
+    background-position: center;
+    background-attachment: fixed;
 }
 
-body::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--dark-overlay-color);
-    transition: background var(--theme-transition-duration) ease;
-    z-index: -1;
+[data-theme="light"] body {
+    background: url('media/background-light.webp');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
 }
 
 html {
@@ -101,8 +93,8 @@ body {
     right: 0;
     height: var(--header-height);
     background: var(--bg-header);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     isolation: isolate;
     will-change: transform;
     transform: translateZ(0);
@@ -111,9 +103,10 @@ body {
     align-items: center;
     padding: 0 20px;
     z-index: 1000;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: var(--glass-border);
+    box-shadow: var(--glass-shadow);
     animation: slideDown 0.5s ease-out;
-    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
 }
 
 @keyframes slideDown {
@@ -230,12 +223,13 @@ body {
 
 .home-layout-container .home-hero {
     background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: var(--glass-border);
+    border-radius: 12px;
     padding: 20px;
-    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    box-shadow: var(--glass-shadow);
+    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
 }
 
 .home-title {
@@ -273,13 +267,15 @@ body {
 
 .geo-shape {
     position: absolute;
-    border-radius: 8px;
-    opacity: 0.8;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    border-radius: 12px;
+    opacity: 0.85;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     will-change: transform;
     transform: translateZ(0);
     backface-visibility: hidden;
+    border: var(--glass-border);
+    box-shadow: var(--glass-shadow);
 }
 
 .shape-1 {
@@ -362,9 +358,9 @@ body {
 .sidebar {
     width: 280px;
     background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-left: 1px solid var(--border-color);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-left: var(--glass-border);
     padding: 0;
     animation: slideLeft 0.5s ease-out;
     position: fixed;
@@ -376,7 +372,8 @@ body {
     will-change: width, opacity, transform;
     backface-visibility: hidden;
     isolation: isolate;
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, transform 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    box-shadow: var(--glass-shadow);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, transform 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
 }
 
 /* Sidebar content wrapper */
@@ -424,9 +421,9 @@ body {
     height: 48px;
     border-radius: 12px 0 0 12px;
     background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--border-color);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: var(--glass-border);
     border-right: none;
     cursor: pointer;
     display: flex;
@@ -434,7 +431,7 @@ body {
     justify-content: center;
     z-index: 1001;
     transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15), var(--glass-shadow);
     color: var(--text-primary);
     padding: 0;
 }
@@ -676,27 +673,29 @@ body {
 
 .blog-post-view .blog-article {
     background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: var(--glass-border);
+    border-radius: 12px;
     padding: 20px;
     line-height: 1.6;
     font-size: 12px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    box-shadow: var(--glass-shadow);
 }
 
 .blog-intro-view .blog-article {
     background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: var(--glass-border);
+    border-radius: 12px;
     padding: 20px;
     line-height: 1.6;
     font-size: 12px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    box-shadow: var(--glass-shadow);
+    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
 }
 
 .blog-intro-view h1 {
@@ -750,15 +749,16 @@ body {
 /* Blog Article */
 .blog-article {
     background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: var(--glass-border);
+    border-radius: 12px;
     padding: 15px;
     line-height: 1.6;
     font-size: 12px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    box-shadow: var(--glass-shadow);
+    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
 }
 
 .blog-article h1 {
@@ -1214,11 +1214,12 @@ body {
     margin: 0 auto;
     text-align: center;
     background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: var(--glass-border);
+    border-radius: 12px;
     padding: 40px;
+    box-shadow: var(--glass-shadow);
 }
 
 .profile-img {
@@ -1282,12 +1283,13 @@ body {
 
 .about-content {
     background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: var(--glass-border);
+    border-radius: 12px;
     padding: 15px;
     line-height: 1.8;
+    box-shadow: var(--glass-shadow);
 }
 
 .about-content p {
