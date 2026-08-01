@@ -622,10 +622,28 @@
             if (bgPrefetched) return;
             if (!navigator.serviceWorker || !navigator.serviceWorker.controller) return;
 
+            // Determine the alternate theme background to prefetch (not the already-loaded one)
+            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            var cookieMatch = document.cookie.match(/theme_preference=([^;]+)/);
+            var savedTheme = cookieMatch ? cookieMatch[1] : null;
+            var currentBg, alternateBg;
+            
+            if (savedTheme === 'dark') {
+                currentBg = '/media/bg-dark.webp';
+                alternateBg = '/media/bg-light.webp';
+            } else if (savedTheme === 'light') {
+                currentBg = '/media/bg-light.webp';
+                alternateBg = '/media/bg-dark.webp';
+            } else {
+                // Auto mode - prefetch the opposite of system preference
+                currentBg = prefersDark ? '/media/bg-dark.webp' : '/media/bg-light.webp';
+                alternateBg = prefersDark ? '/media/bg-light.webp' : '/media/bg-dark.webp';
+            }
+
             bgPrefetched = true;
             navigator.serviceWorker.controller.postMessage({
                 type: 'prefetch-bg',
-                urls: ['/media/bg-dark.webp', '/media/bg-light.webp']
+                urls: [alternateBg]  // Only prefetch the alternate theme, not both
             });
         }
 

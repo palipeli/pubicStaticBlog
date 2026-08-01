@@ -41,11 +41,12 @@
             else if (savedTheme === 'light') activeBg = '/media/bg-light.webp';
             else activeBg = prefersDark ? '/media/bg-dark.webp' : '/media/bg-light.webp';
 
-            if (reg.active) {
-                reg.active.postMessage({ type: 'precache-bg', url: activeBg });
-            }
+            // Single postMessage to precache the active background image
+            // Use ready promise to ensure we have an active worker
             navigator.serviceWorker.ready.then(function(r) {
-                r.active.postMessage({ type: 'precache-bg', url: activeBg });
+                if (r.active) {
+                    r.active.postMessage({ type: 'precache-bg', url: activeBg });
+                }
             });
         });
     }
