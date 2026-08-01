@@ -34,6 +34,10 @@
     --glass-saturate: 1.2;
     --glass-brightness: 1.05;
     --glass-radius: 16px;
+    
+    /* Background Images - Local files */
+    --bg-image-dark: url('bg-dark.webp');
+    --bg-image-light: url('bg-light.webp');
 }
 
 [data-theme="dark"] {
@@ -52,6 +56,10 @@
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     --glass-blur: 0px;
     --glass-brightness: 0.92;
+    
+    /* Background Images - Local files */
+    --bg-image-dark: url('bg-dark.webp');
+    --bg-image-light: url('bg-light.webp');
 }
 
 [data-theme="light"] {
@@ -68,10 +76,6 @@
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
     --glass-blur: 0px;
     --glass-brightness: 1.05;
-    
-    /* Background Images - Local files */
-    --bg-image-dark: url('bg-dark.webp');
-    --bg-image-light: url('bg-light.webp');
 }
 
 body {
@@ -93,10 +97,15 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: var(--bg-image-dark) no-repeat center center;
+    background: var(--bg-image-light) no-repeat center center;
     background-size: cover;
     transition: background var(--theme-transition-duration) ease;
     z-index: -2;
+}
+
+[data-theme="dark"] body::before {
+    background: var(--bg-image-dark) no-repeat center center;
+    background-size: cover;
 }
 
 [data-theme="light"] body::before {
