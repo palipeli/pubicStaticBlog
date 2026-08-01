@@ -1,13 +1,17 @@
 // sw.js - Service Worker for Image Caching & Background Prefetch
-// Caches images with stale-while-revalidate strategy and supports
+// Caches images with cache-first strategy and supports
 // on-demand background image prefetching via postMessage from main thread.
+// Optimized for minimal resource usage and fast load times.
 
 'use strict';
 
-const CACHE_NAME = 'img-cache-v1';
+const CACHE_NAME = 'img-cache-v2';
 
 // Image file extensions to intercept and cache
 const IMAGE_EXTENSIONS = /\.(webp|png|jpg|jpeg|gif|svg|ico)(\?.*)?$/i;
+
+// Maximum cache size limit (in number of entries) to prevent unbounded growth
+const MAX_CACHE_SIZE = 50;
 
 // -------------------------------------------------------------------
 // Install: no pre-caching here. The active background image is
@@ -21,6 +25,7 @@ self.addEventListener('install', (event) => {
 
 // -------------------------------------------------------------------
 // Activate: claim all clients and purge old cache versions.
+// Also enforce maximum cache size limit.
 // -------------------------------------------------------------------
 self.addEventListener('activate', (event) => {
     event.waitUntil(
@@ -33,13 +38,35 @@ self.addEventListener('activate', (event) => {
         }).then(() => {
             // Take control of all open clients immediately
             return self.clients.claim();
+        }).then(() => {
+            // Enforce cache size limit
+            return enforceCacheSizeLimit();
         })
     );
 });
 
+// Enforce maximum cache size by removing oldest entries
+async function enforceCacheSizeLimit() {
+    try {
+        const cache = await caches.open(CACHE_NAME);
+        const keys = await cache.keys();
+        
+        if (keys.length > MAX_CACHE_SIZE) {
+            // Delete oldest entries (first in list)
+            const deleteCount = keys.length - MAX_CACHE_SIZE;
+            for (let i = 0; i < deleteCount; i++) {
+                await cache.delete(keys[i]);
+            }
+            console.log(`[SW] Cache trimmed: removed ${deleteCount} old entries`);
+        }
+    } catch (err) {
+        console.warn('[SW] Cache size enforcement failed:', err);
+    }
+}
+
 // -------------------------------------------------------------------
 // Fetch: cache-first for image requests.
-// If the image is already cached, return it immediately with no
+// If the image is already cached, return it immediately, no
 // network request. Only fetch from the network on a cache miss,
 // then store the response for future use.
 // Non-image requests pass through to the network untouched.
@@ -50,6 +77,9 @@ self.addEventListener('fetch', (event) => {
     // Only intercept same-origin image requests
     if (url.origin !== self.location.origin) return;
     if (!IMAGE_EXTENSIONS.test(url.pathname)) return;
+    
+    // Only handle GET requests
+    if (event.request.method !== 'GET') return;
 
     event.respondWith(
         caches.open(CACHE_NAME).then((cache) => {
@@ -62,11 +92,26 @@ self.addEventListener('fetch', (event) => {
                 // Cache miss — fetch from network, cache, and return
                 return fetch(event.request).then((networkResponse) => {
                     if (networkResponse && networkResponse.ok) {
-                        cache.put(event.request, networkResponse.clone());
+                        // Clone the response before caching (streams can only be consumed once)
+                        const responseClone = networkResponse.clone();
+                        cache.put(event.request, responseClone);
+                        
+                        // Asynchronously enforce cache size limit after successful cache write
+                        enforceCacheSizeLimit().catch(err => {
+                            console.warn('[SW] Post-fetch cache trim failed:', err);
+                        });
                     }
                     return networkResponse;
+                }).catch((fetchError) => {
+                    // Network failed and no cache - return offline fallback or error
+                    console.warn('[SW] Fetch failed for:', url.pathname, fetchError);
+                    throw fetchError;
                 });
             });
+        }).catch((cacheError) => {
+            // Cache operation failed - fallback to network
+            console.warn('[SW] Cache operation failed:', cacheError);
+            return fetch(event.request);
         })
     );
 });
@@ -90,9 +135,13 @@ self.addEventListener('message', (event) => {
             caches.open(CACHE_NAME).then((cache) => {
                 return cache.match(data.url).then((existing) => {
                     if (!existing) {
-                        return cache.add(data.url);
+                        return cache.add(data.url).then(() => {
+                            console.log('[SW] Pre-cached background:', data.url);
+                        });
                     }
                 });
+            }).catch((err) => {
+                console.warn('[SW] Pre-cache failed:', err);
             })
         );
     }
@@ -104,11 +153,15 @@ self.addEventListener('message', (event) => {
                     data.urls.map((url) => {
                         return cache.match(url).then((existing) => {
                             if (!existing) {
-                                return cache.add(url);
+                                return cache.add(url).then(() => {
+                                    console.log('[SW] Prefetched background:', url);
+                                });
                             }
                         });
                     })
                 );
+            }).catch((err) => {
+                console.warn('[SW] Prefetch failed:', err);
             })
         );
     }

@@ -12,6 +12,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     
+    <!-- Resource hints for faster loading of critical assets -->
+    <link rel="preload" href="style.css" as="style">
+    <link rel="preload" href="liquid-glass.css" as="style">
+    <link rel="prefetch" href="js/markdown.js">
+    <link rel="prefetch" href="js/lazyload.js">
+    <link rel="prefetch" href="js/state.js">
+    <link rel="prefetch" href="js/ui.js">
+    <link rel="prefetch" href="js/blog.js">
+    <link rel="prefetch" href="js/home.js">
+    <link rel="prefetch" href="js/app.js">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kamikami.eu/">
@@ -32,22 +44,45 @@
     <!-- Service Worker Registration (early, before any other scripts) -->
     <script>
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').then(function(reg) {
-            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            var cookieMatch = document.cookie.match(/theme_preference=([^;]+)/);
-            var savedTheme = cookieMatch ? cookieMatch[1] : null;
-            var activeBg;
-            if (savedTheme === 'dark') activeBg = '/media/bg-dark.webp';
-            else if (savedTheme === 'light') activeBg = '/media/bg-light.webp';
-            else activeBg = prefersDark ? '/media/bg-dark.webp' : '/media/bg-light.webp';
+        // Register service worker with improved error handling
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+            .then(function(reg) {
+                console.log('Service Worker registered successfully:', reg.scope);
+                
+                // Determine the active background based on theme preference
+                var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var cookieMatch = document.cookie.match(/theme_preference=([^;]+)/);
+                var savedTheme = cookieMatch ? cookieMatch[1] : null;
+                var activeBg;
+                if (savedTheme === 'dark') activeBg = '/media/bg-dark.webp';
+                else if (savedTheme === 'light') activeBg = '/media/bg-light.webp';
+                else activeBg = prefersDark ? '/media/bg-dark.webp' : '/media/bg-light.webp';
 
-            if (reg.active) {
-                reg.active.postMessage({ type: 'precache-bg', url: activeBg });
-            }
-            navigator.serviceWorker.ready.then(function(r) {
-                r.active.postMessage({ type: 'precache-bg', url: activeBg });
+                // Send precache message to active worker immediately if available
+                if (reg.active) {
+                    try {
+                        reg.active.postMessage({ type: 'precache-bg', url: activeBg });
+                    } catch (e) {
+                        console.warn('Failed to send precache message to active SW:', e);
+                    }
+                }
+                
+                // Also send when worker becomes ready (handles case where SW is still installing)
+                navigator.serviceWorker.ready.then(function(r) {
+                    if (r.active) {
+                        try {
+                            r.active.postMessage({ type: 'precache-bg', url: activeBg });
+                        } catch (e) {
+                            console.warn('Failed to send precache message to ready SW:', e);
+                        }
+                    }
+                }).catch(function(err) {
+                    console.warn('Service Worker ready promise failed:', err);
+                });
+            })
+            .catch(function(error) {
+                console.warn('Service Worker registration failed:', error);
             });
-        });
     }
     </script>
 
