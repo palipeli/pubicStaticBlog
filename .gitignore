@@ -1,2 +1,1 @@
-(js/markdown.js is a source file, and there are no build artifacts, dependencies, or temporary files in the changes)
-.DS_Store
+(js/ui.js and style.css are source files, no build artifacts, dependencies, or temp files detected in changes - no .gitignore rules needed)
