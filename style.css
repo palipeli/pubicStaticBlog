@@ -1,4 +1,5 @@
-/* style.css - Adwaita-Style Blog Platform */
+/* style.css - Adwaita-Style Blog Platform with Liquid Glass Effect */
+/* Optimized for Chromium and Safari browsers */
 
 * {
     margin: 0;
@@ -24,6 +25,15 @@
     --btn-text: #2e3436;
     --btn-border: rgba(0, 0, 0, 0.2);
     --btn-hover-bg: rgba(240, 240, 240, 0.7);
+    
+    /* Liquid Glass Effect Variables - Light Mode (default) */
+    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.4);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --glass-blur: 20px;
+    --glass-saturate: 1.2;
+    --glass-brightness: 1.05;
+    --glass-radius: 16px;
 }
 
 [data-theme="dark"] {
@@ -35,6 +45,12 @@
     --btn-text: #ffffff;
     --btn-border: rgba(255, 255, 255, 0.2);
     --btn-hover-bg: rgba(10, 10, 10, 0.7);
+    
+    /* Liquid Glass Effect Variables - Dark Mode (darker for readability) */
+    --glass-bg: rgba(26, 26, 26, 0.70);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --glass-brightness: 0.92;
 }
 
 [data-theme="light"] {
@@ -44,6 +60,12 @@
     --btn-text: #2e3436;
     --btn-border: rgba(0, 0, 0, 0.2);
     --btn-hover-bg: rgba(240, 240, 240, 0.7);
+    
+    /* Liquid Glass Effect Variables - Light Mode (lighter for readability) */
+    --glass-bg: rgba(255, 255, 255, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.4);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --glass-brightness: 1.05;
 }
 
 body {
@@ -93,27 +115,29 @@ body {
     overflow-y: auto;
 }
 
-/* Header */
+/* Header - Enhanced with Liquid Glass Effect */
 .header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     height: var(--header-height);
-    background: var(--bg-header);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     isolation: isolate;
     will-change: transform;
     transform: translateZ(0);
+    backface-visibility: hidden;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
     z-index: 1000;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
     animation: slideDown 0.5s ease-out;
-    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
 }
 
 @keyframes slideDown {
@@ -229,13 +253,16 @@ body {
 }
 
 .home-layout-container .home-hero {
-    background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    border: 1px solid var(--glass-border);
+    border-radius: var(--glass-radius);
     padding: 20px;
-    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    box-shadow: var(--glass-shadow);
+    will-change: transform;
+    transform: translateZ(0);
+    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
 }
 
 .home-title {
@@ -358,13 +385,14 @@ body {
     color: var(--text-primary);
 }
 
-/* Sidebar */
+/* Sidebar - Enhanced with Liquid Glass Effect */
 .sidebar {
     width: 280px;
-    background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-left: 1px solid var(--border-color);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    border-left: 1px solid var(--glass-border);
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
     padding: 0;
     animation: slideLeft 0.5s ease-out;
     position: fixed;
@@ -376,7 +404,12 @@ body {
     will-change: width, opacity, transform;
     backface-visibility: hidden;
     isolation: isolate;
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, transform 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    transform: translateZ(0);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, transform 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
+}
+
+[data-theme="dark"] .sidebar {
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
 }
 
 /* Sidebar content wrapper */
@@ -526,23 +559,35 @@ body {
 }
 
 .template-card {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    border: 1px solid var(--glass-border);
+    border-radius: var(--glass-radius);
     padding: 15px;
     cursor: pointer;
-    transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+    box-shadow: var(--glass-shadow);
+    will-change: transform;
+    transform: translateZ(0);
+    transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, box-shadow var(--theme-transition-duration) ease;
 }
 
 .template-card:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.75);
     border-color: var(--accent-pink);
-    transform: translateX(-5px);
+    transform: translateZ(0) translateX(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .template-card:hover {
+    background: rgba(40, 40, 40, 0.8);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 .template-card.active {
-    background: rgba(255, 69, 252, 0.08);
+    background: rgba(255, 69, 252, 0.15);
     border-color: var(--accent-pink);
+    box-shadow: 0 4px 16px rgba(255, 69, 252, 0.3);
 }
 
 .template-card.active .template-name {
@@ -591,28 +636,41 @@ body {
 }
 
 .theme-btn {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    border: 1px solid var(--glass-border);
+    border-radius: var(--glass-radius);
     padding: 12px 15px;
     cursor: pointer;
-    transition: all 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, color var(--theme-transition-duration) ease;
+    box-shadow: var(--glass-shadow);
+    transition: all 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
     color: var(--text-primary);
     font-size: 13px;
     font-weight: 500;
     text-align: left;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    will-change: transform;
+    transform: translateZ(0);
 }
 
 .theme-btn:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.75);
     border-color: var(--accent-pink);
+    transform: translateZ(0) translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .theme-btn:hover {
+    background: rgba(40, 40, 40, 0.8);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 .theme-btn.active {
-    background: rgba(255, 69, 252, 0.08);
+    background: rgba(255, 69, 252, 0.15);
     border-color: var(--accent-pink);
     color: var(--accent-pink);
+    box-shadow: 0 4px 16px rgba(255, 69, 252, 0.3);
 }
 
 /* Blog Cards */
@@ -1244,18 +1302,26 @@ body {
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    border-radius: 6px;
+    border-radius: var(--glass-radius);
     text-decoration: none;
     font-weight: 600;
     font-size: 14px;
     transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
-    border: none;
+    border: 1px solid var(--glass-border);
     cursor: pointer;
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    will-change: transform;
+    transform: translateZ(0);
 }
 
 .mc-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transform: translateZ(0) translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .mc-btn:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 .about-hero h1 {
@@ -1907,4 +1973,102 @@ footer p {
         animation-duration: 1.5s !important;
         animation-iteration-count: infinite !important;
     }
+}
+
+/* ============================================
+   ADDITIONAL LIQUID GLASS ENHANCEMENTS
+   For remaining UI elements
+   ============================================ */
+
+/* Blog Post Selector Grid Cards - Liquid Glass Effect */
+.blog-post-selector-grid .template-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+}
+
+/* Navigation Items - Subtle Glass Hover */
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+[data-theme="dark"] .nav-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Sidebar Toggle Button - Glass Effect */
+.sidebar-toggle {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    border: 1px solid var(--glass-border);
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] .sidebar-toggle {
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Footer - Optional Glass Effect */
+footer {
+    background: var(--glass-bg);
+    backdrop-filter: blur(calc(var(--glass-blur) * 0.8)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 0.8)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    border-top: 1px solid var(--glass-border);
+}
+
+/* Mobile Tray - Glass Effect */
+.mobile-tray {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    border: 1px solid var(--glass-border);
+}
+
+/* Animation Performance Optimizations for Chromium and Safari */
+@supports (-webkit-overflow-scrolling: touch) {
+    /* Safari iOS smooth scrolling */
+    .content-area,
+    .sidebar-content-wrapper {
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* Hardware acceleration for glass animations */
+.liquid-glass,
+.header,
+.sidebar,
+.template-card,
+.theme-btn,
+.mc-btn {
+    /* Force GPU compositing */
+    transform: translate3d(0, 0, 0);
+    /* Prevent flickering during transitions */
+    backface-visibility: hidden;
+    /* Optimize for animation performance */
+    will-change: transform, opacity;
+}
+
+/* Dark mode specific adjustments for better readability */
+[data-theme="dark"] .liquid-glass,
+[data-theme="dark"] .header,
+[data-theme="dark"] .sidebar,
+[data-theme="dark"] .template-card,
+[data-theme="dark"] .theme-btn,
+[data-theme="dark"] .mc-btn {
+    /* Slightly darker in dark mode for text contrast */
+    --glass-brightness: 0.90;
+}
+
+/* Light mode specific adjustments */
+[data-theme="light"] .liquid-glass,
+[data-theme="light"] .header,
+[data-theme="light"] .sidebar,
+[data-theme="light"] .template-card,
+[data-theme="light"] .theme-btn,
+[data-theme="light"] .mc-btn {
+    /* Brighter in light mode */
+    --glass-brightness: 1.05;
 }
