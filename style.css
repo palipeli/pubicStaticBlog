@@ -9,46 +9,50 @@
 
 :root {
     --bg-dark: #f6f5f4;
-    --bg-panel: rgba(255, 255, 255, 0.55);
-    --bg-header: rgba(246, 245, 244, 0.75);
+    --bg-panel: rgba(255, 255, 255, 0.45);
+    --bg-header: rgba(246, 245, 244, 0.65);
     --accent-pink: #ff45fc;
     --accent-pink-hover: #e031e0;
     --text-primary: #2e3436;
     --text-secondary: #5e5e5e;
-    --border-color: rgba(0, 0, 0, 0.12);
+    --border-color: rgba(0, 0, 0, 0.08);
     --header-height: 40px;
     --font-main: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
     --blur-overlay-brightness: 1.0;
     --dark-overlay-color: rgba(0, 0, 0, 0.0);
     --theme-transition-duration: 0.4s;
-    --btn-bg: rgba(255, 255, 255, 0.5);
+    --btn-bg: rgba(255, 255, 255, 0.4);
     --btn-text: #2e3436;
-    --btn-border: rgba(0, 0, 0, 0.2);
-    --btn-hover-bg: rgba(240, 240, 240, 0.6);
-    /* Enhanced blur values for stronger glass effect */
-    --blur-heavy: 16px;
-    --blur-medium: 12px;
-    --blur-light: 8px;
+    --btn-border: rgba(0, 0, 0, 0.15);
+    --btn-hover-bg: rgba(240, 240, 240, 0.5);
+    /* Enhanced blur values for liquid glass effect */
+    --blur-heavy: 24px;
+    --blur-medium: 18px;
+    --blur-light: 12px;
+    /* Liquid glass highlight effects */
+    --glass-highlight: rgba(255, 255, 255, 0.15);
+    --glass-inner-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.3), inset 0 -1px 2px rgba(0, 0, 0, 0.05);
+    --glass-specular: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%, rgba(255, 255, 255, 0.1) 100%);
 }
 
 [data-theme="dark"] {
     --blur-overlay-brightness: 0.6;
     --dark-overlay-color: rgba(0, 0, 0, 0.4);
-    --bg-panel: rgba(26, 26, 26, 0.55);
-    --bg-header: rgba(18, 18, 18, 0.75);
-    --btn-bg: rgba(26, 26, 26, 0.5);
+    --bg-panel: rgba(26, 26, 26, 0.45);
+    --bg-header: rgba(18, 18, 18, 0.65);
+    --btn-bg: rgba(26, 26, 26, 0.4);
     --btn-text: #ffffff;
-    --btn-border: rgba(255, 255, 255, 0.2);
-    --btn-hover-bg: rgba(10, 10, 10, 0.6);
+    --btn-border: rgba(255, 255, 255, 0.15);
+    --btn-hover-bg: rgba(10, 10, 10, 0.5);
 }
 
 [data-theme="light"] {
-    --bg-panel: rgba(255, 255, 255, 0.55);
-    --bg-header: rgba(246, 245, 244, 0.75);
-    --btn-bg: rgba(255, 255, 255, 0.5);
+    --bg-panel: rgba(255, 255, 255, 0.45);
+    --bg-header: rgba(246, 245, 244, 0.65);
+    --btn-bg: rgba(255, 255, 255, 0.4);
     --btn-text: #2e3436;
-    --btn-border: rgba(0, 0, 0, 0.2);
-    --btn-hover-bg: rgba(240, 240, 240, 0.6);
+    --btn-border: rgba(0, 0, 0, 0.15);
+    --btn-hover-bg: rgba(240, 240, 240, 0.5);
 }
 
 body {
@@ -72,8 +76,8 @@ body::before {
     height: 100%;
     background: url('media/background.webp') no-repeat center center;
     background-size: cover;
-    /* Enhanced blur for stronger glass effect while maintaining performance */
-    filter: blur(16px) brightness(var(--blur-overlay-brightness));
+    /* Enhanced blur for liquid glass effect while maintaining performance */
+    filter: blur(24px) brightness(var(--blur-overlay-brightness));
     /* Hardware acceleration hint for smoother transitions */
     will-change: filter;
     transform: translateZ(0);
@@ -111,9 +115,11 @@ body {
     right: 0;
     height: var(--header-height);
     background: var(--bg-header);
-    /* Enhanced blur for stronger glass effect on Chromium/Safari */
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    /* Enhanced blur for liquid glass effect on Chromium/Safari */
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    /* Liquid glass inner shadow and highlight */
+    box-shadow: var(--glass-inner-shadow), 0 1px 3px rgba(0, 0, 0, 0.05);
     /* Hardware acceleration for smooth scrolling and animations */
     isolation: isolate;
     will-change: transform;
@@ -126,7 +132,7 @@ body {
     z-index: 1000;
     border-bottom: 1px solid var(--border-color);
     animation: slideDown 0.5s ease-out;
-    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
 }
 
 @keyframes slideDown {
@@ -152,12 +158,12 @@ body {
     border: none;
     padding: 3px 8px;
     margin: 0 10px;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 10px;
     font-weight: 600;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
-    box-shadow: 0 2px 8px rgba(255, 20, 147, 0.4);
+    box-shadow: var(--glass-inner-shadow), 0 2px 8px rgba(255, 20, 147, 0.4);
 }
 
 .blue-button span {
@@ -170,7 +176,7 @@ body {
 .blue-button:hover {
     background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 20, 147, 0.6);
+    box-shadow: var(--glass-inner-shadow), 0 4px 12px rgba(255, 20, 147, 0.6);
 }
 
 .blue-button:active {
@@ -187,7 +193,7 @@ body {
     color: var(--text-secondary);
     text-decoration: none;
     padding: 8px 16px;
-    border-radius: 3px;
+    border-radius: 6px;
     transition: transform 0.2s ease, color var(--theme-transition-duration) ease, background-color var(--theme-transition-duration) ease;
     font-size: 13px;
     font-weight: 500;
@@ -243,13 +249,15 @@ body {
 
 .home-layout-container .home-hero {
     background: var(--bg-panel);
-    /* Enhanced blur for stronger glass effect on Chromium/Safari */
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    /* Enhanced blur for liquid glass effect on Chromium/Safari */
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    /* Liquid glass inner shadow and highlight */
+    box-shadow: var(--glass-inner-shadow), 0 2px 8px rgba(0, 0, 0, 0.05);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 20px;
-    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
 }
 
 .home-title {
@@ -287,10 +295,12 @@ body {
 
 .geo-shape {
     position: absolute;
-    border-radius: 8px;
-    opacity: 0.8;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    border-radius: 12px;
+    opacity: 0.7;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    /* Liquid glass inner shadow and highlight */
+    box-shadow: var(--glass-inner-shadow), 0 2px 6px rgba(0, 0, 0, 0.08);
     will-change: transform;
     transform: translateZ(0);
     backface-visibility: hidden;
@@ -376,9 +386,11 @@ body {
 .sidebar {
     width: 280px;
     background: var(--bg-panel);
-    /* Enhanced blur for stronger glass effect on Chromium/Safari */
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    /* Enhanced blur for liquid glass effect on Chromium/Safari */
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    /* Liquid glass inner shadow and highlight */
+    box-shadow: var(--glass-inner-shadow), -2px 0 8px rgba(0, 0, 0, 0.05);
     border-left: 1px solid var(--border-color);
     padding: 0;
     animation: slideLeft 0.5s ease-out;
@@ -391,7 +403,7 @@ body {
     will-change: width, opacity, transform;
     backface-visibility: hidden;
     isolation: isolate;
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, transform 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, transform 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
 }
 
 /* Sidebar content wrapper */
@@ -439,9 +451,11 @@ body {
     height: 48px;
     border-radius: 12px 0 0 12px;
     background: var(--bg-panel);
-    /* Enhanced blur for stronger glass effect on Chromium/Safari */
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* Enhanced blur for liquid glass effect on Chromium/Safari */
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    /* Liquid glass inner shadow and highlight */
+    box-shadow: var(--glass-inner-shadow), -2px 0 8px rgba(0, 0, 0, 0.1);
     border: 1px solid var(--border-color);
     border-right: none;
     cursor: pointer;
@@ -450,7 +464,6 @@ body {
     justify-content: center;
     z-index: 1001;
     transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
     color: var(--text-primary);
     padding: 0;
 }
@@ -508,7 +521,7 @@ body {
     padding: 10px;
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 10px;
 }
 
 .photo-placeholder svg {
@@ -542,23 +555,27 @@ body {
 }
 
 .template-card {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 10px;
     padding: 15px;
     cursor: pointer;
-    transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+    /* Liquid glass inner shadow and highlight */
+    box-shadow: var(--glass-inner-shadow);
+    transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .template-card:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.06);
     border-color: var(--accent-pink);
     transform: translateX(-5px);
+    box-shadow: var(--glass-inner-shadow), 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .template-card.active {
-    background: rgba(255, 69, 252, 0.08);
+    background: rgba(255, 69, 252, 0.1);
     border-color: var(--accent-pink);
+    box-shadow: var(--glass-inner-shadow), 0 2px 12px rgba(255, 69, 252, 0.15);
 }
 
 .template-card.active .template-name {
@@ -581,10 +598,12 @@ body {
     display: inline-block;
     background: rgba(53, 132, 228, 0.08);
     border: 1px solid var(--accent-pink);
-    border-radius: 6px;
+    border-radius: 10px;
     padding: 12px 30px;
     cursor: pointer;
-    transition: border-color 0.3s ease, color 0.3s ease, background-color 0.3s ease, transform 0.2s ease;
+    /* Liquid glass inner shadow and highlight */
+    box-shadow: var(--glass-inner-shadow);
+    transition: border-color 0.3s ease, color 0.3s ease, background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
     color: var(--accent-pink);
     font-size: 14px;
     font-weight: 600;
@@ -594,9 +613,10 @@ body {
 }
 
 .all-post-btn:hover {
-    background: rgba(53, 132, 228, 0.06);
+    background: rgba(53, 132, 228, 0.1);
     border-color: var(--accent-pink-hover);
     color: var(--accent-pink-hover);
+    box-shadow: var(--glass-inner-shadow), 0 2px 12px rgba(255, 69, 252, 0.15);
 }
 
 /* Theme Chooser */
@@ -607,12 +627,14 @@ body {
 }
 
 .theme-btn {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 10px;
     padding: 12px 15px;
     cursor: pointer;
-    transition: all 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, color var(--theme-transition-duration) ease;
+    /* Liquid glass inner shadow and highlight */
+    box-shadow: var(--glass-inner-shadow);
+    transition: all 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
     color: var(--text-primary);
     font-size: 13px;
     font-weight: 500;
@@ -621,14 +643,16 @@ body {
 }
 
 .theme-btn:hover {
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.06);
     border-color: var(--accent-pink);
+    box-shadow: var(--glass-inner-shadow), 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .theme-btn.active {
-    background: rgba(255, 69, 252, 0.08);
+    background: rgba(255, 69, 252, 0.1);
     border-color: var(--accent-pink);
     color: var(--accent-pink);
+    box-shadow: var(--glass-inner-shadow), 0 2px 12px rgba(255, 69, 252, 0.15);
 }
 
 /* Blog Cards */
@@ -663,7 +687,7 @@ body {
     border: 1px solid var(--btn-border);
     color: var(--btn-text);
     padding: 10px 20px;
-    border-radius: 6px;
+    border-radius: 10px;
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
@@ -693,10 +717,10 @@ body {
 .blog-post-view .blog-article {
     background: var(--bg-panel);
     /* Optimized blur for Chromium/Safari performance */
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 20px;
     line-height: 1.6;
     font-size: 12px;
@@ -706,10 +730,10 @@ body {
 .blog-intro-view .blog-article {
     background: var(--bg-panel);
     /* Optimized blur for Chromium/Safari performance */
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 20px;
     line-height: 1.6;
     font-size: 12px;
@@ -769,10 +793,10 @@ body {
 .blog-article {
     background: var(--bg-panel);
     /* Optimized blur for Chromium/Safari performance */
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 15px;
     line-height: 1.6;
     font-size: 12px;
@@ -825,7 +849,7 @@ body {
 .blog-article code {
     background: rgba(255, 69, 252, 0.1);
     padding: 2px 6px;
-    border-radius: 3px;
+    border-radius: 6px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
     font-size: 12px;
     color: var(--text-primary);
@@ -848,7 +872,7 @@ body {
 .blog-article pre {
     background: transparent;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 10px;
     padding: 15px;
     overflow-x: auto;
     margin: 20px 0;
@@ -976,7 +1000,7 @@ body {
     color: var(--text-primary) !important;
     border: 1px solid var(--border-color);
     padding: 15px;
-    border-radius: 6px;
+    border-radius: 10px;
 }
 
 /* Blog Sidebar (in main sidebar) */
@@ -994,7 +1018,7 @@ body {
 .post-selector-item {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 10px;
     padding: 12px 15px;
     cursor: pointer;
     transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
@@ -1055,8 +1079,10 @@ body {
 .blog-card {
     background: var(--bg-panel);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 10px;
     overflow: visible;
+    /* Liquid glass inner shadow and highlight */
+    box-shadow: var(--glass-inner-shadow);
     will-change: transform, background-color, border-color, box-shadow;
     transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     animation: fadeIn 0.3s ease-out;
@@ -1074,11 +1100,11 @@ body {
 }
 
 .blog-card:hover {
-    background: rgba(255, 69, 252, 0.08);
+    background: rgba(255, 69, 252, 0.1);
     border-color: var(--accent-pink);
     transform: translateX(4px);
     z-index: 10;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: var(--glass-inner-shadow), 0 2px 12px rgba(255, 69, 252, 0.15);
 }
 
 .blog-image {
@@ -1239,10 +1265,10 @@ body {
     text-align: center;
     background: var(--bg-panel);
     /* Optimized blur for Chromium/Safari performance */
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 40px;
 }
 
@@ -1269,7 +1295,7 @@ body {
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    border-radius: 6px;
+    border-radius: 10px;
     text-decoration: none;
     font-weight: 600;
     font-size: 14px;
@@ -1308,10 +1334,10 @@ body {
 .about-content {
     background: var(--bg-panel);
     /* Optimized blur for Chromium/Safari performance */
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 15px;
     line-height: 1.8;
 }
@@ -1343,7 +1369,7 @@ body {
 
 ::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
+    border-radius: 8px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -1463,7 +1489,7 @@ body {
     align-items: center;
     gap: 10px;
     text-decoration: none;
-    border-radius: 4px;
+    border-radius: 8px;
     transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
     box-shadow: 0 4px 15px rgba(71, 114, 179, 0.4);
     border: none;
@@ -1566,7 +1592,7 @@ body {
     padding: 8px;
     margin-right: 8px;
     color: var(--text-primary);
-    border-radius: 4px;
+    border-radius: 8px;
     transition: all 0.2s ease;
 }
 
@@ -1598,8 +1624,8 @@ body {
     width: 100vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     z-index: 998;
     opacity: 0;
     visibility: hidden;
@@ -1619,8 +1645,8 @@ body {
     right: 0;
     background: var(--bg-panel);
     /* Optimized blur for Chromium/Safari performance */
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border-bottom: 1px solid var(--border-color);
     z-index: 999;
     max-height: calc(100vh - var(--header-height));
@@ -1667,7 +1693,7 @@ body {
 .mobile-theme-btn {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 10px;
     padding: 14px 16px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -1699,7 +1725,7 @@ body {
     padding: 10px;
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 10px;
 }
 
 .mobile-photo-placeholder svg {
@@ -1723,7 +1749,7 @@ body {
 .mobile-post-item {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 10px;
     padding: 14px 16px;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -1765,7 +1791,7 @@ body {
 .mobile-nav-item {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: 10px;
     padding: 14px 16px;
     color: var(--text-primary);
     text-decoration: none;
@@ -1795,8 +1821,8 @@ body.mobile-tray-open {
 footer {
     background: var(--bg-panel);
     /* Optimized blur for Chromium/Safari performance */
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border-top: 1px solid var(--border-color);
     padding: 30px 20px;
     text-align: center;
