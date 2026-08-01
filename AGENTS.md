@@ -188,5 +188,3 @@ graph TD
 * [README.md](file:///Users/misel/pubicStaticBlog/README.md) – Project technical details and demo.
 * [LICENSE](file:///Users/misel/pubicStaticBlog/LICENSE) – GNU General Public License v3.0 text.
 * [blog/posts.json](file:///Users/misel/pubicStaticBlog/blog/posts.json) – Blog post manifest catalog.
-* > TODO: Create `docs/ARCH.md` for extended architectural decision document.
-* > TODO: Create `docs/ADR/` directory for tracking Architecture Decision Records.
