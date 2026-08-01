@@ -30,8 +30,8 @@
     --glass-bg: rgba(255, 255, 255, 0.65);
     --glass-border: rgba(255, 255, 255, 0.4);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    --glass-blur: 0px;
-    --glass-saturate: 1.2;
+    --glass-blur: 24px;
+    --glass-saturate: 1.5;
     --glass-brightness: 1.05;
     --glass-radius: 16px;
 }
@@ -50,8 +50,13 @@
     --glass-bg: rgba(26, 26, 26, 0.70);
     --glass-border: rgba(255, 255, 255, 0.12);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    --glass-blur: 0px;
+    --glass-blur: 24px;
+    --glass-saturate: 1.5;
     --glass-brightness: 0.92;
+    
+    /* Background Images - Local files */
+    --bg-image-dark: url('media/bg-dark.webp');
+    --bg-image-light: url('media/bg-light.webp');
 }
 
 [data-theme="light"] {
@@ -66,12 +71,9 @@
     --glass-bg: rgba(255, 255, 255, 0.65);
     --glass-border: rgba(255, 255, 255, 0.4);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    --glass-blur: 0px;
+    --glass-blur: 24px;
+    --glass-saturate: 1.5;
     --glass-brightness: 1.05;
-    
-    /* Background Images - Local files */
-    --bg-image-dark: url('bg-dark.webp');
-    --bg-image-light: url('bg-light.webp');
 }
 
 body {
@@ -123,8 +125,8 @@ body {
     right: 0;
     height: var(--header-height);
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     isolation: isolate;
     will-change: transform;
     transform: translateZ(0);
@@ -254,8 +256,8 @@ body {
 
 .home-layout-container .home-hero {
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     border: 1px solid var(--glass-border);
     border-radius: var(--glass-radius);
     padding: 20px;
@@ -302,8 +304,8 @@ body {
     position: absolute;
     border-radius: 8px;
     opacity: 0.8;
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
     will-change: transform;
     transform: translateZ(0);
     backface-visibility: hidden;
@@ -389,8 +391,8 @@ body {
 .sidebar {
     width: 280px;
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     border-left: 1px solid var(--glass-border);
     box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
     padding: 0;
@@ -457,8 +459,8 @@ body {
     height: 48px;
     border-radius: 12px 0 0 12px;
     background: var(--bg-panel);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--border-color);
     border-right: none;
     cursor: pointer;
@@ -560,8 +562,8 @@ body {
 
 .template-card {
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     border: 1px solid var(--glass-border);
     border-radius: var(--glass-radius);
     padding: 15px;
@@ -726,8 +728,8 @@ body {
 
 .blog-post-view .blog-article {
     background: var(--bg-panel);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
@@ -738,8 +740,8 @@ body {
 
 .blog-intro-view .blog-article {
     background: var(--bg-panel);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
@@ -800,8 +802,8 @@ body {
 /* Blog Article */
 .blog-article {
     background: var(--bg-panel);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 15px;
@@ -1264,8 +1266,8 @@ body {
     margin: 0 auto;
     text-align: center;
     background: var(--bg-panel);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 40px;
@@ -1301,8 +1303,8 @@ body {
     transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
     border: 1px solid var(--glass-border);
     cursor: pointer;
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     will-change: transform;
     transform: translateZ(0);
 }
@@ -1340,8 +1342,8 @@ body {
 
 .about-content {
     background: var(--bg-panel);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 15px;
@@ -1622,8 +1624,8 @@ body {
     width: 100vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
     z-index: 998;
     opacity: 0;
     visibility: hidden;
@@ -1642,8 +1644,8 @@ body {
     left: 0;
     right: 0;
     background: var(--bg-panel);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
     border-bottom: 1px solid var(--border-color);
     z-index: 999;
     max-height: calc(100vh - var(--header-height));
@@ -1818,8 +1820,8 @@ body.mobile-tray-open {
 /* Footer Styles */
 footer {
     background: var(--bg-panel);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
     border-top: 1px solid var(--border-color);
     padding: 30px 20px;
     text-align: center;
@@ -1976,15 +1978,15 @@ footer p {
 /* Blog Post Selector Grid Cards - Liquid Glass Effect */
 .blog-post-selector-grid .template-card {
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
 }
 
 /* Navigation Items - Subtle Glass Hover */
 .nav-item:hover {
     background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 
 [data-theme="dark"] .nav-item:hover {
@@ -1994,8 +1996,8 @@ footer p {
 /* Sidebar Toggle Button - Glass Effect */
 .sidebar-toggle {
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     border: 1px solid var(--glass-border);
     box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
 }
@@ -2007,16 +2009,16 @@ footer p {
 /* Footer - Optional Glass Effect */
 footer {
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     border-top: 1px solid var(--glass-border);
 }
 
 /* Mobile Tray - Glass Effect */
 .mobile-tray {
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     border: 1px solid var(--glass-border);
 }
 
