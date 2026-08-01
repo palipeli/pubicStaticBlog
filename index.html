@@ -33,20 +33,33 @@
     <script>
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').then(function(reg) {
-            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            var cookieMatch = document.cookie.match(/theme_preference=([^;]+)/);
-            var savedTheme = cookieMatch ? cookieMatch[1] : null;
-            var activeBg;
-            if (savedTheme === 'dark') activeBg = '/media/bg-dark.webp';
-            else if (savedTheme === 'light') activeBg = '/media/bg-light.webp';
-            else activeBg = prefersDark ? '/media/bg-dark.webp' : '/media/bg-light.webp';
-
-            if (reg.active) {
-                reg.active.postMessage({ type: 'precache-bg', url: activeBg });
-            }
+            // Wait for service worker to be ready, then send a single precache message
             navigator.serviceWorker.ready.then(function(r) {
+                var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var cookieMatch = document.cookie.match(/theme_preference=([^;]+)/);
+                var savedTheme = cookieMatch ? cookieMatch[1] : null;
+                var activeBg;
+                if (savedTheme === 'dark') activeBg = '/media/bg-dark.webp';
+                else if (savedTheme === 'light') activeBg = '/media/bg-light.webp';
+                else activeBg = prefersDark ? '/media/bg-dark.webp' : '/media/bg-light.webp';
+                
+                // Send only the active background image for immediate caching
                 r.active.postMessage({ type: 'precache-bg', url: activeBg });
+                
+                // Also prefetch the alternate background on idle for fast theme switching
+                // This ensures both backgrounds are cached without adding network requests
+                // on initial load (only caches what will likely be needed)
+                if ('requestIdleCallback' in window) {
+                    requestIdleCallback(function() {
+                        var alternateBg = (activeBg === '/media/bg-dark.webp') 
+                            ? '/media/bg-light.webp' 
+                            : '/media/bg-dark.webp';
+                        r.active.postMessage({ type: 'prefetch-bg', urls: [alternateBg] });
+                    }, { timeout: 2000 });
+                }
             });
+        }).catch(function(err) {
+            console.warn('Service Worker registration failed:', err);
         });
     }
     </script>
