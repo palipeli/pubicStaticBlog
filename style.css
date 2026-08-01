@@ -1908,3 +1908,85 @@ footer p {
         animation-iteration-count: infinite !important;
     }
 }
+
+/* ============================================
+   Liquid Glass Effect - Optimized for Chromium & Safari
+   Theme-aware glass panels with enhanced readability
+   ============================================ */
+
+.liquid-glass {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    /* CSS fallback while WebGL initializes */
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.05);
+    transition: 
+        background 0.4s ease,
+        border-color 0.4s ease,
+        box-shadow 0.4s ease;
+    will-change: contents;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+/* Light mode - lighter and more transparent for better contrast */
+[data-theme="light"] .liquid-glass,
+:not([data-theme="dark"]) .liquid-glass {
+    background: rgba(255, 255, 255, 0.72);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+}
+
+/* Dark mode - darker for better readability */
+[data-theme="dark"] .liquid-glass {
+    background: rgba(30, 30, 30, 0.75);
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Enhanced glass effect for key UI elements */
+.liquid-glass-header,
+.liquid-glass-panel,
+.liquid-glass-card {
+    /* WebGL-enhanced glass via liquid-glass.js */
+}
+
+/* Animation optimizations for Chromium/Safari */
+@supports (-webkit-backdrop-filter: blur(20px)) {
+    .liquid-glass {
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        backdrop-filter: blur(20px) saturate(180%);
+    }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .liquid-glass {
+        transition: none;
+    }
+}
+
+/* Performance: disable complex effects on low-power mode */
+@media (prefers-contrast: high) {
+    .liquid-glass {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.85);
+    }
+    [data-theme="dark"] .liquid-glass {
+        background: rgba(20, 20, 20, 0.9);
+    }
+}
