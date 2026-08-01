@@ -1,22 +1,41 @@
-// sw.js - Service Worker for Image Caching & Background Prefetch
-// Caches images with stale-while-revalidate strategy and supports
+// sw.js - Service Worker for Comprehensive Caching & Background Prefetch
+// Caches images, CSS, and JS with stale-while-revalidate strategy and supports
 // on-demand background image prefetching via postMessage from main thread.
 
 'use strict';
 
-const CACHE_NAME = 'img-cache-v1';
+const CACHE_NAME = 'site-cache-v2';
 
 // Image file extensions to intercept and cache
 const IMAGE_EXTENSIONS = /\.(webp|png|jpg|jpeg|gif|svg|ico)(\?.*)?$/i;
 
+// CSS and JS file extensions to cache for faster subsequent loads
+const STATIC_ASSET_EXTENSIONS = /\.(css|js)(\?.*)?$/i;
+
 // -------------------------------------------------------------------
-// Install: no pre-caching here. The active background image is
-// sent via postMessage once the main thread knows the user's theme,
-// and all other images are cached on first natural fetch (cache-first).
+// Install: Pre-cache critical assets for instant first load on return visits
 // -------------------------------------------------------------------
 self.addEventListener('install', (event) => {
-    // Activate immediately without waiting for existing clients
-    event.waitUntil(self.skipWaiting());
+    // Pre-cache critical static assets
+    const criticalAssets = [
+        '/style.css',
+        '/liquid-glass.css',
+        '/js/app.js',
+        '/js/state.js',
+        '/js/ui.js'
+    ];
+
+    event.waitUntil(
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll(criticalAssets).catch(err => {
+                // Ignore errors - assets will be cached on first request
+                console.log('SW pre-caching skipped:', err);
+            });
+        }).then(() => {
+            // Activate immediately without waiting for existing clients
+            return self.skipWaiting();
+        })
+    );
 });
 
 // -------------------------------------------------------------------
@@ -27,7 +46,8 @@ self.addEventListener('activate', (event) => {
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames
-                    .filter((name) => name.startsWith('img-cache-') && name !== CACHE_NAME)
+                    .filter((name) => name.startsWith('img-cache-') || name.startsWith('site-cache-'))
+                    .filter((name) => name !== CACHE_NAME)
                     .map((name) => caches.delete(name))
             );
         }).then(() => {
@@ -38,18 +58,23 @@ self.addEventListener('activate', (event) => {
 });
 
 // -------------------------------------------------------------------
-// Fetch: cache-first for image requests.
-// If the image is already cached, return it immediately with no
+// Fetch: cache-first for images and static assets (CSS, JS).
+// If the resource is already cached, return it immediately with no
 // network request. Only fetch from the network on a cache miss,
 // then store the response for future use.
-// Non-image requests pass through to the network untouched.
+// Non-matching requests pass through to the network untouched.
 // -------------------------------------------------------------------
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
 
-    // Only intercept same-origin image requests
+    // Only intercept same-origin requests
     if (url.origin !== self.location.origin) return;
-    if (!IMAGE_EXTENSIONS.test(url.pathname)) return;
+
+    // Check if this is an image or static asset
+    const isImage = IMAGE_EXTENSIONS.test(url.pathname);
+    const isStaticAsset = STATIC_ASSET_EXTENSIONS.test(url.pathname);
+
+    if (!isImage && !isStaticAsset) return;
 
     event.respondWith(
         caches.open(CACHE_NAME).then((cache) => {
