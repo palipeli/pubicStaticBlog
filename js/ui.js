@@ -58,9 +58,10 @@
         }
         if (window.location.hash !== '#' + hash) {
             if (addToHistory) {
-                history.pushState(null, '', '#' + hash);
+                // Use pushState with a state object to prevent favicon re-fetch
+                history.pushState({ hash: hash }, '', '#' + hash);
             } else {
-                history.replaceState(null, '', '#' + hash);
+                history.replaceState({ hash: hash }, '', '#' + hash);
             }
         }
     }
@@ -110,6 +111,21 @@
     function setupHashRouting() {
         // Listen for hash changes
         window.addEventListener('hashchange', handleHashChange);
+        
+        // Listen for popstate to handle back/forward button with state
+        window.addEventListener('popstate', (event) => {
+            // If we have state data, use it; otherwise fall back to current hash
+            if (event.state && event.state.hash) {
+                const hash = event.state.hash;
+                // Update location hash without adding to history
+                if (window.location.hash !== '#' + hash) {
+                    history.replaceState({ hash: hash }, '', '#' + hash);
+                }
+                handleHashChange();
+            } else if (window.location.hash) {
+                handleHashChange();
+            }
+        });
         
         // Handle initial hash on page load
         if (window.location.hash) {
