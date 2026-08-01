@@ -29,25 +29,39 @@
     <meta name="twitter:site" content="@kamikamieu">
 </head>
 <body>
-    <!-- Service Worker Registration (early, before any other scripts) -->
+    <!-- Service Worker Registration (deferred to avoid blocking rendering) -->
     <script>
+    // Register service worker asynchronously after initial render
+    // This prevents SW registration from blocking the critical rendering path
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js').then(function(reg) {
-            var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            var cookieMatch = document.cookie.match(/theme_preference=([^;]+)/);
-            var savedTheme = cookieMatch ? cookieMatch[1] : null;
-            var activeBg;
-            if (savedTheme === 'dark') activeBg = '/media/bg-dark.webp';
-            else if (savedTheme === 'light') activeBg = '/media/bg-light.webp';
-            else activeBg = prefersDark ? '/media/bg-dark.webp' : '/media/bg-light.webp';
+        // Use requestIdleCallback if available, otherwise setTimeout
+        var registerSW = function() {
+            navigator.serviceWorker.register('/sw.js?cacheVersion=v2').then(function(reg) {
+                var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var cookieMatch = document.cookie.match(/theme_preference=([^;]+)/);
+                var savedTheme = cookieMatch ? cookieMatch[1] : null;
+                var activeBg;
+                if (savedTheme === 'dark') activeBg = '/media/bg-dark.webp';
+                else if (savedTheme === 'light') activeBg = '/media/bg-light.webp';
+                else activeBg = prefersDark ? '/media/bg-dark.webp' : '/media/bg-light.webp';
 
-            if (reg.active) {
-                reg.active.postMessage({ type: 'precache-bg', url: activeBg });
-            }
-            navigator.serviceWorker.ready.then(function(r) {
-                r.active.postMessage({ type: 'precache-bg', url: activeBg });
+                if (reg.active) {
+                    reg.active.postMessage({ type: 'precache-bg', url: activeBg });
+                }
+                navigator.serviceWorker.ready.then(function(r) {
+                    r.active.postMessage({ type: 'precache-bg', url: activeBg });
+                });
+            }).catch(function(err) {
+                console.warn('Service Worker registration failed:', err);
             });
-        });
+        };
+
+        // Defer SW registration until after page is interactive
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(registerSW, { timeout: 5000 });
+        } else {
+            setTimeout(registerSW, 100);
+        }
     }
     </script>
 

@@ -1,10 +1,13 @@
 // sw.js - Service Worker for Image Caching & Background Prefetch
 // Caches images with stale-while-revalidate strategy and supports
 // on-demand background image prefetching via postMessage from main thread.
+// 
+// Version: 2 - Added cache busting support and improved error handling
 
 'use strict';
 
-const CACHE_NAME = 'img-cache-v1';
+const CACHE_NAME = 'img-cache-v2';
+const CACHE_VERSION = 'v2'; // Update this when cache strategy changes
 
 // Image file extensions to intercept and cache
 const IMAGE_EXTENSIONS = /\.(webp|png|jpg|jpeg|gif|svg|ico)(\?.*)?$/i;
@@ -38,11 +41,12 @@ self.addEventListener('activate', (event) => {
 });
 
 // -------------------------------------------------------------------
-// Fetch: cache-first for image requests.
+// Fetch: cache-first for image requests with error handling.
 // If the image is already cached, return it immediately with no
 // network request. Only fetch from the network on a cache miss,
 // then store the response for future use.
 // Non-image requests pass through to the network untouched.
+// Includes fallback to network if cache API fails.
 // -------------------------------------------------------------------
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
@@ -65,8 +69,22 @@ self.addEventListener('fetch', (event) => {
                         cache.put(event.request, networkResponse.clone());
                     }
                     return networkResponse;
+                }).catch((err) => {
+                    // Network failed - try to return any cached version even if stale
+                    console.warn('Network fetch failed, attempting cache fallback:', err);
+                    return cache.match(event.request).then((fallbackResponse) => {
+                        if (fallbackResponse) {
+                            return fallbackResponse;
+                        }
+                        // No cache available - rethrow the error
+                        throw err;
+                    });
                 });
             });
+        }).catch((err) => {
+            // Cache API failed - fall back to network
+            console.warn('Cache API failed, falling back to network:', err);
+            return fetch(event.request);
         })
     );
 });
