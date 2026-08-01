@@ -18,16 +18,21 @@
     /* Light mode glass variables */
     --glass-bg-light: rgba(255, 255, 255, 0.65);
     --glass-bg-dark: rgba(26, 26, 26, 0.70);
-    --glass-border-light: rgba(255, 255, 255, 0.4);
-    --glass-border-dark: rgba(255, 255, 255, 0.12);
+    --glass-border-light: rgba(255, 255, 255, 0.5);
+    --glass-border-dark: rgba(255, 255, 255, 0.18);
     --glass-shadow-light: 0 8px 32px rgba(0, 0, 0, 0.12);
     --glass-shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.4);
-    --glass-blur-strength: 20px;
-    --glass-saturate: 1.2;
-    --glass-brightness-light: 1.05;
-    --glass-brightness-dark: 0.92;
+    --glass-blur-strength: 24px;
+    --glass-saturate: 1.4;
+    --glass-brightness-light: 1.08;
+    --glass-brightness-dark: 0.95;
     --glass-radius: 16px;
     --glass-transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Edge refraction effects */
+    --edge-highlight-light: rgba(255, 255, 255, 0.8);
+    --edge-highlight-dark: rgba(255, 255, 255, 0.25);
+    --edge-refraction-light: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 50%, rgba(255, 255, 255, 0.2) 100%);
+    --edge-refraction-dark: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%, rgba(255, 255, 255, 0.08) 100%);
 }
 
 [data-theme="dark"] {
@@ -74,12 +79,19 @@
     backdrop-filter: blur(var(--glass-blur-strength)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     -webkit-backdrop-filter: blur(var(--glass-blur-strength)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     
-    /* Border and shadow */
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
+    /* Enhanced border with stronger refraction effect */
+    border: 2px solid var(--glass-border);
+    box-shadow: 
+        var(--glass-shadow),
+        inset 0 1px 2px rgba(255, 255, 255, 0.3),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.1);
     
     /* Rounded corners */
     border-radius: var(--glass-radius);
+    
+    /* Edge refraction highlights */
+    position: relative;
+    overflow: hidden;
     
     /* Performance optimizations */
     will-change: transform, opacity;
@@ -91,6 +103,43 @@
     
     /* Isolation for proper stacking */
     isolation: isolate;
+}
+
+/* Edge refraction pseudo-element for stronger glass effect */
+.liquid-glass::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: var(--glass-radius);
+    background: var(--edge-refraction-light);
+    pointer-events: none;
+    opacity: 0.6;
+    z-index: -1;
+}
+
+[data-theme="dark"] .liquid-glass::before {
+    background: var(--edge-refraction-dark);
+}
+
+/* Inner edge highlight for depth */
+.liquid-glass::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    height: 40%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+    border-radius: calc(var(--glass-radius) - 2px) calc(var(--glass-radius) - 2px) 0 0;
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+[data-theme="dark"] .liquid-glass::after {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
 }
 
 /* Hover state for interactive glass panels */
