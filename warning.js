@@ -6,9 +6,6 @@
         "STOP", "PILIH PRABOWO GIBRAN", "PILIH NOMOR 2 2029", "HAIIIIIIII!", "ANTEK ANTEK ASING", "PALING NYAWIT"       
     ];
 
-    // Audio removed - no audio sources needed
-    const VOLUME_GAIN = 2.0; 
-    const AUDIO_LAYERS = 6; 
 
     let bypassWarning = false;
 
@@ -46,12 +43,8 @@
         }
     });
    
-    let audioContext = null;
-    let audioBuffers = [];
-    let isPlaying = false; 
     let isAccepted = false; 
     let areAssetsLoaded = false; 
-    let lastAudioIndex = -1;
 
     let touchStartX = 0;
     let touchStartY = 0;
@@ -205,9 +198,6 @@
         });
     }
 
-    function playSound(buffer) {
-        // Audio playback removed - no-op
-    }
 
     async function triggerWarning(e, force = false) {
         if (!force) {

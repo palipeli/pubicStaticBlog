@@ -14,18 +14,6 @@
         '&yen;': '\u00A5', '&cent;': '\u00A2'
     };
 
-    // Decode HTML entities (for internal processing only, output preserves original)
-    function decodeHtmlEntities(text) {
-        return text.replace(/&(?:[a-zA-Z]+|#\d+|#x[0-9a-fA-F]+);/g, function(match) {
-            if (htmlEntities[match]) return htmlEntities[match];
-            // Handle numeric entities
-            if (match.startsWith('&#')) {
-                const code = match.startsWith('&#x') ? parseInt(match.slice(3, -1), 16) : parseInt(match.slice(2, -1));
-                if (!isNaN(code)) return String.fromCharCode(code);
-            }
-            return match;
-        });
-    }
 
     // Check if character is a whitespace character (space, tab, newline, etc.)
     function isWhitespace(ch) {
@@ -48,17 +36,6 @@
         return level;
     }
 
-    // Remove leading indentation (spaces/tabs)
-    function removeLeadingIndent(line, count) {
-        let removed = 0;
-        let result = line;
-        for (let i = 0; i < line.length && removed < count; i++) {
-            if (line[i] === ' ') { removed++; }
-            else if (line[i] === '\t') { removed += 4; }
-            else { break; }
-        }
-        return line.substring(Math.min(result.indexOf(result.trimStart()), line.length));
-    }
 
     // Parse inline elements (bold, italic, links, images, code spans, etc.)
     function parseInline(text, options = {}) {
