@@ -46,13 +46,17 @@
     }
 
     // Update URL hash without triggering scroll
-    function updateHash(newHash, postId) {
+    function updateHash(newHash, postId, addToHistory = true) {
         let hash = newHash;
         if (postId) {
             hash = generateBlogPostHash(postId);
         }
         if (window.location.hash !== '#' + hash) {
-            history.replaceState(null, '', '#' + hash);
+            if (addToHistory) {
+                history.pushState(null, '', '#' + hash);
+            } else {
+                history.replaceState(null, '', '#' + hash);
+            }
         }
     }
 
@@ -298,11 +302,11 @@
 
                     // Update URL hash based on page
                     if (page === 'home') {
-                        window.updateHash('home');
+                        window.updateHash('home', null, true);
                     } else if (page === 'about') {
-                        window.updateHash('about');
+                        window.updateHash('about', null, true);
                     } else if (page === 'blogs') {
-                        window.updateHash('blogs');
+                        window.updateHash('blogs', null, true);
                     }
 
                     // Scroll to top when changing pages

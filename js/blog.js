@@ -283,9 +283,9 @@
             }
         });
 
-        // Update URL hash with blog post tag
+        // Update URL hash with blog post tag (add to history)
         if (typeof window.updateHash === 'function') {
-            window.updateHash('', id);
+            window.updateHash('', id, true);
         }
 
         // Save state after opening a post
@@ -362,9 +362,9 @@
             renderBlogPostSelectorGrid(blogPostMetadata);
             // Update back button visibility after returning to intro
             updateBlogIntroBackButton();
-            // Update URL hash
+            // Update URL hash (don't add to history when returning to intro)
             if (typeof window.updateHash === 'function') {
-                window.updateHash('blogs');
+                window.updateHash('blogs', null, false);
             }
         } else {
             // Previous state is a post ID - navigate to that post
@@ -399,9 +399,9 @@
                         window.initializeLazyLoading();
                     }
                     
-                    // Update URL hash with the restored post
+                    // Update URL hash with the restored post (don't add to history)
                     if (typeof window.updateHash === 'function') {
-                        window.updateHash('', previousState);
+                        window.updateHash('', previousState, false);
                     }
                 } else {
                     // Failed to load post, show intro instead
@@ -430,9 +430,9 @@
         // Update back button visibility
         updateBlogIntroBackButton();
 
-        // Update URL hash
+        // Update URL hash (don't add to history when showing intro)
         if (typeof window.updateHash === 'function') {
-            window.updateHash('blogs');
+            window.updateHash('blogs', null, false);
         }
 
         // Save state after going back to intro
