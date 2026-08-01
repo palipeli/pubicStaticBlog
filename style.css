@@ -1,15 +1,22 @@
-/* style.css - Adwaita-Style Blog Platform */
+/* style.css - Adwaita-Style Blog Platform 
+ * Optimized for Chromium & Safari with enhanced glassmorphism
+ */
 
+/* Performance: Force GPU acceleration for animations */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 :root {
     --bg-dark: #f6f5f4;
-    --bg-panel: rgba(255, 255, 255, 0.72);
-    --bg-header: rgba(246, 245, 244, 0.85);
+    /* Enhanced glassy effect with lower opacity for more translucency */
+    --bg-panel: rgba(255, 255, 255, 0.65);
+    --bg-header: rgba(246, 245, 244, 0.75);
     --accent-pink: #ff45fc;
     --accent-pink-hover: #e031e0;
     --text-primary: #2e3436;
@@ -20,30 +27,36 @@
     --blur-overlay-brightness: 1.0;
     --dark-overlay-color: rgba(0, 0, 0, 0.0);
     --theme-transition-duration: 0.4s;
-    --btn-bg: rgba(255, 255, 255, 0.6);
+    --btn-bg: rgba(255, 255, 255, 0.55);
     --btn-text: #2e3436;
     --btn-border: rgba(0, 0, 0, 0.2);
-    --btn-hover-bg: rgba(240, 240, 240, 0.7);
+    --btn-hover-bg: rgba(240, 240, 240, 0.65);
+    /* Enhanced blur values for glassier effect */
+    --blur-strength-strong: 20px;
+    --blur-strength-medium: 16px;
+    --blur-strength-light: 10px;
 }
 
 [data-theme="dark"] {
     --blur-overlay-brightness: 0.6;
     --dark-overlay-color: rgba(0, 0, 0, 0.4);
-    --bg-panel: rgba(26, 26, 26, 0.75);
-    --bg-header: rgba(18, 18, 18, 0.85);
-    --btn-bg: rgba(26, 26, 26, 0.6);
+    /* Enhanced glassy dark mode with more translucency */
+    --bg-panel: rgba(26, 26, 26, 0.65);
+    --bg-header: rgba(18, 18, 18, 0.75);
+    --btn-bg: rgba(26, 26, 26, 0.55);
     --btn-text: #ffffff;
     --btn-border: rgba(255, 255, 255, 0.2);
-    --btn-hover-bg: rgba(10, 10, 10, 0.7);
+    --btn-hover-bg: rgba(10, 10, 10, 0.65);
 }
 
 [data-theme="light"] {
-    --bg-panel: rgba(255, 255, 255, 0.72);
-    --bg-header: rgba(246, 245, 244, 0.85);
-    --btn-bg: rgba(255, 255, 255, 0.6);
+    /* Enhanced glassy light mode */
+    --bg-panel: rgba(255, 255, 255, 0.65);
+    --bg-header: rgba(246, 245, 244, 0.75);
+    --btn-bg: rgba(255, 255, 255, 0.55);
     --btn-text: #2e3436;
     --btn-border: rgba(0, 0, 0, 0.2);
-    --btn-hover-bg: rgba(240, 240, 240, 0.7);
+    --btn-hover-bg: rgba(240, 240, 240, 0.65);
 }
 
 body {
@@ -93,7 +106,7 @@ body {
     overflow-y: auto;
 }
 
-/* Header */
+/* Header - Enhanced glassmorphism with optimized blur for Chromium/Safari */
 .header {
     position: fixed;
     top: 0;
@@ -101,18 +114,21 @@ body {
     right: 0;
     height: var(--header-height);
     background: var(--bg-header);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* Enhanced blur for glassier effect, using both standard and webkit prefixes */
+    backdrop-filter: blur(var(--blur-strength-medium)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--blur-strength-medium)) saturate(180%);
+    /* GPU acceleration for smooth animations */
     isolation: isolate;
     will-change: transform;
     transform: translateZ(0);
+    backface-visibility: hidden;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
     z-index: 1000;
     border-bottom: 1px solid var(--border-color);
-    animation: slideDown 0.5s ease-out;
+    animation: slideDown 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
 
@@ -230,11 +246,15 @@ body {
 
 .home-layout-container .home-hero {
     background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* Enhanced glassmorphism with stronger blur and saturation */
+    backdrop-filter: blur(var(--blur-strength-strong)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--blur-strength-strong)) saturate(180%);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
+    /* Hardware acceleration for smooth transitions */
+    transform: translateZ(0);
+    will-change: auto;
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
 
@@ -274,9 +294,11 @@ body {
 .geo-shape {
     position: absolute;
     border-radius: 8px;
-    opacity: 0.8;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    opacity: 0.85;
+    /* Enhanced blur for glassier geometric shapes */
+    backdrop-filter: blur(var(--blur-strength-light)) saturate(160%);
+    -webkit-backdrop-filter: blur(var(--blur-strength-light)) saturate(160%);
+    /* GPU acceleration for smooth animations */
     will-change: transform;
     transform: translateZ(0);
     backface-visibility: hidden;
@@ -358,23 +380,26 @@ body {
     color: var(--text-primary);
 }
 
-/* Sidebar */
+/* Sidebar - Enhanced glassmorphism with optimized blur for Chromium/Safari */
 .sidebar {
     width: 280px;
     background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* Enhanced blur for glassier effect */
+    backdrop-filter: blur(var(--blur-strength-medium)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--blur-strength-medium)) saturate(180%);
     border-left: 1px solid var(--border-color);
     padding: 0;
-    animation: slideLeft 0.5s ease-out;
+    animation: slideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     position: fixed;
     right: 0;
     top: var(--header-height);
     height: calc(100vh - var(--header-height));
     box-sizing: border-box;
     z-index: 999;
+    /* GPU acceleration for smooth animations */
     will-change: width, opacity, transform;
     backface-visibility: hidden;
+    transform: translateZ(0);
     isolation: isolate;
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, transform 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
@@ -424,8 +449,9 @@ body {
     height: 48px;
     border-radius: 12px 0 0 12px;
     background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    /* Enhanced glassmorphism for toggle button */
+    backdrop-filter: blur(var(--blur-strength-light)) saturate(160%);
+    -webkit-backdrop-filter: blur(var(--blur-strength-light)) saturate(160%);
     border: 1px solid var(--border-color);
     border-right: none;
     cursor: pointer;
@@ -433,7 +459,10 @@ body {
     align-items: center;
     justify-content: center;
     z-index: 1001;
-    transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    /* GPU acceleration for smooth transitions */
+    will-change: transform, background-color, box-shadow;
+    transform: translate3d(-100%, -50%, 0);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
     color: var(--text-primary);
     padding: 0;
@@ -676,26 +705,33 @@ body {
 
 .blog-post-view .blog-article {
     background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* Enhanced glassmorphism for blog articles */
+    backdrop-filter: blur(var(--blur-strength-medium)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--blur-strength-medium)) saturate(180%);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
     line-height: 1.6;
     font-size: 12px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    /* GPU acceleration */
+    transform: translateZ(0);
 }
 
 .blog-intro-view .blog-article {
     background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* Enhanced glassmorphism for blog articles */
+    backdrop-filter: blur(var(--blur-strength-medium)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--blur-strength-medium)) saturate(180%);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
     line-height: 1.6;
     font-size: 12px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    /* GPU acceleration for smooth transitions */
+    transform: translateZ(0);
+    will-change: background, border-color;
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
 
@@ -747,17 +783,21 @@ body {
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
-/* Blog Article */
+/* Blog Article - Enhanced glassmorphism */
 .blog-article {
     background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* Enhanced blur for glassier effect */
+    backdrop-filter: blur(var(--blur-strength-medium)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--blur-strength-medium)) saturate(180%);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 15px;
     line-height: 1.6;
     font-size: 12px;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    /* GPU acceleration */
+    transform: translateZ(0);
+    will-change: background, border-color;
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
 
@@ -1035,12 +1075,17 @@ body {
 
 .blog-card {
     background: var(--bg-panel);
+    /* Enhanced glassmorphism for cards */
+    backdrop-filter: blur(var(--blur-strength-light)) saturate(160%);
+    -webkit-backdrop-filter: blur(var(--blur-strength-light)) saturate(160%);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     overflow: visible;
+    /* GPU acceleration for smooth animations */
     will-change: transform, background-color, border-color, box-shadow;
-    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    animation: fadeIn 0.3s ease-out;
+    transform: translateZ(0);
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     animation-fill-mode: both;
     display: flex;
     align-items: center;
@@ -1208,17 +1253,20 @@ body {
     margin-bottom: 30px;
 }
 
-/* About Hero Section */
+/* About Hero Section - Enhanced glassmorphism */
 .about-hero {
     max-width: 800px;
     margin: 0 auto;
     text-align: center;
     background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* Enhanced blur for glassier effect */
+    backdrop-filter: blur(var(--blur-strength-strong)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--blur-strength-strong)) saturate(180%);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 40px;
+    /* GPU acceleration */
+    transform: translateZ(0);
 }
 
 .profile-img {
@@ -1282,12 +1330,15 @@ body {
 
 .about-content {
     background: var(--bg-panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* Enhanced glassmorphism for about content */
+    backdrop-filter: blur(var(--blur-strength-medium)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--blur-strength-medium)) saturate(180%);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 15px;
     line-height: 1.8;
+    /* GPU acceleration */
+    transform: translateZ(0);
 }
 
 .about-content p {
@@ -1556,7 +1607,7 @@ body {
     }
 }
 
-/* Mobile Tray Overlay */
+/* Mobile Tray Overlay - Enhanced glassmorphism */
 .mobile-tray-overlay {
     position: fixed;
     top: 0;
@@ -1564,11 +1615,14 @@ body {
     width: 100vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
+    /* Enhanced blur for glassier overlay */
+    backdrop-filter: blur(var(--blur-strength-light)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--blur-strength-light)) saturate(140%);
     z-index: 998;
     opacity: 0;
     visibility: hidden;
+    /* GPU acceleration for smooth transitions */
+    will-change: opacity, visibility;
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
@@ -1577,21 +1631,24 @@ body {
     visibility: visible;
 }
 
-/* Mobile Navigation Tray */
+/* Mobile Navigation Tray - Enhanced glassmorphism */
 .mobile-nav-tray {
     position: fixed;
     top: var(--header-height);
     left: 0;
     right: 0;
     background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    /* Enhanced blur for glassier effect */
+    backdrop-filter: blur(var(--blur-strength-medium)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--blur-strength-medium)) saturate(180%);
     border-bottom: 1px solid var(--border-color);
     z-index: 999;
     max-height: calc(100vh - var(--header-height));
     overflow-y: auto;
-    transform: translateY(-100%);
-    transition: transform 0.3s ease;
+    /* GPU acceleration for smooth animations */
+    will-change: transform;
+    transform: translateZ(0);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
@@ -1756,15 +1813,18 @@ body.mobile-tray-open {
     overflow: hidden;
 }
 
-/* Footer Styles */
+/* Footer Styles - Enhanced glassmorphism */
 footer {
     background: var(--bg-panel);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    /* Enhanced blur for glassier effect */
+    backdrop-filter: blur(var(--blur-strength-medium)) saturate(180%);
+    -webkit-backdrop-filter: blur(var(--blur-strength-medium)) saturate(180%);
     border-top: 1px solid var(--border-color);
     padding: 30px 20px;
     text-align: center;
     margin-top: 40px;
+    /* GPU acceleration */
+    transform: translateZ(0);
 }
 
 footer p {
