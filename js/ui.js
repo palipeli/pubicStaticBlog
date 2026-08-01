@@ -32,6 +32,89 @@
         window.scrollTo(0, 0);
     }
 
+    // Generate URL-safe hash for a blog post
+    function generateBlogPostHash(postId) {
+        return 'blog-' + postId;
+    }
+
+    // Extract blog post ID from hash
+    function getBlogPostIdFromHash(hash) {
+        if (hash && hash.startsWith('blog-')) {
+            return hash.substring(5); // Remove 'blog-' prefix
+        }
+        return null;
+    }
+
+    // Update URL hash without triggering scroll
+    function updateHash(newHash, postId) {
+        let hash = newHash;
+        if (postId) {
+            hash = generateBlogPostHash(postId);
+        }
+        if (window.location.hash !== '#' + hash) {
+            history.replaceState(null, '', '#' + hash);
+        }
+    }
+
+    // Handle hash change events
+    function handleHashChange() {
+        const hash = window.location.hash.substring(1); // Remove '#'
+        
+        if (!hash || hash === 'home') {
+            // Navigate to home
+            const homeNavItem = document.querySelector('.nav-item[data-page="home"]');
+            if (homeNavItem) homeNavItem.click();
+        } else if (hash === 'blogs') {
+            // Navigate to blogs intro
+            const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
+            if (blogsNavItem) {
+                blogsNavItem.click();
+                // Show intro view
+                const introView = document.getElementById('blog-intro-view');
+                const postView = document.getElementById('blog-post-view');
+                if (introView && postView) {
+                    postView.style.display = 'none';
+                    introView.style.display = 'block';
+                }
+            }
+        } else if (hash === 'about') {
+            // Navigate to about
+            const aboutNavItem = document.querySelector('.nav-item[data-page="about"]');
+            if (aboutNavItem) aboutNavItem.click();
+        } else if (hash && hash.startsWith('blog-')) {
+            // Open specific blog post
+            const postId = getBlogPostIdFromHash(hash);
+            if (postId && typeof window.openBlogPostLazy === 'function') {
+                // Wait for metadata if needed
+                if (!window.blogPostMetadata || window.blogPostMetadata.length === 0) {
+                    window.waitForBlogMetadata().then(() => {
+                        window.openBlogPostLazy(postId);
+                    });
+                } else {
+                    window.openBlogPostLazy(postId);
+                }
+            }
+        }
+    }
+
+    // Setup hash-based routing
+    function setupHashRouting() {
+        // Listen for hash changes
+        window.addEventListener('hashchange', handleHashChange);
+        
+        // Handle initial hash on page load
+        if (window.location.hash) {
+            // Wait for DOM and blog metadata to be ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    setTimeout(handleHashChange, 100);
+                });
+            } else {
+                setTimeout(handleHashChange, 100);
+            }
+        }
+    }
+
     // Initialize particles (respecting reduced motion preferences)
     function createParticles() {
         const container = document.getElementById('particles');
@@ -211,6 +294,15 @@
                         } else {
                             blogSidebarSection.style.display = 'none';
                         }
+                    }
+
+                    // Update URL hash based on page
+                    if (page === 'home') {
+                        window.updateHash('home');
+                    } else if (page === 'about') {
+                        window.updateHash('about');
+                    } else if (page === 'blogs') {
+                        window.updateHash('blogs');
                     }
 
                     // Scroll to top when changing pages
@@ -502,4 +594,6 @@
     window.setupSystemThemeListener = setupSystemThemeListener;
     window.handleClickMe = handleClickMe;
     window.setupSidebarToggle = setupSidebarToggle;
+    window.setupHashRouting = setupHashRouting;
+    window.updateHash = updateHash;
 })();

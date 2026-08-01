@@ -14,6 +14,11 @@
             window.setupNavigation();
         }
 
+        // Setup hash-based routing for URL tags
+        if (typeof window.setupHashRouting === 'function') {
+            window.setupHashRouting();
+        }
+
         // Setup template selection (theme switching)
         if (typeof window.setupTemplates === 'function') {
             window.setupTemplates();

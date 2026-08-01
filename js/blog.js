@@ -283,6 +283,11 @@
             }
         });
 
+        // Update URL hash with blog post tag
+        if (typeof window.updateHash === 'function') {
+            window.updateHash('', id);
+        }
+
         // Save state after opening a post
         setTimeout(window.saveAppState, 100);
 
@@ -357,6 +362,10 @@
             renderBlogPostSelectorGrid(blogPostMetadata);
             // Update back button visibility after returning to intro
             updateBlogIntroBackButton();
+            // Update URL hash
+            if (typeof window.updateHash === 'function') {
+                window.updateHash('blogs');
+            }
         } else {
             // Previous state is a post ID - navigate to that post
             // First ensure we're on blogs page
@@ -389,6 +398,11 @@
                     if (typeof window.initializeLazyLoading === 'function') {
                         window.initializeLazyLoading();
                     }
+                    
+                    // Update URL hash with the restored post
+                    if (typeof window.updateHash === 'function') {
+                        window.updateHash('', previousState);
+                    }
                 } else {
                     // Failed to load post, show intro instead
                     showBlogIntro();
@@ -415,6 +429,11 @@
 
         // Update back button visibility
         updateBlogIntroBackButton();
+
+        // Update URL hash
+        if (typeof window.updateHash === 'function') {
+            window.updateHash('blogs');
+        }
 
         // Save state after going back to intro
         setTimeout(window.saveAppState, 100);
