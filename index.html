@@ -12,6 +12,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     
+    <!-- Preload critical images -->
+    <link rel="preload" as="image" href="media/favicon-circle.webp">
+    <link rel="preload" as="image" href="media/logo.webp">
+    <link rel="preload" as="image" href="media/apple.webp">
+    <link rel="preload" as="image" href="media/dns.webp">
+    <link rel="preload" as="image" href="media/signing.webp">
+    <link rel="prefetch" as="image" href="media/bg-dark.webp">
+    <link rel="prefetch" as="image" href="media/bg-light.webp">
+    
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kamikami.eu/">
@@ -162,6 +171,7 @@
     <script src="js/ui.js" defer></script>
     <script src="js/blog.js" defer></script>
     <script src="js/home.js" defer></script>
+    <script src="js/cache-manager.js" defer></script>
     
     <!-- Legacy scripts -->
     <script src="warning.js"></script>
