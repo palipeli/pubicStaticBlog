@@ -19,7 +19,7 @@
     --header-height: 40px;
     --font-main: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
     --blur-overlay-brightness: 1.0;
-    --dark-overlay-color: rgba(0, 0, 0, 0.0);
+    --dark-overlay-color: rgba(255, 255, 255, 0.92);
     --theme-transition-duration: 0.4s;
     --btn-bg: rgba(255, 255, 255, 0.6);
     --btn-text: #2e3436;
@@ -37,8 +37,8 @@
 }
 
 [data-theme="dark"] {
-    --blur-overlay-brightness: 0.6;
-    --dark-overlay-color: rgba(0, 0, 0, 0.4);
+    --blur-overlay-brightness: 0.3;
+    --dark-overlay-color: rgba(0, 0, 0, 0.92);
     --bg-panel: rgba(26, 26, 26, 0.75);
     --bg-header: rgba(18, 18, 18, 0.85);
     --btn-bg: rgba(26, 26, 26, 0.6);
@@ -72,7 +72,7 @@
 
 body {
     font-family: var(--font-main);
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.85) 100%), url('https://e.kamikami.eu/u/9hoB.webp');
+    background: url('https://e.kamikami.eu/u/9hoB.webp');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
