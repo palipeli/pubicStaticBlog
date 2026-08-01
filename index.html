@@ -32,7 +32,7 @@
     <div class="particles" id="particles"></div>
 
     <!-- Header -->
-    <header class="header">
+    <header class="header liquid-glass">
         <div class="header-left">
             <button class="blue-button" onclick="handleClickMe()"><span>kamikami.eu</span></button>
         </div>
@@ -46,7 +46,7 @@
     <!-- Main Container -->
     <div class="main-container">
         <!-- Content Area -->
-        <main class="content-area">
+        <main class="content-area liquid-glass">
             <!-- Home Page -->
             <section id="home" class="page-section active">
                 <div class="home-hero" id="home-hero-content">
@@ -54,7 +54,7 @@
                     <img src="media/logo.webp" alt="Blog Logo" style="display: block; margin: 20px auto; width: 70%; max-width: 560px;">
                     
                     <!-- Blog Buttons Section (kamikami.eu style) -->
-                    <div class="blog-buttons-container" id="blog-buttons-container" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 25px 0;">
+                    <div class="blog-buttons-container liquid-glass" id="blog-buttons-container" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 25px 0;">
                         <!-- Buttons will be dynamically generated from posts.json -->
                     </div>
                  
@@ -70,7 +70,7 @@
             <section id="blogs" class="page-section">
                 <div class="blog-layout-container">
                     <!-- Main Content Area (Left) -->
-                    <div class="blog-main-content" id="blog-main-content">
+                    <div class="blog-main-content liquid-glass" id="blog-main-content">
                         <!-- Blog Post Selector (Default View) -->
                         <div class="blog-intro-view" id="blog-intro-view">
                             <button class="back-to-intro-btn" id="blog-intro-back-btn" onclick="goBackFromBlogIntro()" style="display: none;">← Back</button>
@@ -86,7 +86,7 @@
                         <!-- Single Post View (Hidden by default) -->
                         <div class="blog-post-view" id="blog-post-view" style="display: none;">
                             <button class="back-to-intro-btn" onclick="goBack()">← Back</button>
-                            <article class="blog-article" id="blog-article-content">
+                            <article class="blog-article liquid-glass" id="blog-article-content">
                                 <!-- Markdown content will be rendered here -->
                             </article>
                         </div>
@@ -97,17 +97,17 @@
             <!-- About Page -->
             <section id="about" class="page-section">
                 <div class="about-layout-container">
-                    <div class="about-hero">
+                    <div class="about-hero liquid-glass">
                         <img src="media/favicon-circle.webp" alt="Michelle" class="profile-img">
                         
                         <div class="social-links">
-                            <a href="https://discord.com/users/654535856950083603" target="_blank" class="mc-btn" style="background: #5865F2; color: white;">
+                            <a href="https://discord.com/users/654535856950083603" target="_blank" class="mc-btn liquid-glass" style="background: #5865F2; color: white;">
                                 <i class="fa-brands fa-discord"></i> Discord
                             </a>
-                            <a href="https://github.com/mikaaeru" target="_blank" class="mc-btn" style="background: #333; color: white;">
+                            <a href="https://github.com/mikaaeru" target="_blank" class="mc-btn liquid-glass" style="background: #333; color: white;">
                                 <i class="fa-brands fa-github"></i> GitHub
                             </a>
-                            <a href="https://www.youtube.com/@kamikamieu" target="_blank" class="mc-btn" style="background: #FF0000; color: white;">
+                            <a href="https://www.youtube.com/@kamikamieu" target="_blank" class="mc-btn liquid-glass" style="background: #FF0000; color: white;">
                                 <i class="fa-brands fa-youtube"></i> YouTube
                             </a>
                         </div>
@@ -124,7 +124,7 @@
         </main>
 
         <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
+        <aside class="sidebar liquid-glass" id="sidebar">
             <!-- Toggle button fixed to left edge of sidebar, vertically centered -->
             <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Collapse Sidebar" title="Collapse Sidebar">
                 <svg viewBox="0 0 24 24" width="20" height="20">
@@ -173,7 +173,7 @@
     <script src="js/app.js" defer></script>
     
     <!-- Footer -->
-    <footer>
+    <footer class="liquid-glass">
         <p>Nothing to see down here</p>
         <p style="font-size:0.9rem; color:#666;">Idjen Boulevard No.48, Kota Malang 65112, Indonesia.</p>
         <p style="font-size:0.9rem; color:#666;">sel@kamikami.eu.</p>
