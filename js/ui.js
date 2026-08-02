@@ -240,14 +240,9 @@
                                 item.classList.remove('active');
                             });
                             
-                            // Render the blog post selector grid
+                             // Render the blog post selector grid
                             if (typeof window.renderBlogPostSelectorGrid === 'function' && window.blogPostMetadata) {
                                 window.renderBlogPostSelectorGrid(window.blogPostMetadata);
-                            }
-                            
-                            // Update back button visibility
-                            if (typeof window.updateBlogIntroBackButton === 'function') {
-                                window.updateBlogIntroBackButton();
                             }
                             
                             // Scroll to top
@@ -279,14 +274,9 @@
                             item.classList.remove('active');
                         });
                         
-                        // Render the blog post selector grid
+                         // Render the blog post selector grid
                         if (typeof window.renderBlogPostSelectorGrid === 'function' && window.blogPostMetadata) {
                             window.renderBlogPostSelectorGrid(window.blogPostMetadata);
-                        }
-                        
-                        // Update back button visibility
-                        if (typeof window.updateBlogIntroBackButton === 'function') {
-                            window.updateBlogIntroBackButton();
                         }
                         
                         // Scroll to top

@@ -73,7 +73,6 @@
             activeBlogPost: getActiveBlogPostId(),
             sidebarCollapsed: isSidebarCollapsed(),
             theme: getCurrentTheme(),
-            blogIntroViewed: isBlogIntroViewed(),
             timestamp: Date.now()
         };
 
@@ -83,17 +82,6 @@
         } catch (err) {
             console.warn('Failed to save app state:', err);
         }
-    }
-    
-    /**
-     * Check if blog intro view is currently displayed
-     * @returns {boolean} True if blog intro view is displayed
-     */
-    function isBlogIntroViewed() {
-        const introView = document.getElementById('blog-intro-view');
-        const postView = document.getElementById('blog-post-view');
-        // Blog intro is viewed when it's displayed AND post view is not displayed
-        return introView && introView.style.display !== 'none' && (!postView || postView.style.display === 'none');
     }
 
     /**
@@ -163,34 +151,6 @@
         // Store pending blog post restoration for later processing (after metadata is loaded)
         if (state.currentPage === 'blogs' && state.activeBlogPost) {
             window.pendingBlogPostRestore = state.activeBlogPost;
-        } else if (state.currentPage === 'blogs' && state.blogIntroViewed) {
-            // Show blog intro grid immediately if we have metadata
-            setTimeout(() => {
-                if (window.blogPostMetadata && window.blogPostMetadata.length > 0) {
-                    const postView = document.getElementById('blog-post-view');
-                    const introView = document.getElementById('blog-intro-view');
-                    
-                    if (postView && introView) {
-                        postView.style.display = 'none';
-                        introView.style.display = 'block';
-                    }
-                    
-                    // Clear active state in sidebar
-                    document.querySelectorAll('.post-selector-item').forEach(item => {
-                        item.classList.remove('active');
-                    });
-                    
-                    // Render the blog post selector grid
-                    if (typeof window.renderBlogPostSelectorGrid === 'function') {
-                        window.renderBlogPostSelectorGrid(window.blogPostMetadata);
-                    }
-                    
-                    // Update back button visibility
-                    if (typeof window.updateBlogIntroBackButton === 'function') {
-                        window.updateBlogIntroBackButton();
-                    }
-                }
-            }, BLOG_POST_RESTORE_DELAY);
         }
     }
     
@@ -272,6 +232,5 @@
     window.getActiveBlogPostId = getActiveBlogPostId;
     window.isSidebarCollapsed = isSidebarCollapsed;
     window.getCurrentTheme = getCurrentTheme;
-    window.isBlogIntroViewed = isBlogIntroViewed;
     window.processPendingBlogPostRestore = processPendingBlogPostRestore;
 })();
