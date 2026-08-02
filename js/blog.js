@@ -197,7 +197,7 @@
 
 
     const blogPostFooter = `
-        <footer class="home-page-footer">
+        <footer>
             <p style="font-size:0.7rem;">What the fuck are you looking at? All the contents are above, but thanks for looking at though!</p>
             <p style="font-size:0.6rem; color:#666;">Idjen Boulevard No.48, Kota Malang 65112, Indonesia.</p>
             <p style="font-size:0.6rem; color:#666;">sel@kamikami.eu.</p>
