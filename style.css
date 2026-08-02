@@ -1871,8 +1871,11 @@ footer p {
 }
 
 .home-page-footer {
-    background: transparent;
+    background: transparent !important;
     border: none;
+    border-top: 1px solid var(--border-color);
+    margin-top: 20px;
+    padding-top: 15px;
 }
 
 .home-page-footer p {
