@@ -667,6 +667,10 @@ body {
     background: rgba(0, 0, 0, 0.03);
 }
 
+[data-theme="dark"] .theme-btn {
+    background: rgba(255, 255, 255, 0.03);
+}
+
 .theme-btn:hover {
     background: rgba(255, 255, 255, 0.06);
     border-color: var(--accent-pink);
@@ -1785,10 +1789,18 @@ body {
     background: rgba(0, 0, 0, 0.03);
 }
 
+[data-theme="dark"] .mobile-theme-btn {
+    background: rgba(255, 255, 255, 0.03);
+}
+
 .mobile-theme-btn:hover {
     background: rgba(255, 255, 255, 0.06);
     border-color: var(--accent-pink);
     transform: translateX(-5px);
+}
+
+[data-theme="dark"] .mobile-theme-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
 }
 
 [data-theme="light"] .mobile-theme-btn:hover {
