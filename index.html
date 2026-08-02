@@ -109,8 +109,8 @@
                         <!-- Single Post View (Hidden by default) -->
                         <div class="blog-post-view" id="blog-post-view" style="display: none;">
                             <div class="blog-post-nav">
-                                <button class="back-to-intro-btn" onclick="goBack()">← Back</button>
-                                <button class="back-to-intro-btn next-post-btn" id="next-post-btn" onclick="goToNextPost()" style="display: none;">Next →</button>
+                                <button class="back-to-intro-btn" onclick="goBack()" onmouseenter="window.preloadPreviousPageOnHover()">← Back</button>
+                                <button class="back-to-intro-btn next-post-btn" id="next-post-btn" onclick="goToNextPost()" onmouseenter="window.preloadNextPostOnHover()" style="display: none;">Next →</button>
                             </div>
                             <article class="blog-article" id="blog-article-content">
                                 <!-- Markdown content will be rendered here -->
