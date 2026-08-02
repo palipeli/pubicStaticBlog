@@ -219,6 +219,17 @@
         return null;
     }
 
+    // Get the previous post ID based on current post (posts are sorted by date descending)
+    function getPreviousPostId(currentPostId) {
+        const currentIndex = blogPostMetadata.findIndex(p => p.id === currentPostId);
+        if (currentIndex === -1) return null;
+        // Since posts are sorted newest first, "previous" means newer post (lower index)
+        if (currentIndex - 1 >= 0) {
+            return blogPostMetadata[currentIndex - 1].id;
+        }
+        return null;
+    }
+
     // Navigate to the next post
     async function goToNextPost() {
         const activeItem = document.querySelector('.post-selector-item.active');
@@ -340,6 +351,13 @@
                 const nextPostId = getNextPostId(id);
                 nextPostBtn.style.display = nextPostId ? 'inline-block' : 'none';
             }
+
+            // Show/hide Back button based on whether there's a previous post
+            const backBtn = document.getElementById('blog-post-view').querySelector('.back-to-intro-btn:not(.next-post-btn)');
+            if (backBtn) {
+                const previousPostId = getPreviousPostId(id);
+                backBtn.style.display = previousPostId ? 'inline-block' : 'none';
+            }
         });
 
         // Update URL hash with blog post tag (add to history)
@@ -382,33 +400,39 @@
         goBack();
     }
 
-    // Preload previous page content when hovering over the Back button
+    // Preload previous post content when hovering over the Back button
     function preloadPreviousPageOnHover() {
-        if (navigationHistory.length === 0) return;
+        const activeItem = document.querySelector('.post-selector-item.active');
+        if (!activeItem) return;
         
-        const previousState = navigationHistory[navigationHistory.length - 1];
+        const currentPostId = activeItem.getAttribute('data-post-id');
+        const previousPostId = getPreviousPostId(currentPostId);
         
-        if (previousState === 'blog-intro') {
-            // No need to preload for blog intro, it's already rendered
-            return;
-        } else if (typeof previousState === 'string' && !previousState.startsWith('http')) {
-            // Previous state is a post ID - preload that post
-            window.preloadBlogPostContent(previousState);
+        if (previousPostId) {
+            // Preload the previous post content
+            window.preloadBlogPostContent(previousPostId);
         }
-        // For 'home' and 'about' pages, no specific content to preload
     }
 
-    // Go back to previous page using navigation history
+    // Go back to previous post in the list
     function goBack() {
         const article = document.getElementById('blog-article-content');
         const postView = document.getElementById('blog-post-view');
         const introView = document.getElementById('blog-intro-view');
         
-        // Pop the last state from navigation history
-        const previousState = navigationHistory.pop();
+        // Get current post ID from active item
+        const activeItem = document.querySelector('.post-selector-item.active');
+        if (!activeItem) {
+            // No active post, show blog intro
+            showBlogIntro();
+            return;
+        }
         
-        if (!previousState) {
-            // No history, default to blog intro
+        const currentPostId = activeItem.getAttribute('data-post-id');
+        const previousPostId = getPreviousPostId(currentPostId);
+        
+        if (!previousPostId) {
+            // No previous post (we're at the first/newest post), show blog intro
             showBlogIntro();
             return;
         }
@@ -418,80 +442,55 @@
             item.classList.remove('active');
         });
         
-        if (previousState === 'home') {
-            // Navigate back to home page
-            const homeNavItem = document.querySelector('.nav-item[data-page="home"]');
-            if (homeNavItem) {
-                homeNavItem.click();
-            }
-        } else if (previousState === 'about') {
-            // Navigate back to about page
-            const aboutNavItem = document.querySelector('.nav-item[data-page="about"]');
-            if (aboutNavItem) {
-                aboutNavItem.click();
-            }
-        } else if (previousState === 'blog-intro') {
-            // Show blog introduction/grid
-            postView.style.display = 'none';
-            introView.style.display = 'block';
-            renderBlogPostSelectorGrid(blogPostMetadata);
-            // Update back button visibility after returning to intro
-            updateBlogIntroBackButton();
-            // Update URL hash (don't add to history when returning to intro)
-            if (typeof window.updateHash === 'function') {
-                window.updateHash('blogs', null, false);
-            }
-        } else {
-            // Previous state is a post ID - navigate to that post
-            // First ensure we're on blogs page
-            const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
-            if (blogsNavItem && !document.querySelector('#blogs.page-section.active')) {
-                blogsNavItem.click();
-            }
-            
-            // Show post view and load the previous post
-            introView.style.display = 'none';
-            postView.style.display = 'block';
-            
-            // Load and render the previous post
-            loadBlogPostContent(previousState).then(post => {
-                if (post) {
-                    article.innerHTML = `
-                        <h1>${post.icon} ${post.title}</h1>
-                        <div class="blog-meta" style="margin-bottom: 20px;">
-                            <span class="blog-date">${post.date}</span>
-                            <span style="margin-left: 15px;">${post.category}</span>
-                        </div>
-                        <div class="blog-post-content">${post.htmlContent}</div>
-                        ${blogPostFooter}
-                    `;
+        // Show post view and load the previous post
+        introView.style.display = 'none';
+        postView.style.display = 'block';
+        
+        // Load and render the previous post
+        loadBlogPostContent(previousPostId).then(post => {
+            if (post) {
+                article.innerHTML = `
+                    <h1>${post.icon} ${post.title}</h1>
+                    <div class="blog-meta" style="margin-bottom: 20px;">
+                        <span class="blog-date">${post.date}</span>
+                        <span style="margin-left: 15px;">${post.category}</span>
+                    </div>
+                    <div class="blog-post-content">${post.htmlContent}</div>
+                    ${blogPostFooter}
+                `;
 
-                    // Update active state in sidebar
-                    document.querySelectorAll('.post-selector-item').forEach((item, index) => {
-                        item.classList.toggle('active', blogPostMetadata[index]?.id === previousState);
-                    });
-                    
-                    if (typeof window.initializeLazyLoading === 'function') {
-                        window.initializeLazyLoading();
-                    }
-                    
-                    // Show/hide Next button based on whether there's a next post
-                    const nextPostBtn = document.getElementById('next-post-btn');
-                    if (nextPostBtn) {
-                        const nextPostId = getNextPostId(previousState);
-                        nextPostBtn.style.display = nextPostId ? 'inline-block' : 'none';
-                    }
-                    
-                    // Update URL hash with the restored post (don't add to history)
-                    if (typeof window.updateHash === 'function') {
-                        window.updateHash('', previousState, false);
-                    }
-                } else {
-                    // Failed to load post, show intro instead
-                    showBlogIntro();
+                // Update active state in sidebar
+                document.querySelectorAll('.post-selector-item').forEach((item) => {
+                    item.classList.toggle('active', item.getAttribute('data-post-id') === previousPostId);
+                });
+                
+                if (typeof window.initializeLazyLoading === 'function') {
+                    window.initializeLazyLoading();
                 }
-            });
-        }
+                
+                // Show/hide Next button based on whether there's a next post
+                const nextPostBtn = document.getElementById('next-post-btn');
+                if (nextPostBtn) {
+                    const nextPostId = getNextPostId(previousPostId);
+                    nextPostBtn.style.display = nextPostId ? 'inline-block' : 'none';
+                }
+                
+                // Show/hide Back button based on whether there's a previous post
+                const backBtn = document.getElementById('blog-post-view').querySelector('.back-to-intro-btn:not(.next-post-btn)');
+                if (backBtn) {
+                    const prevPostId = getPreviousPostId(previousPostId);
+                    backBtn.style.display = prevPostId ? 'inline-block' : 'none';
+                }
+                
+                // Update URL hash with the restored post (don't add to history)
+                if (typeof window.updateHash === 'function') {
+                    window.updateHash('', previousPostId, false);
+                }
+            } else {
+                // Failed to load post, show intro instead
+                showBlogIntro();
+            }
+        });
         
         // Save state after going back
         setTimeout(window.saveAppState, 100);
