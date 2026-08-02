@@ -1861,6 +1861,7 @@ footer {
     padding: 12px 20px;
     text-align: center;
     margin-top: 40px;
+    opacity: 0;
 }
 
 footer p {
@@ -1873,6 +1874,7 @@ footer p {
 .home-page-footer {
     background: transparent;
     border: none;
+    opacity: 0;
 }
 
 .home-page-footer p {
