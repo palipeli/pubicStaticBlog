@@ -1857,7 +1857,7 @@ body.mobile-tray-open {
 /* Footer Styles */
 footer {
     background: transparent;
-    border-top: 1px solid var(--border-color);
+    border: none;
     padding: 12px 20px;
     text-align: center;
     margin-top: 40px;
@@ -1872,6 +1872,7 @@ footer p {
 
 .home-page-footer {
     background: transparent;
+    border: none;
 }
 
 .home-page-footer p {
@@ -2051,14 +2052,6 @@ footer p {
 
 [data-theme="dark"] .sidebar-toggle {
     box-shadow: -2px 0 8px rgba(0, 0, 0, 0.5);
-}
-
-/* Footer - Optional Glass Effect */
-footer {
-    background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    border-top: 1px solid var(--glass-border);
 }
 
 /* Mobile Tray - Glass Effect */
