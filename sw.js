@@ -36,13 +36,18 @@ const PRECACHE_ASSETS = [
 // -------------------------------------------------------------------
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(STATIC_CACHE_NAME).then((cache) => {
+        Promise.all([
+            caches.open(STATIC_CACHE_NAME),
+            caches.open(IMAGE_CACHE_NAME)
+        ]).then(([staticCache, imageCache]) => {
             // Precache critical assets with error handling for each
             const cachePromises = PRECACHE_ASSETS.map((url) => {
+                // Determine which cache to use based on file type
+                const targetCache = IMAGE_EXTENSIONS.test(url) ? imageCache : staticCache;
                 return fetch(url)
                     .then((response) => {
                         if (response.ok) {
-                            return cache.put(url, response);
+                            return targetCache.put(url, response);
                         }
                         console.warn(`Failed to precache ${url}: ${response.status}`);
                     })
