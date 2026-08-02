@@ -671,6 +671,18 @@ body {
     background: rgba(255, 255, 255, 0.03);
 }
 
+@media (prefers-color-scheme: light) {
+    [data-theme="auto"] .theme-btn {
+        background: rgba(0, 0, 0, 0.03);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    [data-theme="auto"] .theme-btn {
+        background: rgba(255, 255, 255, 0.03);
+    }
+}
+
 .theme-btn:hover {
     background: rgba(255, 255, 255, 0.06);
     border-color: var(--accent-pink);
@@ -683,6 +695,18 @@ body {
 
 [data-theme="light"] .theme-btn:hover {
     background: rgba(0, 0, 0, 0.06);
+}
+
+@media (prefers-color-scheme: light) {
+    [data-theme="auto"] .theme-btn:hover {
+        background: rgba(0, 0, 0, 0.06);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    [data-theme="auto"] .theme-btn:hover {
+        background: rgba(255, 255, 255, 0.06);
+    }
 }
 
 .theme-btn.active {
@@ -1793,6 +1817,18 @@ body {
     background: rgba(255, 255, 255, 0.03);
 }
 
+@media (prefers-color-scheme: light) {
+    [data-theme="auto"] .mobile-theme-btn {
+        background: rgba(0, 0, 0, 0.03);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    [data-theme="auto"] .mobile-theme-btn {
+        background: rgba(255, 255, 255, 0.03);
+    }
+}
+
 .mobile-theme-btn:hover {
     background: rgba(255, 255, 255, 0.06);
     border-color: var(--accent-pink);
@@ -1805,6 +1841,18 @@ body {
 
 [data-theme="light"] .mobile-theme-btn:hover {
     background: rgba(0, 0, 0, 0.06);
+}
+
+@media (prefers-color-scheme: light) {
+    [data-theme="auto"] .mobile-theme-btn:hover {
+        background: rgba(0, 0, 0, 0.06);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    [data-theme="auto"] .mobile-theme-btn:hover {
+        background: rgba(255, 255, 255, 0.06);
+    }
 }
 
 .mobile-theme-btn.active {
