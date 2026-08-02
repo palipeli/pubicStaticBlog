@@ -45,6 +45,9 @@
             // Sync with window object for cross-module access
             window.blogPostMetadata = blogPostMetadata;
 
+            // Dispatch event to notify other modules that metadata is loaded
+            document.dispatchEvent(new CustomEvent('blog:metadata-loaded', { detail: blogPostMetadata }));
+
             return blogPostMetadata;
         } catch (err) {
             console.error('Error fetching blog post metadata:', err);
@@ -72,46 +75,62 @@
             return meta;
         }
 
-        try {
-            const mdResponse = await fetch(meta.slug);
-            if (!mdResponse.ok) throw new Error('Failed to fetch content');
+        // Retry logic with exponential backoff
+        const maxRetries = 3;
+        let lastError = null;
+        
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                const mdResponse = await fetch(meta.slug);
+                if (!mdResponse.ok) throw new Error(`Failed to fetch content: ${mdResponse.status}`);
 
-            const mdContent = await mdResponse.text();
-            const { frontmatter, content } = window.parseFrontmatter(mdContent);
+                const mdContent = await mdResponse.text();
+                const { frontmatter, content } = window.parseFrontmatter(mdContent);
 
-            // Update metadata with full content
-            meta.title = frontmatter.title || meta.title;
-            meta.date = frontmatter.date || meta.date;
-            meta.category = frontmatter.category || meta.category;
-            meta.icon = frontmatter.icon || meta.icon;
-            meta.content = content;
-            meta.htmlContent = window.parseMarkdown(content);
-            meta._contentLoaded = true;
+                // Update metadata with full content
+                meta.title = frontmatter.title || meta.title;
+                meta.date = frontmatter.date || meta.date;
+                meta.category = frontmatter.category || meta.category;
+                meta.icon = frontmatter.icon || meta.icon;
+                meta.content = content;
+                meta.htmlContent = window.parseMarkdown(content);
+                meta._contentLoaded = true;
 
-            // Cache the loaded post
-            blogContentCache.set(postId, meta);
+                // Cache the loaded post
+                blogContentCache.set(postId, meta);
 
-            return meta;
-        } catch (err) {
-            console.error(`Error fetching content for ${meta.slug}:`, err);
-            // Return metadata with error state
-            meta.content = '';
-            meta.htmlContent = '<p>Error loading content.</p>';
-            meta._contentLoaded = true;
-            blogContentCache.set(postId, meta);
-            return meta;
+                return meta;
+            } catch (err) {
+                lastError = err;
+                console.warn(`Attempt ${attempt}/${maxRetries} failed for ${meta.slug}:`, err.message);
+                
+                if (attempt < maxRetries) {
+                    // Exponential backoff: 500ms, 1000ms, 2000ms
+                    const delay = 500 * Math.pow(2, attempt - 1);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
         }
+        
+        // All retries failed - don't cache error state, allow retry on next click
+        console.error(`All retries failed for ${meta.slug}:`, lastError);
+        throw lastError;
     }
+
+    // Track timeouts for cleanup
+    const activeTimeouts = new Set();
 
     // Preload content for posts near the cursor (hover optimization)
     function preloadBlogPostContent(postId) {
         // Clear any existing preload timeout
         if (preloadTimeout) {
             clearTimeout(preloadTimeout);
+            activeTimeouts.delete(preloadTimeout);
         }
 
         // Debounce preload to avoid excessive requests during rapid hover
         preloadTimeout = setTimeout(() => {
+            activeTimeouts.delete(preloadTimeout);
             // Only preload if not already loaded
             if (!blogContentCache.has(postId)) {
                 loadBlogPostContent(postId).then(post => {
@@ -121,6 +140,14 @@
                 });
             }
         }, 150); // 150ms delay before preloading on hover
+        
+        activeTimeouts.add(preloadTimeout);
+    }
+
+    // Cleanup function for blog module
+    function cleanupBlogModule() {
+        activeTimeouts.forEach(timeout => clearTimeout(timeout));
+        activeTimeouts.clear();
     }
 
 
@@ -308,7 +335,21 @@
         `;
 
         // Load the post content (will use cache if already loaded)
-        const post = await loadBlogPostContent(id);
+        let post;
+        try {
+            post = await loadBlogPostContent(id);
+        } catch (err) {
+            console.error('Error loading blog post:', err);
+            article.innerHTML = `
+                <div class="error-message">
+                    <h2>Error Loading Post</h2>
+                    <p>${err.message}</p>
+                    <button onclick="window.openBlogPostLazy('${id}')">Retry</button>
+                </div>
+            `;
+            return;
+        }
+        
         if (!post) {
             article.innerHTML = '<p style="color: var(--text-secondary);">Error loading post.</p>';
             return;
@@ -503,4 +544,5 @@
     window.goToNextPost = goToNextPost;
     window.preloadNextPostOnHover = preloadNextPostOnHover;
     window.preloadPreviousPageOnHover = preloadPreviousPageOnHover;
+    window.cleanupBlogModule = cleanupBlogModule;
 })();

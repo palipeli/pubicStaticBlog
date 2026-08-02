@@ -9,7 +9,10 @@
     <link rel="icon" type="image/webp" href="media/favicon-circle.webp">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=VT323&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
+    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -186,6 +189,7 @@
 
     <!-- Scripts - Modular Architecture with Lazy Loading -->
     <!-- Core modules loaded in order of dependency -->
+    <script src="js/config.js" defer></script>
     <script src="js/markdown.js" defer></script>
     <script src="js/lazyload.js" defer></script>
     <script src="js/state.js" defer></script>

@@ -23,7 +23,6 @@ const PRECACHE_ASSETS = [
     '/',
     '/index.html',
     '/style.css',
-    '/liquid-glass.css',
     '/warning.js',
     '/blog/posts.json',
     '/media/favicon-circle.webp',

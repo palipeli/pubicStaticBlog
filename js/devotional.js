@@ -2,10 +2,16 @@
 // Lazy-loaded module for Bible verse display and typing effects
 
 (function() {
+    'use strict';
+
     // Bible Devotional state
     let bibleVerses = [];
     let devotionalActive = false;
     let versesLoaded = false;
+    
+    // Track animation frame IDs for cancellation
+    let currentAnimationFrameId = null;
+    let isAnimating = false;
 
     // Load Bible verses from pre-extracted JSON (compact array format for smaller size)
     // Only loads when needed to keep initial page load lightweight
@@ -45,6 +51,14 @@
         return pool[Math.floor(Math.random() * pool.length)];
     }
 
+    // Cancel any running animation
+    function cancelAnimation() {
+        if (currentAnimationFrameId !== null) {
+            cancelAnimationFrame(currentAnimationFrameId);
+            currentAnimationFrameId = null;
+        }
+    }
+
     // Typing delete animation - removes text character by character using rAF
     function typeDeleteAnimation(element, callback) {
         const text = element.textContent;
@@ -69,10 +83,10 @@
                     return;
                 }
             }
-            requestAnimationFrame(step);
+            currentAnimationFrameId = requestAnimationFrame(step);
         }
 
-        requestAnimationFrame(step);
+        currentAnimationFrameId = requestAnimationFrame(step);
     }
 
     // Typing write animation - types text character by character using rAF
@@ -99,14 +113,18 @@
                     return;
                 }
             }
-            requestAnimationFrame(step);
+            currentAnimationFrameId = requestAnimationFrame(step);
         }
 
-        requestAnimationFrame(step);
+        currentAnimationFrameId = requestAnimationFrame(step);
     }
 
-    // Prevent concurrent animations from running
-    let isAnimating = false;
+    // Stop all animations and clean up
+    function stopAnimations() {
+        cancelAnimation();
+        devotionalActive = false;
+        isAnimating = false;
+    }
 
     // Run the devotional - delete old text, type new verse
     async function runDevotional() {
@@ -237,4 +255,5 @@
     window.typeDeleteAnimation = typeDeleteAnimation;
     window.typeWriteAnimation = typeWriteAnimation;
     window.getRandomShortVerse = getRandomShortVerse;
+    window.stopAnimations = stopAnimations;
 })();

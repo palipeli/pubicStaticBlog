@@ -57,11 +57,18 @@
                 }
             }
             
-            // HTML entities (GFM section 6.2) - preserve them, don't decode
+            // HTML entities (GFM section 6.2) - decode known entities
             if (text[i] === '&') {
                 const entityMatch = text.slice(i).match(/^&([a-zA-Z]+|#\d+|#x[0-9a-fA-F]+);/);
                 if (entityMatch) {
-                    result += entityMatch[0];  // Preserve entity as-is
+                    const entity = entityMatch[0];
+                    // Decode known HTML entities using the map
+                    if (htmlEntities[entity]) {
+                        result += htmlEntities[entity];
+                    } else {
+                        // Preserve unknown entities as-is
+                        result += entity;
+                    }
                     i += entityMatch[0].length;
                     continue;
                 }
@@ -1148,7 +1155,92 @@
         // Clean up trailing newlines
         html = html.trim();
         
+        // Sanitize HTML to prevent XSS
+        html = sanitizeHtml(html);
+        
         return html;
+    }
+
+    // Simple HTML sanitizer - allows safe tags only
+    function sanitizeHtml(html) {
+        // Allowed tags and attributes
+        const allowedTags = new Set([
+            'p', 'b', 'i', 'em', 'strong', 'a', 'code', 'pre', 'blockquote',
+            'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+            'table', 'thead', 'tbody', 'tr', 'th', 'td', 'img', 'br', 'hr',
+            'del', 'input', 'span', 'div'
+        ]);
+        
+        const allowedAttributes = new Map([
+            ['a', new Set(['href', 'title'])],
+            ['img', new Set(['src', 'alt', 'class', 'data-src'])],
+            ['code', new Set(['class'])],
+            ['th', new Set(['align'])],
+            ['td', new Set(['align'])],
+            ['input', new Set(['type', 'disabled', 'checked'])]
+        ]);
+        
+        // Use DOMParser for safe sanitization
+        try {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // Remove disallowed elements
+            const elements = doc.body.querySelectorAll('*');
+            for (const el of elements) {
+                const tagName = el.tagName.toLowerCase();
+                
+                if (!allowedTags.has(tagName)) {
+                    // Remove element but keep its children (unwrap)
+                    const parent = el.parentNode;
+                    while (el.firstChild) {
+                        parent.insertBefore(el.firstChild, el);
+                    }
+                    parent.removeChild(el);
+                    continue;
+                }
+                
+                // Remove disallowed attributes
+                const allowedAttrs = allowedAttributes.get(tagName) || new Set();
+                const attrsToRemove = [];
+                for (const attr of el.attributes) {
+                    if (!allowedAttrs.has(attr.name.toLowerCase())) {
+                        attrsToRemove.push(attr.name);
+                    }
+                }
+                attrsToRemove.forEach(attrName => el.removeAttribute(attrName));
+                
+                // Sanitize href attributes
+                if (tagName === 'a' && el.hasAttribute('href')) {
+                    const href = el.getAttribute('href');
+                    if (href.startsWith('javascript:') || href.startsWith('data:')) {
+                        el.removeAttribute('href');
+                    }
+                }
+                
+                // Sanitize src attributes
+                if (tagName === 'img' && el.hasAttribute('src')) {
+                    const src = el.getAttribute('src');
+                    if (src.startsWith('javascript:') || src.startsWith('data:')) {
+                        el.removeAttribute('src');
+                    }
+                }
+                
+                // Ensure input type is checkbox for task lists
+                if (tagName === 'input' && el.hasAttribute('type')) {
+                    const type = el.getAttribute('type');
+                    if (type !== 'checkbox') {
+                        el.setAttribute('type', 'checkbox');
+                    }
+                }
+            }
+            
+            return doc.body.innerHTML;
+        } catch (err) {
+            // Fallback: strip all tags if sanitization fails
+            console.warn('HTML sanitization failed, stripping tags:', err);
+            return html.replace(/<[^>]*>/g, '');
+        }
     }
 
     // Parse frontmatter from markdown

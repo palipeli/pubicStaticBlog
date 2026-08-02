@@ -1,7 +1,10 @@
-// lazyload.js - Image Lazy Loading on Hover
-// Handles lazy loading of images when hovered or scrolled into view
+// lazyload.js - Image Lazy Loading
+// Handles lazy loading of images with multiple triggers: hover, touch, intersection, and native loading
 
 (function() {
+    // Track IntersectionObserver instances for cleanup
+    const activeObservers = new Set();
+
     // Initialize lazy loading for all images with data-src attribute
     function initializeLazyLoading() {
         const lazyImages = document.querySelectorAll('img.lazy-image[data-src]');
@@ -12,29 +15,38 @@
 
             img.dataset.lazyInitialized = 'true';
 
-            // Load image on hover (mouseenter)
+            // Add native lazy loading attribute as fallback
+            img.loading = 'lazy';
+
+            // Load image on hover (mouseenter) - desktop
             img.addEventListener('mouseenter', () => {
-                loadImageOnHover(img);
-            });
+                loadImage(img);
+            }, { passive: true });
+
+            // Load image on touchstart - mobile
+            img.addEventListener('touchstart', () => {
+                loadImage(img);
+            }, { passive: true });
 
             // Also load on intersection (when scrolled into view) as a fallback
             if ('IntersectionObserver' in window) {
                 const imgObserver = new IntersectionObserver((entries, observer) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
-                            loadImageOnHover(entry.target);
+                            loadImage(entry.target);
                             observer.unobserve(entry.target);
                         }
                     });
-                }, { rootMargin: '50px 0px' });
+                }, { rootMargin: '10px 0px' });
 
                 imgObserver.observe(img);
+                activeObservers.add(imgObserver);
             }
         });
     }
 
-    // Load image source when triggered (hover or intersection)
-    function loadImageOnHover(img) {
+    // Load image source when triggered
+    function loadImage(img) {
         const dataSrc = img.getAttribute('data-src');
         if (!dataSrc) return;
 
@@ -64,9 +76,19 @@
         };
     }
 
+    // Cleanup all observers (call on page navigation/unload)
+    function cleanupLazyLoading() {
+        activeObservers.forEach(observer => {
+            observer.disconnect();
+        });
+        activeObservers.clear();
+    }
+
     // Expose functions globally
     window.initializeLazyLoading = initializeLazyLoading;
-    window.loadImageOnHover = loadImageOnHover;
+    window.loadImageOnHover = loadImage; // Alias for backward compatibility
+    window.loadImage = loadImage;
+    window.cleanupLazyLoading = cleanupLazyLoading;
 
     // Global initialization on DOMContentLoaded
     if (typeof document !== 'undefined') {

@@ -34,6 +34,7 @@
     --glass-saturate: 1.2;
     --glass-brightness: 1.05;
     --glass-radius: 16px;
+    --glass-pulse-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     
     /* Background Images - Local files */
     --bg-image-dark: url('/media/bg-dark.webp');
@@ -41,10 +42,16 @@
 }
 
 [data-theme="dark"] {
-    --blur-overlay-brightness: 0.3;
-    --dark-overlay-color: rgba(0, 0, 0, 0.92);
+    --bg-dark: #121212;
     --bg-panel: rgba(26, 26, 26, 0.75);
     --bg-header: rgba(18, 18, 18, 0.85);
+    --accent-pink: #ff45fc;
+    --accent-pink-hover: #e031e0;
+    --text-primary: #ffffff;
+    --text-secondary: #9a9a9a;
+    --border-color: rgba(255, 255, 255, 0.12);
+    --blur-overlay-brightness: 0.3;
+    --dark-overlay-color: rgba(0, 0, 0, 0.92);
     --btn-bg: rgba(26, 26, 26, 0.6);
     --btn-text: #ffffff;
     --btn-border: rgba(255, 255, 255, 0.2);
@@ -56,10 +63,7 @@
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
     --glass-blur: 0px;
     --glass-brightness: 0.92;
-    
-    /* Background Images - Local files */
-    --bg-image-dark: url('/media/bg-dark.webp');
-    --bg-image-light: url('/media/bg-light.webp');
+    --glass-pulse-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 [data-theme="light"] {
@@ -502,11 +506,12 @@ body {
     transform: translate(-100%, -50%) scale(0.95);
 }
 
-/* Hide toggle button when sidebar is collapsed on mobile */
+/* Always show toggle button on mobile - it's the only way to access sidebar */
 @media (max-width: 768px) {
-    .sidebar.collapsed .sidebar-toggle {
-        opacity: 0;
-        pointer-events: none;
+    .sidebar-toggle {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        visibility: visible !important;
     }
 }
 
@@ -2463,14 +2468,7 @@ footer p {
     }
     50% {
         opacity: 0.95;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    }
-}
-
-[data-theme="dark"] @keyframes glassPulse {
-    50% {
-        opacity: 0.95;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        box-shadow: var(--glass-pulse-shadow, 0 4px 16px rgba(0, 0, 0, 0.08));
     }
 }
 

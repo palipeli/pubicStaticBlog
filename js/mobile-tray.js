@@ -341,17 +341,15 @@
             });
         });
         
-        // Also listen for when blog metadata is loaded to render mobile post list
-        // This ensures the mobile tray can access window.blogPostMetadata once it's available
-        const checkAndRenderPosts = setInterval(() => {
-            if (typeof window.blogPostMetadata !== 'undefined' && window.blogPostMetadata.length > 0) {
-                updateBlogPostsVisibility();
-                clearInterval(checkAndRenderPosts);
-            }
-        }, 100);
+        // Listen for blog metadata loaded event (event-driven instead of polling)
+        document.addEventListener('blog:metadata-loaded', () => {
+            updateBlogPostsVisibility();
+        });
         
-        // Clear interval after 5 seconds to avoid infinite checking
-        setTimeout(() => clearInterval(checkAndRenderPosts), 5000);
+        // Also check if metadata is already loaded (e.g., on page refresh)
+        if (typeof window.blogPostMetadata !== 'undefined' && window.blogPostMetadata.length > 0) {
+            updateBlogPostsVisibility();
+        }
     }
     
     // Start initialization

@@ -4,14 +4,13 @@
 (function() {
     'use strict';
 
-    // Constants
-    const STATE_STORAGE_KEY = 'blogPlatformState';
-    const STATE_SAVE_DELAY = 100;
-    const STATE_AUTO_SAVE_INTERVAL = 30000;
-    const BLOG_POST_RESTORE_DELAY = 300;
-
-    // Selectors
-    const SELECTORS = {
+    // Use shared config constants
+    const CONFIG = window.CONFIG || {};
+    const STATE_STORAGE_KEY = CONFIG.STATE_STORAGE_KEY || 'blogPlatformState';
+    const STATE_SAVE_DELAY = CONFIG.STATE_SAVE_DELAY || 500;
+    const STATE_AUTO_SAVE_INTERVAL = CONFIG.STATE_AUTO_SAVE_INTERVAL || 30000;
+    const BLOG_POST_RESTORE_DELAY = CONFIG.BLOG_POST_RESTORE_DELAY || 300;
+    const SELECTORS = CONFIG.SELECTORS || {
         ACTIVE_SECTION: '.page-section.active',
         POST_SELECTOR_ITEM: '.post-selector-item',
         THEME_BTN: '.theme-btn',
@@ -80,7 +79,18 @@
             localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(currentState));
             console.log('App state saved:', currentState);
         } catch (err) {
-            console.warn('Failed to save app state:', err);
+            if (err.name === 'QuotaExceededError') {
+                // Clear old state and retry
+                localStorage.removeItem(STATE_STORAGE_KEY);
+                try {
+                    localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(currentState));
+                    console.log('App state saved after clearing quota:', currentState);
+                } catch (e) {
+                    console.warn('State save failed: storage full');
+                }
+            } else {
+                console.warn('Failed to save app state:', err);
+            }
         }
     }
 
