@@ -1546,7 +1546,7 @@ body {
 }
 
 .blog-btn i {
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
 
 /* Category-specific button colors */
@@ -1606,6 +1606,33 @@ body {
 }
 .blog-btn.category-monitoring:hover {
     box-shadow: 0 6px 20px rgba(93, 191, 191, 0.6);
+}
+
+/* Discord button */
+.blog-btn.category-discord {
+    background: linear-gradient(135deg, #5865F2 0%, #4752C4 100%);
+    box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);
+}
+.blog-btn.category-discord:hover {
+    box-shadow: 0 6px 20px rgba(88, 101, 242, 0.6);
+}
+
+/* GitHub button */
+.blog-btn.category-github {
+    background: linear-gradient(135deg, #333 0%, #24292e 100%);
+    box-shadow: 0 4px 15px rgba(51, 51, 51, 0.4);
+}
+.blog-btn.category-github:hover {
+    box-shadow: 0 6px 20px rgba(51, 51, 51, 0.6);
+}
+
+/* YouTube button */
+.blog-btn.category-youtube {
+    background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+    box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+}
+.blog-btn.category-youtube:hover {
+    box-shadow: 0 6px 20px rgba(255, 0, 0, 0.6);
 }
 
 @keyframes rippleEffect {
