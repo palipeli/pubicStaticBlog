@@ -236,6 +236,20 @@
         }
     }
 
+    // Preload next post content when hovering over the Next button
+    function preloadNextPostOnHover() {
+        const activeItem = document.querySelector('.post-selector-item.active');
+        if (!activeItem) return;
+        
+        const currentPostId = activeItem.getAttribute('data-post-id');
+        const nextPostId = getNextPostId(currentPostId);
+        
+        if (nextPostId) {
+            // Preload the next post content
+            window.preloadBlogPostContent(nextPostId);
+        }
+    }
+
     // Open a blog post with lazy loading (new approach - loads content on demand)
     async function openBlogPostLazy(id) {
         // Show loading state first
@@ -366,6 +380,22 @@
     // Go back from blog intro page
     function goBackFromBlogIntro() {
         goBack();
+    }
+
+    // Preload previous page content when hovering over the Back button
+    function preloadPreviousPageOnHover() {
+        if (navigationHistory.length === 0) return;
+        
+        const previousState = navigationHistory[navigationHistory.length - 1];
+        
+        if (previousState === 'blog-intro') {
+            // No need to preload for blog intro, it's already rendered
+            return;
+        } else if (typeof previousState === 'string' && !previousState.startsWith('http')) {
+            // Previous state is a post ID - preload that post
+            window.preloadBlogPostContent(previousState);
+        }
+        // For 'home' and 'about' pages, no specific content to preload
     }
 
     // Go back to previous page using navigation history
@@ -505,4 +535,6 @@
     window.updateBlogIntroBackButton = updateBlogIntroBackButton;
     window.waitForBlogMetadata = waitForBlogMetadata;
     window.goToNextPost = goToNextPost;
+    window.preloadNextPostOnHover = preloadNextPostOnHover;
+    window.preloadPreviousPageOnHover = preloadPreviousPageOnHover;
 })();
