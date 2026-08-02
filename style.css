@@ -650,7 +650,6 @@ body {
 }
 
 .theme-btn {
-    background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 12px 15px;
@@ -663,24 +662,47 @@ body {
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
-[data-theme="light"] .theme-btn {
+/* Individual theme button styling - Auto button */
+.theme-btn[data-theme="auto"] {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="light"] .theme-btn[data-theme="auto"] {
     background: rgba(0, 0, 0, 0.03);
 }
 
-[data-theme="dark"] .theme-btn {
+[data-theme="dark"] .theme-btn[data-theme="auto"] {
     background: rgba(255, 255, 255, 0.03);
 }
 
 @media (prefers-color-scheme: light) {
-    [data-theme="auto"] .theme-btn {
+    [data-theme="auto"] .theme-btn[data-theme="auto"] {
         background: rgba(0, 0, 0, 0.03);
     }
 }
 
 @media (prefers-color-scheme: dark) {
-    [data-theme="auto"] .theme-btn {
+    [data-theme="auto"] .theme-btn[data-theme="auto"] {
         background: rgba(255, 255, 255, 0.03);
     }
+}
+
+/* Individual theme button styling - Light button */
+.theme-btn[data-theme="light"] {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="dark"] .theme-btn[data-theme="light"] {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* Individual theme button styling - Dark button */
+.theme-btn[data-theme="dark"] {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="light"] .theme-btn[data-theme="dark"] {
+    background: rgba(0, 0, 0, 0.03);
 }
 
 .theme-btn:hover {
