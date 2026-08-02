@@ -722,6 +722,35 @@ body {
     transform: translateX(-5px);
 }
 
+/* Blog Post Navigation (Back + Next buttons) */
+.blog-post-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+.next-post-btn {
+    background: var(--btn-bg);
+    border: 1px solid var(--btn-border);
+    color: var(--btn-text);
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+    letter-spacing: 0.5px;
+    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    text-transform: none;
+}
+
+.next-post-btn:hover {
+    background: var(--btn-hover-bg);
+    transform: translateX(5px);
+}
+
 /* Blog Introduction View */
 .blog-intro-view {
     width: 100%;

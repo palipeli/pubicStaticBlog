@@ -208,6 +208,34 @@
     // Track navigation history for back button
     const navigationHistory = [];
 
+    // Get the next post ID based on current post (posts are sorted by date descending)
+    function getNextPostId(currentPostId) {
+        const currentIndex = blogPostMetadata.findIndex(p => p.id === currentPostId);
+        if (currentIndex === -1) return null;
+        // Since posts are sorted newest first, "next" means older post (higher index)
+        if (currentIndex + 1 < blogPostMetadata.length) {
+            return blogPostMetadata[currentIndex + 1].id;
+        }
+        return null;
+    }
+
+    // Navigate to the next post
+    async function goToNextPost() {
+        const activeItem = document.querySelector('.post-selector-item.active');
+        if (!activeItem) return;
+        
+        const currentPostId = activeItem.getAttribute('data-post-id');
+        const nextPostId = getNextPostId(currentPostId);
+        
+        if (nextPostId) {
+            // Push current post to navigation history before navigating
+            navigationHistory.push(currentPostId);
+            
+            // Open the next post
+            await window.openBlogPostLazy(nextPostId);
+        }
+    }
+
     // Open a blog post with lazy loading (new approach - loads content on demand)
     async function openBlogPostLazy(id) {
         // Show loading state first
@@ -290,6 +318,13 @@
             // Initialize lazy loading for images in the rendered content
             if (typeof window.initializeLazyLoading === 'function') {
                 window.initializeLazyLoading();
+            }
+
+            // Show/hide Next button based on whether there's a next post
+            const nextPostBtn = document.getElementById('next-post-btn');
+            if (nextPostBtn) {
+                const nextPostId = getNextPostId(id);
+                nextPostBtn.style.display = nextPostId ? 'inline-block' : 'none';
             }
         });
 
@@ -410,6 +445,13 @@
                         window.initializeLazyLoading();
                     }
                     
+                    // Show/hide Next button based on whether there's a next post
+                    const nextPostBtn = document.getElementById('next-post-btn');
+                    if (nextPostBtn) {
+                        const nextPostId = getNextPostId(previousState);
+                        nextPostBtn.style.display = nextPostId ? 'inline-block' : 'none';
+                    }
+                    
                     // Update URL hash with the restored post (don't add to history)
                     if (typeof window.updateHash === 'function') {
                         window.updateHash('', previousState, false);
@@ -462,4 +504,5 @@
     window.goBackFromBlogIntro = goBackFromBlogIntro;
     window.updateBlogIntroBackButton = updateBlogIntroBackButton;
     window.waitForBlogMetadata = waitForBlogMetadata;
+    window.goToNextPost = goToNextPost;
 })();
