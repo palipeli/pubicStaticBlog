@@ -705,30 +705,56 @@ body {
     background: rgba(0, 0, 0, 0.03);
 }
 
+[data-theme="dark"] .theme-btn[data-theme="dark"] {
+    background: rgba(255, 255, 255, 0.03);
+}
+
 .theme-btn:hover {
     background: rgba(255, 255, 255, 0.06);
     border-color: var(--accent-pink);
     transform: translateX(-5px);
 }
 
-[data-theme="dark"] .theme-btn:hover {
+[data-theme="dark"] .theme-btn[data-theme="auto"]:hover {
     background: rgba(255, 255, 255, 0.06);
 }
 
-[data-theme="light"] .theme-btn:hover {
+[data-theme="light"] .theme-btn[data-theme="auto"]:hover {
     background: rgba(0, 0, 0, 0.06);
 }
 
 @media (prefers-color-scheme: light) {
-    [data-theme="auto"] .theme-btn:hover {
+    [data-theme="auto"] .theme-btn[data-theme="auto"]:hover {
         background: rgba(0, 0, 0, 0.06);
     }
 }
 
 @media (prefers-color-scheme: dark) {
-    [data-theme="auto"] .theme-btn:hover {
+    [data-theme="auto"] .theme-btn[data-theme="auto"]:hover {
         background: rgba(255, 255, 255, 0.06);
     }
+}
+
+/* Light button hover */
+.theme-btn[data-theme="light"]:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] .theme-btn[data-theme="light"]:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* Dark button hover */
+.theme-btn[data-theme="dark"]:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="light"] .theme-btn[data-theme="dark"]:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] .theme-btn[data-theme="dark"]:hover {
+    background: rgba(255, 255, 255, 0.06);
 }
 
 .theme-btn.active {
@@ -1817,7 +1843,6 @@ body {
 }
 
 .mobile-theme-btn {
-    background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 12px 15px;
@@ -1831,24 +1856,51 @@ body {
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
-[data-theme="light"] .mobile-theme-btn {
+/* Individual mobile theme button styling - Auto button */
+.mobile-theme-btn[data-theme="auto"] {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="light"] .mobile-theme-btn[data-theme="auto"] {
     background: rgba(0, 0, 0, 0.03);
 }
 
-[data-theme="dark"] .mobile-theme-btn {
+[data-theme="dark"] .mobile-theme-btn[data-theme="auto"] {
     background: rgba(255, 255, 255, 0.03);
 }
 
 @media (prefers-color-scheme: light) {
-    [data-theme="auto"] .mobile-theme-btn {
+    [data-theme="auto"] .mobile-theme-btn[data-theme="auto"] {
         background: rgba(0, 0, 0, 0.03);
     }
 }
 
 @media (prefers-color-scheme: dark) {
-    [data-theme="auto"] .mobile-theme-btn {
+    [data-theme="auto"] .mobile-theme-btn[data-theme="auto"] {
         background: rgba(255, 255, 255, 0.03);
     }
+}
+
+/* Individual mobile theme button styling - Light button */
+.mobile-theme-btn[data-theme="light"] {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="dark"] .mobile-theme-btn[data-theme="light"] {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* Individual mobile theme button styling - Dark button */
+.mobile-theme-btn[data-theme="dark"] {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+[data-theme="light"] .mobile-theme-btn[data-theme="dark"] {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="dark"] .mobile-theme-btn[data-theme="dark"] {
+    background: rgba(255, 255, 255, 0.03);
 }
 
 .mobile-theme-btn:hover {
@@ -1857,24 +1909,46 @@ body {
     transform: translateX(-5px);
 }
 
-[data-theme="dark"] .mobile-theme-btn:hover {
+[data-theme="dark"] .mobile-theme-btn[data-theme="auto"]:hover {
     background: rgba(255, 255, 255, 0.06);
 }
 
-[data-theme="light"] .mobile-theme-btn:hover {
+[data-theme="light"] .mobile-theme-btn[data-theme="auto"]:hover {
     background: rgba(0, 0, 0, 0.06);
 }
 
 @media (prefers-color-scheme: light) {
-    [data-theme="auto"] .mobile-theme-btn:hover {
+    [data-theme="auto"] .mobile-theme-btn[data-theme="auto"]:hover {
         background: rgba(0, 0, 0, 0.06);
     }
 }
 
 @media (prefers-color-scheme: dark) {
-    [data-theme="auto"] .mobile-theme-btn:hover {
+    [data-theme="auto"] .mobile-theme-btn[data-theme="auto"]:hover {
         background: rgba(255, 255, 255, 0.06);
     }
+}
+
+/* Light button hover */
+.mobile-theme-btn[data-theme="light"]:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] .mobile-theme-btn[data-theme="light"]:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* Dark button hover */
+.mobile-theme-btn[data-theme="dark"]:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="light"] .mobile-theme-btn[data-theme="dark"]:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="dark"] .mobile-theme-btn[data-theme="dark"]:hover {
+    background: rgba(255, 255, 255, 0.06);
 }
 
 .mobile-theme-btn.active {
