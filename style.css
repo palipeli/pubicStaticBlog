@@ -1520,7 +1520,7 @@ body {
 .blog-btn {
     font-size: 0.7rem; /* Reduced from 0.8rem */
     padding: 8px 15px; /* Reduced from 15px 25px */
-    background: transparent;
+    background: rgba(255, 255, 255, 0.1);
     color: white;
     display: inline-flex;
     align-items: center;
@@ -1529,7 +1529,7 @@ body {
     border-radius: 4px;
     transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease, background 0.25s ease;
     box-shadow: 0 4px 15px rgba(71, 114, 179, 0.4);
-    border: 2px solid var(--accent-pink);
+    border: 1px solid var(--accent-pink);
     cursor: pointer;
     font-weight: 600;
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
@@ -1538,7 +1538,7 @@ body {
 .blog-btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 20px rgba(71, 114, 179, 0.6);
-    background: rgba(255, 107, 107, 0.2);
+    background: rgba(255, 107, 107, 0.3);
 }
 
 .blog-btn:active {
@@ -1549,99 +1549,109 @@ body {
     font-size: 1.2rem;
 }
 
-/* Category-specific button colors - transparent with colored borders */
+/* Category-specific button colors - with colored backgrounds */
 .blog-btn.category-tutorial {
     border-color: #28a745;
+    background: rgba(40, 167, 69, 0.3);
     box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
 }
 .blog-btn.category-tutorial:hover {
-    background: rgba(40, 167, 69, 0.2);
+    background: rgba(40, 167, 69, 0.5);
     box-shadow: 0 6px 20px rgba(40, 167, 69, 0.6);
 }
 
 .blog-btn.category-blog {
     border-color: #3584e4;
+    background: rgba(53, 132, 228, 0.3);
     box-shadow: 0 4px 15px rgba(53, 132, 228, 0.2);
 }
 .blog-btn.category-blog:hover {
-    background: rgba(53, 132, 228, 0.2);
+    background: rgba(53, 132, 228, 0.5);
     box-shadow: 0 6px 20px rgba(53, 132, 228, 0.3);
 }
 
 .blog-btn.category-technology {
     border-color: #e83e8c;
+    background: rgba(232, 62, 140, 0.3);
     box-shadow: 0 4px 15px rgba(232, 62, 140, 0.4);
 }
 .blog-btn.category-technology:hover {
-    background: rgba(232, 62, 140, 0.2);
+    background: rgba(232, 62, 140, 0.5);
     box-shadow: 0 6px 20px rgba(232, 62, 140, 0.6);
 }
 
 .blog-btn.category-legal {
     border-color: #6c757d;
+    background: rgba(108, 117, 125, 0.3);
     box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
 }
 .blog-btn.category-legal:hover {
-    background: rgba(108, 117, 125, 0.2);
+    background: rgba(108, 117, 125, 0.5);
     box-shadow: 0 6px 20px rgba(108, 117, 125, 0.6);
 }
 
 /* Fun category (cat pictures button) */
 .blog-btn.category-fun {
     border-color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.3);
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
 }
 .blog-btn.category-fun:hover {
-    background: rgba(255, 107, 107, 0.2);
+    background: rgba(255, 107, 107, 0.5);
     box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
 }
 
 /* My Blog button - Pastel Teal */
 .blog-btn.category-blog-home {
     border-color: #5DBFBF;
+    background: rgba(93, 191, 191, 0.3);
     box-shadow: 0 4px 15px rgba(93, 191, 191, 0.4);
 }
 .blog-btn.category-blog-home:hover {
-    background: rgba(93, 191, 191, 0.2);
+    background: rgba(93, 191, 191, 0.5);
     box-shadow: 0 6px 20px rgba(93, 191, 191, 0.6);
 }
 
 .blog-btn.category-monitoring {
     border-color: #5DBFBF;
+    background: rgba(93, 191, 191, 0.3);
     box-shadow: 0 4px 15px rgba(93, 191, 191, 0.4);
 }
 .blog-btn.category-monitoring:hover {
-    background: rgba(93, 191, 191, 0.2);
+    background: rgba(93, 191, 191, 0.5);
     box-shadow: 0 6px 20px rgba(93, 191, 191, 0.6);
 }
 
 /* Discord button */
 .blog-btn.category-discord {
     border-color: #5865F2;
+    background: rgba(88, 101, 242, 0.3);
     box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);
 }
 .blog-btn.category-discord:hover {
-    background: rgba(88, 101, 242, 0.2);
+    background: rgba(88, 101, 242, 0.5);
     box-shadow: 0 6px 20px rgba(88, 101, 242, 0.6);
 }
 
 /* GitHub button */
 .blog-btn.category-github {
     border-color: #333;
+    background: rgba(51, 51, 51, 0.3);
     box-shadow: 0 4px 15px rgba(51, 51, 51, 0.4);
 }
 .blog-btn.category-github:hover {
-    background: rgba(51, 51, 51, 0.2);
+    background: rgba(51, 51, 51, 0.5);
     box-shadow: 0 6px 20px rgba(51, 51, 51, 0.6);
 }
 
 /* YouTube button */
 .blog-btn.category-youtube {
     border-color: #FF0000;
+    background: rgba(255, 0, 0, 0.3);
     box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
 }
 .blog-btn.category-youtube:hover {
-    background: rgba(255, 0, 0, 0.2);
+    background: rgba(255, 0, 0, 0.5);
     box-shadow: 0 6px 20px rgba(255, 0, 0, 0.6);
 }
 
