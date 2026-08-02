@@ -663,6 +663,10 @@ body {
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
+[data-theme="light"] .theme-btn {
+    background: rgba(0, 0, 0, 0.03);
+}
+
 .theme-btn:hover {
     background: rgba(255, 255, 255, 0.06);
     border-color: var(--accent-pink);
@@ -671,6 +675,10 @@ body {
 
 [data-theme="dark"] .theme-btn:hover {
     background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="light"] .theme-btn:hover {
+    background: rgba(0, 0, 0, 0.06);
 }
 
 .theme-btn.active {
@@ -1773,10 +1781,18 @@ body {
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
+[data-theme="light"] .mobile-theme-btn {
+    background: rgba(0, 0, 0, 0.03);
+}
+
 .mobile-theme-btn:hover {
     background: rgba(255, 255, 255, 0.06);
     border-color: var(--accent-pink);
     transform: translateX(-5px);
+}
+
+[data-theme="light"] .mobile-theme-btn:hover {
+    background: rgba(0, 0, 0, 0.06);
 }
 
 .mobile-theme-btn.active {
