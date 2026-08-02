@@ -1856,7 +1856,7 @@ body.mobile-tray-open {
 
 /* Footer Styles */
 footer {
-    background: transparent;
+    background: transparent !important;
     border: none;
     padding: 12px 20px;
     text-align: center;
@@ -1871,7 +1871,7 @@ footer p {
 }
 
 .home-page-footer {
-    background: transparent;
+    background: transparent !important;
     border: none;
 }
 
@@ -1880,6 +1880,14 @@ footer p {
     color: var(--text-secondary);
     font-size: 10px;
     line-height: 1.5;
+}
+
+/* Ensure footers inside about-hero and blog-article are completely transparent */
+.about-hero footer,
+.about-hero .home-page-footer,
+.blog-article footer,
+.blog-article .home-page-footer {
+    background: transparent !important;
 }
 
 /* Loading Spinner Animation for Lazy Loading */
