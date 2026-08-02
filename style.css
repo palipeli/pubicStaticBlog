@@ -1856,9 +1856,7 @@ body.mobile-tray-open {
 
 /* Footer Styles */
 footer {
-    background: var(--bg-panel);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
+    background: transparent;
     border-top: 1px solid var(--border-color);
     padding: 12px 20px;
     text-align: center;
@@ -1870,6 +1868,10 @@ footer p {
     color: var(--text-secondary);
     font-size: 10px;
     line-height: 1.5;
+}
+
+.home-page-footer {
+    background: transparent;
 }
 
 .home-page-footer p {
