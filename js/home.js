@@ -3,6 +3,27 @@
 
 (function() {
 
+    const homePageFooter = `
+        <footer>
+            <p style="font-size:0.8rem;">What the fuck are you looking at? All the contents are above, but thanks for looking at though!</p>
+            <p style="font-size:0.7rem; color:#666;">Idjen Boulevard No.48, Kota Malang 65112, Indonesia.</p>
+            <p style="font-size:0.7rem; color:#666;">sel@kamikami.eu.</p>
+            <p style="font-size:0.7rem; color:#666;">Copyright © Michelle, 2026</p>
+        </footer>
+    `;
+
+    function appendHomePageFooter() {
+        const homeHero = document.getElementById('home-hero-content');
+        if (!homeHero || homeHero.querySelector('.home-page-footer')) return;
+
+        const footer = document.createElement('div');
+        footer.innerHTML = homePageFooter;
+        footer.firstElementChild.className = 'home-page-footer';
+        homeHero.appendChild(footer.firstElementChild);
+    }
+
+    appendHomePageFooter();
+
     // Render blog buttons on home page with lazy loading support (new version)
     function renderBlogButtonsLazy(posts) {
         const container = document.getElementById('blog-buttons-container');

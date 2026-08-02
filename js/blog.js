@@ -196,9 +196,18 @@
     }
 
 
+    const blogPostFooter = `
+        <footer>
+            <p style="font-size:0.8rem;">What the fuck are you looking at? All the contents are above, but thanks for looking at though!</p>
+            <p style="font-size:0.7rem; color:#666;">Idjen Boulevard No.48, Kota Malang 65112, Indonesia.</p>
+            <p style="font-size:0.7rem; color:#666;">sel@kamikami.eu.</p>
+            <p style="font-size:0.7rem; color:#666;">Copyright © Michelle, 2026</p>
+        </footer>
+    `;
+
     // Track navigation history for back button
     const navigationHistory = [];
-    
+
     // Open a blog post with lazy loading (new approach - loads content on demand)
     async function openBlogPostLazy(id) {
         // Show loading state first
@@ -275,6 +284,7 @@
                     <span style="margin-left: 15px;">${post.category}</span>
                 </div>
                 <div class="blog-post-content">${post.htmlContent}</div>
+                ${blogPostFooter}
             `;
 
             // Initialize lazy loading for images in the rendered content
@@ -388,8 +398,9 @@
                             <span style="margin-left: 15px;">${post.category}</span>
                         </div>
                         <div class="blog-post-content">${post.htmlContent}</div>
+                        ${blogPostFooter}
                     `;
-                    
+
                     // Update active state in sidebar
                     document.querySelectorAll('.post-selector-item').forEach((item, index) => {
                         item.classList.toggle('active', blogPostMetadata[index]?.id === previousState);
