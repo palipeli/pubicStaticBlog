@@ -299,9 +299,6 @@
         if (previousPage) {
             navigationHistory.push(previousPage);
         }
-        
-        // Update the visibility of back button on blog intro based on history
-        updateBlogIntroBackButton();
 
         // Update active state in sidebar (use window.blogPostMetadata to ensure we have latest data)
         document.querySelectorAll('.post-selector-item').forEach((item) => {
@@ -384,20 +381,6 @@
             };
             checkMetadata();
         });
-    }
-    
-    // Update the visibility of the back button on blog intro page
-    function updateBlogIntroBackButton() {
-        const backBtn = document.getElementById('blog-intro-back-btn');
-        if (backBtn) {
-            // Show back button only if there's navigation history
-            backBtn.style.display = navigationHistory.length > 0 ? 'inline-block' : 'none';
-        }
-    }
-    
-    // Go back from blog intro page
-    function goBackFromBlogIntro() {
-        goBack();
     }
 
     // Preload previous post content when hovering over the Back button
@@ -509,9 +492,6 @@
         // Render the blog post selector grid
         renderBlogPostSelectorGrid(blogPostMetadata);
 
-        // Update back button visibility
-        updateBlogIntroBackButton();
-
         // Update URL hash (don't add to history when showing intro)
         if (typeof window.updateHash === 'function') {
             window.updateHash('blogs', null, false);
@@ -530,8 +510,6 @@
     window.openBlogPostLazy = openBlogPostLazy;
     window.showBlogIntro = showBlogIntro;
     window.goBack = goBack;
-    window.goBackFromBlogIntro = goBackFromBlogIntro;
-    window.updateBlogIntroBackButton = updateBlogIntroBackButton;
     window.waitForBlogMetadata = waitForBlogMetadata;
     window.goToNextPost = goToNextPost;
     window.preloadNextPostOnHover = preloadNextPostOnHover;
