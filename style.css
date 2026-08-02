@@ -1277,7 +1277,7 @@ body {
     -webkit-backdrop-filter: blur(0px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 40px;
+    padding: 20px;
 }
 
 .profile-img {
@@ -1831,15 +1831,16 @@ footer {
     backdrop-filter: blur(0px);
     -webkit-backdrop-filter: blur(0px);
     border-top: 1px solid var(--border-color);
-    padding: 30px 20px;
+    padding: 10px 20px;
     text-align: center;
     margin-top: 40px;
 }
 
 footer p {
-    margin: 8px 0;
+    margin: 1px 0;
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: 10px;
+    line-height: 1.15;
 }
 
 /* Loading Spinner Animation for Lazy Loading */
