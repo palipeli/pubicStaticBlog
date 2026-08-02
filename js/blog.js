@@ -205,9 +205,6 @@
         </footer>
     `;
 
-    // Track navigation history for back button
-    const navigationHistory = [];
-
     // Get the next post ID based on current post (posts are sorted by date descending)
     function getNextPostId(currentPostId) {
         const currentIndex = blogPostMetadata.findIndex(p => p.id === currentPostId);
@@ -239,9 +236,6 @@
         const nextPostId = getNextPostId(currentPostId);
         
         if (nextPostId) {
-            // Push current post to navigation history before navigating
-            navigationHistory.push(currentPostId);
-            
             // Open the next post
             await window.openBlogPostLazy(nextPostId);
         }
@@ -293,11 +287,6 @@
                     previousPage = 'blog-intro';
                 }
             }
-        }
-        
-        // Push previous state to navigation history
-        if (previousPage) {
-            navigationHistory.push(previousPage);
         }
 
         // Update active state in sidebar (use window.blogPostMetadata to ensure we have latest data)
