@@ -16,6 +16,7 @@ Top-level files:
 * `index.html`: Main HTML entry point defining SPA section containers and script loading order.
 * `style.css`: Global design system, GNOME Adwaita dark/light themes, and CSS custom variables.
 * `warning.js`: Flashing lights warning consent modal overlay and user interaction listeners.
+* `sw.js`: Service Worker for static asset caching, offline support, and background prefetching.
 * `README.md`: High-level project summary, features, and deployment overview.
 * `LICENSE`: GNU General Public License v3.0 (`GPL-3.0`) legal text.
 
@@ -115,6 +116,27 @@ graph TD
 6. **Mobile Tray (`js/mobile-tray.js`)**: Responsive navigation drawer for viewports <= 768px.
 7. **Devotional (`js/devotional.js`)**: Lazy loads compact Bible verse dataset (`nt_verses_compact.json`)
    and executes requestAnimationFrame typing animations upon consent clearance.
+8. **Lazy Loading (`js/lazyload.js`)**: IntersectionObserver + hover-based image lazy loading.
+9. **Home Page (`js/home.js`)**: Renders blog buttons (Michelle DNS, Privacy Policy, My Blog, Monitoring)
+   and legacy home page functions.
+10. **Warning System (`warning.js`)**: Flashing lights consent overlay with localStorage persistence.
+11. **Service Worker (`sw.js`)**: Static asset caching with multiple strategies (cache-first,
+    network-first, stale-while-revalidate), offline fallback, background prefetching of
+    background images and blog content via postMessage, and periodic cache cleanup.
+
+### Module Load Order (from index.html)
+```
+1. markdown.js   - GFM parser (no dependencies)
+2. lazyload.js   - Image lazy loading (no dependencies)
+3. state.js      - State persistence (no dependencies)
+4. devotional.js - Bible verses + typing animations (no dependencies)
+5. ui.js         - Navigation, themes, particles (depends on markdown, state)
+6. blog.js       - Blog engine, lazy loading, rendering (depends on markdown, state, ui)
+7. home.js       - Home page blog buttons (depends on blog, ui)
+8. mobile-tray.js - Mobile navigation (independent, loads without defer)
+9. warning.js    - Consent overlay (independent, loads without defer)
+10. app.js       - Entry point (depends on all above)
+```
 
 ## Testing Strategy
 
@@ -127,22 +149,6 @@ graph TD
 2. **Automated Unit Testing**
    > TODO: Configure unit testing framework (e.g., Vitest or Jest) to test `parseMarkdown()`.
 
-3. **Integration & E2E Testing**
-   > TODO: Configure E2E test runner (e.g., Playwright) for testing post navigation and state.
-
-4. **Continuous Integration Pipeline**
-   > TODO: Set up GitHub Actions CI workflow to execute syntax check on pull requests.
-
-## Security & Compliance
-
-1. **Secrets Handling**: Pure client-side static application. No private API keys or credentials
-   should ever be committed to this repository.
-2. **Dependencies & CDNs**: Loads third-party font resources over HTTPS (Google Fonts, FontAwesome).
-   Zero npm package runtime dependencies.
-3. **HTML Sanitization & Escaping**: Markdown parser implements `escapeHtml` for raw text nodes
-   to mitigate script injection risks while rendering post HTML.
-4. **License**: Distributed under the terms of the GNU General Public License v3.0 (`GPL-3.0`).
-
 ## Agent Guardrails
 
 1. **Protected Files**: Do not modify `LICENSE` or alter `blog/posts.json` schema without
@@ -151,10 +157,14 @@ graph TD
    * `#blog-intro-view`, `#blog-post-view`, `#blog-article-content`
    * `#post-selector-list`, `#blog-post-selector-grid`, `#blog-buttons-container`
    * `#particles`, `#sidebar`, `#sidebar-toggle`, `#consent-overlay`
+   * `#home-hero-content`, `#home`, `#blogs`, `#about`
+   * `#mobile-nav-tray`, `#mobile-tray-overlay`, `#mobile-tray-toggle`
 3. **Asynchronous Lazy Loading**: Always preserve lazy loading mechanisms (`openBlogPostLazy`,
    `preloadBlogPostContent`, `initializeLazyLoading`) over synchronous eager loading.
 4. **Mandatory Post-Edit Verification**: Always run `node -c js/*.js warning.js` after modifying
    any JavaScript file to ensure syntactical validity.
+5. **Module Dependencies**: Respect the load order in `index.html` - modules loaded earlier
+   cannot depend on modules loaded later.
 
 ## Extensibility Hooks
 
