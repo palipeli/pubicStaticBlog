@@ -20,14 +20,13 @@ build/
 target/
 .gradle/
 
-# Editor/IDE files
+# Editors/IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*.tmp
 
-# System files
+# System/Environment
 .DS_Store
 Thumbs.db
 .env
