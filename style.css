@@ -701,12 +701,12 @@ body {
     background: rgba(255, 255, 255, 0.03);
 }
 
-[data-theme="light"] .theme-btn[data-theme="dark"] {
-    background: rgba(0, 0, 0, 0.03) !important;
+html[data-theme="light"] .theme-btn[data-theme="dark"] {
+    background: rgba(0, 0, 0, 0.03);
 }
 
-[data-theme="dark"] .theme-btn[data-theme="dark"] {
-    background: rgba(255, 255, 255, 0.03) !important;
+html[data-theme="dark"] .theme-btn[data-theme="dark"] {
+    background: rgba(255, 255, 255, 0.03);
 }
 
 .theme-btn:hover {
@@ -749,12 +749,12 @@ body {
     background: rgba(255, 255, 255, 0.06);
 }
 
-[data-theme="light"] .theme-btn[data-theme="dark"]:hover {
-    background: rgba(0, 0, 0, 0.06) !important;
+html[data-theme="light"] .theme-btn[data-theme="dark"]:hover {
+    background: rgba(0, 0, 0, 0.06);
 }
 
-[data-theme="dark"] .theme-btn[data-theme="dark"]:hover {
-    background: rgba(255, 255, 255, 0.06) !important;
+html[data-theme="dark"] .theme-btn[data-theme="dark"]:hover {
+    background: rgba(255, 255, 255, 0.06);
 }
 
 .theme-btn.active {
@@ -1895,12 +1895,12 @@ body {
     background: rgba(255, 255, 255, 0.03);
 }
 
-[data-theme="light"] .mobile-theme-btn[data-theme="dark"] {
-    background: rgba(0, 0, 0, 0.03) !important;
+html[data-theme="light"] .mobile-theme-btn[data-theme="dark"] {
+    background: rgba(0, 0, 0, 0.03);
 }
 
-[data-theme="dark"] .mobile-theme-btn[data-theme="dark"] {
-    background: rgba(255, 255, 255, 0.03) !important;
+html[data-theme="dark"] .mobile-theme-btn[data-theme="dark"] {
+    background: rgba(255, 255, 255, 0.03);
 }
 
 .mobile-theme-btn:hover {
@@ -1943,12 +1943,12 @@ body {
     background: rgba(255, 255, 255, 0.06);
 }
 
-[data-theme="light"] .mobile-theme-btn[data-theme="dark"]:hover {
-    background: rgba(0, 0, 0, 0.06) !important;
+html[data-theme="light"] .mobile-theme-btn[data-theme="dark"]:hover {
+    background: rgba(0, 0, 0, 0.06);
 }
 
-[data-theme="dark"] .mobile-theme-btn[data-theme="dark"]:hover {
-    background: rgba(255, 255, 255, 0.06) !important;
+html[data-theme="dark"] .mobile-theme-btn[data-theme="dark"]:hover {
+    background: rgba(255, 255, 255, 0.06);
 }
 
 .mobile-theme-btn.active {
