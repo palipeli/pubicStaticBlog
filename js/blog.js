@@ -136,20 +136,15 @@
         return loadPromise;
     }
 
-    // Track timeouts for cleanup
-    const activeTimeouts = new Set();
-
     // Preload content for posts near the cursor (hover optimization)
     function preloadBlogPostContent(postId) {
         // Clear any existing preload timeout
         if (preloadTimeout) {
             clearTimeout(preloadTimeout);
-            activeTimeouts.delete(preloadTimeout);
         }
 
         // Debounce preload to avoid excessive requests during rapid hover
         preloadTimeout = setTimeout(() => {
-            activeTimeouts.delete(preloadTimeout);
             // Only preload if not already loaded
             if (!blogContentCache.has(postId)) {
                 loadBlogPostContent(postId).then(post => {
@@ -160,13 +155,6 @@
             }
         }, 150); // 150ms delay before preloading on hover
         
-        activeTimeouts.add(preloadTimeout);
-    }
-
-    // Cleanup function for blog module
-    function cleanupBlogModule() {
-        activeTimeouts.forEach(timeout => clearTimeout(timeout));
-        activeTimeouts.clear();
     }
 
 
@@ -533,7 +521,7 @@
         setTimeout(window.saveAppState, 100);
     }
 
-    // Show blog introduction (back from post view) - legacy function kept for compatibility
+    // Show blog introduction when returning from post view.
     function showBlogIntro() {
         document.getElementById('blog-post-view').style.display = 'none';
         document.getElementById('blog-intro-view').style.display = 'block';
@@ -557,7 +545,6 @@
 
     // Expose functions globally
     window.fetchBlogPostMetadata = fetchBlogPostMetadata;
-    window.loadBlogPostContent = loadBlogPostContent;
     window.preloadBlogPostContent = preloadBlogPostContent;
     window.renderPostSelector = renderPostSelector;
     window.renderBlogPostSelectorGrid = renderBlogPostSelectorGrid;
@@ -568,5 +555,4 @@
     window.goToNextPost = goToNextPost;
     window.preloadNextPostOnHover = preloadNextPostOnHover;
     window.preloadPreviousPageOnHover = preloadPreviousPageOnHover;
-    window.cleanupBlogModule = cleanupBlogModule;
 })();

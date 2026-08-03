@@ -8,8 +8,6 @@
     const CONFIG = window.CONFIG || {};
     const STATE_STORAGE_KEY = CONFIG.STATE_STORAGE_KEY || 'blogPlatformState';
     const STATE_SAVE_DELAY = CONFIG.STATE_SAVE_DELAY || 500;
-    const STATE_AUTO_SAVE_INTERVAL = CONFIG.STATE_AUTO_SAVE_INTERVAL || 30000;
-    const BLOG_POST_RESTORE_DELAY = CONFIG.BLOG_POST_RESTORE_DELAY || 300;
     const SELECTORS = CONFIG.SELECTORS || {
         ACTIVE_SECTION: '.page-section.active',
         POST_SELECTOR_ITEM: '.post-selector-item',
@@ -110,18 +108,6 @@
             console.warn('Failed to load app state:', err);
         }
         return null;
-    }
-
-    /**
-     * Clear saved state (useful for logout or reset)
-     */
-    function clearAppState() {
-        try {
-            localStorage.removeItem(STATE_STORAGE_KEY);
-            console.log('App state cleared');
-        } catch (err) {
-            console.warn('Failed to clear app state:', err);
-        }
     }
 
     /**
@@ -234,13 +220,8 @@
     // Expose functions globally
     window.saveAppState = saveAppState;
     window.loadAppState = loadAppState;
-    window.clearAppState = clearAppState;
     window.restoreAppState = restoreAppState;
-    window.applySavedState = applySavedState;
     window.setupStatePersistence = setupStatePersistence;
     window.getCurrentPage = getCurrentPage;
-    window.getActiveBlogPostId = getActiveBlogPostId;
-    window.isSidebarCollapsed = isSidebarCollapsed;
-    window.getCurrentTheme = getCurrentTheme;
     window.processPendingBlogPostRestore = processPendingBlogPostRestore;
 })();

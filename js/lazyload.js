@@ -2,9 +2,6 @@
 // Handles lazy loading of images with multiple triggers: hover, touch, intersection, and native loading
 
 (function() {
-    // Track IntersectionObserver instances for cleanup
-    const activeObservers = new Set();
-
     // Initialize lazy loading for all images with data-src attribute
     function initializeLazyLoading() {
         const lazyImages = document.querySelectorAll('img.lazy-image[data-src]');
@@ -40,7 +37,6 @@
                 }, { rootMargin: '10px 0px' });
 
                 imgObserver.observe(img);
-                activeObservers.add(imgObserver);
             }
         });
     }
@@ -76,19 +72,8 @@
         };
     }
 
-    // Cleanup all observers (call on page navigation/unload)
-    function cleanupLazyLoading() {
-        activeObservers.forEach(observer => {
-            observer.disconnect();
-        });
-        activeObservers.clear();
-    }
-
     // Expose functions globally
     window.initializeLazyLoading = initializeLazyLoading;
-    window.loadImageOnHover = loadImage; // Alias for backward compatibility
-    window.loadImage = loadImage;
-    window.cleanupLazyLoading = cleanupLazyLoading;
 
     // Global initialization on DOMContentLoaded
     if (typeof document !== 'undefined') {

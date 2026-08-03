@@ -183,16 +183,6 @@
         }
     }
 
-    // Check if warning has been accepted/cleared
-    function isWarningCleared() {
-        // Check localStorage for consent
-        const hasConsent = localStorage.getItem('system_warning_consent') === 'true';
-        // Also check if consent overlay is gone
-        const consentOverlay = document.getElementById('consent-overlay');
-        const isOverlayGone = !consentOverlay || consentOverlay.style.display === 'none';
-        return hasConsent && isOverlayGone;
-    }
-
     // Monitor for warning clearance and trigger devotional using event-based approach
     async function monitorWarningAndStartDevotional() {
         // Helper function to check if conditions are met to start devotional
@@ -250,10 +240,4 @@
     // Expose functions globally
     window.runDevotional = runDevotional;
     window.monitorWarningAndStartDevotional = monitorWarningAndStartDevotional;
-    window.isWarningCleared = isWarningCleared;
-    window.loadBibleVerses = loadBibleVerses;
-    window.typeDeleteAnimation = typeDeleteAnimation;
-    window.typeWriteAnimation = typeWriteAnimation;
-    window.getRandomShortVerse = getRandomShortVerse;
-    window.stopAnimations = stopAnimations;
 })();

@@ -3,7 +3,6 @@
 
 (function() {
     const MOBILE_BREAKPOINT = 768;
-    let isTrayOpen = false;
     
     // Check if we're in mobile view
     function isMobileView() {
@@ -110,30 +109,7 @@
         if (tray) tray.classList.remove('open');
         if (overlay) overlay.classList.remove('open');
         
-        isTrayOpen = false;
         document.body.classList.remove('mobile-tray-open');
-    }
-    
-    // Open the tray (used for auto-expand on blogs page)
-    function openTray() {
-        if (!isMobileView()) return;
-        
-        const tray = document.getElementById('mobile-nav-tray');
-        const overlay = document.getElementById('mobile-tray-overlay');
-        
-        if (!tray) return;
-        
-        // Only open if not already open
-        if (tray.classList.contains('open')) return;
-        
-        // Open tray
-        tray.classList.add('open');
-        if (overlay) overlay.classList.add('open');
-        isTrayOpen = true;
-        document.body.classList.add('mobile-tray-open');
-        
-        // Update blog posts section visibility
-        updateBlogPostsVisibility();
     }
     
     // Create the overlay
@@ -194,13 +170,11 @@
                 // Close tray
                 tray.classList.remove('open');
                 if (overlay) overlay.classList.remove('open');
-                isTrayOpen = false;
                 document.body.classList.remove('mobile-tray-open');
             } else {
                 // Open tray
                 tray.classList.add('open');
                 if (overlay) overlay.classList.add('open');
-                isTrayOpen = true;
                 document.body.classList.add('mobile-tray-open');
                 
                 // Update blog posts section visibility

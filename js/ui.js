@@ -586,17 +586,14 @@
             var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             var cookieMatch = document.cookie.match(/theme_preference=([^;]+)/);
             var savedTheme = cookieMatch ? cookieMatch[1] : null;
-            var currentBg, alternateBg;
+            var alternateBg;
             
             if (savedTheme === 'dark') {
-                currentBg = '/media/bg-dark.webp';
                 alternateBg = '/media/bg-light.webp';
             } else if (savedTheme === 'light') {
-                currentBg = '/media/bg-light.webp';
                 alternateBg = '/media/bg-dark.webp';
             } else {
                 // Auto mode - prefetch the opposite of system preference
-                currentBg = prefersDark ? '/media/bg-dark.webp' : '/media/bg-light.webp';
                 alternateBg = prefersDark ? '/media/bg-light.webp' : '/media/bg-dark.webp';
             }
 
@@ -660,9 +657,6 @@
     window.createParticles = createParticles;
     window.setupNavigation = setupNavigation;
     window.wrapHomeContentInRectangle = wrapHomeContentInRectangle;
-    window.setCookie = setCookie;
-    window.getCookie = getCookie;
-    window.isFirstVisit = isFirstVisit;
     window.getSavedTheme = getSavedTheme;
     window.saveThemePreference = saveThemePreference;
     window.applyTheme = applyTheme;
