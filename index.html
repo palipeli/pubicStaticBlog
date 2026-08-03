@@ -50,6 +50,9 @@
                     r.active.postMessage({ type: 'precache-bg', url: activeBg });
                 }
             });
+        }).catch(function(error) {
+            // Service workers are an enhancement; the SPA remains usable without one.
+            console.warn('Service worker registration failed:', error);
         });
     }
     </script>

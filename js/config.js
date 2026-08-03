@@ -82,10 +82,10 @@
         
         // Cache names
         CACHE_NAMES: {
-            STATIC: 'static-assets-v1',
-            IMAGE: 'images-v1',
-            CONTENT: 'blog-content-v1',
-            MAIN: 'pubic-static-blog-v1'
+            STATIC: 'static-assets-v2',
+            IMAGE: 'images-v2',
+            CONTENT: 'blog-content-v2',
+            MAIN: 'pubic-static-blog-v2'
         }
     };
 

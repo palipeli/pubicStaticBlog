@@ -4,13 +4,15 @@
 
 'use strict';
 
-const CACHE_NAME = 'pubic-static-blog-v1';
-const STATIC_CACHE_NAME = 'static-assets-v1';
-const IMAGE_CACHE_NAME = 'images-v1';
-const CONTENT_CACHE_NAME = 'blog-content-v1';
+const CACHE_NAME = 'pubic-static-blog-v2';
+const STATIC_CACHE_NAME = 'static-assets-v2';
+const IMAGE_CACHE_NAME = 'images-v2';
+const CONTENT_CACHE_NAME = 'blog-content-v2';
 
 // Track pending fetches to prevent duplicate network requests
-const pendingFetches = new Set();
+// Share in-flight requests instead of polling Cache Storage. A failed request
+// must reject all waiters rather than leaving them waiting forever.
+const pendingFetches = new Map();
 
 // File extensions to cache with different strategies
 const STATIC_EXTENSIONS = /\.(html|css|js|json|webmanifest|ico|txt|xml)$/i;
@@ -23,6 +25,16 @@ const PRECACHE_ASSETS = [
     '/',
     '/index.html',
     '/style.css',
+    '/js/config.js',
+    '/js/markdown.js',
+    '/js/lazyload.js',
+    '/js/state.js',
+    '/js/devotional.js',
+    '/js/ui.js',
+    '/js/blog.js',
+    '/js/home.js',
+    '/js/mobile-tray.js',
+    '/js/app.js',
     '/warning.js',
     '/blog/posts.json',
     '/media/favicon-circle.webp',
@@ -71,11 +83,12 @@ self.addEventListener('activate', (event) => {
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames
-                    .filter((name) => 
-                        (name.startsWith('img-cache-') || 
-                         name.startsWith('static-') || 
+                    .filter((name) =>
+                        (name.startsWith('img-cache-') ||
+                         name.startsWith('images-') ||
+                         name.startsWith('static-') ||
                          name.startsWith('blog-content-') ||
-                         name.startsWith('pubic-static-blog-')) && 
+                         name.startsWith('pubic-static-blog-')) &&
                         name !== STATIC_CACHE_NAME &&
                         name !== IMAGE_CACHE_NAME &&
                         name !== CONTENT_CACHE_NAME &&
@@ -107,6 +120,12 @@ function getCacheStrategy(request) {
         return 'network-first';
     }
 
+    // The manifest changes independently from the rest of the static assets.
+    // Keep this check before the generic JSON/static rule.
+    if (pathname === '/blog/posts.json') {
+        return 'network-first';
+    }
+
     // Static assets (CSS, JS, JSON) - cache-first with network fallback
     if (STATIC_EXTENSIONS.test(pathname)) {
         return 'cache-first';
@@ -127,11 +146,6 @@ function getCacheStrategy(request) {
         return 'stale-while-revalidate';
     }
 
-    // API/manifest - network-first
-    if (pathname === '/blog/posts.json') {
-        return 'network-first';
-    }
-
     // Default: network-first
     return 'network-first';
 }
@@ -150,6 +164,30 @@ function getCacheForRequest(request) {
         return CONTENT_CACHE_NAME;
     }
     return STATIC_CACHE_NAME;
+}
+
+function isCacheableMessageUrl(value) {
+    try {
+        const url = new URL(value, self.location.origin);
+        return url.origin === self.location.origin &&
+            (url.pathname === '/' || url.pathname === '/index.html' ||
+             url.pathname === '/style.css' || url.pathname === '/warning.js' ||
+             url.pathname.startsWith('/js/') || url.pathname.startsWith('/media/') ||
+             url.pathname.startsWith('/blog/'));
+    } catch (error) {
+        return false;
+    }
+}
+
+async function prefetchUrl(value, cache) {
+    if (!isCacheableMessageUrl(value)) return;
+    const request = new Request(new URL(value, self.location.origin).href);
+    if (await cache.match(request)) return;
+    try {
+        await fetchAndCache(request, cache);
+    } catch (error) {
+        console.warn('Prefetch failed:', request.url, error);
+    }
 }
 
 // -------------------------------------------------------------------
@@ -210,9 +248,8 @@ async function cacheFirst(request, cache) {
     const cachedResponse = await cache.match(request);
     
     if (cachedResponse) {
-        // Return cached response immediately
-        // Optionally update cache in background (stale-while-revalidate behavior)
-        updateCacheInBackground(request, cache);
+        // Static assets are versioned through the cache name. Avoid a second
+        // network request on every script/style/image read.
         return cachedResponse;
     }
 
@@ -230,7 +267,7 @@ async function networkFirst(request, cache) {
         
         if (networkResponse && networkResponse.ok) {
             // Cache successful response
-            cache.put(request, networkResponse.clone());
+            await cache.put(request, networkResponse.clone());
         }
         
         return networkResponse;
@@ -244,7 +281,7 @@ async function networkFirst(request, cache) {
 
         // No cache - return offline fallback for HTML pages
         if (request.headers.get('accept')?.includes('text/html')) {
-            return createOfflineFallback();
+            return getOfflineShell(cache);
         }
 
         throw error;
@@ -272,7 +309,7 @@ async function staleWhileRevalidate(request, cache) {
     } catch (error) {
         // If network fails and no cache, return offline fallback for HTML
         if (request.headers.get('accept')?.includes('text/html')) {
-            return createOfflineFallback();
+            return getOfflineShell(cache);
         }
         throw error;
     }
@@ -284,30 +321,24 @@ async function staleWhileRevalidate(request, cache) {
 async function fetchAndCache(request, cache) {
     const url = request.url;
     
-    // Prevent duplicate fetches
+    // Prevent duplicate fetches and propagate the original result/error.
     if (pendingFetches.has(url)) {
-        // Wait for the existing fetch to complete
-        return new Promise((resolve, reject) => {
-            const checkPending = setInterval(() => {
-                if (!pendingFetches.has(url)) {
-                    clearInterval(checkPending);
-                    cache.match(request).then(resolve).catch(reject);
-                }
-            }, 50);
-        });
+        return pendingFetches.get(url);
     }
 
-    pendingFetches.add(url);
-    
-    try {
+    const fetchPromise = (async () => {
         const response = await fetch(request);
-        
+
         if (response && response.ok) {
-            // Clone response before caching (response body can only be read once)
-            cache.put(request, response.clone());
+            await cache.put(request, response.clone());
         }
-        
+
         return response;
+    })();
+
+    pendingFetches.set(url, fetchPromise);
+    try {
+        return await fetchPromise;
     } finally {
         pendingFetches.delete(url);
     }
@@ -322,13 +353,10 @@ function updateCacheInBackground(request, cache) {
     if (pendingFetches.has(url)) {
         return; // Already fetching
     }
-    
-    pendingFetches.add(url);
-    
-    fetch(request)
+    const updatePromise = fetch(request)
         .then((response) => {
             if (response && response.ok) {
-                cache.put(request, response);
+                return cache.put(request, response.clone());
             }
         })
         .catch(() => {
@@ -337,11 +365,18 @@ function updateCacheInBackground(request, cache) {
         .finally(() => {
             pendingFetches.delete(url);
         });
+
+    pendingFetches.set(url, updatePromise);
 }
 
 // -------------------------------------------------------------------
 // Create offline fallback response
 // -------------------------------------------------------------------
+async function getOfflineShell(cache) {
+    const shell = await cache.match('/index.html') || await cache.match('/');
+    return shell || createOfflineFallback();
+}
+
 function createOfflineFallback() {
     const offlineHtml = `
         <!DOCTYPE html>
@@ -403,86 +438,32 @@ function createOfflineFallback() {
 // -------------------------------------------------------------------
 self.addEventListener('message', (event) => {
     const data = event.data;
+
+    if (data === 'clear-cache') {
+        event.waitUntil(
+            caches.keys().then((names) => Promise.all(names.map((name) => caches.delete(name))))
+                .then(() => event.ports[0]?.postMessage({ success: true }))
+        );
+        return;
+    }
+
     if (!data || !data.type) return;
 
-    // Precache a single background image (sent on SW registration)
+    // Precache/prefetch requests share one validated implementation.
     if (data.type === 'precache-bg' && data.url) {
-        event.waitUntil(
-            caches.open(IMAGE_CACHE_NAME).then((cache) => {
-                if (pendingFetches.has(data.url)) {
-                    return;
-                }
-                return cache.match(data.url).then((existing) => {
-                    if (existing) return;
-                    pendingFetches.add(data.url);
-                    return fetch(data.url)
-                        .then((response) => {
-                            if (response && response.ok) {
-                                return cache.put(data.url, response);
-                            }
-                        })
-                        .finally(() => {
-                            pendingFetches.delete(data.url);
-                        });
-                });
-            })
-        );
+        event.waitUntil(caches.open(IMAGE_CACHE_NAME).then((cache) => prefetchUrl(data.url, cache)));
     }
 
-    // Prefetch background images (sent on cursor proximity)
     if (data.type === 'prefetch-bg' && Array.isArray(data.urls)) {
-        event.waitUntil(
-            caches.open(IMAGE_CACHE_NAME).then((cache) => {
-                return Promise.all(
-                    data.urls.map((url) => {
-                        if (pendingFetches.has(url)) {
-                            return Promise.resolve();
-                        }
-                        return cache.match(url).then((existing) => {
-                            if (existing) return;
-                            pendingFetches.add(url);
-                            return fetch(url)
-                                .then((response) => {
-                                    if (response && response.ok) {
-                                        return cache.put(url, response);
-                                    }
-                                })
-                                .finally(() => {
-                                    pendingFetches.delete(url);
-                                });
-                        });
-                    })
-                );
-            })
-        );
+        event.waitUntil(caches.open(IMAGE_CACHE_NAME).then((cache) =>
+            Promise.all(data.urls.map((url) => prefetchUrl(url, cache)))
+        ));
     }
 
-    // Prefetch blog post content (markdown files)
     if (data.type === 'prefetch-posts' && Array.isArray(data.urls)) {
-        event.waitUntil(
-            caches.open(CONTENT_CACHE_NAME).then((cache) => {
-                return Promise.all(
-                    data.urls.map((url) => {
-                        if (pendingFetches.has(url)) {
-                            return Promise.resolve();
-                        }
-                        return cache.match(url).then((existing) => {
-                            if (existing) return;
-                            pendingFetches.add(url);
-                            return fetch(url)
-                                .then((response) => {
-                                    if (response && response.ok) {
-                                        return cache.put(url, response);
-                                    }
-                                })
-                                .finally(() => {
-                                    pendingFetches.delete(url);
-                                });
-                        });
-                    })
-                );
-            })
-        );
+        event.waitUntil(caches.open(CONTENT_CACHE_NAME).then((cache) =>
+            Promise.all(data.urls.map((url) => prefetchUrl(url, cache)))
+        ));
     }
 
     // Precahce all static assets (can be called manually)
@@ -548,23 +529,7 @@ async function precacheAllAssets() {
     const cachePromises = allAssets.map((url) => {
         const cache = url.startsWith('/blog/') && url.endsWith('.md') ? contentCache :
                       IMAGE_EXTENSIONS.test(url) ? imageCache : staticCache;
-        
-        if (pendingFetches.has(url)) return Promise.resolve();
-        
-        return cache.match(url).then((existing) => {
-            if (existing) return Promise.resolve();
-            pendingFetches.add(url);
-            return fetch(url)
-                .then((response) => {
-                    if (response && response.ok) {
-                        return cache.put(url, response);
-                    }
-                })
-                .catch(() => {})
-                .finally(() => {
-                    pendingFetches.delete(url);
-                });
-        });
+        return prefetchUrl(url, cache);
     });
 
     await Promise.all(cachePromises);
@@ -577,20 +542,5 @@ async function precacheAllAssets() {
 self.addEventListener('periodicsync', (event) => {
     if (event.tag === 'precache-assets') {
         event.waitUntil(precacheAllAssets());
-    }
-});
-
-// -------------------------------------------------------------------
-// Handle client messages for cache management
-// -------------------------------------------------------------------
-self.addEventListener('message', (event) => {
-    if (event.data === 'clear-cache') {
-        event.waitUntil(
-            caches.keys().then((names) => 
-                Promise.all(names.map((name) => caches.delete(name)))
-            ).then(() => {
-                event.ports[0]?.postMessage({ success: true });
-            })
-        );
     }
 });
