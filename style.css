@@ -814,7 +814,8 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     display: block;
 }
 
-.blog-post-view .blog-article {
+.blog-post-view .blog-article,
+.blog-intro-view .blog-article {
     background: var(--bg-panel);
     backdrop-filter: blur(0px);
     -webkit-backdrop-filter: blur(0px);
@@ -827,15 +828,6 @@ html[data-theme="dark"] .mobile-theme-btn.active {
 }
 
 .blog-intro-view .blog-article {
-    background: var(--bg-panel);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 20px;
-    line-height: 1.6;
-    font-size: 12px;
-    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
 }
 
@@ -1644,18 +1636,12 @@ html[data-theme="dark"] .mobile-theme-btn.active {
 }
 
 /* My Blog button - Pastel Teal */
-.blog-btn.category-blog-home {
-    background: linear-gradient(135deg, #5DBFBF 0%, #4A9E9E 100%);
-    box-shadow: 0 4px 15px rgba(93, 191, 191, 0.4);
-}
-.blog-btn.category-blog-home:hover {
-    box-shadow: 0 6px 20px rgba(93, 191, 191, 0.6);
-}
-
+.blog-btn.category-blog-home,
 .blog-btn.category-monitoring {
     background: linear-gradient(135deg, #5DBFBF 0%, #4A9E9E 100%);
     box-shadow: 0 4px 15px rgba(93, 191, 191, 0.4);
 }
+.blog-btn.category-blog-home:hover,
 .blog-btn.category-monitoring:hover {
     box-shadow: 0 6px 20px rgba(93, 191, 191, 0.6);
 }
