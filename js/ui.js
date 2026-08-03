@@ -55,6 +55,13 @@
                 void aboutHero.offsetWidth;
                 aboutHero.classList.add('about-animate');
             }
+        } else if (page === 'home') {
+            const homeHero = document.querySelector('.home-hero');
+            if (homeHero && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                homeHero.classList.remove('home-animate');
+                void homeHero.offsetWidth;
+                homeHero.classList.add('home-animate');
+            }
         }
     }
 

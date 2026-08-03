@@ -276,6 +276,43 @@ body {
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
 }
 
+.home-hero.home-animate > img {
+    animation: homeLogoEnter 0.7s ease-out 0.15s both;
+}
+
+.home-hero.home-animate .blog-buttons-container {
+    animation: slideUp 0.6s ease-out 0.35s both;
+}
+
+.home-hero.home-animate .blog-buttons-container .blog-btn {
+    animation: homeButtonEnter 0.5s ease-out both;
+}
+
+.home-hero.home-animate .blog-buttons-container .blog-btn:nth-child(2) { animation-delay: 0.1s; }
+.home-hero.home-animate .blog-buttons-container .blog-btn:nth-child(3) { animation-delay: 0.2s; }
+.home-hero.home-animate .home-content {
+    animation: slideUp 0.6s ease-out 0.55s both;
+}
+
+@keyframes homeLogoEnter {
+    from { opacity: 0; transform: translateY(18px) scale(0.9) rotate(-3deg); }
+    to { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
+}
+
+@keyframes homeButtonEnter {
+    from { opacity: 0; transform: translateY(12px) scale(0.92); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .home-hero.home-animate > img,
+    .home-hero.home-animate .blog-buttons-container,
+    .home-hero.home-animate .blog-buttons-container .blog-btn,
+    .home-hero.home-animate .home-content {
+        animation: none;
+    }
+}
+
 .home-title {
     font-size: 42px;
     font-weight: 700;
