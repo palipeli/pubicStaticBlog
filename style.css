@@ -1,5 +1,5 @@
-/* style.css - Adwaita-Style Blog Platform with Liquid Glass Effect */
-/* Optimized for Chromium and Safari browsers */
+
+
 
 * {
     margin: 0;
@@ -28,8 +28,8 @@
     --theme-selector-bg: rgba(255, 255, 255, 0.6);
     --theme-selector-text: #2e3436;
     --theme-selector-hover-bg: rgba(240, 240, 240, 0.7);
-    
-    /* Liquid Glass Effect Variables - Light Mode (default) */
+
+
     --glass-bg: rgba(255, 255, 255, 0.65);
     --glass-border: rgba(255, 255, 255, 0.4);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
@@ -38,8 +38,8 @@
     --glass-brightness: 1.05;
     --glass-radius: 16px;
     --glass-pulse-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    
-    /* Background Images - Local files */
+
+
     --bg-image-dark: url('/media/bg-dark.webp');
     --bg-image-light: url('/media/bg-light.webp');
 }
@@ -62,8 +62,8 @@
     --theme-selector-bg: rgba(26, 26, 26, 0.6);
     --theme-selector-text: #ffffff;
     --theme-selector-hover-bg: rgba(10, 10, 10, 0.7);
-    
-    /* Liquid Glass Effect Variables - Dark Mode (darker for readability) */
+
+
     --glass-bg: rgba(26, 26, 26, 0.70);
     --glass-border: rgba(255, 255, 255, 0.12);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -82,8 +82,8 @@
     --theme-selector-bg: rgba(255, 255, 255, 0.6);
     --theme-selector-text: #2e3436;
     --theme-selector-hover-bg: rgba(240, 240, 240, 0.7);
-    
-    /* Liquid Glass Effect Variables - Light Mode (lighter for readability) */
+
+
     --glass-bg: rgba(255, 255, 255, 0.65);
     --glass-border: rgba(255, 255, 255, 0.4);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
@@ -126,7 +126,7 @@ body::before {
     background-size: cover;
 }
 
-/* Overlay removed - background images are now directly visible */
+
 
 html {
     height: 100%;
@@ -137,7 +137,7 @@ body {
     overflow-y: auto;
 }
 
-/* Header - Enhanced with Liquid Glass Effect */
+
 .header {
     position: fixed;
     top: 0;
@@ -239,7 +239,7 @@ body {
     background: rgba(255, 69, 252, 0.1);
 }
 
-/* Main Content */
+
 .main-container {
     display: block;
     margin-top: var(--header-height);
@@ -261,14 +261,14 @@ body {
     width: 100%;
 }
 
-/* Home Hero Section */
+
 .home-hero {
     max-width: 800px;
     margin: 0 auto;
     text-align: center;
 }
 
-/* Home Layout Container - Same rectangle styling as blog and about pages */
+
 .home-layout-container {
     display: block;
     margin-top: 20px;
@@ -407,7 +407,7 @@ body {
     color: var(--text-primary);
 }
 
-/* Sidebar - Enhanced with Liquid Glass Effect */
+
 .sidebar {
     width: 280px;
     background: var(--glass-bg);
@@ -434,7 +434,7 @@ body {
     box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
 }
 
-/* Sidebar content wrapper */
+
 .sidebar-content-wrapper {
     padding: 20px;
     height: 100%;
@@ -445,7 +445,7 @@ body {
     box-sizing: border-box;
 }
 
-/* Collapsed sidebar state - only hide content, keep button visible */
+
 .sidebar.collapsed {
     width: 0;
 }
@@ -455,7 +455,7 @@ body {
     pointer-events: none;
 }
 
-/* Auto-collapse on constrained space - handle resize smoothly */
+
 @media (max-width: 768px) {
     .sidebar:not(.expanded) {
         width: 0;
@@ -469,7 +469,7 @@ body {
     }
 }
 
-/* Sidebar toggle button - fixed to left edge of sidebar, vertically centered */
+
 .sidebar-toggle {
     position: absolute;
     left: 0;
@@ -494,13 +494,13 @@ body {
     padding: 0;
 }
 
-/* When sidebar is expanded, show the chevron pointing left (<) */
+
 .sidebar-toggle svg {
     transform: rotate(180deg);
     transition: transform 0.3s ease;
 }
 
-/* When sidebar is collapsed, rotate chevron to point right (>) */
+
 .sidebar.collapsed .sidebar-toggle svg {
     transform: rotate(0deg);
 }
@@ -515,7 +515,7 @@ body {
     transform: translate(-100%, -50%) scale(0.95);
 }
 
-/* Always show toggle button on mobile - it's the only way to access sidebar */
+
 @media (max-width: 768px) {
     .sidebar-toggle {
         opacity: 1 !important;
@@ -539,7 +539,7 @@ body {
     margin-bottom: 30px;
 }
 
-/* Photo Placeholder and About Section Styles */
+
 .photo-placeholder {
     display: flex;
     justify-content: center;
@@ -628,7 +628,7 @@ body {
     color: var(--text-secondary);
 }
 
-/* ALL POST Button */
+
 .all-post-btn {
     display: inline-block;
     background: rgba(53, 132, 228, 0.08);
@@ -651,7 +651,7 @@ body {
     color: var(--accent-pink-hover);
 }
 
-/* Theme Chooser */
+
 .theme-chooser {
     display: flex;
     flex-direction: column;
@@ -663,7 +663,7 @@ body {
     appearance: none;
     -webkit-appearance: none;
     width: 100%;
-    /* Every option uses the current page theme, not the theme it represents. */
+
     background: var(--theme-selector-bg);
     border: 1px solid var(--btn-border);
     border-radius: 6px;
@@ -677,8 +677,8 @@ body {
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
-/* The buttons also carry data-theme values for JavaScript. Use the root theme
-   for their appearance so a Dark option cannot style itself as dark in light mode. */
+
+
 html[data-theme="light"] .theme-btn,
 html[data-theme="light"] .mobile-theme-btn {
     background: rgba(255, 255, 255, 0.6);
@@ -726,7 +726,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     color: #ff45fc;
 }
 
-/* Blog Cards */
+
 .blog-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -734,25 +734,25 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     margin-top: 20px;
 }
 
-/* Blog Layout Container - New Structure */
+
 .blog-layout-container {
     display: block;
     margin-top: 20px;
 }
 
-/* About Layout Container - Same rectangle styling as blog */
+
 .about-layout-container {
     display: block;
     margin-top: 20px;
 }
 
-/* Blog Main Content Area */
+
 .blog-main-content {
     width: 100%;
     max-width: 100%;
 }
 
-/* Back to Intro Button */
+
 .back-to-intro-btn {
     background: var(--btn-bg);
     border: 1px solid var(--btn-border);
@@ -774,7 +774,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     transform: translateX(-5px);
 }
 
-/* Blog Post Navigation (Back + Next buttons) */
+
 .blog-post-nav {
     display: flex;
     justify-content: space-between;
@@ -803,12 +803,12 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     transform: translateX(5px);
 }
 
-/* Blog Introduction View */
+
 .blog-intro-view {
     width: 100%;
 }
 
-/* Blog Post View - ensures proper display when viewing individual posts */
+
 .blog-post-view {
     width: 100%;
     display: block;
@@ -879,7 +879,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
-/* Blog Article */
+
 .blog-article {
     background: var(--bg-panel);
     backdrop-filter: blur(0px);
@@ -1011,7 +1011,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
-/* Tables */
+
 .blog-article table {
     width: 100%;
     border-collapse: collapse;
@@ -1036,13 +1036,13 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     display: table-cell;
 }
 
-/* Default alignment */
+
 .blog-article th:not([align]),
 .blog-article td:not([align]) {
     text-align: left;
 }
 
-/* Respect align attribute for table cells */
+
 .blog-article th[align="left"],
 .blog-article td[align="left"] {
     text-align: left !important;
@@ -1064,7 +1064,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     font-weight: 600;
 }
 
-/* Ensure table cells are displayed as table cells */
+
 .blog-article tr {
     display: table-row;
 }
@@ -1077,7 +1077,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     background: rgba(255, 69, 252, 0.05);
 }
 
-/* Raw HTML blocks - respect theme colors */
+
 .blog-article div,
 .blog-article span,
 .blog-article p[data-raw-html] {
@@ -1092,9 +1092,9 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     border-radius: 6px;
 }
 
-/* Blog Sidebar (in main sidebar) */
+
 .sidebar-section.blog-only {
-    /* Visibility controlled by JavaScript based on current page */
+
 }
 
 .post-selector-list {
@@ -1140,7 +1140,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     color: var(--text-secondary);
 }
 
-/* Category Filter in Sidebar - REMOVED */
+
 
 .blog-post-selector-grid {
     display: grid;
@@ -1244,26 +1244,26 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     line-height: 1.1;
 }
 
-/* Mobile responsive - compact list */
+
 @media (max-width: 900px) {
     .blog-post-selector-grid {
         gap: 3px;
         margin: 3px 0;
     }
-    
+
     .blog-card {
         padding: 2px 3px;
         gap: 3px;
     }
-    
+
     .blog-image {
         font-size: 0.85rem;
     }
-    
+
     .blog-title {
         font-size: 0.7rem;
     }
-    
+
     .blog-meta {
         font-size: 0.55rem;
     }
@@ -1274,20 +1274,20 @@ html[data-theme="dark"] .mobile-theme-btn.active {
         gap: 2px;
         margin: 2px 0;
     }
-    
+
     .blog-card {
         padding: 2px 3px;
         gap: 2px;
     }
-    
+
     .blog-image {
         font-size: 0.8rem;
     }
-    
+
     .blog-title {
         font-size: 0.65rem;
     }
-    
+
     .blog-meta {
         font-size: 0.5rem;
     }
@@ -1306,7 +1306,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     color: var(--accent-pink-hover);
 }
 
-/* Page Sections */
+
 .page-section {
     display: none;
 }
@@ -1340,7 +1340,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     margin-bottom: 30px;
 }
 
-/* About Hero Section */
+
 .about-hero {
     max-width: 800px;
     margin: 0 auto;
@@ -1445,7 +1445,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     margin-bottom: 8px;
 }
 
-/* Scrollbar */
+
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -1464,46 +1464,46 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     background: rgba(255, 255, 255, 0.3);
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
-    /* On mobile, sidebar is collapsed by default but toggle button remains visible */
+
     .sidebar.collapsed {
         width: 0;
         opacity: 0;
         transform: translateX(20px);
         pointer-events: none;
     }
-    
+
     .sidebar:not(.collapsed) {
         opacity: 1;
         transform: translateX(0);
         pointer-events: auto;
     }
-    
+
     .content-area {
         max-width: 100vw;
     }
-    
+
     .blog-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .home-title {
         font-size: 32px;
     }
-    
+
     .abstract-geometric {
         width: 200px;
         height: 200px;
     }
-    
+
     .shape-1 { width: 100px; height: 100px; }
     .shape-2 { width: 80px; height: 80px; }
     .shape-3 { width: 60px; height: 60px; }
     .shape-4 { width: 50px; height: 50px; }
 }
 
-/* Floating particles */
+
 .particles {
     position: fixed;
     top: 0;
@@ -1544,14 +1544,14 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     }
 }
 
-/* Pulse animation for button */
+
 @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(0.95); }
     100% { transform: scale(1); }
 }
 
-/* Blog Buttons Container (kamikami.eu style) */
+
 .blog-buttons-container {
     display: flex;
     justify-content: center;
@@ -1560,10 +1560,10 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     margin: 18px 0;
 }
 
-/* Blog Button Style (inspired by kamikami.eu mc-btn) */
+
 .blog-btn {
-    font-size: 0.7rem; /* Reduced from 0.8rem */
-    padding: 8px 15px; /* Reduced from 15px 25px */
+    font-size: 0.7rem;
+    padding: 8px 15px;
     background: linear-gradient(135deg, var(--accent-pink) 0%, #3a5a8f 100%);
     color: white;
     display: inline-flex;
@@ -1593,7 +1593,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     font-size: 1rem;
 }
 
-/* Category-specific button colors */
+
 .blog-btn.category-tutorial {
     background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
     box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);
@@ -1626,7 +1626,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     box-shadow: 0 6px 20px rgba(108, 117, 125, 0.6);
 }
 
-/* Fun category (cat pictures button) */
+
 .blog-btn.category-fun {
     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
     box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
@@ -1635,7 +1635,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
 }
 
-/* My Blog button - Pastel Teal */
+
 .blog-btn.category-blog-home,
 .blog-btn.category-monitoring {
     background: linear-gradient(135deg, #5DBFBF 0%, #4A9E9E 100%);
@@ -1646,7 +1646,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     box-shadow: 0 6px 20px rgba(93, 191, 191, 0.6);
 }
 
-/* Discord button */
+
 .blog-btn.category-discord {
     background: linear-gradient(135deg, #5865F2 0%, #4752C4 100%);
     box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);
@@ -1655,7 +1655,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     box-shadow: 0 6px 20px rgba(88, 101, 242, 0.6);
 }
 
-/* GitHub button */
+
 .blog-btn.category-github {
     background: linear-gradient(135deg, #333 0%, #24292e 100%);
     box-shadow: 0 4px 15px rgba(51, 51, 51, 0.4);
@@ -1664,7 +1664,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     box-shadow: 0 6px 20px rgba(51, 51, 51, 0.6);
 }
 
-/* YouTube button */
+
 .blog-btn.category-youtube {
     background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
     box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
@@ -1684,7 +1684,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     }
 }
 
-/* Mobile Navigation Tray Styles */
+
 .mobile-tray-toggle {
     display: none;
     background: transparent;
@@ -1706,18 +1706,18 @@ html[data-theme="dark"] .mobile-theme-btn.active {
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-left: auto; /* Push to rightmost position */
-        order: 10; /* Ensure it's last in flex container */
+        margin-left: auto;
+        order: 10;
     }
-    
-    /* Keep nav items visible on mobile but adjust spacing */
+
+
     .header-right .nav-item {
         padding: 6px 10px;
         font-size: 12px;
     }
 }
 
-/* Mobile Tray Overlay */
+
 .mobile-tray-overlay {
     position: fixed;
     top: 0;
@@ -1738,7 +1738,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     visibility: visible;
 }
 
-/* Mobile Navigation Tray */
+
 .mobile-nav-tray {
     position: fixed;
     top: 0;
@@ -1784,14 +1784,14 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     border-bottom: 1px solid var(--border-color);
 }
 
-/* Theme Chooser in Mobile Tray */
+
 .mobile-theme-chooser {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
-/* Photo Placeholder in Mobile Tray */
+
 .mobile-photo-placeholder {
     display: flex;
     justify-content: center;
@@ -1814,7 +1814,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     text-align: center;
 }
 
-/* Post List in Mobile Tray */
+
 .mobile-post-list {
     display: flex;
     flex-direction: column;
@@ -1856,7 +1856,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     color: var(--text-secondary);
 }
 
-/* Navigation Links in Mobile Tray */
+
 .mobile-nav-links {
     display: flex;
     flex-direction: column;
@@ -1887,12 +1887,12 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     color: var(--accent-pink);
 }
 
-/* Prevent body scroll when tray is open */
+
 body.mobile-tray-open {
     overflow: hidden;
 }
 
-/* Footer Styles */
+
 footer {
     background: transparent;
     border: none;
@@ -1923,7 +1923,7 @@ footer p {
     line-height: 1.5;
 }
 
-/* Loading Spinner Animation for Lazy Loading */
+
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
@@ -1952,7 +1952,7 @@ footer p {
     font-size: 14px;
 }
 
-/* Hover preview indicator for lazy-loaded items */
+
 .post-selector-item:hover {
     cursor: pointer;
 }
@@ -1964,7 +1964,7 @@ footer p {
     opacity: 0.7;
 }
 
-/* Smooth fade-in for loaded content */
+
 @keyframes fadeInContent {
     from {
         opacity: 0;
@@ -1980,7 +1980,7 @@ footer p {
     animation: fadeInContent 0.3s ease-out;
 }
 
-/* Markdown content styling */
+
 .blog-post-content hr {
     border: none;
     border-top: 1px solid var(--border-color);
@@ -2009,7 +2009,7 @@ footer p {
     padding-left: 0;
 }
 
-/* Lazy Loading Image Styles */
+
 .lazy-image {
     transition: opacity 0.3s ease, transform 0.3s ease;
     opacity: 0.6;
@@ -2038,7 +2038,7 @@ footer p {
     }
 }
 
-/* Prefers Reduced Motion Accessibility & Battery Optimization */
+
 @media (prefers-reduced-motion: reduce) {
     *, ::before, ::after {
         animation-duration: 0.01ms !important;
@@ -2059,19 +2059,19 @@ footer p {
     }
 }
 
-/* ============================================
-   ADDITIONAL LIQUID GLASS ENHANCEMENTS
-   For remaining UI elements
-   ============================================ */
 
-/* Blog Post Selector Grid Cards - Liquid Glass Effect */
+
+
+
+
+
 .blog-post-selector-grid .template-card {
     background: var(--glass-bg);
     backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
 }
 
-/* Navigation Items - Subtle Glass Hover */
+
 .nav-item:hover {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(0px);
@@ -2082,7 +2082,7 @@ footer p {
     background: rgba(255, 255, 255, 0.05);
 }
 
-/* Sidebar Toggle Button - Glass Effect */
+
 .sidebar-toggle {
     background: var(--glass-bg);
     backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
@@ -2095,7 +2095,7 @@ footer p {
     box-shadow: -2px 0 8px rgba(0, 0, 0, 0.5);
 }
 
-/* Mobile Tray - Glass Effect */
+
 .mobile-tray {
     background: var(--glass-bg);
     backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
@@ -2103,66 +2103,66 @@ footer p {
     border: 1px solid var(--glass-border);
 }
 
-/* Animation Performance Optimizations for Chromium and Safari */
+
 @supports (-webkit-overflow-scrolling: touch) {
-    /* Safari iOS smooth scrolling */
+
     .content-area,
     .sidebar-content-wrapper {
         -webkit-overflow-scrolling: touch;
     }
 }
 
-/* Hardware acceleration for glass animations */
+
 .liquid-glass,
 .header,
 .sidebar,
 .template-card,
 .mc-btn {
-    /* Force GPU compositing */
+
     transform: translate3d(0, 0, 0);
-    /* Prevent flickering during transitions */
+
     backface-visibility: hidden;
-    /* Optimize for animation performance */
+
     will-change: transform, opacity;
 }
 
-/* Dark mode specific adjustments for better readability */
+
 [data-theme="dark"] .liquid-glass,
 [data-theme="dark"] .header,
 [data-theme="dark"] .sidebar,
 [data-theme="dark"] .template-card,
 [data-theme="dark"] .mc-btn {
-    /* Slightly darker in dark mode for text contrast */
+
     --glass-brightness: 0.90;
 }
 
-/* Light mode specific adjustments */
+
 [data-theme="light"] .liquid-glass,
 [data-theme="light"] .header,
 [data-theme="light"] .sidebar,
 [data-theme="light"] .template-card,
 [data-theme="light"] .mc-btn {
-    /* Brighter in light mode */
+
     --glass-brightness: 1.05;
 }
-/* 
- * Liquid Glass Effect - Local Implementation
- * Optimized for Chromium and Safari browsers
- * Inspired by: https://github.com/ybouane/liquidglass
- * 
- * Features:
- * - GPU-accelerated backdrop-filter blur
- * - Hardware-accelerated transforms
- * - Dark/Light mode adaptive transparency
- * - Smooth animations with will-change hints
- */
 
-/* ============================================
-   LIQUID GLASS CORE STYLES
-   ============================================ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 :root {
-    /* Light mode glass variables */
+
     --glass-bg-light: rgba(255, 255, 255, 0.65);
     --glass-bg-dark: rgba(26, 26, 26, 0.70);
     --glass-border-light: rgba(255, 255, 255, 0.5);
@@ -2175,7 +2175,7 @@ footer p {
     --glass-brightness-dark: 0.95;
     --glass-radius: 16px;
     --glass-transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    /* Edge refraction effects */
+
     --edge-highlight-light: rgba(255, 255, 255, 0.8);
     --edge-highlight-dark: rgba(255, 255, 255, 0.25);
     --edge-refraction-light: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, transparent 50%, rgba(255, 255, 255, 0.2) 100%);
@@ -2196,7 +2196,7 @@ footer p {
     --glass-brightness: var(--glass-brightness-light);
 }
 
-/* Auto theme detection */
+
 @media (prefers-color-scheme: dark) {
     [data-theme="auto"] {
         --glass-bg: var(--glass-bg-dark);
@@ -2215,44 +2215,44 @@ footer p {
     }
 }
 
-/* ============================================
-   LIQUID GLASS PANEL CLASS
-   Apply .liquid-glass class to any element
-   ============================================ */
+
+
+
+
 
 .liquid-glass {
-    /* Core glass effect */
+
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur-strength)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     -webkit-backdrop-filter: blur(var(--glass-blur-strength)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    
-    /* Enhanced border with stronger refraction effect */
+
+
     border: 2px solid var(--glass-border);
-    box-shadow: 
+    box-shadow:
         var(--glass-shadow),
         inset 0 1px 2px rgba(255, 255, 255, 0.3),
         inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-    
-    /* Rounded corners */
+
+
     border-radius: var(--glass-radius);
-    
-    /* Edge refraction highlights */
+
+
     position: relative;
     overflow: hidden;
-    
-    /* Performance optimizations */
+
+
     will-change: transform, opacity;
     transform: translateZ(0);
     backface-visibility: hidden;
-    
-    /* Smooth transitions */
+
+
     transition: var(--glass-transition);
-    
-    /* Isolation for proper stacking */
+
+
     isolation: isolate;
 }
 
-/* Edge refraction pseudo-element for stronger glass effect */
+
 .liquid-glass::before {
     content: '';
     position: absolute;
@@ -2271,7 +2271,7 @@ footer p {
     background: var(--edge-refraction-dark);
 }
 
-/* Inner edge highlight for depth */
+
 .liquid-glass::after {
     content: '';
     position: absolute;
@@ -2289,7 +2289,7 @@ footer p {
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 100%);
 }
 
-/* Hover state for interactive glass panels */
+
 .liquid-glass:hover {
     transform: translateZ(0) translateY(-2px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
@@ -2299,31 +2299,31 @@ footer p {
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
 }
 
-/* ============================================
-   LIQUID GLASS BUTTON VARIANT
-   ============================================ */
+
+
+
 
 .liquid-glass-btn {
-    /* Inherit base glass styles */
+
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur-strength)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     -webkit-backdrop-filter: blur(var(--glass-blur-strength)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    
+
     border: 1px solid var(--glass-border);
     border-radius: calc(var(--glass-radius) / 2);
     box-shadow: var(--glass-shadow);
-    
-    /* Button-specific styles */
+
+
     padding: 10px 20px;
     cursor: pointer;
     font-weight: 600;
     color: var(--text-primary);
-    
-    /* Performance */
+
+
     will-change: transform, background-color;
     transform: translateZ(0);
     backface-visibility: hidden;
-    
+
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -2342,10 +2342,10 @@ footer p {
     transform: translateZ(0) scale(0.98);
 }
 
-/* ============================================
-   LIQUID GLASS CARD VARIANT
-   Enhanced card with subtle gradient overlay
-   ============================================ */
+
+
+
+
 
 .liquid-glass-card {
     background: linear-gradient(
@@ -2355,15 +2355,15 @@ footer p {
     );
     backdrop-filter: blur(var(--glass-blur-strength)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     -webkit-backdrop-filter: blur(var(--glass-blur-strength)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    
+
     border: 1px solid var(--glass-border);
     border-radius: var(--glass-radius);
     box-shadow: var(--glass-shadow);
-    
-    /* Subtle inner highlight */
+
+
     position: relative;
     overflow: hidden;
-    
+
     will-change: transform;
     transform: translateZ(0);
     transition: var(--glass-transition);
@@ -2398,10 +2398,10 @@ footer p {
     left: 100%;
 }
 
-/* ============================================
-   LIQUID GLASS HEADER VARIANT
-   Fixed header with optimized rendering
-   ============================================ */
+
+
+
+
 
 .liquid-glass-header {
     position: fixed;
@@ -2409,19 +2409,19 @@ footer p {
     left: 0;
     right: 0;
     height: var(--header-height, 60px);
-    
+
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur-strength)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     -webkit-backdrop-filter: blur(var(--glass-blur-strength)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    
+
     border-bottom: 1px solid var(--glass-border);
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-    
-    /* Critical for smooth scrolling performance */
+
+
     will-change: transform;
     transform: translateZ(0);
     contain: layout style paint;
-    
+
     z-index: 1000;
     transition: var(--glass-transition);
 }
@@ -2430,22 +2430,22 @@ footer p {
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
 }
 
-/* ============================================
-   LIQUID GLASS SIDEBAR VARIANT
-   ============================================ */
+
+
+
 
 .liquid-glass-sidebar {
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur-strength)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     -webkit-backdrop-filter: blur(var(--glass-blur-strength)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    
+
     border-left: 1px solid var(--glass-border);
     box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
-    
+
     will-change: transform, width, opacity;
     transform: translateZ(0);
     backface-visibility: hidden;
-    
+
     transition: var(--glass-transition);
 }
 
@@ -2453,10 +2453,10 @@ footer p {
     box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
 }
 
-/* ============================================
-   ANIMATED GLASS EFFECTS
-   Optimized for Chromium and Safari
-   ============================================ */
+
+
+
+
 
 @keyframes glassFloat {
     0%, 100% {
@@ -2488,26 +2488,26 @@ footer p {
     will-change: opacity, box-shadow;
 }
 
-/* ============================================
-   RESPONSIVE ADJUSTMENTS
-   ============================================ */
+
+
+
 
 @media (max-width: 768px) {
     :root {
         --glass-blur-strength: 16px;
         --glass-radius: 12px;
     }
-    
+
     .liquid-glass {
-        /* Reduce blur on mobile for better performance */
+
         backdrop-filter: blur(12px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
         -webkit-backdrop-filter: blur(12px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     }
 }
 
-/* ============================================
-   REDUCED MOTION PREFERENCE
-   ============================================ */
+
+
+
 
 @media (prefers-reduced-motion: reduce) {
     .liquid-glass,
@@ -2521,18 +2521,18 @@ footer p {
     }
 }
 
-/* ============================================
-   SAFARI-SPECIFIC OPTIMIZATIONS
-   ============================================ */
+
+
+
 
 @supports (-webkit-touch-callout: none) {
-    /* Safari-specific tweaks */
+
     .liquid-glass {
-        /* Use stronger blur for Safari's implementation */
+
         --glass-blur-strength: 24px;
     }
-    
-    /* Prevent text selection issues */
+
+
     .liquid-glass,
     .liquid-glass-btn {
         -webkit-user-select: none;
@@ -2540,31 +2540,31 @@ footer p {
     }
 }
 
-/* ============================================
-   CHROMIUM-SPECIFIC OPTIMIZATIONS
-   ============================================ */
+
+
+
 
 @supports (color: oklch(0 0 0)) {
-    /* Modern Chromium browsers support OKLCH */
-    /* Can be used for more vibrant glass effects if needed */
+
+
 }
 
-/* Hardware acceleration hints for Chromium */
+
 .liquid-glass {
-    /* Force GPU layer creation */
+
     transform: translate3d(0, 0, 0);
 }
 
-/* ============================================
-   ACCESSIBILITY ENHANCEMENTS
-   ============================================ */
+
+
+
 
 .liquid-glass:focus-within {
     outline: 2px solid var(--accent-pink, #ff45fc);
     outline-offset: 2px;
 }
 
-/* High contrast mode support */
+
 @media (forced-colors: active) {
     .liquid-glass {
         border: 2px solid CanvasText;

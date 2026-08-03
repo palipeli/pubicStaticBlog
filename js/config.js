@@ -1,15 +1,15 @@
-// config.js - Shared Configuration Constants
-// Centralized constants to avoid magic numbers and strings scattered across modules
+
+
 
 (function() {
     'use strict';
 
     const CONFIG = {
-        // State persistence
+
         STATE_STORAGE_KEY: 'blogPlatformState',
-        STATE_SAVE_DELAY: 500,        // Debounce saves with 500ms minimum interval
-        
-        // Selectors (for state.js)
+        STATE_SAVE_DELAY: 500,
+
+
         SELECTORS: {
             ACTIVE_SECTION: '.page-section.active',
             POST_SELECTOR_ITEM: '.post-selector-item',
@@ -22,12 +22,12 @@
         }
     };
 
-    // Expose globally
+
     if (typeof window !== 'undefined') {
         window.CONFIG = CONFIG;
     }
-    
-    // Export for Node.js
+
+
     if (typeof module !== 'undefined' && module.exports) {
         module.exports = CONFIG;
     }

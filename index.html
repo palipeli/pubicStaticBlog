@@ -13,8 +13,8 @@
     <noscript><link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet"></noscript>
     <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
-    
-    <!-- Open Graph / Facebook -->
+
+
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kamikami.eu/">
     <meta property="og:title" content="Michelle's DNS and Blog">
@@ -22,8 +22,8 @@
     <meta property="og:image" content="https://kamikami.eu/media/logo.webp">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    
-    <!-- Twitter Card -->
+
+
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Michelle's DNS and Blog">
     <meta name="twitter:description" content="WELCOME TO MY SUPER-CUTE-BUT-SHITTY WEBSITE! TAKE VICODIN IF YOU CAME FROM WSFTEAM.XYZ. I'm running a website where I post about shitty and janky technology that I like and personally use. Especially in audio, networking, and Linux technologies.">
@@ -31,7 +31,7 @@
     <meta name="twitter:site" content="@kamikamieu">
 </head>
 <body>
-    <!-- Service Worker Registration (early, before any other scripts) -->
+
     <script>
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').then(function(reg) {
@@ -43,24 +43,24 @@
             else if (savedTheme === 'light') activeBg = '/media/bg-light.webp';
             else activeBg = prefersDark ? '/media/bg-dark.webp' : '/media/bg-light.webp';
 
-            // Single postMessage to precache the active background image
-            // Use ready promise to ensure we have an active worker
+
+
             navigator.serviceWorker.ready.then(function(r) {
                 if (r.active) {
                     r.active.postMessage({ type: 'precache-bg', url: activeBg });
                 }
             });
         }).catch(function(error) {
-            // Service workers are an enhancement; the SPA remains usable without one.
+
             console.warn('Service worker registration failed:', error);
         });
     }
     </script>
 
-    <!-- Particles Background -->
+
     <div class="particles" id="particles"></div>
 
-    <!-- Header -->
+
     <header class="header">
         <div class="header-left">
             <button class="blue-button" onclick="handleClickMe()"><span>kamikami.eu</span></button>
@@ -72,21 +72,21 @@
         </div>
     </header>
 
-    <!-- Main Container -->
+
     <div class="main-container">
-        <!-- Content Area -->
+
         <main class="content-area">
-            <!-- Home Page -->
+
             <section id="home" class="page-section active">
                 <div class="home-hero" id="home-hero-content">
                     <p class="home-lead">WELCOME TO MY SUPER-CUTE-BUT-SHITTY WEBSITE! TAKE VICODIN IF YOU CAME FROM WSFTEAM.XYZ</p>
                     <img src="media/logo.webp" alt="Blog Logo" style="display: block; margin: 20px auto; width: 70%; max-width: 560px;">
-                    
-                    <!-- Blog Buttons Section (kamikami.eu style) -->
+
+
                     <div class="blog-buttons-container" id="blog-buttons-container" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 25px 0;">
-                        <!-- Buttons will be dynamically generated from posts.json -->
+
                     </div>
-                 
+
                     <div class="home-content">
                         <p>I'm running a website where I post about shitty and janky technology that I like and personally use. Especially in audio, networking, and Linux technologies.</p>
                         <p>Michelle's DNS is a .mobileconfig profile made to provision Apple iOS/iPadOS devices to allow sideloading using revoked certificate through privacy-preserving DNS which is compliant with WSFteam.xyz (partner) documentations and practice.</p>
@@ -95,42 +95,42 @@
                 </div>
             </section>
 
-            <!-- Blogs Page -->
+
             <section id="blogs" class="page-section">
                 <div class="blog-layout-container">
-                    <!-- Main Content Area (Left) -->
+
                     <div class="blog-main-content" id="blog-main-content">
-                        <!-- Blog Post Selector (Default View) -->
+
                         <div class="blog-intro-view" id="blog-intro-view">
                             <article class="blog-article">
                                 <h1>All Blog Posts</h1>
                                 <p class="blog-meta"><span class="blog-date">Select a post to read</span></p>
                                 <div class="blog-post-selector-grid" id="blog-post-selector-grid">
-                                    <!-- Post cards will be dynamically generated -->
+
                                 </div>
                             </article>
                         </div>
-                        
-                        <!-- Single Post View (Hidden by default) -->
+
+
                         <div class="blog-post-view" id="blog-post-view" style="display: none;">
                             <div class="blog-post-nav">
                                 <button class="back-to-intro-btn" onclick="goBack()" onmouseenter="window.preloadPreviousPageOnHover()">← Back</button>
                                 <button class="back-to-intro-btn next-post-btn" id="next-post-btn" onclick="goToNextPost()" onmouseenter="window.preloadNextPostOnHover()" style="display: none;">Next →</button>
                             </div>
                             <article class="blog-article" id="blog-article-content">
-                                <!-- Markdown content will be rendered here -->
+
                             </article>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- About Page -->
+
             <section id="about" class="page-section">
                 <div class="about-layout-container">
                     <div class="about-hero">
                         <img src="media/favicon-circle.webp" alt="Michelle" class="profile-img">
-                        
+
                         <div class="social-links">
                             <a href="https://discord.com/users/654535856950083603" target="_blank" class="blog-btn category-discord">
                                 <i class="fa-brands fa-discord"></i> Discord
@@ -142,10 +142,10 @@
                                 <i class="fa-brands fa-youtube"></i> YouTube
                             </a>
                         </div>
-                        
+
                         <h1>My name is Michelle</h1>
                         <p class="subtitle">Jesus Christ, you came here? Why even bother visiting this site, since there's practically nothing here. My name is Michelle and I'm not racist because I'm neither white or stereotypically asian. I'm just myself and I don't care how would anyone perceive me, although I still prefer a small talk about something other than quieting alone.</p>
-                        
+
                         <div style="margin-top:20px;">
                             <span style="font-size:3rem; animation: float 2s infinite;">💖</span>
                         </div>
@@ -161,9 +161,9 @@
             </section>
         </main>
 
-        <!-- Sidebar -->
+
         <aside class="sidebar" id="sidebar">
-            <!-- Toggle button fixed to left edge of sidebar, vertically centered -->
+
             <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Collapse Sidebar" title="Collapse Sidebar">
                 <svg viewBox="0 0 24 24" width="20" height="20">
                     <path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
@@ -179,19 +179,19 @@
                     </div>
                 </div>
 
-                <!-- Blog Post Selector - Visible on Home, About, and Blogs pages -->
+
                 <div class="sidebar-section blog-only" id="blog-sidebar-section" style="display: none;">
                     <h3 class="sidebar-title">All Posts</h3>
                     <div class="post-selector-list" id="post-selector-list">
-                        <!-- Post links will be loaded here -->
+
                     </div>
                 </div>
             </div>
         </aside>
     </div>
 
-    <!-- Scripts - Modular Architecture with Lazy Loading -->
-    <!-- Core modules loaded in order of dependency -->
+
+
     <script src="js/config.js" defer></script>
     <script src="js/markdown.js" defer></script>
     <script src="js/lazyload.js" defer></script>
@@ -200,15 +200,15 @@
     <script src="js/ui.js" defer></script>
     <script src="js/blog.js" defer></script>
     <script src="js/home.js" defer></script>
-    
-    <!-- Legacy scripts -->
+
+
     <script src="warning.js"></script>
     <script src="js/mobile-tray.js"></script>
-    
-    <!-- Main app entry point (loads after all modules) -->
+
+
     <script src="js/app.js" defer></script>
-    
-    <!-- Footer -->
+
+
     <footer>
         <p style="font-size:0.7rem;">What the fuck are you looking at? All the contents are above, but thanks for looking at though!</p>
         <p style="font-size:0.6rem; color:#666;">Idjen Boulevard No.48, Kota Malang 65112, Indonesia.</p>

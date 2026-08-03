@@ -1,10 +1,10 @@
-// state.js - Application State Persistence
-// Handles saving and restoring application state to localStorage
+
+
 
 (function() {
     'use strict';
 
-    // Use shared config constants
+
     const CONFIG = window.CONFIG || {};
     const STATE_STORAGE_KEY = CONFIG.STATE_STORAGE_KEY || 'blogPlatformState';
     const STATE_SAVE_DELAY = CONFIG.STATE_SAVE_DELAY || 500;
@@ -19,19 +19,19 @@
         BACK_BUTTON: '.back-to-intro-btn'
     };
 
-    /**
-     * Get current active page
-     * @returns {string} Current page ID or 'home'
-     */
+
+
+
+
     function getCurrentPage() {
         const activeSection = document.querySelector(SELECTORS.ACTIVE_SECTION);
         return activeSection ? activeSection.id : 'home';
     }
 
-    /**
-     * Get currently active blog post ID (if viewing a post)
-     * @returns {string|null} Post ID or null
-     */
+
+
+
+
     function getActiveBlogPostId() {
         const postView = document.getElementById(SELECTORS.BLOG_POST_VIEW.substring(1));
         if (postView && postView.style.display !== 'none') {
@@ -43,27 +43,27 @@
         return null;
     }
 
-    /**
-     * Check if sidebar is collapsed
-     * @returns {boolean} True if sidebar is collapsed
-     */
+
+
+
+
     function isSidebarCollapsed() {
         const sidebar = document.getElementById(SELECTORS.SIDEBAR.substring(1));
         return sidebar ? sidebar.classList.contains('collapsed') : false;
     }
 
-    /**
-     * Get current theme
-     * @returns {string} Current theme name or 'auto'
-     */
+
+
+
+
     function getCurrentTheme() {
         const activeThemeBtn = document.querySelector(SELECTORS.THEME_BTN + '.active');
         return activeThemeBtn ? activeThemeBtn.dataset.theme : 'auto';
     }
 
-    /**
-     * Save current application state to localStorage
-     */
+
+
+
     function saveAppState() {
         const currentState = {
             currentPage: getCurrentPage(),
@@ -78,7 +78,7 @@
             console.log('App state saved:', currentState);
         } catch (err) {
             if (err.name === 'QuotaExceededError') {
-                // Clear old state and retry
+
                 localStorage.removeItem(STATE_STORAGE_KEY);
                 try {
                     localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(currentState));
@@ -92,10 +92,10 @@
         }
     }
 
-    /**
-     * Load application state from localStorage
-     * @returns {Object|null} Saved state or null
-     */
+
+
+
+
     function loadAppState() {
         try {
             const savedState = localStorage.getItem(STATE_STORAGE_KEY);
@@ -110,14 +110,14 @@
         return null;
     }
 
-    /**
-     * Apply saved state to the application
-     * @param {Object} state - State object to apply
-     */
+
+
+
+
     function applySavedState(state) {
         console.log('Applying saved state:', state);
 
-        // Restore theme first (before other UI updates)
+
         if (state.theme) {
             const themeBtn = document.querySelector(`${SELECTORS.THEME_BTN}[data-theme="${state.theme}"]`);
             if (themeBtn && !themeBtn.classList.contains('active')) {
@@ -125,7 +125,7 @@
             }
         }
 
-        // Restore sidebar state
+
         if (state.sidebarCollapsed) {
             const sidebar = document.getElementById(SELECTORS.SIDEBAR.substring(1));
             if (sidebar && !sidebar.classList.contains('collapsed')) {
@@ -136,7 +136,7 @@
             }
         }
 
-        // Restore page navigation
+
         if (state.currentPage && state.currentPage !== 'home') {
             const navItem = document.querySelector(`${SELECTORS.NAV_ITEM}[data-page="${state.currentPage}"]`);
             if (navItem) {
@@ -144,31 +144,31 @@
             }
         }
 
-        // Store pending blog post restoration for later processing (after metadata is loaded)
+
         if (state.currentPage === 'blogs' && state.activeBlogPost) {
             window.pendingBlogPostRestore = state.activeBlogPost;
         }
     }
-    
-    /**
-     * Process pending blog post restoration after metadata is loaded
-     * Called from app.js after fetchBlogPostMetadata completes
-     */
+
+
+
+
+
     function processPendingBlogPostRestore() {
         if (window.pendingBlogPostRestore) {
             const postId = window.pendingBlogPostRestore;
             window.pendingBlogPostRestore = null;
-            
-            // Restore the post they were reading
+
+
             if (typeof window.openBlogPostLazy === 'function') {
                 window.openBlogPostLazy(postId);
             }
         }
     }
 
-    /**
-     * Restore application state after page load
-     */
+
+
+
     function restoreAppState() {
         const savedState = loadAppState();
         if (!savedState) {
@@ -176,7 +176,7 @@
             return;
         }
 
-        // Wait for DOM to be ready and blog posts to be loaded
+
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => applySavedState(savedState));
         } else {
@@ -184,10 +184,10 @@
         }
     }
 
-    /**
-     * Handle state persistence on user interactions
-     * @param {Event} e - Click event
-     */
+
+
+
+
     function handleInteraction(e) {
         const interactiveSelectors = [
             SELECTORS.NAV_ITEM,
@@ -197,7 +197,7 @@
             SELECTORS.SIDEBAR_TOGGLE
         ];
 
-        const isInteractive = interactiveSelectors.some(selector => 
+        const isInteractive = interactiveSelectors.some(selector =>
             e.target.closest(selector)
         );
 
@@ -206,18 +206,18 @@
         }
     }
 
-    /**
-     * Auto-save state on various user actions
-     */
+
+
+
     function setupStatePersistence() {
-        // Save state when navigating between pages
+
         document.addEventListener('click', handleInteraction);
 
-        // Also save before page unload
+
         window.addEventListener('beforeunload', saveAppState);
     }
 
-    // Expose functions globally
+
     window.saveAppState = saveAppState;
     window.loadAppState = loadAppState;
     window.restoreAppState = restoreAppState;

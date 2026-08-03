@@ -1,23 +1,23 @@
-// blog.js - Blog Post Management and Rendering
-// Handles fetching, caching, lazy loading, and rendering of blog posts
+
+
 
 (function() {
-    // Global state for blog posts - exposed on window for cross-module access
-    window.blogPostMetadata = []; // Metadata only (loaded initially)
-    const blogContentCache = new Map(); // Cache for loaded blog content
-    const blogContentInflight = new Map(); // Coalesce concurrent loads by post ID
+
+    window.blogPostMetadata = [];
+    const blogContentCache = new Map();
+    const blogContentInflight = new Map();
     let activeNavigationToken = 0;
 
-    // Shorthand references for cleaner code
+
     let blogPostMetadata = window.blogPostMetadata;
 
-    // Preload timeout for debouncing
+
     let preloadTimeout = null;
 
-    // Fetch only blog post metadata from /blog/ using posts.json manifest (lazy load content)
+
     async function fetchBlogPostMetadata() {
         try {
-            // Fetch the posts.json manifest file
+
             const response = await fetch('/blog/posts.json');
             if (!response.ok) {
                 throw new Error('Could not fetch blog manifest');
@@ -30,7 +30,7 @@
                 return [];
             }
 
-            // Store only metadata (no content fetched yet)
+
             blogPostMetadata = postsMeta.map(meta => ({
                 id: meta.id,
                 slug: meta.slug,
@@ -38,16 +38,16 @@
                 date: meta.date || '',
                 category: meta.category || 'Uncategorized',
                 icon: meta.icon || '📄',
-                _contentLoaded: false // Flag to track if content has been loaded
+                _contentLoaded: false
             }));
 
-            // Sort by date
+
             blogPostMetadata = blogPostMetadata.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-            // Sync with window object for cross-module access
+
             window.blogPostMetadata = blogPostMetadata;
 
-            // Dispatch event to notify other modules that metadata is loaded
+
             document.dispatchEvent(new CustomEvent('blog:metadata-loaded', { detail: blogPostMetadata }));
 
             return blogPostMetadata;
@@ -58,29 +58,29 @@
     }
 
 
-    // Lazy load a single blog post's content on demand
+
     async function loadBlogPostContentInternal(postId) {
-        // Check if already loaded in cache
+
         if (blogContentCache.has(postId)) {
             return blogContentCache.get(postId);
         }
 
-        // Find the post metadata
+
         const meta = blogPostMetadata.find(p => p.id === postId);
         if (!meta) {
             console.error(`Post with id ${postId} not found`);
             return null;
         }
 
-        // Check if content already loaded in the post object
+
         if (meta._contentLoaded && meta.htmlContent) {
             return meta;
         }
 
-        // Retry logic with exponential backoff
+
         const maxRetries = 3;
         let lastError = null;
-        
+
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
                 const mdResponse = await fetch(meta.slug);
@@ -89,7 +89,7 @@
                 const mdContent = await mdResponse.text();
                 const { frontmatter, content } = window.parseFrontmatter(mdContent);
 
-                // Update metadata with full content
+
                 meta.title = frontmatter.title || meta.title;
                 meta.date = frontmatter.date || meta.date;
                 meta.category = frontmatter.category || meta.category;
@@ -98,29 +98,29 @@
                 meta.htmlContent = window.parseMarkdown(content);
                 meta._contentLoaded = true;
 
-                // Cache the loaded post
+
                 blogContentCache.set(postId, meta);
 
                 return meta;
             } catch (err) {
                 lastError = err;
                 console.warn(`Attempt ${attempt}/${maxRetries} failed for ${meta.slug}:`, err.message);
-                
+
                 if (attempt < maxRetries) {
-                    // Exponential backoff: 500ms, 1000ms, 2000ms
+
                     const delay = 500 * Math.pow(2, attempt - 1);
                     await new Promise(resolve => setTimeout(resolve, delay));
                 }
             }
         }
-        
-        // All retries failed - don't cache error state, allow retry on next click
+
+
         console.error(`All retries failed for ${meta.slug}:`, lastError);
         throw lastError;
     }
 
-    // Share one network request and one Markdown parse between hover, click,
-    // navigation, and state-restoration callers.
+
+
     function loadBlogPostContent(postId) {
         if (blogContentCache.has(postId)) {
             return Promise.resolve(blogContentCache.get(postId));
@@ -136,16 +136,16 @@
         return loadPromise;
     }
 
-    // Preload content for posts near the cursor (hover optimization)
+
     function preloadBlogPostContent(postId) {
-        // Clear any existing preload timeout
+
         if (preloadTimeout) {
             clearTimeout(preloadTimeout);
         }
 
-        // Debounce preload to avoid excessive requests during rapid hover
+
         preloadTimeout = setTimeout(() => {
-            // Only preload if not already loaded
+
             if (!blogContentCache.has(postId)) {
                 loadBlogPostContent(postId).then(post => {
                     if (post) {
@@ -153,12 +153,12 @@
                     }
                 });
             }
-        }, 150); // 150ms delay before preloading on hover
-        
+        }, 150);
+
     }
 
 
-    // Render post selector in sidebar (with lazy loading and hover preload)
+
     function renderPostSelector(posts) {
         const container = document.getElementById('post-selector-list');
         if (!container) return;
@@ -168,11 +168,11 @@
         posts.forEach(post => {
             const item = document.createElement('div');
             item.className = 'post-selector-item';
-            // Add data attribute for state persistence
+
             item.setAttribute('data-post-id', post.id);
-            // Use metadata-only approach: load content on click, preload on hover
+
             item.onclick = () => window.openBlogPostLazy(post.id);
-            // Only prefetch the specific post content on hover (not the blog introduction)
+
             item.onmouseenter = () => {
                 preloadBlogPostContent(post.id);
             };
@@ -186,12 +186,12 @@
         });
     }
 
-    // Render blog post selector grid in main content area
+
     function renderBlogPostSelectorGrid(posts) {
         const container = document.getElementById('blog-post-selector-grid');
         if (!container) return;
 
-        // Signature guard
+
         if (typeof posts === 'undefined' || !Array.isArray(posts)) return;
 
         container.innerHTML = '';
@@ -214,13 +214,13 @@
                 </div>
             `;
 
-            // Make entire card clickable
+
             card.style.cursor = 'pointer';
             card.onclick = () => {
                 window.openBlogPostLazy(post.id);
             };
 
-            // Prefetch on hover
+
             card.onmouseenter = () => {
                 preloadBlogPostContent(post.id);
             };
@@ -239,82 +239,82 @@
         </footer>
     `;
 
-    // Get the next post ID based on current post (posts are sorted by date descending)
+
     function getNextPostId(currentPostId) {
         const currentIndex = blogPostMetadata.findIndex(p => p.id === currentPostId);
         if (currentIndex === -1) return null;
-        // Since posts are sorted newest first, "next" means older post (higher index)
+
         if (currentIndex + 1 < blogPostMetadata.length) {
             return blogPostMetadata[currentIndex + 1].id;
         }
         return null;
     }
 
-    // Get the previous post ID based on current post (posts are sorted by date descending)
+
     function getPreviousPostId(currentPostId) {
         const currentIndex = blogPostMetadata.findIndex(p => p.id === currentPostId);
         if (currentIndex === -1) return null;
-        // Since posts are sorted newest first, "previous" means newer post (lower index)
+
         if (currentIndex - 1 >= 0) {
             return blogPostMetadata[currentIndex - 1].id;
         }
         return null;
     }
 
-    // Navigate to the next post
+
     async function goToNextPost() {
         const activeItem = document.querySelector('.post-selector-item.active');
         if (!activeItem) return;
-        
+
         const currentPostId = activeItem.getAttribute('data-post-id');
         const nextPostId = getNextPostId(currentPostId);
-        
+
         if (nextPostId) {
-            // Open the next post
+
             await window.openBlogPostLazy(nextPostId);
         }
     }
 
-    // Preload next post content when hovering over the Next button
+
     function preloadNextPostOnHover() {
         const activeItem = document.querySelector('.post-selector-item.active');
         if (!activeItem) return;
-        
+
         const currentPostId = activeItem.getAttribute('data-post-id');
         const nextPostId = getNextPostId(currentPostId);
-        
+
         if (nextPostId) {
-            // Preload the next post content
+
             window.preloadBlogPostContent(nextPostId);
         }
     }
 
-    // Open a blog post with lazy loading (new approach - loads content on demand)
+
     async function openBlogPostLazy(id) {
         const navigationToken = ++activeNavigationToken;
-        // Show loading state first
+
         const article = document.getElementById('blog-article-content');
 
-        // Wait for metadata to be loaded first (critical for refresh scenario)
+
         if (!window.blogPostMetadata || window.blogPostMetadata.length === 0) {
             await waitForBlogMetadata();
         }
 
-        // Check if we're currently on home or about page, and switch to blogs if so
+
         const currentPage = document.querySelector('.page-section.active');
         let previousPage = null;
         if (currentPage && (currentPage.id === 'home' || currentPage.id === 'about')) {
-            // Save the previous page before navigating to blogs
+
             previousPage = currentPage.id;
-            // Navigate to blogs page without triggering blog introduction prefetch
+
             window.navigateToBlogsPageWithoutPrefetch();
         } else if (currentPage && currentPage.id === 'blogs') {
-            // Check if we're in intro view or post view
+
             const introView = document.getElementById('blog-intro-view');
             if (introView && introView.style.display !== 'none') {
                 previousPage = 'blog-intro';
             } else {
-                // Already viewing a post, save current post ID
+
                 const activeItem = document.querySelector('.post-selector-item.active');
                 if (activeItem) {
                     previousPage = activeItem.getAttribute('data-post-id');
@@ -324,17 +324,17 @@
             }
         }
 
-        // Update active state in sidebar (use window.blogPostMetadata to ensure we have latest data)
+
         document.querySelectorAll('.post-selector-item').forEach((item) => {
             const postId = item.getAttribute('data-post-id');
             item.classList.toggle('active', postId === id);
         });
 
-        // Hide intro view, show post view with loading indicator
+
         document.getElementById('blog-intro-view').style.display = 'none';
         document.getElementById('blog-post-view').style.display = 'block';
 
-        // Show enhanced loading state with spinner
+
         article.innerHTML = `
             <div class="loading-container">
                 <div class="loading-spinner"></div>
@@ -342,7 +342,7 @@
             </div>
         `;
 
-        // Load the post content (will use cache if already loaded)
+
         let post;
         try {
             post = await loadBlogPostContent(id);
@@ -358,7 +358,7 @@
             `;
             return;
         }
-        
+
         if (navigationToken !== activeNavigationToken) return;
 
         if (!post) {
@@ -366,7 +366,7 @@
             return;
         }
 
-        // Render post content with fade-in animation (keep loading state visible until render completes)
+
         requestAnimationFrame(() => {
             if (navigationToken !== activeNavigationToken) return;
             article.innerHTML = `
@@ -379,19 +379,19 @@
                 ${blogPostFooter}
             `;
 
-            // Initialize lazy loading for images in the rendered content
+
             if (typeof window.initializeLazyLoading === 'function') {
                 window.initializeLazyLoading();
             }
 
-            // Show/hide Next button based on whether there's a next post
+
             const nextPostBtn = document.getElementById('next-post-btn');
             if (nextPostBtn) {
                 const nextPostId = getNextPostId(id);
                 nextPostBtn.style.display = nextPostId ? 'inline-block' : 'none';
             }
 
-            // Show/hide Back button based on whether there's a previous post
+
             const backBtn = document.getElementById('blog-post-view').querySelector('.back-to-intro-btn:not(.next-post-btn)');
             if (backBtn) {
                 const previousPostId = getPreviousPostId(id);
@@ -399,19 +399,19 @@
             }
         });
 
-        // Update URL hash with blog post tag (add to history)
+
         if (typeof window.updateHash === 'function') {
             window.updateHash('', id, true);
         }
 
-        // Save state after opening a post
+
         setTimeout(window.saveAppState, 100);
 
-        // Scroll to top
+
         window.scrollTo(0, 0);
     }
-    
-    // Helper function to wait for blog metadata to be loaded
+
+
     function waitForBlogMetadata() {
         return new Promise((resolve) => {
             const checkMetadata = () => {
@@ -425,53 +425,53 @@
         });
     }
 
-    // Preload previous post content when hovering over the Back button
+
     function preloadPreviousPageOnHover() {
         const activeItem = document.querySelector('.post-selector-item.active');
         if (!activeItem) return;
-        
+
         const currentPostId = activeItem.getAttribute('data-post-id');
         const previousPostId = getPreviousPostId(currentPostId);
-        
+
         if (previousPostId) {
-            // Preload the previous post content
+
             window.preloadBlogPostContent(previousPostId);
         }
     }
 
-    // Go back to previous post in the list
+
     function goBack() {
         const article = document.getElementById('blog-article-content');
         const postView = document.getElementById('blog-post-view');
         const introView = document.getElementById('blog-intro-view');
-        
-        // Get current post ID from active item
+
+
         const activeItem = document.querySelector('.post-selector-item.active');
         if (!activeItem) {
-            // No active post, show blog intro
+
             showBlogIntro();
             return;
         }
-        
+
         const currentPostId = activeItem.getAttribute('data-post-id');
         const previousPostId = getPreviousPostId(currentPostId);
-        
+
         if (!previousPostId) {
-            // No previous post (we're at the first/newest post), show blog intro
+
             showBlogIntro();
             return;
         }
-        
-        // Clear active state
+
+
         document.querySelectorAll('.post-selector-item').forEach(item => {
             item.classList.remove('active');
         });
-        
-        // Show post view and load the previous post
+
+
         introView.style.display = 'none';
         postView.style.display = 'block';
-        
-        // Load and render the previous post
+
+
         loadBlogPostContent(previousPostId).then(post => {
             if (post) {
                 article.innerHTML = `
@@ -484,66 +484,66 @@
                     ${blogPostFooter}
                 `;
 
-                // Update active state in sidebar
+
                 document.querySelectorAll('.post-selector-item').forEach((item) => {
                     item.classList.toggle('active', item.getAttribute('data-post-id') === previousPostId);
                 });
-                
+
                 if (typeof window.initializeLazyLoading === 'function') {
                     window.initializeLazyLoading();
                 }
-                
-                // Show/hide Next button based on whether there's a next post
+
+
                 const nextPostBtn = document.getElementById('next-post-btn');
                 if (nextPostBtn) {
                     const nextPostId = getNextPostId(previousPostId);
                     nextPostBtn.style.display = nextPostId ? 'inline-block' : 'none';
                 }
-                
-                // Show/hide Back button based on whether there's a previous post
+
+
                 const backBtn = document.getElementById('blog-post-view').querySelector('.back-to-intro-btn:not(.next-post-btn)');
                 if (backBtn) {
                     const prevPostId = getPreviousPostId(previousPostId);
                     backBtn.style.display = prevPostId ? 'inline-block' : 'none';
                 }
-                
-                // Update URL hash with the restored post (don't add to history)
+
+
                 if (typeof window.updateHash === 'function') {
                     window.updateHash('', previousPostId, false);
                 }
             } else {
-                // Failed to load post, show intro instead
+
                 showBlogIntro();
             }
         });
-        
-        // Save state after going back
+
+
         setTimeout(window.saveAppState, 100);
     }
 
-    // Show blog introduction when returning from post view.
+
     function showBlogIntro() {
         document.getElementById('blog-post-view').style.display = 'none';
         document.getElementById('blog-intro-view').style.display = 'block';
 
-        // Clear active state
+
         document.querySelectorAll('.post-selector-item').forEach(item => {
             item.classList.remove('active');
         });
 
-        // Render the blog post selector grid
+
         renderBlogPostSelectorGrid(blogPostMetadata);
 
-        // Update URL hash (don't add to history when showing intro)
+
         if (typeof window.updateHash === 'function') {
             window.updateHash('blogs', null, false);
         }
 
-        // Save state after going back to intro
+
         setTimeout(window.saveAppState, 100);
     }
 
-    // Expose functions globally
+
     window.fetchBlogPostMetadata = fetchBlogPostMetadata;
     window.preloadBlogPostContent = preloadBlogPostContent;
     window.renderPostSelector = renderPostSelector;

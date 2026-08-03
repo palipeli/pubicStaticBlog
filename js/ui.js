@@ -1,8 +1,8 @@
-// ui.js - UI Components, Navigation, and Event Handlers
-// Handles navigation, sidebar toggle, theme switching, particles, and UI interactions
+
+
 
 (function() {
-    // Navigate to blogs page without triggering blog introduction prefetch
+
     function navigateToBlogsPageWithoutPrefetch() {
         const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
         if (!blogsNavItem) return;
@@ -11,11 +11,11 @@
         const navItems = document.querySelectorAll('.nav-item');
         const blogSidebarSection = document.getElementById('blog-sidebar-section');
 
-        // Update active nav item
+
         navItems.forEach(nav => nav.classList.remove('active'));
         blogsNavItem.classList.add('active');
 
-        // Show blogs section
+
         sections.forEach(section => {
             section.classList.remove('active');
             if (section.id === 'blogs') {
@@ -23,22 +23,22 @@
             }
         });
 
-        // Show/hide "All Posts" in sidebar
+
         if (blogSidebarSection) {
             blogSidebarSection.style.display = 'block';
         }
 
-        // Scroll to top
+
         window.scrollTo(0, 0);
-        
-        // Update URL hash for blogs page
+
+
         if (typeof window.updateHash === 'function') {
             window.updateHash('blogs', null, true);
         }
     }
 
-    // Shared navigation helpers keep page transitions consistent across normal
-    // navigation, hash routing, and blog-session restoration.
+
+
     function setActiveNavigationItem(navItems, activeItem) {
         navItems.forEach(nav => nav.classList.toggle('active', nav === activeItem));
     }
@@ -79,20 +79,20 @@
         setTimeout(window.saveAppState, 100);
     }
 
-    // Generate URL-safe hash for a blog post
+
     function generateBlogPostHash(postId) {
         return 'blog-' + postId;
     }
 
-    // Extract blog post ID from hash
+
     function getBlogPostIdFromHash(hash) {
         if (hash && hash.startsWith('blog-')) {
-            return hash.substring(5); // Remove 'blog-' prefix
+            return hash.substring(5);
         }
         return null;
     }
 
-    // Update URL hash without triggering scroll
+
     function updateHash(newHash, postId, addToHistory = true) {
         let hash = newHash;
         if (postId) {
@@ -100,7 +100,7 @@
         }
         if (window.location.hash !== '#' + hash) {
             if (addToHistory) {
-                // Use pushState with a state object to prevent favicon re-fetch
+
                 history.pushState({ hash: hash }, '', '#' + hash);
             } else {
                 history.replaceState({ hash: hash }, '', '#' + hash);
@@ -108,20 +108,20 @@
         }
     }
 
-    // Handle hash change events
+
     function handleHashChange() {
-        const hash = window.location.hash.substring(1); // Remove '#'
-        
+        const hash = window.location.hash.substring(1);
+
         if (!hash || hash === 'home') {
-            // Navigate to home
+
             const homeNavItem = document.querySelector('.nav-item[data-page="home"]');
             if (homeNavItem) homeNavItem.click();
         } else if (hash === 'blogs') {
-            // Navigate to blogs intro
+
             const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
             if (blogsNavItem) {
                 blogsNavItem.click();
-                // Show intro view
+
                 const introView = document.getElementById('blog-intro-view');
                 const postView = document.getElementById('blog-post-view');
                 if (introView && postView) {
@@ -130,14 +130,14 @@
                 }
             }
         } else if (hash === 'about') {
-            // Navigate to about
+
             const aboutNavItem = document.querySelector('.nav-item[data-page="about"]');
             if (aboutNavItem) aboutNavItem.click();
         } else if (hash && hash.startsWith('blog-')) {
-            // Open specific blog post
+
             const postId = getBlogPostIdFromHash(hash);
             if (postId && typeof window.openBlogPostLazy === 'function') {
-                // Wait for metadata if needed
+
                 if (!window.blogPostMetadata || window.blogPostMetadata.length === 0) {
                     window.waitForBlogMetadata().then(() => {
                         window.openBlogPostLazy(postId);
@@ -149,17 +149,17 @@
         }
     }
 
-    // Setup hash-based routing
+
     function setupHashRouting() {
-        // Listen for hash changes
+
         window.addEventListener('hashchange', handleHashChange);
-        
-        // Listen for popstate to handle back/forward button with state
+
+
         window.addEventListener('popstate', (event) => {
-            // If we have state data, use it; otherwise fall back to current hash
+
             if (event.state && event.state.hash) {
                 const hash = event.state.hash;
-                // Update location hash without adding to history
+
                 if (window.location.hash !== '#' + hash) {
                     history.replaceState({ hash: hash }, '', '#' + hash);
                 }
@@ -168,10 +168,10 @@
                 handleHashChange();
             }
         });
-        
-        // Handle initial hash on page load
+
+
         if (window.location.hash) {
-            // Wait for DOM and blog metadata to be ready
+
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', () => {
                     setTimeout(handleHashChange, 100);
@@ -182,12 +182,12 @@
         }
     }
 
-    // Initialize particles (respecting reduced motion preferences)
+
     function createParticles() {
         const container = document.getElementById('particles');
         if (!container) return;
 
-        // Skip particle creation if user prefers reduced motion
+
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             return;
         }
@@ -204,121 +204,121 @@
         container.appendChild(fragment);
     }
 
-    // Navigation
+
     function setupNavigation() {
         const navItems = document.querySelectorAll('.nav-item');
         const sections = document.querySelectorAll('.page-section');
         const blogSidebarSection = document.getElementById('blog-sidebar-section');
-        
-        // Track if user has already restored their blog session
+
+
         let hasRestoredBlogSession = false;
-        // Track if user was previously reading a blog post before navigating away
+
         let wasReadingBlogPost = false;
 
-        // Wrap home content in rectangle on initialization
+
         wrapHomeContentInRectangle();
 
         navItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
 
-                // Track if user was reading a blog post before clicking nav
+
                 const postView = document.getElementById('blog-post-view');
                 const isReadingPost = postView && postView.style.display !== 'none' && postView.style.display !== '';
-                
-                // Handle Blog button behavior
+
+
                 if (item.dataset.page === 'blogs') {
                     const currentPage = window.getCurrentPage ? window.getCurrentPage() : 'home';
-                    
-                    // If clicking Blog from Home or About page
+
+
                     if (currentPage === 'home' || currentPage === 'about') {
-                        // Check if there's a saved blog post to restore
+
                         const savedState = window.loadAppState ? window.loadAppState() : null;
                         const hasSavedPost = savedState && savedState.activeBlogPost;
-                        
-                        // First click: Restore the blog post if user was reading one before navigating away
-                        // OR if they haven't restored yet and there's a saved post
+
+
+
                         if ((wasReadingBlogPost || !hasRestoredBlogSession) && hasSavedPost) {
                             hasRestoredBlogSession = true;
-                            wasReadingBlogPost = false; // Reset after restoration
-                            
-                            // Navigate to blogs page
+                            wasReadingBlogPost = false;
+
+
                             navigateToBlogsPageWithoutPrefetch();
-                            
-                            // Update URL hash
+
+
                             window.updateHash('blogs', null, true);
-                            
-                            // Open the saved blog post
+
+
                             if (typeof window.openBlogPostLazy === 'function' && savedState.activeBlogPost) {
                                 window.openBlogPostLazy(savedState.activeBlogPost);
                             }
-                            
-                            // Scroll to top
+
+
                             window.scrollTo(0, 0);
-                            
-                            // Save state after navigation
+
+
                             setTimeout(window.saveAppState, 100);
                             return;
                         } else {
-                            // Second click (or no saved post): Show blog intro grid
-                            hasRestoredBlogSession = false; // Reset for next time
-                            
-                            // Navigate to blogs page and show intro grid
+
+                            hasRestoredBlogSession = false;
+
+
                             navigateToBlogsPageWithoutPrefetch();
-                            
-                            // Update URL hash
+
+
                             window.updateHash('blogs', null, true);
-                            
-                            // Show blog intro view (grid of all posts)
+
+
                             showBlogIntroView();
-                            
-                            // Scroll to top
+
+
                             window.scrollTo(0, 0);
-                            
-                            // Save state after navigation
+
+
                             saveStateAfterNavigation();
                             return;
                         }
                     }
-                    // If already reading a blog post on blogs page, show the blog intro grid
+
                     if (isReadingPost) {
-                        // Navigate to blogs page and show intro grid
+
                         navigateToBlogsPageWithoutPrefetch();
-                        
-                        // Update URL hash
+
+
                         window.updateHash('blogs', null, true);
-                        
-                        // Show blog intro view (grid of all posts)
+
+
                         showBlogIntroView();
-                        
-                        // Scroll to top
+
+
                         window.scrollTo(0, 0);
-                        
-                        // Save state after navigation
+
+
                         saveStateAfterNavigation();
                         return;
                     }
-                    // If clicking Blog from elsewhere, just navigate normally
+
                 } else {
-                    // For other nav items, track if user was reading a blog post
+
                     if (isReadingPost) {
                         wasReadingBlogPost = true;
                     }
-                    
-                    // Reset the blog session flag when going to Home or About
+
+
                     if (item.dataset.page === 'home' || item.dataset.page === 'about') {
                         hasRestoredBlogSession = false;
                     }
-                    
-                    // Show corresponding section
+
+
                     const page = item.dataset.page;
                     setActiveNavigationItem(navItems, item);
                     showPageSection(sections, page);
 
-                    // Show/hide "All Posts" in sidebar on Home, About, and Blogs pages
+
                     updateBlogSidebarVisibility(blogSidebarSection, page);
 
-                    // Update URL hash based on page
+
                     if (page === 'home') {
                         window.updateHash('home', null, true);
                     } else if (page === 'about') {
@@ -327,42 +327,42 @@
                         window.updateHash('blogs', null, true);
                     }
 
-                    // Scroll to top when changing pages
+
                     window.scrollTo(0, 0);
 
-                    // Save state after navigation
+
                     saveStateAfterNavigation();
                     return;
                 }
 
-                // Navigation already handled in the Blog button logic above
+
                 return;
             });
         });
     }
 
-    // Wrap home page content in a rectangle container (like blog and about pages)
+
     function wrapHomeContentInRectangle() {
         const homeHero = document.getElementById('home-hero-content');
         if (!homeHero) return;
 
-        // Check if already wrapped
+
         if (homeHero.parentElement.classList.contains('home-layout-container')) {
             return;
         }
 
-        // Create wrapper container
+
         const wrapper = document.createElement('div');
         wrapper.className = 'home-layout-container';
 
-        // Insert wrapper before homeHero
+
         homeHero.parentNode.insertBefore(wrapper, homeHero);
 
-        // Move homeHero into wrapper
+
         wrapper.appendChild(homeHero);
     }
 
-    // Cookie helpers for theme persistence
+
     function setCookie(name, value, days) {
         const d = new Date();
         d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -374,12 +374,12 @@
         return match ? match[2] : null;
     }
 
-    // Check if first visit (no cookie set)
+
     function isFirstVisit() {
         return getCookie('theme_preference') === null;
     }
 
-    // Get saved theme or default to auto
+
     function getSavedTheme() {
         if (isFirstVisit()) {
             return 'auto';
@@ -387,29 +387,29 @@
         return getCookie('theme_preference') || 'auto';
     }
 
-    // Save theme preference
+
     function saveThemePreference(theme) {
         setCookie('theme_preference', theme, 365);
     }
 
-    // Apply different themes
+
     function applyTheme(themeName) {
         const root = document.documentElement;
 
-        // Set data-theme attribute for CSS selectors
+
         root.setAttribute('data-theme', themeName);
 
         if (themeName === 'auto') {
-            // Auto theme - detect system preference
+
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             applyTheme(prefersDark ? 'dark' : 'light');
             return;
         }
-        // All theme colors are now defined in CSS custom properties in style.css
-        // No inline styles needed - CSS handles theme switching via [data-theme] selectors
+
+
     }
 
-    // Template selection - now handles theme switching with cookie persistence
+
     function setupTemplates() {
         const themeBtns = document.querySelectorAll('.theme-btn');
 
@@ -422,12 +422,12 @@
                 applyTheme(theme);
                 saveThemePreference(theme);
 
-                // Save state after theme change
+
                 setTimeout(window.saveAppState, 100);
             });
         });
 
-        // Load saved theme on initialization
+
         const savedTheme = getSavedTheme();
         const savedBtn = document.querySelector(`.theme-btn[data-theme="${savedTheme}"]`);
         if (savedBtn) {
@@ -435,18 +435,18 @@
             savedBtn.classList.add('active');
             applyTheme(savedTheme);
         } else {
-            // Default to auto if no button matches
+
             applyTheme('auto');
         }
     }
 
-    // Setup system theme change listener for auto mode
+
     function setupSystemThemeListener() {
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-        // Listen for changes in system color scheme preference
+
         mediaQuery.addEventListener('change', (e) => {
-            // Only react if auto theme is currently selected
+
             const activeThemeBtn = document.querySelector('.theme-btn.active');
             if (activeThemeBtn && activeThemeBtn.dataset.theme === 'auto') {
                 applyTheme('auto');
@@ -454,7 +454,7 @@
         });
     }
 
-    // Click me button handler
+
     function handleClickMe() {
         const button = document.querySelector('.blue-button');
         if (!button) return;
@@ -465,7 +465,7 @@
             button.style.animation = '';
         }, 300);
 
-        // Create ripple effect
+
         const ripple = document.createElement('div');
         ripple.style.cssText = `
             position: fixed;
@@ -487,14 +487,14 @@
             ripple.remove();
         }, 600);
 
-        // Navigate to home page
+
         const homeNavItem = document.querySelector('.nav-item[data-page="home"]');
         if (homeNavItem) {
             homeNavItem.click();
         }
     }
 
-    // Sidebar toggle functionality
+
     function setupSidebarToggle() {
         const sidebarToggle = document.getElementById('sidebar-toggle');
         const sidebar = document.getElementById('sidebar');
@@ -502,12 +502,12 @@
 
         if (!sidebarToggle || !sidebar || !mainContainer) return;
 
-        // Check if we're on mobile/small screen
+
         function isMobileView() {
             return window.innerWidth <= 768;
         }
 
-        // Initialize sidebar state based on screen size
+
         function initSidebarState() {
             if (isMobileView()) {
                 sidebar.classList.add('collapsed');
@@ -524,32 +524,32 @@
             }
         }
 
-        // Call on load
+
         initSidebarState();
 
-        // Toggle sidebar on button click
+
         sidebarToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             sidebar.classList.toggle('collapsed');
             sidebar.classList.toggle('expanded');
             mainContainer.classList.toggle('sidebar-collapsed');
 
-            // Update toggle button aria-label and icon direction
+
             const isCollapsed = sidebar.classList.contains('collapsed');
             sidebarToggle.setAttribute('aria-label', isCollapsed ? 'Open Sidebar' : 'Collapse Sidebar');
             sidebarToggle.setAttribute('title', isCollapsed ? 'Open Sidebar' : 'Collapse Sidebar');
 
-            // Save state after sidebar toggle
+
             setTimeout(window.saveAppState, 100);
         });
 
-        // Handle window resize - sidebar always accessible via button
+
         let resizeTimeout;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
-                // On mobile, auto-collapse for space but button remains visible
-                // On desktop, preserve user's choice
+
+
                 if (isMobileView()) {
                     if (!sidebar.classList.contains('collapsed')) {
                         sidebar.classList.add('collapsed');
@@ -559,7 +559,7 @@
                         sidebarToggle.setAttribute('title', 'Open Sidebar');
                     }
                 } else {
-                    // Desktop: only auto-expand if user hasn't manually collapsed it
+
                     if (!sidebar.classList.contains('collapsed') && !sidebar.classList.contains('expanded')) {
                         sidebar.classList.add('expanded');
                         mainContainer.classList.remove('sidebar-collapsed');
@@ -571,38 +571,38 @@
         });
     }
 
-    // Prefetch both background images when cursor approaches theme chooser
+
     function setupThemePrefetch() {
-        // Only fire once per page session
+
         let bgPrefetched = false;
 
         function triggerPrefetch() {
             if (bgPrefetched) return;
             if (!navigator.serviceWorker || !navigator.serviceWorker.controller) return;
 
-            // Determine the alternate theme background to prefetch (not the already-loaded one)
+
             var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             var cookieMatch = document.cookie.match(/theme_preference=([^;]+)/);
             var savedTheme = cookieMatch ? cookieMatch[1] : null;
             var alternateBg;
-            
+
             if (savedTheme === 'dark') {
                 alternateBg = '/media/bg-light.webp';
             } else if (savedTheme === 'light') {
                 alternateBg = '/media/bg-dark.webp';
             } else {
-                // Auto mode - prefetch the opposite of system preference
+
                 alternateBg = prefersDark ? '/media/bg-light.webp' : '/media/bg-dark.webp';
             }
 
             bgPrefetched = true;
             navigator.serviceWorker.controller.postMessage({
                 type: 'prefetch-bg',
-                urls: [alternateBg]  // Only prefetch the alternate theme, not both
+                urls: [alternateBg]
             });
         }
 
-        // Desktop: detect proximity to .theme-chooser inside #sidebar
+
         const sidebar = document.getElementById('sidebar');
         if (sidebar) {
             sidebar.addEventListener('mousemove', function(e) {
@@ -611,7 +611,7 @@
                 if (!chooser) return;
 
                 const rect = chooser.getBoundingClientRect();
-                const proximity = 100; // pixels
+                const proximity = 100;
                 const isNear = (
                     e.clientX >= rect.left - proximity &&
                     e.clientX <= rect.right + proximity &&
@@ -625,7 +625,7 @@
             });
         }
 
-        // Mobile: prefetch when the mobile tray opens (touchstart on tray area)
+
         const mobileTray = document.querySelector('.mobile-tray');
         if (mobileTray) {
             mobileTray.addEventListener('touchstart', function() {
@@ -633,8 +633,8 @@
             }, { once: true, passive: true });
         }
 
-        // Fallback: also trigger if the mobile tray is created dynamically
-        // (mobile-tray.js creates it on DOMContentLoaded)
+
+
         const observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
                 mutation.addedNodes.forEach(function(node) {
@@ -650,7 +650,7 @@
         observer.observe(document.body, { childList: true, subtree: true });
     }
 
-    // Expose functions globally
+
     window.navigateToBlogsPageWithoutPrefetch = navigateToBlogsPageWithoutPrefetch;
     window.createParticles = createParticles;
     window.setupNavigation = setupNavigation;

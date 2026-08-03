@@ -1,18 +1,18 @@
 (function() {
-    const STORAGE_KEY = 'system_warning_consent'; 
-    const SCROLL_THRESHOLD = 10; 
+    const STORAGE_KEY = 'system_warning_consent';
+    const SCROLL_THRESHOLD = 10;
 
     const phrases = [
-        "STOP", "PILIH PRABOWO GIBRAN", "PILIH NOMOR 2 2029", "HAIIIIIIII!", "ANTEK ANTEK ASING", "PALING NYAWIT"       
+        "STOP", "PILIH PRABOWO GIBRAN", "PILIH NOMOR 2 2029", "HAIIIIIIII!", "ANTEK ANTEK ASING", "PALING NYAWIT"
     ];
 
 
     let bypassWarning = false;
 
-    // Global link bypass - only skip warning for actual links and interactive UI elements
+
     window.addEventListener('click', (e) => {
-        if (e.target.closest('a') || 
-            e.target.closest('#themeToggle') || 
+        if (e.target.closest('a') ||
+            e.target.closest('#themeToggle') ||
             e.target.closest('.menu-toggle') ||
             e.target.closest('.theme-btn') ||
             e.target.closest('.nav-item') ||
@@ -35,16 +35,16 @@
         }
     });
 
-    // The "Are you sure you want to leave?" logic
+
     window.addEventListener('beforeunload', (e) => {
         if (!bypassWarning) {
-            e.preventDefault(); 
-            e.returnValue = ''; 
+            e.preventDefault();
+            e.returnValue = '';
         }
     });
-   
-    let isAccepted = false; 
-    let areAssetsLoaded = false; 
+
+    let isAccepted = false;
+    let areAssetsLoaded = false;
 
     let touchStartX = 0;
     let touchStartY = 0;
@@ -56,17 +56,17 @@
         #consent-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-            background-color: rgba(0, 0, 0, 0.4); 
+            background-color: rgba(0, 0, 0, 0.4);
             z-index: 2147483646;
             display: flex; align-items: flex-end; justify-content: center;
             padding-bottom: 50px; opacity: 1; transition: opacity 0.3s ease-out;
         }
         #consent-box {
             background-color: #3a3a3a; color: #fff;
-            width: 90%; max-width: 900px; 
+            width: 90%; max-width: 900px;
             border: 4px solid #000;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);   
-            display: flex; flex-direction: column; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column;
             font-family: 'VT323', monospace;
             overflow: hidden;
         }
@@ -89,17 +89,17 @@
         }
         .mc-btn:hover:not(:disabled) { background: #fff; color: #000; }
         .mc-btn:disabled { opacity: 0.5; cursor: wait; }
-        
+
         #warning-flash {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: rgba(242, 0, 255, 1); 
+            background-color: rgba(242, 0, 255, 1);
             z-index: 2147483647; pointer-events: none; opacity: 0;
             display: flex; justify-content: center; align-items: center;
         }
-        
+
         #hdr-pre-flash {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: white; 
+            background-color: white;
             z-index: 2147483648; pointer-events: none; opacity: 0;
         }
 
@@ -135,10 +135,10 @@
 
     const consentOverlay = document.createElement('div');
     consentOverlay.id = 'consent-overlay';
-    
+
     if (hasPriorConsent) {
         consentOverlay.style.display = 'none';
-        isAccepted = true; 
+        isAccepted = true;
     }
 
     consentOverlay.innerHTML = `
@@ -159,25 +159,25 @@
     document.body.appendChild(consentOverlay);
 
     async function initAudio() {
-        // Audio initialization removed - assets are considered loaded immediately
+
         const acceptBtn = document.getElementById('accept-btn');
         const declineBtn = document.getElementById('decline-btn');
         const loadText = document.getElementById('loading-status');
 
-        // Simulate asset loading completion without audio
+
         areAssetsLoaded = true;
         loadText.innerText = "Assets Loaded.";
         acceptBtn.innerText = "ACCEPT";
         acceptBtn.disabled = false;
         declineBtn.disabled = false;
-        
+
         acceptBtn.addEventListener('click', () => {
             localStorage.setItem(STORAGE_KEY, 'true');
             consentOverlay.style.opacity = '0';
-            
-            // Dispatch custom event for devotional.js to listen to
+
+
             document.dispatchEvent(new CustomEvent('warning:cleared'));
-            
+
             setTimeout(() => {
                 consentOverlay.style.display = 'none';
                 isAccepted = true;
@@ -188,11 +188,11 @@
             localStorage.removeItem(STORAGE_KEY);
             acceptBtn.disabled = true;
             declineBtn.disabled = true;
-            
-            const intervalId = setInterval(() => { triggerWarning(null, true); }, 100); 
+
+            const intervalId = setInterval(() => { triggerWarning(null, true); }, 100);
             setTimeout(() => {
                 clearInterval(intervalId);
-                bypassWarning = true; 
+                bypassWarning = true;
                 location.reload();
             }, 3000);
         });
@@ -201,12 +201,12 @@
 
     async function triggerWarning(e, force = false) {
         if (!force) {
-            if (!isAccepted || !areAssetsLoaded) return; 
-            // Don't trigger on clicks to interactive elements
+            if (!isAccepted || !areAssetsLoaded) return;
+
             if (e && e.target && (
-                e.target.closest('#consent-overlay') || 
-                e.target.closest('a') || 
-                e.target.closest('#themeToggle') || 
+                e.target.closest('#consent-overlay') ||
+                e.target.closest('a') ||
+                e.target.closest('#themeToggle') ||
                 e.target.closest('.menu-toggle') ||
                 e.target.closest('.theme-btn') ||
                 e.target.closest('.nav-item') ||
@@ -227,14 +227,14 @@
             )) return;
         }
 
-        // Always allow multiple triggers - don't set isPlaying flag
-        // Only use isPlaying for forced triggers to prevent recursion during flash
+
+
 
         preFlashOverlay.style.opacity = '1';
         setTimeout(() => {
             textSpan.innerText = phrases[Math.floor(Math.random() * phrases.length)];
             flashOverlay.style.opacity = '1';
-            // Audio playback removed
+
             setTimeout(() => { flashOverlay.style.opacity = '0'; }, 100);
         }, 5);
         setTimeout(() => { preFlashOverlay.style.opacity = '0'; }, 25);
@@ -242,7 +242,7 @@
 
     initAudio();
 
-    // Trigger handlers
+
     window.addEventListener('keydown', (e) => isAccepted && triggerWarning(e));
     window.addEventListener('mousedown', (e) => isAccepted && triggerWarning(e));
     window.addEventListener('touchstart', (e) => {

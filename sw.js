@@ -1,6 +1,6 @@
-// sw.js - Service Worker for Static Asset Caching & Offline Support
-// Caches all static assets (HTML, CSS, JS, images, JSON, Markdown) with appropriate strategies
-// Provides offline fallback and background prefetching for improved load times and UI responsiveness
+
+
+
 
 'use strict';
 
@@ -9,18 +9,18 @@ const STATIC_CACHE_NAME = 'static-assets-v2';
 const IMAGE_CACHE_NAME = 'images-v2';
 const CONTENT_CACHE_NAME = 'blog-content-v2';
 
-// Track pending fetches to prevent duplicate network requests
-// Share in-flight requests instead of polling Cache Storage. A failed request
-// must reject all waiters rather than leaving them waiting forever.
+
+
+
 const pendingFetches = new Map();
 
-// File extensions to cache with different strategies
+
 const STATIC_EXTENSIONS = /\.(html|css|js|json|webmanifest|ico|txt|xml)$/i;
 const IMAGE_EXTENSIONS = /\.(webp|png|jpg|jpeg|gif|svg|ico)(\?.*)?$/i;
 const MARKDOWN_EXTENSIONS = /\.(md|markdown)(\?.*)?$/i;
 const FONT_EXTENSIONS = /\.(woff|woff2|ttf|eot|otf)(\?.*)?$/i;
 
-// Critical assets to precache on install
+
 const PRECACHE_ASSETS = [
     '/',
     '/index.html',
@@ -43,18 +43,18 @@ const PRECACHE_ASSETS = [
     '/media/bg-dark.webp',
 ];
 
-// -------------------------------------------------------------------
-// Install: Precache critical static assets
-// -------------------------------------------------------------------
+
+
+
 self.addEventListener('install', (event) => {
     event.waitUntil(
         Promise.all([
             caches.open(STATIC_CACHE_NAME),
             caches.open(IMAGE_CACHE_NAME)
         ]).then(([staticCache, imageCache]) => {
-            // Precache critical assets with error handling for each
+
             const cachePromises = PRECACHE_ASSETS.map((url) => {
-                // Determine which cache to use based on file type
+
                 const targetCache = IMAGE_EXTENSIONS.test(url) ? imageCache : staticCache;
                 return fetch(url)
                     .then((response) => {
@@ -69,15 +69,15 @@ self.addEventListener('install', (event) => {
             });
             return Promise.all(cachePromises);
         }).then(() => {
-            // Activate immediately without waiting for existing clients
+
             return self.skipWaiting();
         })
     );
 });
 
-// -------------------------------------------------------------------
-// Activate: Claim all clients and purge old cache versions
-// -------------------------------------------------------------------
+
+
+
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
@@ -97,64 +97,64 @@ self.addEventListener('activate', (event) => {
                     .map((name) => caches.delete(name))
             );
         }).then(() => {
-            // Take control of all open clients immediately
+
             return self.clients.claim();
         })
     );
 });
 
-// -------------------------------------------------------------------
-// Helper: Determine cache strategy based on request
-// -------------------------------------------------------------------
+
+
+
 function getCacheStrategy(request) {
     const url = new URL(request.url);
     const pathname = url.pathname;
 
-    // Same-origin only
+
     if (url.origin !== self.location.origin) {
         return 'network-only';
     }
 
-    // HTML pages - network-first with offline fallback
+
     if (pathname === '/' || pathname === '/index.html' || pathname.endsWith('.html')) {
         return 'network-first';
     }
 
-    // The manifest changes independently from the rest of the static assets.
-    // Keep this check before the generic JSON/static rule.
+
+
     if (pathname === '/blog/posts.json') {
         return 'network-first';
     }
 
-    // Static assets (CSS, JS, JSON) - cache-first with network fallback
+
     if (STATIC_EXTENSIONS.test(pathname)) {
         return 'cache-first';
     }
 
-    // Images - cache-first
+
     if (IMAGE_EXTENSIONS.test(pathname)) {
         return 'cache-first';
     }
 
-    // Fonts - cache-first (long-term caching)
+
     if (FONT_EXTENSIONS.test(pathname)) {
         return 'cache-first';
     }
 
-    // Blog content is static in this deployment. Cache-first avoids a network
-    // refresh every time a user revisits a post; publish updates by bumping
-    // the cache version or explicitly running the precache command.
+
+
+
     if (MARKDOWN_EXTENSIONS.test(pathname) || pathname.startsWith('/blog/')) {
         return 'cache-first';
     }
 
-    // Default: network-first
+
     return 'network-first';
 }
 
-// -------------------------------------------------------------------
-// Helper: Get appropriate cache for request
-// -------------------------------------------------------------------
+
+
+
 function getCacheForRequest(request) {
     const url = new URL(request.url);
     const pathname = url.pathname;
@@ -192,25 +192,25 @@ async function prefetchUrl(value, cache) {
     }
 }
 
-// -------------------------------------------------------------------
-// Fetch: Apply appropriate caching strategy
-// -------------------------------------------------------------------
+
+
+
 self.addEventListener('fetch', (event) => {
     const request = event.request;
     const url = new URL(request.url);
 
-    // Only handle GET requests
+
     if (request.method !== 'GET') {
         return;
     }
 
-    // Skip cross-origin requests (except for fonts from Google Fonts)
+
     if (url.origin !== self.location.origin) {
-        // Allow Google Fonts to pass through (they have their own caching)
+
         if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
             return;
         }
-        // Allow FontAwesome CDN
+
         if (url.hostname === 'cdnjs.cloudflare.com') {
             return;
         }
@@ -223,9 +223,9 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(handleRequest(request, strategy, cacheName));
 });
 
-// -------------------------------------------------------------------
-// Request handler with different strategies
-// -------------------------------------------------------------------
+
+
+
 async function handleRequest(request, strategy, cacheName) {
     const cache = await caches.open(cacheName);
 
@@ -242,46 +242,46 @@ async function handleRequest(request, strategy, cacheName) {
     }
 }
 
-// -------------------------------------------------------------------
-// Cache-First Strategy: Return cached response immediately, fetch in background
-// Best for: Static assets (CSS, JS, images, fonts) that rarely change
-// -------------------------------------------------------------------
+
+
+
+
 async function cacheFirst(request, cache) {
     const cachedResponse = await cache.match(request);
-    
+
     if (cachedResponse) {
-        // Static assets are versioned through the cache name. Avoid a second
-        // network request on every script/style/image read.
+
+
         return cachedResponse;
     }
 
-    // Cache miss - fetch from network
+
     return fetchAndCache(request, cache);
 }
 
-// -------------------------------------------------------------------
-// Network-First Strategy: Try network first, fallback to cache
-// Best for: HTML pages, API endpoints, manifest files
-// -------------------------------------------------------------------
+
+
+
+
 async function networkFirst(request, cache) {
     try {
         const networkResponse = await fetch(request);
-        
+
         if (networkResponse && networkResponse.ok) {
-            // Cache successful response
+
             await cache.put(request, networkResponse.clone());
         }
-        
+
         return networkResponse;
     } catch (error) {
-        // Network failed - try cache
+
         const cachedResponse = await cache.match(request);
-        
+
         if (cachedResponse) {
             return cachedResponse;
         }
 
-        // No cache - return offline fallback for HTML pages
+
         if (request.headers.get('accept')?.includes('text/html')) {
             return getOfflineShell(cache);
         }
@@ -290,26 +290,26 @@ async function networkFirst(request, cache) {
     }
 }
 
-// -------------------------------------------------------------------
-// Stale-While-Revalidate: Return cached immediately, update in background
-// Best for: Blog content (markdown posts) that may update occasionally
-// -------------------------------------------------------------------
+
+
+
+
 async function staleWhileRevalidate(request, cache) {
     const cachedResponse = await cache.match(request);
-    
-    // Always fetch in background to update cache
+
+
     const fetchPromise = fetchAndCache(request, cache);
-    
+
     if (cachedResponse) {
-        // Return cached immediately, update happens in background
+
         return cachedResponse;
     }
 
-    // No cache - wait for network
+
     try {
         return await fetchPromise;
     } catch (error) {
-        // If network fails and no cache, return offline fallback for HTML
+
         if (request.headers.get('accept')?.includes('text/html')) {
             return getOfflineShell(cache);
         }
@@ -317,13 +317,13 @@ async function staleWhileRevalidate(request, cache) {
     }
 }
 
-// -------------------------------------------------------------------
-// Fetch from network and cache the response
-// -------------------------------------------------------------------
+
+
+
 async function fetchAndCache(request, cache) {
     const url = request.url;
-    
-    // Prevent duplicate fetches and propagate the original result/error.
+
+
     if (pendingFetches.has(url)) {
         return pendingFetches.get(url);
     }
@@ -346,14 +346,14 @@ async function fetchAndCache(request, cache) {
     }
 }
 
-// -------------------------------------------------------------------
-// Update cache in background (for cache-first strategy)
-// -------------------------------------------------------------------
+
+
+
 function updateCacheInBackground(request, cache) {
     const url = request.url;
-    
+
     if (pendingFetches.has(url)) {
-        return; // Already fetching
+        return;
     }
     const updatePromise = fetch(request)
         .then((response) => {
@@ -362,7 +362,7 @@ function updateCacheInBackground(request, cache) {
             }
         })
         .catch(() => {
-            // Ignore background update failures
+
         })
         .finally(() => {
             pendingFetches.delete(url);
@@ -371,9 +371,9 @@ function updateCacheInBackground(request, cache) {
     pendingFetches.set(url, updatePromise);
 }
 
-// -------------------------------------------------------------------
-// Create offline fallback response
-// -------------------------------------------------------------------
+
+
+
 async function getOfflineShell(cache) {
     const shell = await cache.match('/index.html') || await cache.match('/');
     return shell || createOfflineFallback();
@@ -389,27 +389,27 @@ function createOfflineFallback() {
             <title>Offline - Michelle's DNS and Blog</title>
             <style>
                 * { box-sizing: border-box; margin: 0; padding: 0; }
-                body { 
+                body {
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                    display: flex; 
-                    align-items: center; 
-                    justify-content: center; 
-                    min-height: 100vh; 
-                    background: #1a1a1a; 
-                    color: #fff; 
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-height: 100vh;
+                    background: #1a1a1a;
+                    color: #fff;
                     text-align: center;
                     padding: 20px;
                 }
                 .container { max-width: 400px; }
                 h1 { font-size: 2rem; margin-bottom: 1rem; color: #ff45fc; }
                 p { font-size: 1.1rem; margin-bottom: 1.5rem; color: #ccc; }
-                button { 
-                    background: #ff45fc; 
-                    border: none; 
-                    color: #fff; 
-                    padding: 12px 24px; 
-                    font-size: 1rem; 
-                    border-radius: 8px; 
+                button {
+                    background: #ff45fc;
+                    border: none;
+                    color: #fff;
+                    padding: 12px 24px;
+                    font-size: 1rem;
+                    border-radius: 8px;
                     cursor: pointer;
                     transition: background 0.2s;
                 }
@@ -427,7 +427,7 @@ function createOfflineFallback() {
         </body>
         </html>
     `;
-    
+
     return new Response(offlineHtml, {
         status: 200,
         statusText: 'OK',
@@ -435,9 +435,9 @@ function createOfflineFallback() {
     });
 }
 
-// -------------------------------------------------------------------
-// Message handler: Precache/prefetch assets on demand
-// -------------------------------------------------------------------
+
+
+
 self.addEventListener('message', (event) => {
     const data = event.data;
 
@@ -451,7 +451,7 @@ self.addEventListener('message', (event) => {
 
     if (!data || !data.type) return;
 
-    // Precache/prefetch requests share one validated implementation.
+
     if (data.type === 'precache-bg' && data.url) {
         event.waitUntil(caches.open(IMAGE_CACHE_NAME).then((cache) => prefetchUrl(data.url, cache)));
     }
@@ -468,26 +468,26 @@ self.addEventListener('message', (event) => {
         ));
     }
 
-    // Precahce all static assets (can be called manually)
+
     if (data.type === 'precache-all') {
         event.waitUntil(precacheAllAssets());
     }
 
-    // Skip waiting and activate new SW immediately
+
     if (data.type === 'skip-waiting') {
         self.skipWaiting();
     }
 });
 
-// -------------------------------------------------------------------
-// Precaches all known static assets
-// -------------------------------------------------------------------
+
+
+
 async function precacheAllAssets() {
     const staticCache = await caches.open(STATIC_CACHE_NAME);
     const imageCache = await caches.open(IMAGE_CACHE_NAME);
     const contentCache = await caches.open(CONTENT_CACHE_NAME);
 
-    // Get all media files
+
     const mediaFiles = [
         '/media/apple.webp',
         '/media/background.webp',
@@ -499,7 +499,7 @@ async function precacheAllAssets() {
         '/media/signing.webp',
     ];
 
-    // Get all blog markdown files from posts.json
+
     let blogPosts = [];
     try {
         const response = await fetch('/blog/posts.json');
@@ -511,7 +511,7 @@ async function precacheAllAssets() {
         console.warn('Could not fetch posts.json for precaching');
     }
 
-    // Precahce all assets
+
     const allAssets = [
         ...PRECACHE_ASSETS,
         ...mediaFiles,
@@ -538,9 +538,9 @@ async function precacheAllAssets() {
     console.log('All assets precached');
 }
 
-// -------------------------------------------------------------------
-// Periodic background sync (if supported)
-// -------------------------------------------------------------------
+
+
+
 self.addEventListener('periodicsync', (event) => {
     if (event.tag === 'precache-assets') {
         event.waitUntil(precacheAllAssets());
