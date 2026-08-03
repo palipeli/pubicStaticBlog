@@ -275,13 +275,6 @@
                 }
             });
             
-            // Preload on mouseover as backup
-            item.addEventListener('mouseover', () => {
-                if (typeof window.preloadBlogPostContent === 'function') {
-                    window.preloadBlogPostContent(post.id);
-                }
-            });
-            
             item.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();

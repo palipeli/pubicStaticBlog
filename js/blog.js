@@ -5,6 +5,8 @@
     // Global state for blog posts - exposed on window for cross-module access
     window.blogPostMetadata = []; // Metadata only (loaded initially)
     const blogContentCache = new Map(); // Cache for loaded blog content
+    const blogContentInflight = new Map(); // Coalesce concurrent loads by post ID
+    let activeNavigationToken = 0;
 
     // Shorthand references for cleaner code
     let blogPostMetadata = window.blogPostMetadata;
@@ -57,7 +59,7 @@
 
 
     // Lazy load a single blog post's content on demand
-    async function loadBlogPostContent(postId) {
+    async function loadBlogPostContentInternal(postId) {
         // Check if already loaded in cache
         if (blogContentCache.has(postId)) {
             return blogContentCache.get(postId);
@@ -115,6 +117,23 @@
         // All retries failed - don't cache error state, allow retry on next click
         console.error(`All retries failed for ${meta.slug}:`, lastError);
         throw lastError;
+    }
+
+    // Share one network request and one Markdown parse between hover, click,
+    // navigation, and state-restoration callers.
+    function loadBlogPostContent(postId) {
+        if (blogContentCache.has(postId)) {
+            return Promise.resolve(blogContentCache.get(postId));
+        }
+
+        if (blogContentInflight.has(postId)) {
+            return blogContentInflight.get(postId);
+        }
+
+        const loadPromise = loadBlogPostContentInternal(postId)
+            .finally(() => blogContentInflight.delete(postId));
+        blogContentInflight.set(postId, loadPromise);
+        return loadPromise;
     }
 
     // Track timeouts for cleanup
@@ -284,6 +303,7 @@
 
     // Open a blog post with lazy loading (new approach - loads content on demand)
     async function openBlogPostLazy(id) {
+        const navigationToken = ++activeNavigationToken;
         // Show loading state first
         const article = document.getElementById('blog-article-content');
 
@@ -339,6 +359,7 @@
         try {
             post = await loadBlogPostContent(id);
         } catch (err) {
+            if (navigationToken !== activeNavigationToken) return;
             console.error('Error loading blog post:', err);
             article.innerHTML = `
                 <div class="error-message">
@@ -350,6 +371,8 @@
             return;
         }
         
+        if (navigationToken !== activeNavigationToken) return;
+
         if (!post) {
             article.innerHTML = '<p style="color: var(--text-secondary);">Error loading post.</p>';
             return;
@@ -357,6 +380,7 @@
 
         // Render post content with fade-in animation (keep loading state visible until render completes)
         requestAnimationFrame(() => {
+            if (navigationToken !== activeNavigationToken) return;
             article.innerHTML = `
                 <h1>${post.icon} ${post.title}</h1>
                 <div class="blog-meta" style="margin-bottom: 20px;">

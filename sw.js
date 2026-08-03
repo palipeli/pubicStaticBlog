@@ -141,9 +141,11 @@ function getCacheStrategy(request) {
         return 'cache-first';
     }
 
-    // Markdown blog posts - stale-while-revalidate
+    // Blog content is static in this deployment. Cache-first avoids a network
+    // refresh every time a user revisits a post; publish updates by bumping
+    // the cache version or explicitly running the precache command.
     if (MARKDOWN_EXTENSIONS.test(pathname) || pathname.startsWith('/blog/')) {
-        return 'stale-while-revalidate';
+        return 'cache-first';
     }
 
     // Default: network-first

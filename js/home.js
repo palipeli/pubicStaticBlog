@@ -3,6 +3,9 @@
 
 (function() {
 
+    let pendingPostOpenTimer = null;
+    let pendingPostOpenId = null;
+
     const homePageFooter = `
         <footer>
             <p style="font-size:0.7rem;">What the fuck are you looking at? All the contents are above, but thanks for looking at though!</p>
@@ -117,11 +120,18 @@
 
     // Open a blog post from home page button with lazy loading (new)
     function openBlogPostFromHomeLazy(id) {
-        // Navigate to blogs page first without triggering prefetch
+        if (pendingPostOpenId === id && pendingPostOpenTimer) return;
+
+        if (pendingPostOpenTimer) {
+            clearTimeout(pendingPostOpenTimer);
+        }
+
+        pendingPostOpenId = id;
         window.navigateToBlogsPageWithoutPrefetch();
 
-        // Then open the specific post with lazy loading after a short delay
-        setTimeout(() => {
+        pendingPostOpenTimer = setTimeout(() => {
+            pendingPostOpenTimer = null;
+            pendingPostOpenId = null;
             window.openBlogPostLazy(id);
         }, 100);
     }
