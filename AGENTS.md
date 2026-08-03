@@ -137,7 +137,7 @@ Add a post atomically:
 
 1. Create `blog/<id>.md`.
 2. Add one manifest object with matching `id` and `slug`.
-3. Ensure JSON parses and the file loads over HTTP.
+3. Ensure JSON parses and the manifest slug points to the new file.
 4. If title/date/category/icon are in Markdown frontmatter, verify they intentionally match the index.
 
 The loader fetches `meta.slug`, parses the body, and lets frontmatter override manifest values for
@@ -198,7 +198,7 @@ When adding or renaming runtime assets:
 2. Update the explicit asset list in `precacheAllAssets()`; it duplicates JS/media coverage.
 3. Ensure the URL passes `isCacheableMessageUrl()` before relying on prefetch.
 4. Bump relevant cache version constants when cache contents/strategy must invalidate old clients.
-5. Test a fresh registration and a reload; an already-controlled tab can retain old SW behavior.
+5. Keep `PRECACHE_ASSETS`, `precacheAllAssets()`, and cache version changes coherent.
 
 Supported client → SW messages: `precache-bg {url}`, `prefetch-bg {urls[]}`,
 `prefetch-posts {urls[]}`, `precache-all`, `skip-waiting`, and `clear-cache`.
@@ -216,33 +216,16 @@ Keep `pendingFetches` deduplication and same-origin validation intact.
   more intense without updating the consent warning.
 - Keep asset URLs root-relative to match CSS and SW behavior.
 
-## Verification commands
+## Static validation
 
-Run from repository root; there is no install step:
+When content/index files change, use only repository-local static checks:
 
 ```bash
-# Serve over HTTP; fetch(), service workers, and root-relative URLs need this.
-python3 -m http.server 8000
-
-# Syntax-check every browser script (Node checks syntax; it does not execute browser globals).
-for f in js/*.js warning.js sw.js; do node --check "$f" || exit 1; done
-
-# Validate content index and whitespace errors.
 jq empty blog/posts.json && git diff --check
 ```
 
-Manual smoke test in a browser at `http://localhost:8000`:
-
-1. Accept the flashing-light consent; verify `warning:cleared` and devotional startup.
-2. Navigate Home → Blogs → About and verify hashes, active nav, sidebar, and mobile tray at `<=768px`.
-3. Open a post from the grid, sidebar, and home CTA; verify loading, Markdown, back/next, and images.
-4. Hover a post before opening; verify no duplicate visible navigation and eventual content load.
-5. Toggle auto/light/dark, reload, and verify cookie/state restoration.
-6. Reload after opening a post; verify `blogPlatformState` restores the page/post.
-7. In DevTools Application, verify SW registration, caches, offline shell, and post cache behavior.
-
-Do not automate or manually trigger the decline/flashing path casually; it intentionally produces
-rapid full-screen flashes. If JavaScript changes, syntax-check all JS even when only one module changed.
+Do not add browser, server, or build-tool verification instructions unless the project architecture
+explicitly changes to require them.
 
 ## Agent guardrails
 
@@ -254,4 +237,3 @@ rapid full-screen flashes. If JavaScript changes, syntax-check all JS even when 
 - Preserve lazy loading, navigation-token race protection, state restoration, consent gating, and
   reduced-motion handling unless the task explicitly changes those requirements.
 - Validate paths case-sensitively; deployment hosts may be case-sensitive even on macOS.
-- Report tests not run and any browser-only behavior not verifiable from CLI.
