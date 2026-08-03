@@ -47,6 +47,15 @@
         sections.forEach(section => {
             section.classList.toggle('active', section.id === page);
         });
+
+        if (page === 'about') {
+            const aboutHero = document.querySelector('.about-hero');
+            if (aboutHero && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                aboutHero.classList.remove('about-animate');
+                void aboutHero.offsetWidth;
+                aboutHero.classList.add('about-animate');
+            }
+        }
     }
 
     function updateBlogSidebarVisibility(blogSidebarSection, page) {
