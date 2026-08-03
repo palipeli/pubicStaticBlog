@@ -1053,6 +1053,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
 }
 
 [data-theme="dark"] .blog-article pre code {
+    background: transparent;
     color: #e0e0e0;
 }
 
