@@ -15,6 +15,11 @@
         }
 
 
+        if (!window.location.hash && (window.location.pathname === '/' || window.location.pathname.endsWith('/index.html'))) {
+            history.replaceState({ hash: 'home' }, '', window.location.pathname + '#home');
+        }
+
+
         if (typeof window.setupHashRouting === 'function') {
             window.setupHashRouting();
         }
