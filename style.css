@@ -25,6 +25,9 @@
     --btn-text: #2e3436;
     --btn-border: rgba(0, 0, 0, 0.2);
     --btn-hover-bg: rgba(240, 240, 240, 0.7);
+    --theme-selector-bg: rgba(255, 255, 255, 0.6);
+    --theme-selector-text: #2e3436;
+    --theme-selector-hover-bg: rgba(240, 240, 240, 0.7);
     
     /* Liquid Glass Effect Variables - Light Mode (default) */
     --glass-bg: rgba(255, 255, 255, 0.65);
@@ -56,6 +59,9 @@
     --btn-text: #ffffff;
     --btn-border: rgba(255, 255, 255, 0.2);
     --btn-hover-bg: rgba(10, 10, 10, 0.7);
+    --theme-selector-bg: rgba(26, 26, 26, 0.6);
+    --theme-selector-text: #ffffff;
+    --theme-selector-hover-bg: rgba(10, 10, 10, 0.7);
     
     /* Liquid Glass Effect Variables - Dark Mode (darker for readability) */
     --glass-bg: rgba(26, 26, 26, 0.70);
@@ -73,6 +79,9 @@
     --btn-text: #2e3436;
     --btn-border: rgba(0, 0, 0, 0.2);
     --btn-hover-bg: rgba(240, 240, 240, 0.7);
+    --theme-selector-bg: rgba(255, 255, 255, 0.6);
+    --theme-selector-text: #2e3436;
+    --theme-selector-hover-bg: rgba(240, 240, 240, 0.7);
     
     /* Liquid Glass Effect Variables - Light Mode (lighter for readability) */
     --glass-bg: rgba(255, 255, 255, 0.65);
@@ -649,34 +658,72 @@ body {
     gap: 8px;
 }
 
-.theme-btn {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--border-color);
+.theme-btn,
+.mobile-theme-btn {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    /* Every option uses the current page theme, not the theme it represents. */
+    background: var(--theme-selector-bg);
+    border: 1px solid var(--btn-border);
     border-radius: 6px;
     padding: 12px 15px;
     cursor: pointer;
     transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
-    color: var(--text-primary);
+    color: var(--theme-selector-text);
     font-size: 13px;
     font-weight: 600;
     text-align: left;
     font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
 }
 
-.theme-btn:hover {
-    background: rgba(255, 255, 255, 0.06);
+/* The buttons also carry data-theme values for JavaScript. Use the root theme
+   for their appearance so a Dark option cannot style itself as dark in light mode. */
+html[data-theme="light"] .theme-btn,
+html[data-theme="light"] .mobile-theme-btn {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: rgba(0, 0, 0, 0.2);
+    color: #2e3436;
+}
+
+html[data-theme="dark"] .theme-btn,
+html[data-theme="dark"] .mobile-theme-btn {
+    background: rgba(26, 26, 26, 0.6);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+.theme-btn:hover,
+.mobile-theme-btn:hover {
+    background: var(--theme-selector-hover-bg);
     border-color: var(--accent-pink);
     transform: translateX(-5px);
 }
 
-[data-theme="dark"] .theme-btn:hover {
-    background: rgba(255, 255, 255, 0.06);
-}
-
-.theme-btn.active {
+.theme-btn.active,
+.mobile-theme-btn.active {
     background: rgba(255, 69, 252, 0.1);
     border-color: var(--accent-pink);
     color: var(--accent-pink);
+}
+
+html[data-theme="light"] .theme-btn:hover,
+html[data-theme="light"] .mobile-theme-btn:hover {
+    background: rgba(240, 240, 240, 0.7);
+}
+
+html[data-theme="dark"] .theme-btn:hover,
+html[data-theme="dark"] .mobile-theme-btn:hover {
+    background: rgba(10, 10, 10, 0.7);
+}
+
+html[data-theme="light"] .theme-btn.active,
+html[data-theme="light"] .mobile-theme-btn.active,
+html[data-theme="dark"] .theme-btn.active,
+html[data-theme="dark"] .mobile-theme-btn.active {
+    background: rgba(255, 69, 252, 0.1);
+    border-color: #ff45fc;
+    color: #ff45fc;
 }
 
 /* Blog Cards */
@@ -1755,34 +1802,7 @@ body {
 .mobile-theme-chooser {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-}
-
-.mobile-theme-btn {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 12px 15px;
-    cursor: pointer;
-    transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
-    color: var(--text-primary);
-    font-size: 13px;
-    font-weight: 600;
-    text-align: left;
-    width: 100%;
-    font-family: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-}
-
-.mobile-theme-btn:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: var(--accent-pink);
-    transform: translateX(-5px);
-}
-
-.mobile-theme-btn.active {
-    background: rgba(255, 69, 252, 0.1);
-    border-color: var(--accent-pink);
-    color: var(--accent-pink);
+    gap: 8px;
 }
 
 /* Photo Placeholder in Mobile Tray */
