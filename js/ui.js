@@ -37,6 +37,48 @@
         }
     }
 
+    // Shared navigation helpers keep page transitions consistent across normal
+    // navigation, hash routing, and blog-session restoration.
+    function setActiveNavigationItem(navItems, activeItem) {
+        navItems.forEach(nav => nav.classList.toggle('active', nav === activeItem));
+    }
+
+    function showPageSection(sections, page) {
+        sections.forEach(section => {
+            section.classList.toggle('active', section.id === page);
+        });
+    }
+
+    function updateBlogSidebarVisibility(blogSidebarSection, page) {
+        if (!blogSidebarSection) return;
+        blogSidebarSection.style.display = ['blogs', 'home', 'about'].includes(page)
+            ? 'block'
+            : 'none';
+    }
+
+    function clearActivePostSelector() {
+        document.querySelectorAll('.post-selector-item.active').forEach(item => {
+            item.classList.remove('active');
+        });
+    }
+
+    function showBlogIntroView() {
+        const introView = document.getElementById('blog-intro-view');
+        const postView = document.getElementById('blog-post-view');
+
+        if (postView) postView.style.display = 'none';
+        if (introView) introView.style.display = 'block';
+
+        clearActivePostSelector();
+        if (typeof window.renderBlogPostSelectorGrid === 'function' && window.blogPostMetadata) {
+            window.renderBlogPostSelectorGrid(window.blogPostMetadata);
+        }
+    }
+
+    function saveStateAfterNavigation() {
+        setTimeout(window.saveAppState, 100);
+    }
+
     // Generate URL-safe hash for a blog post
     function generateBlogPostHash(postId) {
         return 'blog-' + postId;
@@ -228,28 +270,13 @@
                             window.updateHash('blogs', null, true);
                             
                             // Show blog intro view (grid of all posts)
-                            const introView = document.getElementById('blog-intro-view');
-                            
-                            if (postView && introView) {
-                                postView.style.display = 'none';
-                                introView.style.display = 'block';
-                            }
-                            
-                            // Clear active state in sidebar
-                            document.querySelectorAll('.post-selector-item').forEach(item => {
-                                item.classList.remove('active');
-                            });
-                            
-                             // Render the blog post selector grid
-                            if (typeof window.renderBlogPostSelectorGrid === 'function' && window.blogPostMetadata) {
-                                window.renderBlogPostSelectorGrid(window.blogPostMetadata);
-                            }
+                            showBlogIntroView();
                             
                             // Scroll to top
                             window.scrollTo(0, 0);
                             
                             // Save state after navigation
-                            setTimeout(window.saveAppState, 100);
+                            saveStateAfterNavigation();
                             return;
                         }
                     }
@@ -262,28 +289,13 @@
                         window.updateHash('blogs', null, true);
                         
                         // Show blog intro view (grid of all posts)
-                        const introView = document.getElementById('blog-intro-view');
-                        
-                        if (introView) {
-                            postView.style.display = 'none';
-                            introView.style.display = 'block';
-                        }
-                        
-                        // Clear active state in sidebar
-                        document.querySelectorAll('.post-selector-item').forEach(item => {
-                            item.classList.remove('active');
-                        });
-                        
-                         // Render the blog post selector grid
-                        if (typeof window.renderBlogPostSelectorGrid === 'function' && window.blogPostMetadata) {
-                            window.renderBlogPostSelectorGrid(window.blogPostMetadata);
-                        }
+                        showBlogIntroView();
                         
                         // Scroll to top
                         window.scrollTo(0, 0);
                         
                         // Save state after navigation
-                        setTimeout(window.saveAppState, 100);
+                        saveStateAfterNavigation();
                         return;
                     }
                     // If clicking Blog from elsewhere, just navigate normally
@@ -298,27 +310,13 @@
                         hasRestoredBlogSession = false;
                     }
                     
-                    // Update active nav item
-                    navItems.forEach(nav => nav.classList.remove('active'));
-                    item.classList.add('active');
-
                     // Show corresponding section
                     const page = item.dataset.page;
-                    sections.forEach(section => {
-                        section.classList.remove('active');
-                        if (section.id === page) {
-                            section.classList.add('active');
-                        }
-                    });
+                    setActiveNavigationItem(navItems, item);
+                    showPageSection(sections, page);
 
                     // Show/hide "All Posts" in sidebar on Home, About, and Blogs pages
-                    if (blogSidebarSection) {
-                        if (page === 'blogs' || page === 'home' || page === 'about') {
-                            blogSidebarSection.style.display = 'block';
-                        } else {
-                            blogSidebarSection.style.display = 'none';
-                        }
-                    }
+                    updateBlogSidebarVisibility(blogSidebarSection, page);
 
                     // Update URL hash based on page
                     if (page === 'home') {
@@ -333,7 +331,7 @@
                     window.scrollTo(0, 0);
 
                     // Save state after navigation
-                    setTimeout(window.saveAppState, 100);
+                    saveStateAfterNavigation();
                     return;
                 }
 
