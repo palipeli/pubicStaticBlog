@@ -34,6 +34,7 @@ const PRECACHE_ASSETS = [
     '/js/blog.js',
     '/js/home.js',
     '/js/mobile-tray.js',
+    '/js/glass-effect.js',
     '/js/app.js',
     '/warning.js',
     '/blog/posts.json',
