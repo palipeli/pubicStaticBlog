@@ -25,6 +25,10 @@
         }
 
 
+        if (typeof window.initializeLiquidGlassEffect === 'function') {
+            window.initializeLiquidGlassEffect();
+        }
+
         if (typeof window.setupTemplates === 'function') {
             window.setupTemplates();
         }
