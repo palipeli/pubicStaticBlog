@@ -26,14 +26,14 @@
     --theme-selector-text: #2e3436;
     --theme-selector-hover-bg: rgba(240, 240, 240, 0.7);
 
-    --glass-bg: rgba(255, 255, 255, 0.65);
-    --glass-border: rgba(255, 255, 255, 0.4);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    --glass-blur: 0px;
-    --glass-saturate: 1.2;
-    --glass-brightness: 1.05;
+    --glass-bg: rgba(255, 255, 255, 0.55);
+    --glass-border: rgba(255, 255, 255, 0.35);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    --glass-blur: 24px;
+    --glass-saturate: 1.5;
+    --glass-brightness: 1.08;
     --glass-radius: 16px;
-    --glass-pulse-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    --glass-pulse-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
     --bg-image-dark: url('/media/bg-dark.webp');
     --bg-image-light: url('/media/bg-light.webp');
@@ -58,11 +58,12 @@
     --theme-selector-text: #ffffff;
     --theme-selector-hover-bg: rgba(10, 10, 10, 0.7);
 
-    --glass-bg: rgba(26, 26, 26, 0.70);
-    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-bg: rgba(26, 26, 26, 0.60);
+    --glass-border: rgba(255, 255, 255, 0.18);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    --glass-blur: 0px;
-    --glass-brightness: 0.92;
+    --glass-blur: 24px;
+    --glass-saturate: 1.5;
+    --glass-brightness: 0.90;
     --glass-pulse-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
@@ -77,11 +78,13 @@
     --theme-selector-text: #2e3436;
     --theme-selector-hover-bg: rgba(240, 240, 240, 0.7);
 
-    --glass-bg: rgba(255, 255, 255, 0.65);
-    --glass-border: rgba(255, 255, 255, 0.4);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    --glass-blur: 0px;
-    --glass-brightness: 1.05;
+    --glass-bg: rgba(255, 255, 255, 0.55);
+    --glass-border: rgba(255, 255, 255, 0.35);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    --glass-blur: 24px;
+    --glass-saturate: 1.5;
+    --glass-brightness: 1.08;
+    --glass-pulse-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 }
 
 body {
@@ -135,8 +138,8 @@ body {
     right: 0;
     height: var(--header-height);
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     isolation: isolate;
     will-change: transform;
     transform: translateZ(0);
@@ -265,8 +268,8 @@ body {
 
 .home-layout-container .home-hero {
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     border: 1px solid var(--glass-border);
     border-radius: var(--glass-radius);
     padding: 20px;
@@ -436,8 +439,8 @@ body {
 .sidebar {
     width: 280px;
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     border-left: 1px solid var(--glass-border);
     box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
     padding: 0;
@@ -500,8 +503,8 @@ body {
     height: 48px;
     border-radius: 12px 0 0 12px;
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     border: 1px solid var(--glass-border);
     cursor: pointer;
     display: flex;
@@ -599,8 +602,8 @@ body {
 
 .template-card {
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     border: 1px solid var(--glass-border);
     border-radius: var(--glass-radius);
     padding: 15px;
@@ -1424,8 +1427,8 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
     border: 1px solid var(--glass-border);
     cursor: pointer;
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     will-change: transform;
     transform: translateZ(0);
 }
@@ -2056,8 +2059,8 @@ footer p {
 
 .blog-post-selector-grid .template-card {
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
 }
 
 [data-theme="dark"] .nav-item:hover {
@@ -2069,8 +2072,8 @@ footer p {
 
 .mobile-tray {
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     border: 1px solid var(--glass-border);
 }
 
