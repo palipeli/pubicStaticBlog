@@ -10,6 +10,17 @@
         }
 
 
+        if (typeof window.createGlassEdgeEffect === 'function') {
+            var glassCanvas = document.getElementById('glass-edge-canvas');
+            if (glassCanvas) {
+                window._glassEdge = window.createGlassEdgeEffect(glassCanvas, {
+                    intensity: 0.6,
+                    edgeSize: 0.18
+                });
+            }
+        }
+
+
         if (typeof window.setupNavigation === 'function') {
             window.setupNavigation();
         }

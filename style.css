@@ -236,6 +236,7 @@ body {
     margin-top: var(--header-height);
     height: calc(100vh - var(--header-height));
     position: relative;
+    z-index: 1;
     margin-right: 280px;
     will-change: margin-right;
     transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1534,6 +1535,32 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     .shape-2 { width: 80px; height: 80px; }
     .shape-3 { width: 60px; height: 60px; }
     .shape-4 { width: 50px; height: 50px; }
+}
+
+#glass-edge-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    mix-blend-mode: screen;
+    opacity: 1;
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+[data-theme="dark"] #glass-edge-canvas {
+    mix-blend-mode: overlay;
+    opacity: 0.85;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #glass-edge-canvas {
+        display: none;
+    }
 }
 
 .particles {
