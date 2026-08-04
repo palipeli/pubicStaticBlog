@@ -1036,7 +1036,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     color: #e0e0e0;
 }
 .blog-article pre {
-    background: transparent;
+    background: #f0f0f0;
     border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 15px;
@@ -1045,6 +1045,15 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     font-family: var(--font-main);
     font-size: 12px;
 }
+
+[data-theme="dark"] .blog-article pre {
+    background: #1a1a1a;
+}
+
+[data-theme="light"] .blog-article pre {
+    background: #f0f0f0;
+}
+
 .blog-article pre code {
     background: transparent;
     padding: 0;
