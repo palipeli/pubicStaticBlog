@@ -1689,17 +1689,6 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     box-shadow: 0 6px 20px rgba(255, 0, 0, 0.6);
 }
 
-@keyframes rippleEffect {
-    0% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(100);
-        opacity: 0;
-    }
-}
-
 .mobile-tray-toggle {
     display: none;
     background: transparent;

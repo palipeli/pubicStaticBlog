@@ -481,29 +481,6 @@
             button.style.animation = '';
         }, 300);
 
-
-        const ripple = document.createElement('div');
-        ripple.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 10px;
-            height: 10px;
-            background: rgba(71, 114, 179, 0.6);
-            border-radius: 50%;
-            animation: rippleEffect 0.6s ease-out forwards;
-            pointer-events: none;
-            z-index: 9999;
-        `;
-
-        document.body.appendChild(ripple);
-
-        setTimeout(() => {
-            ripple.remove();
-        }, 600);
-
-
         const homeNavItem = document.querySelector('.nav-item[data-page="home"]');
         if (homeNavItem) {
             homeNavItem.click();
