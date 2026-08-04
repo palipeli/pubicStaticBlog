@@ -1036,7 +1036,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     color: #e0e0e0;
 }
 .blog-article pre {
-    background: #f0f0f0;
+    background: #ffffff;
     border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 15px;
@@ -1047,11 +1047,11 @@ html[data-theme="dark"] .mobile-theme-btn.active {
 }
 
 [data-theme="dark"] .blog-article pre {
-    background: #1a1a1a;
+    background: #000000;
 }
 
 [data-theme="light"] .blog-article pre {
-    background: #f0f0f0;
+    background: #ffffff;
 }
 
 .blog-article pre code {
@@ -1063,7 +1063,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
 
 [data-theme="dark"] .blog-article pre code {
     background: transparent;
-    color: #e0e0e0;
+    color: #ffffff;
 }
 
 .blog-article blockquote {
