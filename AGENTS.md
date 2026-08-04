@@ -216,13 +216,6 @@ Keep `pendingFetches` deduplication and same-origin validation intact.
   more intense without updating the consent warning.
 - Keep asset URLs root-relative to match CSS and SW behavior.
 
-## Static validation
-
-When content/index files change, use only repository-local static checks:
-
-```bash
-jq empty blog/posts.json && git diff --check
-```
 
 Do not add browser, server, or build-tool verification instructions unless the project architecture
 explicitly changes to require them.
