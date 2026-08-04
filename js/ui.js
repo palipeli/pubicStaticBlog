@@ -482,15 +482,42 @@
         }, 300);
 
 
+        const homeLayoutContainer = document.querySelector('.home-layout-container');
+        const sidebar = document.getElementById('sidebar');
+        
+        let centerX, centerY;
+        
+        if (homeLayoutContainer) {
+            const rect = homeLayoutContainer.getBoundingClientRect();
+            centerX = rect.left + rect.width / 2;
+            centerY = rect.top + rect.height / 2;
+        } else {
+            const mainContainer = document.querySelector('.main-container');
+            const isSidebarCollapsed = mainContainer && mainContainer.classList.contains('sidebar-collapsed');
+            
+            if (isSidebarCollapsed) {
+                centerX = window.innerWidth / 2;
+            } else {
+                const sidebarWidth = sidebar ? sidebar.offsetWidth : 280;
+                centerX = (window.innerWidth - sidebarWidth) / 2 + sidebarWidth;
+            }
+            centerY = window.innerHeight / 2;
+        }
+        
+        const rootStyles = getComputedStyle(document.documentElement);
+        const accentPink = rootStyles.getPropertyValue('--accent-pink').trim() || '#ff45fc';
+
+
         const ripple = document.createElement('div');
+        const pinkRgb = hexToRgb(accentPink);
         ripple.style.cssText = `
             position: fixed;
-            top: 50%;
-            left: 50%;
+            top: ${centerY}px;
+            left: ${centerX}px;
             transform: translate(-50%, -50%);
             width: 10px;
             height: 10px;
-            background: rgba(71, 114, 179, 0.6);
+            background: rgba(${pinkRgb.r}, ${pinkRgb.g}, ${pinkRgb.b}, 0.6);
             border-radius: 50%;
             animation: rippleEffect 0.6s ease-out forwards;
             pointer-events: none;
@@ -508,6 +535,15 @@
         if (homeNavItem) {
             homeNavItem.click();
         }
+    }
+    
+    function hexToRgb(hex) {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : { r: 255, g: 69, b: 252 };
     }
 
 
