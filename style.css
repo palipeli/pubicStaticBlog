@@ -1,3 +1,11 @@
+@font-face {
+    font-family: 'VT323';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/media/vt323.ttf') format('truetype');
+}
+
 * {
     margin: 0;
     padding: 0;

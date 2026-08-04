@@ -41,6 +41,7 @@ const PRECACHE_ASSETS = [
     '/media/logo.webp',
     '/media/bg-light.webp',
     '/media/bg-dark.webp',
+    '/media/vt323.ttf',
 ];
 
 
@@ -206,11 +207,6 @@ self.addEventListener('fetch', (event) => {
 
 
     if (url.origin !== self.location.origin) {
-
-        if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
-            return;
-        }
-
         if (url.hostname === 'cdnjs.cloudflare.com') {
             return;
         }
@@ -497,6 +493,7 @@ async function precacheAllAssets() {
         '/media/favicon-circle.webp',
         '/media/logo.webp',
         '/media/signing.webp',
+        '/media/vt323.ttf',
     ];
 
 
