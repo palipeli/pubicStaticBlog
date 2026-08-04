@@ -268,13 +268,40 @@ body {
     background: var(--glass-bg);
     backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    border: 1px solid var(--glass-border);
+    border: 2px solid var(--glass-border);
     border-radius: var(--glass-radius);
     padding: 20px;
-    box-shadow: var(--glass-shadow);
+    box-shadow:
+        var(--glass-shadow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.1);
     will-change: transform;
     transform: translateZ(0);
+    position: relative;
+    overflow: hidden;
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
+}
+
+.home-layout-container .home-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 100%);
+    border-radius: calc(var(--glass-radius) - 2px) calc(var(--glass-radius) - 2px) 0 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+[data-theme="dark"] .home-layout-container .home-hero::before {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 100%);
+}
+
+.home-layout-container .home-hero > * {
+    position: relative;
+    z-index: 1;
 }
 
 .home-hero.home-animate > img {
@@ -762,10 +789,37 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     padding: 25px;
     text-align: center;
     background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    border: 2px solid var(--glass-border);
     border-radius: var(--glass-radius);
-    box-shadow: var(--glass-shadow);
+    box-shadow:
+        var(--glass-shadow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
+}
+
+.about-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, transparent 100%);
+    border-radius: calc(var(--glass-radius) - 2px) calc(var(--glass-radius) - 2px) 0 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+[data-theme="dark"] .about-hero::before {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, transparent 100%);
+}
+
+.about-hero > * {
+    position: relative;
+    z-index: 1;
 }
 
 .about-hero.about-animate {
@@ -973,13 +1027,41 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     background: var(--bg-panel);
     backdrop-filter: blur(0px);
     -webkit-backdrop-filter: blur(0px);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border: 2px solid var(--glass-border);
+    border-radius: var(--glass-radius);
     padding: 15px;
     line-height: 1.6;
     font-size: 12px;
     font-family: var(--font-main);
-    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease;
+    box-shadow:
+        var(--glass-shadow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
+}
+
+.blog-article::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, transparent 100%);
+    border-radius: calc(var(--glass-radius) - 2px) calc(var(--glass-radius) - 2px) 0 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+[data-theme="dark"] .blog-article::before {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, transparent 100%);
+}
+
+.blog-article > * {
+    position: relative;
+    z-index: 1;
 }
 
 .blog-article h1 {
