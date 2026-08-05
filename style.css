@@ -1706,6 +1706,60 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     box-shadow: 0 6px 20px rgba(255, 0, 0, 0.6);
 }
 
+#home .blog-btn,
+#about .blog-btn {
+    --home-button-start: var(--accent-pink);
+    --home-button-end: #3a5a8f;
+    background: linear-gradient(135deg, var(--home-button-start) 0%, var(--home-button-end) 100%);
+    transition: background 0.3s ease, transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+}
+
+#home .blog-btn.category-legal,
+#about .blog-btn.category-legal {
+    --home-button-start: #11d9aa;
+    --home-button-end: #ff45fc;
+}
+
+#home .blog-btn.category-sideloading,
+#about .blog-btn.category-sideloading {
+    --home-button-start: var(--accent-pink);
+    --home-button-end: #ff6b6b;
+}
+
+#home .blog-btn.category-fun,
+#about .blog-btn.category-fun {
+    --home-button-start: #ff6b6b;
+    --home-button-end: #ffd166;
+}
+
+#home .blog-btn.category-blog-home,
+#home .blog-btn.category-monitoring,
+#about .blog-btn.category-blog-home,
+#about .blog-btn.category-monitoring {
+    --home-button-start: #5DBFBF;
+    --home-button-end: #6c5ce7;
+}
+
+#about .blog-btn.category-discord {
+    --home-button-start: #5865F2;
+    --home-button-end: #ff45fc;
+}
+
+#about .blog-btn.category-github {
+    --home-button-start: #238636;
+    --home-button-end: #8b5cf6;
+}
+
+#about .blog-btn.category-youtube {
+    --home-button-start: #FF0000;
+    --home-button-end: #111827;
+}
+
+#home .blog-btn:hover,
+#about .blog-btn:hover {
+    background: linear-gradient(135deg, var(--home-button-end) 0%, var(--home-button-start) 100%);
+}
+
 .mobile-tray-toggle {
     display: none;
     background: transparent;
