@@ -236,7 +236,7 @@ body {
 
 .nav-item.active {
     color: var(--accent-pink);
-    background: rgba(255, 69, 252, 0.1);
+    background: rgba(255, 69, 252, 0.25);
 }
 
 .main-container {
