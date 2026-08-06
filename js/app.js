@@ -74,6 +74,11 @@
                     }
 
 
+                    if (typeof window.initGitHubGraphs === 'function') {
+                        window.initGitHubGraphs();
+                    }
+
+
                     if (typeof window.renderBlogPostSelectorGrid === 'function') {
                         window.renderBlogPostSelectorGrid(posts);
                     }
