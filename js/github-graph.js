@@ -3,7 +3,7 @@
 
     const GITHUB_GRAPH_API = 'https://github-contributions-api.jogruber.de/v4/';
     const GITHUB_GRAPH_ACCOUNTS = ['mikaaeru', 'palipeli'];
-    const NEON_GREEN = '#39d353';
+    const NEON_GREEN = '#50D096';
 
     const RANGE_DAYS = {
         '1d': 1,
@@ -21,7 +21,7 @@
             tooltipBorder: '#30363d',
             tooltipTitle: '#ffffff',
             tooltipBody: '#8b949e',
-            fill: 'rgba(57, 211, 83, 0.12)'
+            fill: 'rgba(80, 208, 150, 0.12)'
         },
         light: {
             text: '#57606a',
@@ -30,7 +30,7 @@
             tooltipBorder: '#d0d7de',
             tooltipTitle: '#24292f',
             tooltipBody: '#57606a',
-            fill: 'rgba(57, 211, 83, 0.15)'
+            fill: 'rgba(80, 208, 150, 0.15)'
         }
     };
 

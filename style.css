@@ -2515,6 +2515,47 @@ footer p {
     }
 }
 
+.dns-graph-card {
+    max-width: 800px;
+    margin: 30px auto 0;
+    background: rgba(13, 17, 23, 0.85);
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+html[data-theme="light"] .dns-graph-card {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: #d0d7de;
+}
+
+.dns-graph-title {
+    color: #ffffff;
+    font-size: 1rem;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+html[data-theme="light"] .dns-graph-title {
+    color: #24292f;
+}
+
+.dns-graph-canvas-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.dns-graph-error {
+    color: #8b949e;
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9rem;
+}
+
+html[data-theme="light"] .dns-graph-error {
+    color: #57606a;
+}
+
 .github-graphs-heading {
     text-align: center;
     margin: 30px 0 0;
@@ -2547,14 +2588,14 @@ footer p {
     flex: 1 1 0;
     min-width: 280px;
     max-width: 560px;
-    background: #0d1117;
+    background: rgba(13, 17, 23, 0.85);
     border: 1px solid #30363d;
     border-radius: 12px;
     padding: 16px;
 }
 
 html[data-theme="light"] .github-graph-card {
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.85);
     border-color: #d0d7de;
 }
 
@@ -2606,14 +2647,14 @@ html[data-theme="light"] .github-graph-error {
 }
 
 .github-graph-range-btn:hover {
-    border-color: #39d353;
-    color: #39d353;
+    border-color: #50D096;
+    color: #50D096;
 }
 
 .github-graph-range-btn.active {
-    background: rgba(57, 211, 83, 0.15);
-    border-color: #39d353;
-    color: #39d353;
+    background: rgba(80, 208, 150, 0.15);
+    border-color: #50D096;
+    color: #50D096;
 }
 
 html[data-theme="light"] .github-graph-range-btn {
@@ -2623,14 +2664,14 @@ html[data-theme="light"] .github-graph-range-btn {
 }
 
 html[data-theme="light"] .github-graph-range-btn:hover {
-    border-color: #39d353;
-    color: #39d353;
+    border-color: #50D096;
+    color: #50D096;
 }
 
 html[data-theme="light"] .github-graph-range-btn.active {
-    background: rgba(57, 211, 83, 0.15);
-    border-color: #39d353;
-    color: #39d353;
+    background: rgba(80, 208, 150, 0.15);
+    border-color: #50D096;
+    color: #50D096;
 }
 
 @media (max-width: 768px) {
