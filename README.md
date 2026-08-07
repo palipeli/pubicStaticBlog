@@ -29,4 +29,6 @@ A fucking lightweight single page application (SPA) static blogger completely wr
 
 See it live at [kamikami.eu](https://kamikami.eu)
 
+## CHANGE THE THEMES OR AT LEAST THE COLORWAYS BEFORE YOU FUCKING DEPLOY IT!!!!!!!!
+
 ---
