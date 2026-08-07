@@ -88,6 +88,39 @@
                         <p>Michelle's DNS is a .mobileconfig profile made to provision Apple iOS/iPadOS devices to allow sideloading using revoked certificate through privacy-preserving DNS which is compliant with WSFteam.xyz (partner) documentations and practice.</p>
                         <p>If you want to send me cat pictures or other interesting files, please click the button above!!!</p>
                     </div>
+
+                    <div class="dns-graph-card">
+                        <h3 class="dns-graph-title">DNS Requests</h3>
+                        <div class="dns-graph-canvas-wrap">
+                            <canvas id="dns-graph"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="github-graphs-heading">
+                        <h2>This website is created in part with cheap slop generator, so commits would look weird.</h2>
+                        <p>My Slop Activity graphs:</p>
+                    </div>
+                    <div class="github-graphs-container">
+                        <div class="github-graph-card">
+                            <h3 class="github-graph-title">mikaaeru</h3>
+                            <div class="github-graph-canvas-wrap">
+                                <canvas id="github-graph-mikaaeru"></canvas>
+                            </div>
+                        </div>
+                        <div class="github-graph-card">
+                            <h3 class="github-graph-title">palipeli</h3>
+                            <div class="github-graph-canvas-wrap">
+                                <canvas id="github-graph-palipeli"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="github-graph-ranges">
+                        <button class="github-graph-range-btn" data-range="1d">1d</button>
+                        <button class="github-graph-range-btn" data-range="10d">10d</button>
+                        <button class="github-graph-range-btn" data-range="30d">30d</button>
+                        <button class="github-graph-range-btn" data-range="6m">6m</button>
+                        <button class="github-graph-range-btn active" data-range="1y">1y</button>
+                    </div>
                 </div>
             </section>
 
@@ -196,6 +229,9 @@
     <script src="js/ui.js" defer></script>
     <script src="js/blog.js" defer></script>
     <script src="js/home.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="js/github-graph.js" defer></script>
+    <script src="js/dns-graph.js" defer></script>
 
 
     <script src="warning.js"></script>
