@@ -147,6 +147,8 @@
 
         if (state.currentPage === 'blogs' && state.activeBlogPost) {
             window.pendingBlogPostRestore = state.activeBlogPost;
+        } else if (state.currentPage === 'blogs') {
+            window.pendingBlogScrollToTop = true;
         }
     }
 
