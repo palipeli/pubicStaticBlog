@@ -147,6 +147,16 @@
 
         if (state.currentPage === 'blogs' && state.activeBlogPost) {
             window.pendingBlogPostRestore = state.activeBlogPost;
+        } else if (state.currentPage === 'blogs' && !state.activeBlogPost) {
+            // Ensure blog intro view is shown when no active post
+            setTimeout(() => {
+                const introView = document.getElementById('blog-intro-view');
+                const postView = document.getElementById('blog-post-view');
+                if (introView && postView) {
+                    postView.style.display = 'none';
+                    introView.style.display = 'block';
+                }
+            }, 50);
         }
     }
 
