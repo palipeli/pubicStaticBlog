@@ -1368,6 +1368,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
 
 .page-section {
     display: none;
+    scroll-margin-top: var(--header-height);
 }
 
 .page-section.active {
