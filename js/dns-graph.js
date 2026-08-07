@@ -119,8 +119,7 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
-                aspectRatio: 4,
+                maintainAspectRatio: false,
                 interaction: {
                     mode: 'index',
                     intersect: false
@@ -235,6 +234,14 @@
             });
         });
         observer.observe(document.documentElement, { attributes: true });
+
+        if (typeof window.ResizeObserver !== 'undefined') {
+            const resizeObserver = new ResizeObserver(function() {
+                if (chart) chart.resize();
+            });
+            const wrap = document.querySelector('.dns-graph-canvas-wrap');
+            if (wrap) resizeObserver.observe(wrap);
+        }
     }
 
     if (document.readyState === 'loading') {

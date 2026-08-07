@@ -252,6 +252,17 @@
             });
         });
         observer.observe(document.documentElement, { attributes: true });
+
+        if (typeof window.ResizeObserver !== 'undefined') {
+            const resizeObserver = new ResizeObserver(function() {
+                Object.keys(charts).forEach(function(canvasId) {
+                    const chart = charts[canvasId];
+                    if (chart) chart.resize();
+                });
+            });
+            const container = document.querySelector('.github-graphs-container');
+            if (container) resizeObserver.observe(container);
+        }
     }
 
     if (document.readyState === 'loading') {

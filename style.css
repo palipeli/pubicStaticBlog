@@ -2543,6 +2543,7 @@ html[data-theme="light"] .dns-graph-title {
 .dns-graph-canvas-wrap {
     position: relative;
     width: 100%;
+    height: 300px;
 }
 
 .dns-graph-error {
