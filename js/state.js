@@ -165,6 +165,18 @@
             if (typeof window.openBlogPostLazy === 'function') {
                 window.openBlogPostLazy(postId);
             }
+        } else if (window.pendingBlogScrollToTop) {
+            window.pendingBlogScrollToTop = false;
+
+
+            if (typeof window.showBlogIntro === 'function') {
+                window.showBlogIntro();
+            }
+
+
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+            }, 50);
         }
     }
 
