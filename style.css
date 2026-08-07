@@ -1375,6 +1375,19 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     display: block;
 }
 
+#blogs .blog-layout-container {
+    margin-top: calc(var(--header-height) + 20px);
+}
+
+#home footer {
+    display: block;
+}
+
+#blogs footer,
+#about footer {
+    display: none;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
