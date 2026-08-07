@@ -134,14 +134,17 @@ html {
 
 body {
     overflow-y: auto;
+    padding-top: env(safe-area-inset-top, 0);
+    background-color: var(--bg-dark);
 }
 
 .header {
     position: fixed;
-    top: 0;
+    top: env(safe-area-inset-top, 0);
     left: 0;
     right: 0;
-    height: var(--header-height);
+    height: calc(var(--header-height) + env(safe-area-inset-top, 0));
+    padding-top: env(safe-area-inset-top, 0);
     background: var(--glass-bg);
     backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
@@ -241,8 +244,8 @@ body {
 
 .main-container {
     display: block;
-    margin-top: var(--header-height);
-    height: calc(100vh - var(--header-height));
+    margin-top: calc(var(--header-height) + env(safe-area-inset-top, 0));
+    height: calc(100vh - var(--header-height) - env(safe-area-inset-top, 0));
     position: relative;
     margin-right: 280px;
     will-change: margin-right;
@@ -258,6 +261,7 @@ body {
     overflow-y: auto;
     height: 100%;
     width: 100%;
+    -webkit-overflow-scrolling: touch;
 }
 
 .home-hero {
@@ -452,8 +456,8 @@ body {
     animation: slideLeft 0.5s ease-out;
     position: fixed;
     right: 0;
-    top: var(--header-height);
-    height: calc(100vh - var(--header-height));
+    top: calc(var(--header-height) + env(safe-area-inset-top, 0));
+    height: calc(100vh - var(--header-height) - env(safe-area-inset-top, 0));
     box-sizing: border-box;
     z-index: 999;
     will-change: width, opacity, transform;
@@ -1532,6 +1536,8 @@ html[data-theme="dark"] .mobile-theme-btn.active {
 
     .content-area {
         max-width: 100vw;
+        padding-left: calc(15px + env(safe-area-inset-left, 0));
+        padding-right: calc(15px + env(safe-area-inset-right, 0));
     }
 
     .blog-grid {
@@ -1962,7 +1968,7 @@ body.mobile-tray-open {
 footer {
     background: transparent;
     border: none;
-    padding: 12px 20px;
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0)) 20px;
     text-align: center;
     margin-top: 40px;
 }
@@ -1979,7 +1985,7 @@ footer p {
     border: none;
     border-top: 1px solid var(--border-color);
     margin-top: 20px;
-    padding-top: 15px;
+    padding: 15px 15px calc(15px + env(safe-area-inset-bottom, 0)) 15px;
 }
 
 .home-page-footer p {
