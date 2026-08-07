@@ -2514,3 +2514,128 @@ footer p {
         background: Canvas;
     }
 }
+
+.github-graphs-heading {
+    text-align: center;
+    margin: 30px 0 0;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.github-graphs-heading h2 {
+    font-size: 1rem;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    font-family: var(--font-main);
+}
+
+.github-graphs-heading p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-family: var(--font-main);
+}
+
+.github-graphs-container {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 30px 0;
+}
+
+.github-graph-card {
+    flex: 1 1 0;
+    min-width: 280px;
+    max-width: 560px;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+html[data-theme="light"] .github-graph-card {
+    background: #ffffff;
+    border-color: #d0d7de;
+}
+
+.github-graph-title {
+    color: #ffffff;
+    font-size: 1rem;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+html[data-theme="light"] .github-graph-title {
+    color: #24292f;
+}
+
+.github-graph-canvas-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.github-graph-error {
+    color: #8b949e;
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9rem;
+}
+
+html[data-theme="light"] .github-graph-error {
+    color: #57606a;
+}
+
+.github-graph-ranges {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.github-graph-range-btn {
+    background: #161b22;
+    border: 1px solid #30363d;
+    color: #8b949e;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-family: var(--font-main);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.github-graph-range-btn:hover {
+    border-color: #39d353;
+    color: #39d353;
+}
+
+.github-graph-range-btn.active {
+    background: rgba(57, 211, 83, 0.15);
+    border-color: #39d353;
+    color: #39d353;
+}
+
+html[data-theme="light"] .github-graph-range-btn {
+    background: #ffffff;
+    border-color: #d0d7de;
+    color: #57606a;
+}
+
+html[data-theme="light"] .github-graph-range-btn:hover {
+    border-color: #39d353;
+    color: #39d353;
+}
+
+html[data-theme="light"] .github-graph-range-btn.active {
+    background: rgba(57, 211, 83, 0.15);
+    border-color: #39d353;
+    color: #39d353;
+}
+
+@media (max-width: 768px) {
+    .github-graph-card {
+        flex: 1 1 100%;
+        max-width: 100%;
+    }
+}
