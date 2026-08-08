@@ -1,10 +1,8 @@
     (function() {
     'use strict';
-
     const DNS_GRAPH_API = 'https://graph.kamikami.workers.dev/';
     const ALLOWED_COLOR = '#50D096';
     const BLOCKED_COLOR = '#EA38EC';
-
     const THEME_COLORS = {
         dark: {
             text: '#8b949e',
@@ -27,16 +25,13 @@
             blockedFill: 'rgba(234, 56, 236, 0.15)'
         }
     };
-
     let chart = null;
-
     function getCurrentTheme() {
         const theme = document.documentElement.getAttribute('data-theme');
         if (theme === 'light') return 'light';
         if (theme === 'dark') return 'dark';
         return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
-
     function fetchDnsData() {
         return fetch(DNS_GRAPH_API)
             .then(function(response) {
@@ -48,44 +43,35 @@
             .then(function(data) {
                 const groups = data.data.viewer.accounts[0].gatewayResolverQueriesAdaptiveGroups || [];
                 const byDate = {};
-
                 groups.forEach(function(group) {
                     const date = group.dimensions.date;
                     const decision = group.dimensions.resolverDecision;
                     const count = group.count;
-
                     if (!byDate[date]) {
-                        byDate[date] = { allowed: 0, blocked: 0 };
+                        byDate[date] = {allowed: 0, blocked: 0};
                     }
-
                     if (decision === 5 || decision === 6) {
                         byDate[date].allowed += count;
                     } else if (decision === 9 || decision === 10) {
                         byDate[date].blocked += count;
                     }
                 });
-
                 const dates = Object.keys(byDate).sort();
                 const labels = [];
                 const allowed = [];
                 const blocked = [];
-
                 dates.forEach(function(date) {
                     labels.push(date);
                     allowed.push(byDate[date].allowed);
                     blocked.push(byDate[date].blocked);
                 });
-
-                return { labels: labels, allowed: allowed, blocked: blocked };
+                return {labels: labels, allowed: allowed, blocked: blocked};
             });
     }
-
     function createChart(data) {
         const canvas = document.getElementById('dns-graph');
         if (!canvas || typeof window.Chart === 'undefined') return;
-
         const colors = THEME_COLORS[getCurrentTheme()];
-
         chart = new window.Chart(canvas.getContext('2d'), {
             type: 'line',
             data: {
@@ -185,7 +171,6 @@
             }
         });
     }
-
     function updateChartTheme() {
         if (!chart) return;
         const colors = THEME_COLORS[getCurrentTheme()];
@@ -202,7 +187,6 @@
         chart.options.scales.y.ticks.color = colors.text;
         chart.update();
     }
-
     function showError() {
         const canvas = document.getElementById('dns-graph');
         if (!canvas) return;
@@ -214,10 +198,8 @@
         msg.textContent = 'Could not load DNS request data.';
         wrap.appendChild(msg);
     }
-
     function initDnsGraph() {
         if (typeof window.Chart === 'undefined') return;
-
         fetchDnsData()
             .then(function(data) {
                 createChart(data);
@@ -225,7 +207,6 @@
             .catch(function() {
                 showError();
             });
-
         const observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
                 if (mutation.attributeName === 'data-theme') {
@@ -233,8 +214,7 @@
                 }
             });
         });
-        observer.observe(document.documentElement, { attributes: true });
-
+        observer.observe(document.documentElement, {attributes: true});
         if (typeof window.ResizeObserver !== 'undefined') {
             const resizeObserver = new ResizeObserver(function() {
                 if (chart) chart.resize();
@@ -243,7 +223,6 @@
             if (wrap) resizeObserver.observe(wrap);
         }
     }
-
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initDnsGraph);
     } else {
