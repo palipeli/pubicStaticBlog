@@ -18,8 +18,7 @@
 | `js/config.js` | shared constants | `window.CONFIG` |
 | `js/markdown.js` | custom Markdown/frontmatter parser + sanitizer | `window.parseMarkdown`, `window.parseFrontmatter` |
 | `js/lazyload.js` | `img.lazy-image[data-src]` loading | `window.initializeLazyLoading` |
-| `js/state.js` | DOM-derived state persistence | `blogPlatformState` in `localStorage`; `window.*` state API |
-| `js/scroll-position.js` | per-page scroll position record/restore | `window.setupScrollPositionTracking`, `window.saveScrollPosition`, `window.restoreScrollPosition` |
+| `js/state.js` | DOM-derived state persistence + per-page scroll position record/restore | `blogPlatformState`/`blogPlatformScrollPositions` in `localStorage`; `window.*` state/scroll API |
 | `js/devotional.js` | consent-gated verse fetch/type animation | `window.monitorWarningAndStartDevotional` |
 | `js/ui.js` | navigation, hash routing, theme, particles, sidebar | `window.*` navigation/theme API |
 | `js/blog.js` | manifest fetch, post cache, prefetch, render, navigation | `window.blogPostMetadata`; `window.openBlogPostLazy` |
@@ -37,7 +36,7 @@
 `index.html` contains deferred scripts in this order:
 
 ```text
-config → markdown → lazyload → state → scroll-position → devotional → ui → blog → home → app
+config → markdown → lazyload → state → devotional → ui → blog → home → app
 ```
 
 `warning.js` and `js/mobile-tray.js` are non-deferred scripts after the deferred list. They install
@@ -115,7 +114,7 @@ stable. Preserve `aria-label`/`title` updates on sidebar and mobile toggles.
 
 - State storage key: `localStorage['blogPlatformState']`.
 - Scroll positions per page live in `localStorage['blogPlatformScrollPositions']`; keys are `home`,
-  `blogs`, `about`, and `blog-<post-id>`. `scroll-position.js` saves on scroll (debounced), on
+  `blogs`, `about`, and `blog-<post-id>`. `js/state.js` saves on scroll (debounced), on
   navigation clicks, and before unload; it restores via `window.restoreScrollPosition()` after
   navigation. New navigation code must call `window.restoreScrollPosition()` after its content
   renders and must not fight it with a later `scrollTo(0, 0)`.

@@ -1,6 +1,6 @@
 'use strict';
 const CACHE_NAME = 'pubic-static-blog-v2';
-const STATIC_CACHE_NAME = 'static-assets-v2';
+const STATIC_CACHE_NAME = 'static-assets-v3';
 const IMAGE_CACHE_NAME = 'images-v2';
 const CONTENT_CACHE_NAME = 'blog-content-v2';
 const pendingFetches = new Map();
@@ -16,7 +16,6 @@ const PRECACHE_ASSETS = [
     '/js/markdown.js',
     '/js/lazyload.js',
     '/js/state.js',
-    '/js/scroll-position.js',
     '/js/devotional.js',
     '/js/ui.js',
     '/js/blog.js',
@@ -373,7 +372,6 @@ async function precacheAllAssets() {
         '/js/lazyload.js',
         '/js/markdown.js',
     '/js/mobile-tray.js',
-    '/js/scroll-position.js',
     '/js/state.js',
     '/js/ui.js',
         '/blog/nt_verses_compact.json',
