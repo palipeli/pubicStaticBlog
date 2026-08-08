@@ -1,8 +1,4 @@
-
-
-
 (function() {
-
     let pendingPostOpenTimer = null;
     let pendingPostOpenId = null;
 
@@ -18,7 +14,6 @@
     function appendHomePageFooter() {
         const homeHero = document.getElementById('home-hero-content');
         if (!homeHero || homeHero.querySelector('.home-page-footer')) return;
-
         const footer = document.createElement('div');
         footer.innerHTML = homePageFooter;
         footer.firstElementChild.className = 'home-page-footer';
@@ -27,31 +22,23 @@
 
     appendHomePageFooter();
 
-
     function renderBlogButtonsLazy(posts) {
         const container = document.getElementById('blog-buttons-container');
         if (!container) return;
-
         container.innerHTML = '';
-
-
         const homePagePosts = posts.filter(post =>
             post.id === 'michelle-dns-for-ios-sideloading' ||
             post.id === 'privacy-policy'
         );
-
         if (homePagePosts.length === 0) {
             container.style.display = 'none';
             return;
         }
-
         homePagePosts.forEach(post => {
             const categoryClass = post.category ? 'category-' + post.category.toLowerCase().replace(/\s+/g, '-') : '';
-
             const button = document.createElement('a');
             button.className = `blog-btn ${categoryClass}`;
             button.href = '#';
-
             button.onmouseenter = () => {
                 window.preloadBlogPostContent(post.id);
             };
@@ -59,84 +46,62 @@
                 e.preventDefault();
                 window.openBlogPostFromHomeLazy(post.id);
             };
-
             button.innerHTML = `
                 <i class="fa-solid fa-book"></i>
                 <span>${post.title}</span>
             `;
-
             container.appendChild(button);
         });
-
-
         const catButton = document.createElement('a');
         catButton.className = 'blog-btn category-fun';
         catButton.href = 'https://cloud.kamikami.eu/s/send-me-cat-pics';
         catButton.target = '_blank';
         catButton.rel = 'noopener noreferrer';
-
         catButton.innerHTML = `
             <i class="fa-solid fa-cat"></i>
             <span>Send me cat pictures and files!</span>
         `;
-
         container.appendChild(catButton);
-
-
         const myBlogButton = document.createElement('a');
         myBlogButton.className = 'blog-btn category-blog-home';
         myBlogButton.href = '#';
         myBlogButton.onclick = (e) => {
             e.preventDefault();
-
             const navItem = document.querySelector('.nav-item[data-page="blogs"]');
             if (navItem) {
                 navItem.click();
             }
         };
-
         myBlogButton.innerHTML = `
             <i class="fa-solid fa-rss"></i>
             <span>My Blog</span>
         `;
-
         container.appendChild(myBlogButton);
-
-
         const monitoringButton = document.createElement('a');
         monitoringButton.className = 'blog-btn category-monitoring';
         monitoringButton.href = 'https://stats.kamikami.eu/status/one';
         monitoringButton.target = '_blank';
         monitoringButton.rel = 'noopener noreferrer';
-
         monitoringButton.innerHTML = `
             <i class="fa-solid fa-chart-line"></i>
             <span>Monitoring</span>
         `;
-
         container.appendChild(monitoringButton);
     }
 
-
-
     function openBlogPostFromHomeLazy(id) {
         if (pendingPostOpenId === id && pendingPostOpenTimer) return;
-
         if (pendingPostOpenTimer) {
             clearTimeout(pendingPostOpenTimer);
         }
-
         pendingPostOpenId = id;
         window.navigateToBlogsPageWithoutPrefetch();
-
         pendingPostOpenTimer = setTimeout(() => {
             pendingPostOpenTimer = null;
             pendingPostOpenId = null;
             window.openBlogPostLazy(id);
         }, 100);
     }
-
-
 
     window.renderBlogButtonsLazy = renderBlogButtonsLazy;
     window.openBlogPostFromHomeLazy = openBlogPostFromHomeLazy;

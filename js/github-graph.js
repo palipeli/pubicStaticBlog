@@ -1,10 +1,8 @@
 (function() {
     'use strict';
-
     const GITHUB_GRAPH_API = 'https://github-contributions-api.jogruber.de/v4/';
     const GITHUB_GRAPH_ACCOUNTS = ['mikaaeru', 'palipeli'];
     const NEON_GREEN = '#50D096';
-
     const RANGE_DAYS = {
         '1d': 1,
         '10d': 10,
@@ -12,7 +10,6 @@
         '6m': 183,
         '1y': 366
     };
-
     const THEME_COLORS = {
         dark: {
             text: '#8b949e',
@@ -33,18 +30,15 @@
             fill: 'rgba(80, 208, 150, 0.15)'
         }
     };
-
     const charts = {};
     const allData = {};
     let currentRange = '1y';
-
     function getCurrentTheme() {
         const theme = document.documentElement.getAttribute('data-theme');
         if (theme === 'light') return 'light';
         if (theme === 'dark') return 'dark';
         return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
-
     function fetchContributions(username) {
         return fetch(GITHUB_GRAPH_API + username)
             .then(function(response) {
@@ -64,12 +58,10 @@
                 return { labels: labels, values: values };
             });
     }
-
     function filterDataByRange(data, range) {
         const days = RANGE_DAYS[range] || RANGE_DAYS['1y'];
         const cutoff = new Date();
         cutoff.setDate(cutoff.getDate() - days);
-
         const labels = [];
         const values = [];
         for (let i = 0; i < data.labels.length; i++) {
@@ -81,14 +73,11 @@
         }
         return { labels: labels, values: values };
     }
-
     function createChart(canvasId, username, data) {
         const canvas = document.getElementById(canvasId);
         if (!canvas || typeof window.Chart === 'undefined') return;
-
         const colors = THEME_COLORS[getCurrentTheme()];
         const filtered = filterDataByRange(data, currentRange);
-
         charts[canvasId] = new window.Chart(canvas.getContext('2d'), {
             type: 'line',
             data: {
@@ -167,7 +156,6 @@
             }
         });
     }
-
     function updateChartTheme() {
         const colors = THEME_COLORS[getCurrentTheme()];
         Object.keys(charts).forEach(function(canvasId) {
@@ -185,7 +173,6 @@
             chart.update();
         });
     }
-
     function updateChartRange() {
         Object.keys(charts).forEach(function(canvasId) {
             const chart = charts[canvasId];
@@ -199,7 +186,6 @@
             chart.update();
         });
     }
-
     function setupRangeButtons() {
         const container = document.querySelector('.github-graph-ranges');
         if (!container) return;
@@ -214,7 +200,6 @@
             updateChartRange();
         });
     }
-
     function showError(canvasId, username) {
         const canvas = document.getElementById(canvasId);
         if (!canvas) return;
@@ -226,12 +211,9 @@
         msg.textContent = 'Could not load ' + username + ' contribution data.';
         wrap.appendChild(msg);
     }
-
     function initGithubGraphs() {
         if (typeof window.Chart === 'undefined') return;
-
         setupRangeButtons();
-
         GITHUB_GRAPH_ACCOUNTS.forEach(function(username) {
             const canvasId = 'github-graph-' + username;
             fetchContributions(username)
@@ -243,7 +225,6 @@
                     showError(canvasId, username);
                 });
         });
-
         const observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
                 if (mutation.attributeName === 'data-theme') {
@@ -252,7 +233,6 @@
             });
         });
         observer.observe(document.documentElement, { attributes: true });
-
         if (typeof window.ResizeObserver !== 'undefined') {
             const resizeObserver = new ResizeObserver(function() {
                 Object.keys(charts).forEach(function(canvasId) {
@@ -264,7 +244,6 @@
             if (container) resizeObserver.observe(container);
         }
     }
-
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initGithubGraphs);
     } else {

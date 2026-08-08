@@ -1,53 +1,33 @@
-
-
-
 (function() {
-
     function navigateToBlogsPageWithoutPrefetch() {
         const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
         if (!blogsNavItem) return;
-
         const sections = document.querySelectorAll('.page-section');
         const navItems = document.querySelectorAll('.nav-item');
         const blogSidebarSection = document.getElementById('blog-sidebar-section');
-
-
         navItems.forEach(nav => nav.classList.remove('active'));
         blogsNavItem.classList.add('active');
-
-
         sections.forEach(section => {
             section.classList.remove('active');
             if (section.id === 'blogs') {
                 section.classList.add('active');
             }
         });
-
-
         if (blogSidebarSection) {
             blogSidebarSection.style.display = 'block';
         }
-
-
         window.scrollTo(0, 0);
-
-
         if (typeof window.updateHash === 'function') {
             window.updateHash('blogs', null, true);
         }
     }
-
-
-
     function setActiveNavigationItem(navItems, activeItem) {
         navItems.forEach(nav => nav.classList.toggle('active', nav === activeItem));
     }
-
     function showPageSection(sections, page) {
         sections.forEach(section => {
             section.classList.toggle('active', section.id === page);
         });
-
         if (page === 'about') {
             const aboutHero = document.querySelector('.about-hero');
             if (aboutHero && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -64,51 +44,39 @@
             }
         }
     }
-
     function updateBlogSidebarVisibility(blogSidebarSection, page) {
         if (!blogSidebarSection) return;
         blogSidebarSection.style.display = ['blogs', 'home', 'about'].includes(page)
             ? 'block'
             : 'none';
     }
-
     function clearActivePostSelector() {
         document.querySelectorAll('.post-selector-item.active').forEach(item => {
             item.classList.remove('active');
         });
     }
-
     function showBlogIntroView() {
         const introView = document.getElementById('blog-intro-view');
         const postView = document.getElementById('blog-post-view');
-
         if (postView) postView.style.display = 'none';
         if (introView) introView.style.display = 'block';
-
         clearActivePostSelector();
         if (typeof window.renderBlogPostSelectorGrid === 'function' && window.blogPostMetadata) {
             window.renderBlogPostSelectorGrid(window.blogPostMetadata);
         }
     }
-
     function saveStateAfterNavigation() {
         setTimeout(window.saveAppState, 100);
     }
-
-
     function generateBlogPostHash(postId) {
         return 'blog-' + postId;
     }
-
-
     function getBlogPostIdFromHash(hash) {
         if (hash && hash.startsWith('blog-')) {
             return hash.substring(5);
         }
         return null;
     }
-
-
     function updateHash(newHash, postId, addToHistory = true) {
         let hash = newHash;
         if (postId) {
@@ -116,28 +84,21 @@
         }
         if (window.location.hash !== '#' + hash) {
             if (addToHistory) {
-
                 history.pushState({ hash: hash }, '', '#' + hash);
             } else {
                 history.replaceState({ hash: hash }, '', '#' + hash);
             }
         }
     }
-
-
     function handleHashChange() {
         const hash = window.location.hash.substring(1);
-
         if (!hash || hash === 'home') {
-
             const homeNavItem = document.querySelector('.nav-item[data-page="home"]');
             if (homeNavItem) homeNavItem.click();
         } else if (hash === 'blogs') {
-
             const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
             if (blogsNavItem) {
                 blogsNavItem.click();
-
                 const introView = document.getElementById('blog-intro-view');
                 const postView = document.getElementById('blog-post-view');
                 if (introView && postView) {
@@ -146,14 +107,11 @@
                 }
             }
         } else if (hash === 'about') {
-
             const aboutNavItem = document.querySelector('.nav-item[data-page="about"]');
             if (aboutNavItem) aboutNavItem.click();
         } else if (hash && hash.startsWith('blog-')) {
-
             const postId = getBlogPostIdFromHash(hash);
             if (postId && typeof window.openBlogPostLazy === 'function') {
-
                 if (!window.blogPostMetadata || window.blogPostMetadata.length === 0) {
                     window.waitForBlogMetadata().then(() => {
                         window.openBlogPostLazy(postId);
@@ -164,18 +122,11 @@
             }
         }
     }
-
-
     function setupHashRouting() {
-
         window.addEventListener('hashchange', handleHashChange);
-
-
         window.addEventListener('popstate', (event) => {
-
             if (event.state && event.state.hash) {
                 const hash = event.state.hash;
-
                 if (window.location.hash !== '#' + hash) {
                     history.replaceState({ hash: hash }, '', '#' + hash);
                 }
@@ -184,10 +135,7 @@
                 handleHashChange();
             }
         });
-
-
         if (window.location.hash) {
-
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', () => {
                     setTimeout(handleHashChange, 100);
@@ -197,17 +145,12 @@
             }
         }
     }
-
-
     function createParticles() {
         const container = document.getElementById('particles');
         if (!container) return;
-
-
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
             return;
         }
-
         const fragment = document.createDocumentFragment();
         for (let i = 0; i < 20; i++) {
             const particle = document.createElement('div');
@@ -219,122 +162,63 @@
         }
         container.appendChild(fragment);
     }
-
-
     function setupNavigation() {
         const navItems = document.querySelectorAll('.nav-item');
         const sections = document.querySelectorAll('.page-section');
         const blogSidebarSection = document.getElementById('blog-sidebar-section');
-
-
         let hasRestoredBlogSession = false;
-
         let wasReadingBlogPost = false;
-
-
         wrapHomeContentInRectangle();
-
         navItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
-
-
                 const postView = document.getElementById('blog-post-view');
                 const isReadingPost = postView && postView.style.display !== 'none' && postView.style.display !== '';
-
-
                 if (item.dataset.page === 'blogs') {
                     const currentPage = window.getCurrentPage ? window.getCurrentPage() : 'home';
-
-
                     if (currentPage === 'home' || currentPage === 'about') {
-
                         const savedState = window.loadAppState ? window.loadAppState() : null;
                         const hasSavedPost = savedState && savedState.activeBlogPost;
-
-
-
                         if ((wasReadingBlogPost || !hasRestoredBlogSession) && hasSavedPost) {
                             hasRestoredBlogSession = true;
                             wasReadingBlogPost = false;
-
-
                             navigateToBlogsPageWithoutPrefetch();
-
-
                             window.updateHash('blogs', null, true);
-
-
                             if (typeof window.openBlogPostLazy === 'function' && savedState.activeBlogPost) {
                                 window.openBlogPostLazy(savedState.activeBlogPost);
                             }
-
-
                             window.scrollTo(0, 0);
-
-
                             setTimeout(window.saveAppState, 100);
                             return;
                         } else {
-
                             hasRestoredBlogSession = false;
-
-
                             navigateToBlogsPageWithoutPrefetch();
-
-
                             window.updateHash('blogs', null, true);
-
-
                             showBlogIntroView();
-
-
                             window.scrollTo(0, 0);
-
-
                             saveStateAfterNavigation();
                             return;
                         }
                     }
-
                     if (isReadingPost) {
-
                         navigateToBlogsPageWithoutPrefetch();
-
-
                         window.updateHash('blogs', null, true);
-
-
                         showBlogIntroView();
-
-
                         window.scrollTo(0, 0);
-
-
                         saveStateAfterNavigation();
                         return;
                     }
-
                 } else {
-
                     if (isReadingPost) {
                         wasReadingBlogPost = true;
                     }
-
-
                     if (item.dataset.page === 'home' || item.dataset.page === 'about') {
                         hasRestoredBlogSession = false;
                     }
-
-
                     const page = item.dataset.page;
                     setActiveNavigationItem(navItems, item);
                     showPageSection(sections, page);
-
-
                     updateBlogSidebarVisibility(blogSidebarSection, page);
-
-
                     if (page === 'home') {
                         window.updateHash('home', null, true);
                     } else if (page === 'about') {
@@ -342,108 +226,67 @@
                     } else if (page === 'blogs') {
                         window.updateHash('blogs', null, true);
                     }
-
-
                     window.scrollTo(0, 0);
-
-
                     saveStateAfterNavigation();
                     return;
                 }
-
-
                 return;
             });
         });
     }
-
-
     function wrapHomeContentInRectangle() {
         const homeHero = document.getElementById('home-hero-content');
         if (!homeHero) return;
-
-
         if (homeHero.parentElement.classList.contains('home-layout-container')) {
             return;
         }
-
-
         const wrapper = document.createElement('div');
         wrapper.className = 'home-layout-container';
-
-
         homeHero.parentNode.insertBefore(wrapper, homeHero);
-
-
         wrapper.appendChild(homeHero);
     }
-
-
     function setCookie(name, value, days) {
         const d = new Date();
         d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
         document.cookie = name + '=' + value + ';expires=' + d.toUTCString() + ';path=/';
     }
-
     function getCookie(name) {
         const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
         return match ? match[2] : null;
     }
-
-
     function isFirstVisit() {
         return getCookie('theme_preference') === null;
     }
-
-
     function getSavedTheme() {
         if (isFirstVisit()) {
             return 'auto';
         }
         return getCookie('theme_preference') || 'auto';
     }
-
-
     function saveThemePreference(theme) {
         setCookie('theme_preference', theme, 365);
     }
-
-
     function applyTheme(themeName) {
         const root = document.documentElement;
-
-
         root.setAttribute('data-theme', themeName);
-
         if (themeName === 'auto') {
-
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             applyTheme(prefersDark ? 'dark' : 'light');
             return;
         }
-
-
     }
-
-
     function setupTemplates() {
         const themeBtns = document.querySelectorAll('.theme-btn');
-
         themeBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 themeBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-
                 const theme = btn.dataset.theme;
                 applyTheme(theme);
                 saveThemePreference(theme);
-
-
                 setTimeout(window.saveAppState, 100);
             });
         });
-
-
         const savedTheme = getSavedTheme();
         const savedBtn = document.querySelector(`.theme-btn[data-theme="${savedTheme}"]`);
         if (savedBtn) {
@@ -451,56 +294,38 @@
             savedBtn.classList.add('active');
             applyTheme(savedTheme);
         } else {
-
             applyTheme('auto');
         }
     }
-
-
     function setupSystemThemeListener() {
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-
         mediaQuery.addEventListener('change', (e) => {
-
             const activeThemeBtn = document.querySelector('.theme-btn.active');
             if (activeThemeBtn && activeThemeBtn.dataset.theme === 'auto') {
                 applyTheme('auto');
             }
         });
     }
-
-
     function handleClickMe() {
         const button = document.querySelector('.blue-button');
         if (!button) return;
-
         button.style.animation = 'pulse 0.3s ease';
-
         setTimeout(() => {
             button.style.animation = '';
         }, 300);
-
         const homeNavItem = document.querySelector('.nav-item[data-page="home"]');
         if (homeNavItem) {
             homeNavItem.click();
         }
     }
-
-
     function setupSidebarToggle() {
         const sidebarToggle = document.getElementById('sidebar-toggle');
         const sidebar = document.getElementById('sidebar');
         const mainContainer = document.querySelector('.main-container');
-
         if (!sidebarToggle || !sidebar || !mainContainer) return;
-
-
         function isMobileView() {
             return window.innerWidth <= 768;
         }
-
-
         function initSidebarState() {
             if (isMobileView()) {
                 sidebar.classList.add('collapsed');
@@ -516,33 +341,21 @@
                 sidebarToggle.setAttribute('title', 'Collapse Sidebar');
             }
         }
-
-
         initSidebarState();
-
-
         sidebarToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             sidebar.classList.toggle('collapsed');
             sidebar.classList.toggle('expanded');
             mainContainer.classList.toggle('sidebar-collapsed');
-
-
             const isCollapsed = sidebar.classList.contains('collapsed');
             sidebarToggle.setAttribute('aria-label', isCollapsed ? 'Open Sidebar' : 'Collapse Sidebar');
             sidebarToggle.setAttribute('title', isCollapsed ? 'Open Sidebar' : 'Collapse Sidebar');
-
-
             setTimeout(window.saveAppState, 100);
         });
-
-
         let resizeTimeout;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(() => {
-
-
                 if (isMobileView()) {
                     if (!sidebar.classList.contains('collapsed')) {
                         sidebar.classList.add('collapsed');
@@ -552,7 +365,6 @@
                         sidebarToggle.setAttribute('title', 'Open Sidebar');
                     }
                 } else {
-
                     if (!sidebar.classList.contains('collapsed') && !sidebar.classList.contains('expanded')) {
                         sidebar.classList.add('expanded');
                         mainContainer.classList.remove('sidebar-collapsed');
@@ -563,46 +375,34 @@
             }, 200);
         });
     }
-
-
     function setupThemePrefetch() {
-
         let bgPrefetched = false;
-
         function triggerPrefetch() {
             if (bgPrefetched) return;
             if (!navigator.serviceWorker || !navigator.serviceWorker.controller) return;
-
-
             var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             var cookieMatch = document.cookie.match(/theme_preference=([^;]+)/);
             var savedTheme = cookieMatch ? cookieMatch[1] : null;
             var alternateBg;
-
             if (savedTheme === 'dark') {
                 alternateBg = '/media/bg-light.webp';
             } else if (savedTheme === 'light') {
                 alternateBg = '/media/bg-dark.webp';
             } else {
-
                 alternateBg = prefersDark ? '/media/bg-light.webp' : '/media/bg-dark.webp';
             }
-
             bgPrefetched = true;
             navigator.serviceWorker.controller.postMessage({
                 type: 'prefetch-bg',
                 urls: [alternateBg]
             });
         }
-
-
         const sidebar = document.getElementById('sidebar');
         if (sidebar) {
             sidebar.addEventListener('mousemove', function(e) {
                 if (bgPrefetched) return;
                 const chooser = sidebar.querySelector('.theme-chooser');
                 if (!chooser) return;
-
                 const rect = chooser.getBoundingClientRect();
                 const proximity = 100;
                 const isNear = (
@@ -611,23 +411,17 @@
                     e.clientY >= rect.top - proximity &&
                     e.clientY <= rect.bottom + proximity
                 );
-
                 if (isNear) {
                     triggerPrefetch();
                 }
             });
         }
-
-
         const mobileTray = document.querySelector('.mobile-tray');
         if (mobileTray) {
             mobileTray.addEventListener('touchstart', function() {
                 triggerPrefetch();
             }, { once: true, passive: true });
         }
-
-
-
         const observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutation) {
                 mutation.addedNodes.forEach(function(node) {
@@ -642,8 +436,6 @@
         });
         observer.observe(document.body, { childList: true, subtree: true });
     }
-
-
     window.navigateToBlogsPageWithoutPrefetch = navigateToBlogsPageWithoutPrefetch;
     window.createParticles = createParticles;
     window.setupNavigation = setupNavigation;
