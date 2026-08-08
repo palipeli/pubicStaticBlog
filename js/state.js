@@ -115,7 +115,11 @@
                 window.showBlogIntro();
             }
             setTimeout(() => {
-                window.scrollTo(0, 0);
+                if (typeof window.restoreScrollPosition === 'function') {
+                    window.restoreScrollPosition();
+                } else {
+                    window.scrollTo(0, 0);
+                }
             }, 50);
         }
     }

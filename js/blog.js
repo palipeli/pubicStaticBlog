@@ -272,6 +272,9 @@
                 const previousPostId = getPreviousPostId(id);
                 backBtn.style.display = previousPostId ? 'inline-block' : 'none';
             }
+            if (typeof window.restoreScrollPosition === 'function') {
+                window.restoreScrollPosition();
+            }
         });
         if (typeof window.updateHash === 'function') {
             window.updateHash('', id, true);
@@ -350,6 +353,9 @@
                 if (typeof window.updateHash === 'function') {
                     window.updateHash('', previousPostId, false);
                 }
+                if (typeof window.restoreScrollPosition === 'function') {
+                    window.restoreScrollPosition();
+                }
             } else {
                 showBlogIntro();
             }
@@ -365,6 +371,9 @@
         renderBlogPostSelectorGrid(blogPostMetadata);
         if (typeof window.updateHash === 'function') {
             window.updateHash('blogs', null, false);
+        }
+        if (typeof window.restoreScrollPosition === 'function') {
+            window.restoreScrollPosition();
         }
         setTimeout(window.saveAppState, 100);
     }

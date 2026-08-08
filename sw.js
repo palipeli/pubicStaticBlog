@@ -16,6 +16,7 @@ const PRECACHE_ASSETS = [
     '/js/markdown.js',
     '/js/lazyload.js',
     '/js/state.js',
+    '/js/scroll-position.js',
     '/js/devotional.js',
     '/js/ui.js',
     '/js/blog.js',
@@ -371,9 +372,10 @@ async function precacheAllAssets() {
         '/js/dns-graph.js',
         '/js/lazyload.js',
         '/js/markdown.js',
-        '/js/mobile-tray.js',
-        '/js/state.js',
-        '/js/ui.js',
+    '/js/mobile-tray.js',
+    '/js/scroll-position.js',
+    '/js/state.js',
+    '/js/ui.js',
         '/blog/nt_verses_compact.json',
     ];
     const cachePromises = allAssets.map((url) => {

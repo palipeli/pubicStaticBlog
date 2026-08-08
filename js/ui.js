@@ -196,6 +196,9 @@
                             window.updateHash('blogs', null, true);
                             showBlogIntroView();
                             window.scrollTo(0, 0);
+                            if (typeof window.restoreScrollPosition === 'function') {
+                                window.restoreScrollPosition();
+                            }
                             saveStateAfterNavigation();
                             return;
                         }
@@ -205,6 +208,9 @@
                         window.updateHash('blogs', null, true);
                         showBlogIntroView();
                         window.scrollTo(0, 0);
+                        if (typeof window.restoreScrollPosition === 'function') {
+                            window.restoreScrollPosition();
+                        }
                         saveStateAfterNavigation();
                         return;
                     }
@@ -227,6 +233,9 @@
                         window.updateHash('blogs', null, true);
                     }
                     window.scrollTo(0, 0);
+                    if (typeof window.restoreScrollPosition === 'function') {
+                        window.restoreScrollPosition();
+                    }
                     saveStateAfterNavigation();
                     return;
                 }
