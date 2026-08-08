@@ -1,13 +1,10 @@
 (function() {
     const STORAGE_KEY = 'system_warning_consent';
     const SCROLL_THRESHOLD = 10;
-
     const phrases = [
-        "STOP", "PILIH PRABOWO GIBRAN", "PILIH NOMOR 2 2029", "HAIIIIIIII!", "ANTEK ANTEK ASING", "PALING NYAWIT"
+        "STOP", "PLS", "STOPPPPPP!", "STAHPPP", "ARE YOU INSANE?"
     ];
-
     let bypassWarning = false;
-
     window.addEventListener('click', (e) => {
         if (e.target.closest('a') ||
             e.target.closest('#themeToggle') ||
@@ -33,22 +30,17 @@
             setTimeout(() => {bypassWarning = false;}, 1000);
         }
     });
-
     window.addEventListener('beforeunload', (e) => {
         if (!bypassWarning) {
             e.preventDefault();
             e.returnValue = '';
         }
     });
-
     let isAccepted = false;
     let areAssetsLoaded = false;
-
     let touchStartX = 0;
     let touchStartY = 0;
-
     const hasPriorConsent = localStorage.getItem(STORAGE_KEY) === 'true';
-
     const style = document.createElement('style');
     style.innerHTML = `
         #consent-overlay {
@@ -78,7 +70,6 @@
         .consent-text h3 {margin: 0; color: #ff6ec7; font-size: 1.8rem; text-transform: uppercase; text-shadow: 2px 2px 0 #000;}
         .consent-text p {margin: 5px 0 0 0; font-size: 1.1rem; color: #ccc;}
         #loading-status {color: #ff92df; font-weight: bold;}
-
         .btn-group {display: flex; gap: 10px;}
         .mc-btn {
             background: #000; color: #fff; border: 2px solid #fff;
@@ -87,27 +78,23 @@
         }
         .mc-btn:hover:not(:disabled) {background: #fff; color: #000;}
         .mc-btn:disabled {opacity: 0.5; cursor: wait;}
-
         #warning-flash {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: rgba(242, 0, 255, 1);
             z-index: 2147483647; pointer-events: none; opacity: 0;
             display: flex; justify-content: center; align-items: center;
         }
-
         #hdr-pre-flash {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: white;
             z-index: 2147483648; pointer-events: none; opacity: 0;
         }
-
         #warning-text {
             font-family: 'VT323', monospace; font-size: 6rem;
             font-weight: 900; text-transform: uppercase;
             text-shadow: 4px 4px 0px #000;
             animation: shake 0.1s infinite;
         }
-
         @media (max-width: 600px) {
             .consent-content-wrapper {flex-direction: column; text-align: center;}
             .btn-group {width: 100%; flex-direction: column;}
@@ -119,26 +106,21 @@
         }
     `;
     document.head.appendChild(style);
-
     const preFlashOverlay = document.createElement('div');
     preFlashOverlay.id = 'hdr-pre-flash';
     document.body.appendChild(preFlashOverlay);
-
     const flashOverlay = document.createElement('div');
     flashOverlay.id = 'warning-flash';
     const textSpan = document.createElement('span');
     textSpan.id = 'warning-text';
     flashOverlay.appendChild(textSpan);
     document.body.appendChild(flashOverlay);
-
     const consentOverlay = document.createElement('div');
     consentOverlay.id = 'consent-overlay';
-
     if (hasPriorConsent) {
         consentOverlay.style.display = 'none';
         isAccepted = true;
     }
-
     consentOverlay.innerHTML = `
         <div id="consent-box">
             <div class="consent-content-wrapper">
@@ -155,36 +137,28 @@
         </div>
     `;
     document.body.appendChild(consentOverlay);
-
     async function initAudio() {
-
         const acceptBtn = document.getElementById('accept-btn');
         const declineBtn = document.getElementById('decline-btn');
         const loadText = document.getElementById('loading-status');
-
         areAssetsLoaded = true;
         loadText.innerText = "Assets Loaded.";
         acceptBtn.innerText = "ACCEPT";
         acceptBtn.disabled = false;
         declineBtn.disabled = false;
-
         acceptBtn.addEventListener('click', () => {
             localStorage.setItem(STORAGE_KEY, 'true');
             consentOverlay.style.opacity = '0';
-
             document.dispatchEvent(new CustomEvent('warning:cleared'));
-
             setTimeout(() => {
                 consentOverlay.style.display = 'none';
                 isAccepted = true;
             }, 300);
         });
-
         declineBtn.addEventListener('click', async () => {
             localStorage.removeItem(STORAGE_KEY);
             acceptBtn.disabled = true;
             declineBtn.disabled = true;
-
             const intervalId = setInterval(() => {triggerWarning(null, true);}, 100);
             setTimeout(() => {
                 clearInterval(intervalId);
@@ -193,11 +167,9 @@
             }, 3000);
         });
     }
-
     async function triggerWarning(e, force = false) {
         if (!force) {
             if (!isAccepted || !areAssetsLoaded) return;
-
             if (e && e.target && (
                 e.target.closest('#consent-overlay') ||
                 e.target.closest('a') ||
@@ -222,19 +194,15 @@
                 e.target.closest('.github-graph-range-btn')
             )) return;
         }
-
         preFlashOverlay.style.opacity = '1';
         setTimeout(() => {
             textSpan.innerText = phrases[Math.floor(Math.random() * phrases.length)];
             flashOverlay.style.opacity = '1';
-
             setTimeout(() => {flashOverlay.style.opacity = '0';}, 100);
         }, 5);
         setTimeout(() => {preFlashOverlay.style.opacity = '0';}, 25);
     }
-
     initAudio();
-
     window.addEventListener('keydown', (e) => isAccepted && triggerWarning(e));
     window.addEventListener('mousedown', (e) => isAccepted && triggerWarning(e));
     window.addEventListener('touchstart', (e) => {
@@ -250,5 +218,4 @@
             if (diffX < SCROLL_THRESHOLD && diffY < SCROLL_THRESHOLD) triggerWarning(e);
         }
     });
-
 })();

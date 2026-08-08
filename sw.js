@@ -1,17 +1,13 @@
 'use strict';
-
 const CACHE_NAME = 'pubic-static-blog-v2';
 const STATIC_CACHE_NAME = 'static-assets-v2';
 const IMAGE_CACHE_NAME = 'images-v2';
 const CONTENT_CACHE_NAME = 'blog-content-v2';
-
 const pendingFetches = new Map();
-
 const STATIC_EXTENSIONS = /\.(html|css|js|json|webmanifest|ico|txt|xml)$/i;
 const IMAGE_EXTENSIONS = /\.(webp|png|jpg|jpeg|gif|svg|ico)(\?.*)?$/i;
 const MARKDOWN_EXTENSIONS = /\.(md|markdown)(\?.*)?$/i;
 const FONT_EXTENSIONS = /\.(woff|woff2|ttf|eot|otf)(\?.*)?$/i;
-
 const PRECACHE_ASSETS = [
     '/',
     '/index.html',
@@ -36,16 +32,13 @@ const PRECACHE_ASSETS = [
     '/media/bg-dark.webp',
     '/media/vt323.ttf',
 ];
-
 self.addEventListener('install', (event) => {
     event.waitUntil(
         Promise.all([
             caches.open(STATIC_CACHE_NAME),
             caches.open(IMAGE_CACHE_NAME)
         ]).then(([staticCache, imageCache]) => {
-
             const cachePromises = PRECACHE_ASSETS.map((url) => {
-
                 const targetCache = IMAGE_EXTENSIONS.test(url) ? imageCache : staticCache;
                 return fetch(url)
                     .then((response) => {
@@ -60,12 +53,10 @@ self.addEventListener('install', (event) => {
             });
             return Promise.all(cachePromises);
         }).then(() => {
-
             return self.skipWaiting();
         })
     );
 });
-
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
@@ -85,51 +76,39 @@ self.addEventListener('activate', (event) => {
                     .map((name) => caches.delete(name))
             );
         }).then(() => {
-
             return self.clients.claim();
         })
     );
 });
-
 function getCacheStrategy(request) {
     const url = new URL(request.url);
     const pathname = url.pathname;
-
     if (url.origin !== self.location.origin) {
         return 'network-only';
     }
-
     if (pathname === '/' || pathname === '/index.html' || pathname.endsWith('.html')) {
         return 'network-first';
     }
-
     if (pathname === '/blog/posts.json') {
         return 'network-first';
     }
-
     if (STATIC_EXTENSIONS.test(pathname)) {
         return 'cache-first';
     }
-
     if (IMAGE_EXTENSIONS.test(pathname)) {
         return 'cache-first';
     }
-
     if (FONT_EXTENSIONS.test(pathname)) {
         return 'cache-first';
     }
-
     if (MARKDOWN_EXTENSIONS.test(pathname) || pathname.startsWith('/blog/')) {
         return 'cache-first';
     }
-
     return 'network-first';
 }
-
 function getCacheForRequest(request) {
     const url = new URL(request.url);
     const pathname = url.pathname;
-
     if (IMAGE_EXTENSIONS.test(pathname)) {
         return IMAGE_CACHE_NAME;
     }
@@ -138,7 +117,6 @@ function getCacheForRequest(request) {
     }
     return STATIC_CACHE_NAME;
 }
-
 function isCacheableMessageUrl(value) {
     try {
         const url = new URL(value, self.location.origin);
@@ -151,7 +129,6 @@ function isCacheableMessageUrl(value) {
         return false;
     }
 }
-
 async function prefetchUrl(value, cache) {
     if (!isCacheableMessageUrl(value)) return;
     const request = new Request(new URL(value, self.location.origin).href);
@@ -162,31 +139,24 @@ async function prefetchUrl(value, cache) {
         console.warn('Prefetch failed:', request.url, error);
     }
 }
-
 self.addEventListener('fetch', (event) => {
     const request = event.request;
     const url = new URL(request.url);
-
     if (request.method !== 'GET') {
         return;
     }
-
     if (url.origin !== self.location.origin) {
         if (url.hostname === 'cdnjs.cloudflare.com') {
             return;
         }
         return;
     }
-
     const strategy = getCacheStrategy(request);
     const cacheName = getCacheForRequest(request);
-
     event.respondWith(handleRequest(request, strategy, cacheName));
 });
-
 async function handleRequest(request, strategy, cacheName) {
     const cache = await caches.open(cacheName);
-
     switch (strategy) {
         case 'cache-first':
             return cacheFirst(request, cache);
@@ -199,82 +169,58 @@ async function handleRequest(request, strategy, cacheName) {
             return fetch(request);
     }
 }
-
 async function cacheFirst(request, cache) {
     const cachedResponse = await cache.match(request);
-
     if (cachedResponse) {
-
         return cachedResponse;
     }
-
     return fetchAndCache(request, cache);
 }
-
 async function networkFirst(request, cache) {
     try {
         const networkResponse = await fetch(request);
-
         if (networkResponse && networkResponse.ok) {
-
             await cache.put(request, networkResponse.clone());
         }
-
         return networkResponse;
     } catch (error) {
-
         const cachedResponse = await cache.match(request);
-
         if (cachedResponse) {
             return cachedResponse;
         }
-
         if (request.headers.get('accept')?.includes('text/html')) {
             return getOfflineShell(cache);
         }
-
         throw error;
     }
 }
-
 async function staleWhileRevalidate(request, cache) {
     const cachedResponse = await cache.match(request);
-
     const fetchPromise = fetchAndCache(request, cache);
-
     if (cachedResponse) {
-
         return cachedResponse;
     }
-
     try {
         return await fetchPromise;
     } catch (error) {
-
         if (request.headers.get('accept')?.includes('text/html')) {
             return getOfflineShell(cache);
         }
         throw error;
     }
 }
-
 async function fetchAndCache(request, cache) {
     const url = request.url;
-
     if (pendingFetches.has(url)) {
         return pendingFetches.get(url);
     }
-
     const fetchPromise = (async () => {
         const response = await fetch(request);
-
         if (response && response.ok) {
             await cache.put(request, response.clone());
         }
-
         return response;
     })();
-
     pendingFetches.set(url, fetchPromise);
     try {
         return await fetchPromise;
@@ -282,10 +228,8 @@ async function fetchAndCache(request, cache) {
         pendingFetches.delete(url);
     }
 }
-
 function updateCacheInBackground(request, cache) {
     const url = request.url;
-
     if (pendingFetches.has(url)) {
         return;
     }
@@ -296,20 +240,16 @@ function updateCacheInBackground(request, cache) {
             }
         })
         .catch(() => {
-
         })
         .finally(() => {
             pendingFetches.delete(url);
         });
-
     pendingFetches.set(url, updatePromise);
 }
-
 async function getOfflineShell(cache) {
     const shell = await cache.match('/index.html') || await cache.match('/');
     return shell || createOfflineFallback();
 }
-
 function createOfflineFallback() {
     const offlineHtml = `
         <!DOCTYPE html>
@@ -358,17 +298,14 @@ function createOfflineFallback() {
         </body>
         </html>
     `;
-
     return new Response(offlineHtml, {
         status: 200,
         statusText: 'OK',
         headers: {'Content-Type': 'text/html; charset=utf-8'}
     });
 }
-
 self.addEventListener('message', (event) => {
     const data = event.data;
-
     if (data === 'clear-cache') {
         event.waitUntil(
             caches.keys().then((names) => Promise.all(names.map((name) => caches.delete(name))))
@@ -376,39 +313,31 @@ self.addEventListener('message', (event) => {
         );
         return;
     }
-
     if (!data || !data.type) return;
-
     if (data.type === 'precache-bg' && data.url) {
         event.waitUntil(caches.open(IMAGE_CACHE_NAME).then((cache) => prefetchUrl(data.url, cache)));
     }
-
     if (data.type === 'prefetch-bg' && Array.isArray(data.urls)) {
         event.waitUntil(caches.open(IMAGE_CACHE_NAME).then((cache) =>
             Promise.all(data.urls.map((url) => prefetchUrl(url, cache)))
         ));
     }
-
     if (data.type === 'prefetch-posts' && Array.isArray(data.urls)) {
         event.waitUntil(caches.open(CONTENT_CACHE_NAME).then((cache) =>
             Promise.all(data.urls.map((url) => prefetchUrl(url, cache)))
         ));
     }
-
     if (data.type === 'precache-all') {
         event.waitUntil(precacheAllAssets());
     }
-
     if (data.type === 'skip-waiting') {
         self.skipWaiting();
     }
 });
-
 async function precacheAllAssets() {
     const staticCache = await caches.open(STATIC_CACHE_NAME);
     const imageCache = await caches.open(IMAGE_CACHE_NAME);
     const contentCache = await caches.open(CONTENT_CACHE_NAME);
-
     const mediaFiles = [
         '/media/apple.webp',
         '/media/background.webp',
@@ -420,7 +349,6 @@ async function precacheAllAssets() {
         '/media/signing.webp',
         '/media/vt323.ttf',
     ];
-
     let blogPosts = [];
     try {
         const response = await fetch('/blog/posts.json');
@@ -431,7 +359,6 @@ async function precacheAllAssets() {
     } catch (e) {
         console.warn('Could not fetch posts.json for precaching');
     }
-
     const allAssets = [
         ...PRECACHE_ASSETS,
         ...mediaFiles,
@@ -449,17 +376,14 @@ async function precacheAllAssets() {
         '/js/ui.js',
         '/blog/nt_verses_compact.json',
     ];
-
     const cachePromises = allAssets.map((url) => {
         const cache = url.startsWith('/blog/') && url.endsWith('.md') ? contentCache :
                       IMAGE_EXTENSIONS.test(url) ? imageCache : staticCache;
         return prefetchUrl(url, cache);
     });
-
     await Promise.all(cachePromises);
     console.log('All assets precached');
 }
-
 self.addEventListener('periodicsync', (event) => {
     if (event.tag === 'precache-assets') {
         event.waitUntil(precacheAllAssets());

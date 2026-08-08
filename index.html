@@ -9,7 +9,6 @@
     <link rel="icon" type="image/webp" href="media/favicon-circle.webp">
     <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
-
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kamikami.eu/">
     <meta property="og:title" content="Michelle's DNS and Blog">
@@ -17,7 +16,6 @@
     <meta property="og:image" content="https://kamikami.eu/media/logo.webp">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Michelle's DNS and Blog">
     <meta name="twitter:description" content="WELCOME TO MY SUPER-CUTE-BUT-SHITTY WEBSITE! TAKE VICODIN IF YOU CAME FROM WSFTEAM.XYZ. I'm running a website where I post about shitty and janky technology that I like and personally use. Especially in audio, networking, and Linux technologies.">
@@ -25,7 +23,6 @@
     <meta name="twitter:site" content="@kamikamieu">
 </head>
 <body>
-
     <script>
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js').then(function(reg) {
@@ -36,21 +33,17 @@
             if (savedTheme === 'dark') activeBg = '/media/bg-dark.webp';
             else if (savedTheme === 'light') activeBg = '/media/bg-light.webp';
             else activeBg = prefersDark ? '/media/bg-dark.webp' : '/media/bg-light.webp';
-
             navigator.serviceWorker.ready.then(function(r) {
                 if (r.active) {
                     r.active.postMessage({type: 'precache-bg', url: activeBg});
                 }
             });
         }).catch(function(error) {
-
             console.warn('Service worker registration failed:', error);
         });
     }
     </script>
-
     <div class="particles" id="particles"></div>
-
     <header class="header">
         <div class="header-left">
             <button class="blue-button" onclick="handleClickMe()"><span>kamikami.eu</span></button>
@@ -61,33 +54,25 @@
             <a href="#" class="nav-item" data-page="about">About</a>
         </div>
     </header>
-
     <div class="main-container">
-
         <main class="content-area">
-
             <section id="home" class="page-section active">
                 <div class="home-hero" id="home-hero-content">
                     <p class="home-lead">WELCOME TO MY SUPER-CUTE-BUT-SHITTY WEBSITE! TAKE VICODIN IF YOU CAME FROM WSFTEAM.XYZ</p>
                     <img src="media/logo.webp" alt="Blog Logo" style="display: block; margin: 20px auto; width: 70%; max-width: 560px;">
-
                     <div class="blog-buttons-container" id="blog-buttons-container" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 25px 0;">
-
                     </div>
-
                     <div class="home-content">
                         <p>I'm running a website where I post about shitty and janky technology that I like and personally use. Especially in audio, networking, and Linux technologies.</p>
                         <p>Michelle's DNS is a .mobileconfig profile made to provision Apple iOS/iPadOS devices to allow sideloading using revoked certificate through privacy-preserving DNS which is compliant with WSFteam.xyz (partner) documentations and practice.</p>
                         <p>If you want to send me cat pictures or other interesting files, please click the button above!!!</p>
                     </div>
-
                     <div class="dns-graph-card">
                         <h3 class="dns-graph-title">DNS Requests</h3>
                         <div class="dns-graph-canvas-wrap">
                             <canvas id="dns-graph"></canvas>
                         </div>
                     </div>
-
                     <div class="github-graphs-heading">
                         <h2>This website is created in part with cheap slop generator, so commits would look weird.</h2>
                         <p>My Slop Activity graphs:</p>
@@ -115,40 +100,32 @@
                     </div>
                 </div>
             </section>
-
             <section id="blogs" class="page-section">
                 <div class="blog-layout-container">
-
                     <div class="blog-main-content" id="blog-main-content">
-
                         <div class="blog-intro-view" id="blog-intro-view">
                             <article class="blog-article">
                                 <h1>All Blog Posts</h1>
                                 <p class="blog-meta"><span class="blog-date">Select a post to read</span></p>
                                 <div class="blog-post-selector-grid" id="blog-post-selector-grid">
-
                                 </div>
                             </article>
                         </div>
-
                         <div class="blog-post-view" id="blog-post-view" style="display: none;">
                             <div class="blog-post-nav">
                                 <button class="back-to-intro-btn" onclick="goBack()" onmouseenter="window.preloadPreviousPageOnHover()">← Back</button>
                                 <button class="back-to-intro-btn next-post-btn" id="next-post-btn" onclick="goToNextPost()" onmouseenter="window.preloadNextPostOnHover()" style="display: none;">Next →</button>
                             </div>
                             <article class="blog-article" id="blog-article-content">
-
                             </article>
                         </div>
                     </div>
                 </div>
             </section>
-
             <section id="about" class="page-section">
                 <div class="about-layout-container">
                     <div class="about-hero">
                         <img src="media/favicon-circle.webp" alt="Michelle" class="profile-img">
-
                         <div class="social-links">
                             <a href="https://discord.com/users/654535856950083603" target="_blank" class="blog-btn category-discord">
                                 <i class="fa-brands fa-discord"></i> Discord
@@ -160,14 +137,11 @@
                                 <i class="fa-brands fa-youtube"></i> YouTube
                             </a>
                         </div>
-
                         <h1>My name is Michelle</h1>
                         <p class="subtitle">Jesus Christ, you came here? Why even bother visiting this site, since there's practically nothing here. My name is Michelle and I'm not racist because I'm neither white or stereotypically asian. I'm just myself and I don't care how would anyone perceive me, although I still prefer a small talk about something other than quieting alone.</p>
-
                         <div style="margin-top:20px;">
                             <span style="font-size:3rem; animation: float 2s infinite;">💖</span>
                         </div>
-
                         <footer class="home-page-footer">
                             <p style="font-size:0.7rem;">What the fuck are you looking at? All the contents are above, but thanks for looking at though!</p>
                             <p style="font-size:0.6rem; color:#666;">Idjen Boulevard No.48, Kota Malang 65112, Indonesia.</p>
@@ -178,9 +152,7 @@
                 </div>
             </section>
         </main>
-
         <aside class="sidebar" id="sidebar">
-
             <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Collapse Sidebar" title="Collapse Sidebar">
                 <svg viewBox="0 0 24 24" width="20" height="20">
                     <path fill="currentColor" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
@@ -195,17 +167,14 @@
                         <button class="theme-btn" data-theme="dark"><i class="fa-solid fa-moon"></i> Dark</button>
                     </div>
                 </div>
-
                 <div class="sidebar-section blog-only" id="blog-sidebar-section" style="display: none;">
                     <h3 class="sidebar-title">All Posts</h3>
                     <div class="post-selector-list" id="post-selector-list">
-
                     </div>
                 </div>
             </div>
         </aside>
     </div>
-
     <script src="js/config.js" defer></script>
     <script src="js/markdown.js" defer></script>
     <script src="js/lazyload.js" defer></script>
@@ -217,12 +186,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="js/github-graph.js" defer></script>
     <script src="js/dns-graph.js" defer></script>
-
     <script src="warning.js"></script>
     <script src="js/mobile-tray.js"></script>
-
     <script src="js/app.js" defer></script>
-
     <footer>
         <p style="font-size:0.7rem;">What the fuck are you looking at? All the contents are above, but thanks for looking at though!</p>
         <p style="font-size:0.6rem; color:#666;">Idjen Boulevard No.48, Kota Malang 65112, Indonesia.</p>
