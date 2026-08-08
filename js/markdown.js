@@ -1,7 +1,3 @@
-
-
-
-
 (function() {
 
     const htmlEntities = {
@@ -14,17 +10,13 @@
         '&yen;': '\u00A5', '&cent;': '\u00A2'
     };
 
-
-
     function isWhitespace(ch) {
         return ch === ' ' || ch === '\t' || ch === '\n' || ch === '\r';
     }
 
-
     function isBlank(line) {
         return /^[ \t]*$/.test(line);
     }
-
 
     function getIndentLevel(line) {
         let level = 0;
@@ -36,8 +28,6 @@
         return level;
     }
 
-
-
     function parseInline(text, options = {}) {
         if (!text) return '';
 
@@ -45,8 +35,6 @@
         let i = 0;
 
         while (i < text.length) {
-
-
 
             if (text[i] === '\\' && i + 1 < text.length) {
                 const nextChar = text[i + 1];
@@ -56,7 +44,6 @@
                     continue;
                 }
             }
-
 
             if (text[i] === '&') {
                 const entityMatch = text.slice(i).match(/^&([a-zA-Z]+|#\d+|#x[0-9a-fA-F]+);/);
@@ -74,7 +61,6 @@
                 }
             }
 
-
             if (text[i] === '`') {
 
                 let backtickCount = 0;
@@ -83,7 +69,6 @@
                     backtickCount++;
                     i++;
                 }
-
 
                 const delimiter = '`'.repeat(backtickCount);
                 const closeIndex = text.indexOf(delimiter, i);
@@ -105,7 +90,6 @@
                 continue;
             }
 
-
             if (text[i] === '!' && i + 1 < text.length && text[i + 1] === '[') {
                 const imgResult = parseLinkOrImage(text, i, true);
                 if (imgResult) {
@@ -114,7 +98,6 @@
                     continue;
                 }
             }
-
 
             if (text[i] === '[') {
                 const linkResult = parseLinkOrImage(text, i, false);
@@ -125,7 +108,6 @@
                 }
             }
 
-
             if (text[i] === '<') {
                 const autoLinkResult = parseAutolink(text, i);
                 if (autoLinkResult) {
@@ -134,7 +116,6 @@
                     continue;
                 }
             }
-
 
             if (text[i] === '<') {
                 const htmlTagResult = parseRawHtmlTag(text, i);
@@ -145,8 +126,6 @@
                 }
             }
 
-
-
             if (text[i] === 'h' && text.slice(i, i + 8) === 'https://' || text.slice(i, i + 7) === 'http://') {
                 const urlResult = parseExtendedAutolink(text, i);
                 if (urlResult) {
@@ -156,14 +135,12 @@
                 }
             }
 
-
             const emphasisResult = parseEmphasis(text, i);
             if (emphasisResult) {
                 result += emphasisResult.html;
                 i = emphasisResult.end;
                 continue;
             }
-
 
             if (text[i] === '~' && i + 1 < text.length && text[i + 1] === '~') {
                 const strikeResult = parseStrikethrough(text, i);
@@ -174,13 +151,11 @@
                 }
             }
 
-
             if (text[i] === ' ' && i + 1 < text.length && text[i + 1] === ' ' && i + 2 < text.length && text[i + 2] === '\n') {
                 result += '<br>';
                 i += 3;
                 continue;
             }
-
 
             result += text[i];
             i++;
@@ -188,7 +163,6 @@
 
         return result;
     }
-
 
     function parseLinkOrImage(text, start, isImage) {
         let i = start;
@@ -200,7 +174,6 @@
             if (text[i] !== '[') return null;
             i++;
         }
-
 
         let bracketDepth = 1;
         const labelStart = i;
@@ -215,13 +188,10 @@
         const label = text.slice(labelStart, i);
         i++;
 
-
         if (i < text.length && text[i] === '(') {
             i++;
 
-
             while (i < text.length && isWhitespace(text[i]) && text[i] !== '\n') i++;
-
 
             const destStart = i;
             let parenDepth = 1;
@@ -240,8 +210,6 @@
 
             let destAndTitle = text.slice(destStart, i).trim();
 
-
-
             const titleMatch = destAndTitle.match(/^([^\s"']+)(?:\s+["'](.+)["']|\s+\((.+)\))?$/);
             if (titleMatch) {
                 dest = titleMatch[1];
@@ -249,7 +217,6 @@
             } else {
                 dest = destAndTitle;
             }
-
 
             if (dest.startsWith('<') && dest.endsWith('>')) {
                 dest = dest.slice(1, -1);
@@ -274,7 +241,6 @@
             }
         }
 
-
         if (i < text.length && text[i] === '[') {
             i++;
             const refStart = i;
@@ -282,8 +248,6 @@
             if (i >= text.length) return null;
             const refLabel = text.slice(refStart, i);
             i += 2;
-
-
 
             return {
                 html: (isImage ? '!' : '') + '[' + label + '][' + refLabel + ']',
@@ -294,13 +258,11 @@
         return null;
     }
 
-
     function parseAutolink(text, start) {
         if (text[start] !== '<') return null;
 
         let i = start + 1;
         let hasAt = false;
-
 
         while (i < text.length && text[i] !== '>' && text[i] !== ' ' && text[i] !== '\n') {
             if (text[i] === '@') hasAt = true;
@@ -310,7 +272,6 @@
         if (i >= text.length || text[i] !== '>') return null;
 
         const dest = text.slice(start + 1, i);
-
 
         if (hasAt) {
 
@@ -333,7 +294,6 @@
         }
     }
 
-
     function parseRawHtmlTag(text, start) {
 
         const tagMatch = text.slice(start).match(/^<([a-zA-Z][a-zA-Z0-9]*)\s*>/);
@@ -346,7 +306,6 @@
         return null;
     }
 
-
     function parseExtendedAutolink(text, start) {
 
         let isHttps = false;
@@ -355,7 +314,6 @@
         } else if (text.slice(start, start + 7) !== 'http://') {
             return null;
         }
-
 
         let i = start + (isHttps ? 8 : 7);
         while (i < text.length) {
@@ -369,11 +327,9 @@
             i++;
         }
 
-
         if (i <= start + (isHttps ? 8 : 7)) return null;
 
         const url = text.slice(start, i);
-
 
         if (!/^https?:\/\/.+$/.test(url)) return null;
 
@@ -382,7 +338,6 @@
             end: i
         };
     }
-
 
     function parseEmphasis(text, start) {
 
@@ -413,7 +368,6 @@
             }
         }
 
-
         if (start + 1 < text.length) {
             if (text[start] === '*' && text[start + 1] === '*') {
                 const closeIndex = text.indexOf('**', start + 2);
@@ -441,18 +395,14 @@
             }
         }
 
-
         if (text[start] === '*' || text[start] === '_') {
             const marker = text[start];
-
-
 
             if (marker === '_') {
                 const prevChar = start > 0 ? text[start - 1] : '';
                 const nextChar = start + 1 < text.length ? text[start + 1] : '';
                 const isPrevAlphaNum = /[a-zA-Z0-9]/.test(prevChar);
                 const isNextAlphaNum = /[a-zA-Z0-9]/.test(nextChar);
-
 
                 if (isPrevAlphaNum && isNextAlphaNum) {
                     return null;
@@ -461,21 +411,17 @@
 
             let closeIndex = -1;
 
-
             for (let j = start + 1; j < text.length; j++) {
                 if (text[j] === marker) {
 
                     if (j + 1 < text.length && text[j + 1] === marker) continue;
                     if (j - 1 >= start && text[j - 1] === marker) continue;
 
-
                     if (marker === '_') {
                         const prevCloseChar = j > 0 ? text[j - 1] : '';
                         const nextCloseChar = j + 1 < text.length ? text[j + 1] : '';
                         const isPrevCloseAlphaNum = /[a-zA-Z0-9]/.test(prevCloseChar);
                         const isNextCloseAlphaNum = /[a-zA-Z0-9]/.test(nextCloseChar);
-
-
 
                         if (!isPrevCloseAlphaNum && isNextCloseAlphaNum) {
                             continue;
@@ -502,7 +448,6 @@
         return null;
     }
 
-
     function parseStrikethrough(text, start) {
         if (text[start] !== '~' || text[start + 1] !== '~') return null;
 
@@ -518,7 +463,6 @@
         }
         return null;
     }
-
 
     function escapeHtml(text) {
         return text
@@ -583,14 +527,14 @@
             const line = lines[i];
 
             if (isBlank(line)) {
-                blocks.push({ type: 'blank', line: i });
+                blocks.push({type: 'blank', line: i});
                 i++;
                 continue;
             }
 
             const hrMatch = line.match(/^( {0,3})([-*_])([ ]?\2){2,}[ ]*$/);
             if (hrMatch) {
-                blocks.push({ type: 'thematic_break', line: i });
+                blocks.push({type: 'thematic_break', line: i});
                 i++;
                 continue;
             }
@@ -600,7 +544,7 @@
                 const level = atxMatch[1].length;
                 let content = atxMatch[2];
                 content = content.replace(/[ \t]*#+[ \t]*$/, '');
-                blocks.push({ type: 'heading', level: level, content: content, line: i });
+                blocks.push({type: 'heading', level: level, content: content, line: i});
                 i++;
                 continue;
             }
@@ -608,12 +552,12 @@
             if (i + 1 < lines.length) {
                 const nextLine = lines[i + 1];
                 if (/^={1,}[ \t]*$/.test(nextLine)) {
-                    blocks.push({ type: 'heading', level: 1, content: line.trim(), line: i });
+                    blocks.push({type: 'heading', level: 1, content: line.trim(), line: i});
                     i += 2;
                     continue;
                 }
                 if (/^-{1,}[ \t]*$/.test(nextLine)) {
-                    blocks.push({ type: 'heading', level: 2, content: line.trim(), line: i });
+                    blocks.push({type: 'heading', level: 2, content: line.trim(), line: i});
                     i += 2;
                     continue;
                 }
@@ -649,7 +593,7 @@
                 while (codeLines.length > 0 && codeLines[0] === '') codeLines.shift();
                 while (codeLines.length > 0 && codeLines[codeLines.length - 1] === '') codeLines.pop();
 
-                blocks.push({ type: 'code', content: codeLines.join('\n'), lang: '', line: i - codeLines.length });
+                blocks.push({type: 'code', content: codeLines.join('\n'), lang: '', line: i - codeLines.length});
                 continue;
             }
 
@@ -675,7 +619,7 @@
                     i++;
                 }
 
-                blocks.push({ type: 'code', content: codeLines.join('\n'), lang: lang, line: i - codeLines.length - 1 });
+                blocks.push({type: 'code', content: codeLines.join('\n'), lang: lang, line: i - codeLines.length - 1});
                 continue;
             }
 
@@ -703,7 +647,7 @@
                     i++;
                 }
 
-                blocks.push({ type: 'html', content: htmlLines.join('\n'), line: i - htmlLines.length });
+                blocks.push({type: 'html', content: htmlLines.join('\n'), line: i - htmlLines.length});
                 continue;
             }
 
@@ -716,11 +660,11 @@
                     if (bqLineMatch) {
                         const markers = bqLineMatch[2];
                         const content = bqLineMatch[4];
-                        bqLines.push({ markers: markers.length, content: content });
+                        bqLines.push({markers: markers.length, content: content});
                         i++;
                     } else if (isBlank(bqLine)) {
                         if (i + 1 < lines.length && lines[i + 1].match(/^ {0,3}>/)) {
-                            bqLines.push({ markers: 1, content: '' });
+                            bqLines.push({markers: 1, content: ''});
                             i++;
                         } else {
                             break;
@@ -729,7 +673,7 @@
                         break;
                     }
                 }
-                blocks.push({ type: 'blockquote', content: bqLines, line: i - bqLines.length });
+                blocks.push({type: 'blockquote', content: bqLines, line: i - bqLines.length});
                 continue;
             }
 
@@ -882,7 +826,7 @@
 
             if (paraLines.length > 0) {
                 const content = paraLines.join('\n');
-                blocks.push({ type: 'paragraph', content: content, line: i - paraLines.length });
+                blocks.push({type: 'paragraph', content: content, line: i - paraLines.length});
             }
         }
 
@@ -1173,17 +1117,15 @@
             }
         });
 
-        return { frontmatter, content: body };
+        return {frontmatter, content: body};
     }
-
 
     if (typeof window !== 'undefined') {
         window.parseMarkdown = parseMarkdown;
         window.parseFrontmatter = parseFrontmatter;
     }
 
-
     if (typeof module !== 'undefined' && module.exports) {
-        module.exports = { parseMarkdown, parseFrontmatter };
+        module.exports = {parseMarkdown, parseFrontmatter};
     }
 })();

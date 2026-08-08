@@ -1,20 +1,12 @@
-
-
-
 (function() {
     'use strict';
-
 
     let bibleVerses = [];
     let devotionalActive = false;
     let versesLoaded = false;
 
-
     let currentAnimationFrameId = null;
     let isAnimating = false;
-
-
-
 
     async function loadBibleVerses() {
         if (versesLoaded) return bibleVerses;
@@ -40,10 +32,8 @@
         }
     }
 
-
     function getRandomShortVerse() {
         if (bibleVerses.length === 0) return null;
-
 
         const shortVerses = bibleVerses.filter(v => v.text.length < 150);
         const pool = shortVerses.length > 0 ? shortVerses : bibleVerses;
@@ -51,14 +41,12 @@
         return pool[Math.floor(Math.random() * pool.length)];
     }
 
-
     function cancelAnimation() {
         if (currentAnimationFrameId !== null) {
             cancelAnimationFrame(currentAnimationFrameId);
             currentAnimationFrameId = null;
         }
     }
-
 
     function typeDeleteAnimation(element, callback) {
         const text = element.textContent;
@@ -89,7 +77,6 @@
         currentAnimationFrameId = requestAnimationFrame(step);
     }
 
-
     function typeWriteAnimation(element, text, callback) {
         let index = 0;
         let lastTime = 0;
@@ -119,13 +106,11 @@
         currentAnimationFrameId = requestAnimationFrame(step);
     }
 
-
     function stopAnimations() {
         cancelAnimation();
         devotionalActive = false;
         isAnimating = false;
     }
-
 
     async function runDevotional() {
         if (devotionalActive || isAnimating) return;
@@ -156,7 +141,6 @@
                 return;
             }
 
-
             const verse = getRandomShortVerse();
             if (!verse) {
                 devotionalActive = false;
@@ -164,9 +148,7 @@
                 return;
             }
 
-
             const displayText = `${verse.text} — ${verse.book} ${verse.chapter}:${verse.verse} NRSVUE`;
-
 
             typeDeleteAnimation(leadParagraph, () => {
 
@@ -183,7 +165,6 @@
         }
     }
 
-
     async function monitorWarningAndStartDevotional() {
 
         function canStartDevotional() {
@@ -194,11 +175,9 @@
             return consentNow && isOverlayGone && heroElement;
         }
 
-
         const hasConsent = localStorage.getItem('system_warning_consent') === 'true';
 
         if (hasConsent) {
-
 
             const tryStart = async () => {
                 const heroElement = document.getElementById('home-hero-content');
@@ -214,15 +193,12 @@
             return;
         }
 
-
         document.addEventListener('warning:cleared', () => {
 
             setTimeout(async () => {
                 await runDevotional();
             }, 300);
-        }, { once: true });
-
-
+        }, {once: true});
 
         let pollCount = 0;
         const maxPolls = 10;
@@ -236,7 +212,6 @@
             }
         }, 500);
     }
-
 
     window.runDevotional = runDevotional;
     window.monitorWarningAndStartDevotional = monitorWarningAndStartDevotional;

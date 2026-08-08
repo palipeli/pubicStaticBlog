@@ -55,7 +55,7 @@
                     const count = group.count;
 
                     if (!byDate[date]) {
-                        byDate[date] = { allowed: 0, blocked: 0 };
+                        byDate[date] = {allowed: 0, blocked: 0};
                     }
 
                     if (decision === 5 || decision === 6) {
@@ -76,7 +76,7 @@
                     blocked.push(byDate[date].blocked);
                 });
 
-                return { labels: labels, allowed: allowed, blocked: blocked };
+                return {labels: labels, allowed: allowed, blocked: blocked};
             });
     }
 
@@ -233,7 +233,7 @@
                 }
             });
         });
-        observer.observe(document.documentElement, { attributes: true });
+        observer.observe(document.documentElement, {attributes: true});
 
         if (typeof window.ResizeObserver !== 'undefined') {
             const resizeObserver = new ResizeObserver(function() {

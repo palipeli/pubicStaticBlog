@@ -61,7 +61,7 @@
                     labels.push(day.date);
                     values.push(day.count);
                 });
-                return { labels: labels, values: values };
+                return {labels: labels, values: values};
             });
     }
 
@@ -79,7 +79,7 @@
                 values.push(data.values[i]);
             }
         }
-        return { labels: labels, values: values };
+        return {labels: labels, values: values};
     }
 
     function createChart(canvasId, username, data) {
@@ -251,7 +251,7 @@
                 }
             });
         });
-        observer.observe(document.documentElement, { attributes: true });
+        observer.observe(document.documentElement, {attributes: true});
 
         if (typeof window.ResizeObserver !== 'undefined') {
             const resizeObserver = new ResizeObserver(function() {

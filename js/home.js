@@ -1,6 +1,3 @@
-
-
-
 (function() {
 
     let pendingPostOpenTimer = null;
@@ -27,13 +24,11 @@
 
     appendHomePageFooter();
 
-
     function renderBlogButtonsLazy(posts) {
         const container = document.getElementById('blog-buttons-container');
         if (!container) return;
 
         container.innerHTML = '';
-
 
         const homePagePosts = posts.filter(post =>
             post.id === 'michelle-dns-for-ios-sideloading' ||
@@ -68,7 +63,6 @@
             container.appendChild(button);
         });
 
-
         const catButton = document.createElement('a');
         catButton.className = 'blog-btn category-fun';
         catButton.href = 'https://cloud.kamikami.eu/s/send-me-cat-pics';
@@ -81,7 +75,6 @@
         `;
 
         container.appendChild(catButton);
-
 
         const myBlogButton = document.createElement('a');
         myBlogButton.className = 'blog-btn category-blog-home';
@@ -102,7 +95,6 @@
 
         container.appendChild(myBlogButton);
 
-
         const monitoringButton = document.createElement('a');
         monitoringButton.className = 'blog-btn category-monitoring';
         monitoringButton.href = 'https://stats.kamikami.eu/status/one';
@@ -116,8 +108,6 @@
 
         container.appendChild(monitoringButton);
     }
-
-
 
     function openBlogPostFromHomeLazy(id) {
         if (pendingPostOpenId === id && pendingPostOpenTimer) return;
@@ -135,8 +125,6 @@
             window.openBlogPostLazy(id);
         }, 100);
     }
-
-
 
     window.renderBlogButtonsLazy = renderBlogButtonsLazy;
     window.openBlogPostFromHomeLazy = openBlogPostFromHomeLazy;

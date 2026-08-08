@@ -1,6 +1,3 @@
-
-
-
 (function() {
     'use strict';
 
@@ -8,7 +5,6 @@
 
         STATE_STORAGE_KEY: 'blogPlatformState',
         STATE_SAVE_DELAY: 500,
-
 
         SELECTORS: {
             ACTIVE_SECTION: '.page-section.active',
@@ -22,11 +18,9 @@
         }
     };
 
-
     if (typeof window !== 'undefined') {
         window.CONFIG = CONFIG;
     }
-
 
     if (typeof module !== 'undefined' && module.exports) {
         module.exports = CONFIG;

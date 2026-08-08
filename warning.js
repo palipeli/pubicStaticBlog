@@ -6,9 +6,7 @@
         "STOP", "PILIH PRABOWO GIBRAN", "PILIH NOMOR 2 2029", "HAIIIIIIII!", "ANTEK ANTEK ASING", "PALING NYAWIT"
     ];
 
-
     let bypassWarning = false;
-
 
     window.addEventListener('click', (e) => {
         if (e.target.closest('a') ||
@@ -32,10 +30,9 @@
             e.target.closest('.blog-card') ||
             e.target.closest('.github-graph-range-btn')) {
             bypassWarning = true;
-            setTimeout(() => { bypassWarning = false; }, 1000);
+            setTimeout(() => {bypassWarning = false;}, 1000);
         }
     });
-
 
     window.addEventListener('beforeunload', (e) => {
         if (!bypassWarning) {
@@ -78,18 +75,18 @@
             justify-content: space-between;
             gap: 20px;
         }
-        .consent-text h3 { margin: 0; color: #ff6ec7; font-size: 1.8rem; text-transform: uppercase; text-shadow: 2px 2px 0 #000; }
-        .consent-text p { margin: 5px 0 0 0; font-size: 1.1rem; color: #ccc; }
-        #loading-status { color: #ff92df; font-weight: bold; }
+        .consent-text h3 {margin: 0; color: #ff6ec7; font-size: 1.8rem; text-transform: uppercase; text-shadow: 2px 2px 0 #000;}
+        .consent-text p {margin: 5px 0 0 0; font-size: 1.1rem; color: #ccc;}
+        #loading-status {color: #ff92df; font-weight: bold;}
 
-        .btn-group { display: flex; gap: 10px; }
+        .btn-group {display: flex; gap: 10px;}
         .mc-btn {
             background: #000; color: #fff; border: 2px solid #fff;
             padding: 10px 20px; font-family: inherit; font-size: 1.2rem;
             cursor: pointer; text-transform: uppercase;
         }
-        .mc-btn:hover:not(:disabled) { background: #fff; color: #000; }
-        .mc-btn:disabled { opacity: 0.5; cursor: wait; }
+        .mc-btn:hover:not(:disabled) {background: #fff; color: #000;}
+        .mc-btn:disabled {opacity: 0.5; cursor: wait;}
 
         #warning-flash {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -112,13 +109,13 @@
         }
 
         @media (max-width: 600px) {
-            .consent-content-wrapper { flex-direction: column; text-align: center; }
-            .btn-group { width: 100%; flex-direction: column; }
-            .btn-group button { width: 100%; }
+            .consent-content-wrapper {flex-direction: column; text-align: center;}
+            .btn-group {width: 100%; flex-direction: column;}
+            .btn-group button {width: 100%;}
         }
         @keyframes shake {
-            0% { transform: translate(2px, 2px); }
-            100% { transform: translate(-2px, -2px); }
+            0% {transform: translate(2px, 2px);}
+            100% {transform: translate(-2px, -2px);}
         }
     `;
     document.head.appendChild(style);
@@ -165,7 +162,6 @@
         const declineBtn = document.getElementById('decline-btn');
         const loadText = document.getElementById('loading-status');
 
-
         areAssetsLoaded = true;
         loadText.innerText = "Assets Loaded.";
         acceptBtn.innerText = "ACCEPT";
@@ -175,7 +171,6 @@
         acceptBtn.addEventListener('click', () => {
             localStorage.setItem(STORAGE_KEY, 'true');
             consentOverlay.style.opacity = '0';
-
 
             document.dispatchEvent(new CustomEvent('warning:cleared'));
 
@@ -190,7 +185,7 @@
             acceptBtn.disabled = true;
             declineBtn.disabled = true;
 
-            const intervalId = setInterval(() => { triggerWarning(null, true); }, 100);
+            const intervalId = setInterval(() => {triggerWarning(null, true);}, 100);
             setTimeout(() => {
                 clearInterval(intervalId);
                 bypassWarning = true;
@@ -198,7 +193,6 @@
             }, 3000);
         });
     }
-
 
     async function triggerWarning(e, force = false) {
         if (!force) {
@@ -229,21 +223,17 @@
             )) return;
         }
 
-
-
-
         preFlashOverlay.style.opacity = '1';
         setTimeout(() => {
             textSpan.innerText = phrases[Math.floor(Math.random() * phrases.length)];
             flashOverlay.style.opacity = '1';
 
-            setTimeout(() => { flashOverlay.style.opacity = '0'; }, 100);
+            setTimeout(() => {flashOverlay.style.opacity = '0';}, 100);
         }, 5);
-        setTimeout(() => { preFlashOverlay.style.opacity = '0'; }, 25);
+        setTimeout(() => {preFlashOverlay.style.opacity = '0';}, 25);
     }
 
     initAudio();
-
 
     window.addEventListener('keydown', (e) => isAccepted && triggerWarning(e));
     window.addEventListener('mousedown', (e) => isAccepted && triggerWarning(e));
@@ -252,7 +242,7 @@
             touchStartX = e.touches[0].screenX;
             touchStartY = e.touches[0].screenY;
         }
-    }, { passive: true });
+    }, {passive: true});
     window.addEventListener('touchend', (e) => {
         if(isAccepted && e.changedTouches.length > 0) {
             const diffX = Math.abs(e.changedTouches[0].screenX - touchStartX);

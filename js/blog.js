@@ -1,6 +1,3 @@
-
-
-
 (function() {
 
     window.blogPostMetadata = [];
@@ -8,12 +5,9 @@
     const blogContentInflight = new Map();
     let activeNavigationToken = 0;
 
-
     let blogPostMetadata = window.blogPostMetadata;
 
-
     let preloadTimeout = null;
-
 
     async function fetchBlogPostMetadata() {
         try {
@@ -30,7 +24,6 @@
                 return [];
             }
 
-
             blogPostMetadata = postsMeta.map(meta => ({
                 id: meta.id,
                 slug: meta.slug,
@@ -41,14 +34,11 @@
                 _contentLoaded: false
             }));
 
-
             blogPostMetadata = blogPostMetadata.sort((a, b) => new Date(b.date) - new Date(a.date));
-
 
             window.blogPostMetadata = blogPostMetadata;
 
-
-            document.dispatchEvent(new CustomEvent('blog:metadata-loaded', { detail: blogPostMetadata }));
+            document.dispatchEvent(new CustomEvent('blog:metadata-loaded', {detail: blogPostMetadata}));
 
             return blogPostMetadata;
         } catch (err) {
@@ -57,14 +47,11 @@
         }
     }
 
-
-
     async function loadBlogPostContentInternal(postId) {
 
         if (blogContentCache.has(postId)) {
             return blogContentCache.get(postId);
         }
-
 
         const meta = blogPostMetadata.find(p => p.id === postId);
         if (!meta) {
@@ -72,11 +59,9 @@
             return null;
         }
 
-
         if (meta._contentLoaded && meta.htmlContent) {
             return meta;
         }
-
 
         const maxRetries = 3;
         let lastError = null;
@@ -87,8 +72,7 @@
                 if (!mdResponse.ok) throw new Error(`Failed to fetch content: ${mdResponse.status}`);
 
                 const mdContent = await mdResponse.text();
-                const { frontmatter, content } = window.parseFrontmatter(mdContent);
-
+                const {frontmatter, content} = window.parseFrontmatter(mdContent);
 
                 meta.title = frontmatter.title || meta.title;
                 meta.date = frontmatter.date || meta.date;
@@ -97,7 +81,6 @@
                 meta.content = content;
                 meta.htmlContent = window.parseMarkdown(content);
                 meta._contentLoaded = true;
-
 
                 blogContentCache.set(postId, meta);
 
@@ -114,12 +97,9 @@
             }
         }
 
-
         console.error(`All retries failed for ${meta.slug}:`, lastError);
         throw lastError;
     }
-
-
 
     function loadBlogPostContent(postId) {
         if (blogContentCache.has(postId)) {
@@ -136,13 +116,11 @@
         return loadPromise;
     }
 
-
     function preloadBlogPostContent(postId) {
 
         if (preloadTimeout) {
             clearTimeout(preloadTimeout);
         }
-
 
         preloadTimeout = setTimeout(() => {
 
@@ -156,8 +134,6 @@
         }, 150);
 
     }
-
-
 
     function renderPostSelector(posts) {
         const container = document.getElementById('post-selector-list');
@@ -186,11 +162,9 @@
         });
     }
 
-
     function renderBlogPostSelectorGrid(posts) {
         const container = document.getElementById('blog-post-selector-grid');
         if (!container) return;
-
 
         if (typeof posts === 'undefined' || !Array.isArray(posts)) return;
 
@@ -214,12 +188,10 @@
                 </div>
             `;
 
-
             card.style.cursor = 'pointer';
             card.onclick = () => {
                 window.openBlogPostLazy(post.id);
             };
-
 
             card.onmouseenter = () => {
                 preloadBlogPostContent(post.id);
@@ -229,7 +201,6 @@
         });
     }
 
-
     const blogPostFooter = `
         <footer class="home-page-footer">
             <p style="font-size:0.7rem;">What the fuck are you looking at? All the contents are above, but thanks for looking at though!</p>
@@ -238,7 +209,6 @@
             <p style="font-size:0.6rem; color:#666;">Copyright © Michelle, 2026</p>
         </footer>
     `;
-
 
     function getNextPostId(currentPostId) {
         const currentIndex = blogPostMetadata.findIndex(p => p.id === currentPostId);
@@ -250,7 +220,6 @@
         return null;
     }
 
-
     function getPreviousPostId(currentPostId) {
         const currentIndex = blogPostMetadata.findIndex(p => p.id === currentPostId);
         if (currentIndex === -1) return null;
@@ -260,7 +229,6 @@
         }
         return null;
     }
-
 
     async function goToNextPost() {
         const activeItem = document.querySelector('.post-selector-item.active');
@@ -275,7 +243,6 @@
         }
     }
 
-
     function preloadNextPostOnHover() {
         const activeItem = document.querySelector('.post-selector-item.active');
         if (!activeItem) return;
@@ -289,17 +256,14 @@
         }
     }
 
-
     async function openBlogPostLazy(id) {
         const navigationToken = ++activeNavigationToken;
 
         const article = document.getElementById('blog-article-content');
 
-
         if (!window.blogPostMetadata || window.blogPostMetadata.length === 0) {
             await waitForBlogMetadata();
         }
-
 
         const currentPage = document.querySelector('.page-section.active');
         let previousPage = null;
@@ -324,16 +288,13 @@
             }
         }
 
-
         document.querySelectorAll('.post-selector-item').forEach((item) => {
             const postId = item.getAttribute('data-post-id');
             item.classList.toggle('active', postId === id);
         });
 
-
         document.getElementById('blog-intro-view').style.display = 'none';
         document.getElementById('blog-post-view').style.display = 'block';
-
 
         article.innerHTML = `
             <div class="loading-container">
@@ -341,7 +302,6 @@
                 <p class="loading-text">Loading post...</p>
             </div>
         `;
-
 
         let post;
         try {
@@ -366,7 +326,6 @@
             return;
         }
 
-
         requestAnimationFrame(() => {
             if (navigationToken !== activeNavigationToken) return;
             article.innerHTML = `
@@ -379,18 +338,15 @@
                 ${blogPostFooter}
             `;
 
-
             if (typeof window.initializeLazyLoading === 'function') {
                 window.initializeLazyLoading();
             }
-
 
             const nextPostBtn = document.getElementById('next-post-btn');
             if (nextPostBtn) {
                 const nextPostId = getNextPostId(id);
                 nextPostBtn.style.display = nextPostId ? 'inline-block' : 'none';
             }
-
 
             const backBtn = document.getElementById('blog-post-view').querySelector('.back-to-intro-btn:not(.next-post-btn)');
             if (backBtn) {
@@ -399,18 +355,14 @@
             }
         });
 
-
         if (typeof window.updateHash === 'function') {
             window.updateHash('', id, true);
         }
 
-
         setTimeout(window.saveAppState, 100);
-
 
         window.scrollTo(0, 0);
     }
-
 
     function waitForBlogMetadata() {
         return new Promise((resolve) => {
@@ -425,7 +377,6 @@
         });
     }
 
-
     function preloadPreviousPageOnHover() {
         const activeItem = document.querySelector('.post-selector-item.active');
         if (!activeItem) return;
@@ -439,12 +390,10 @@
         }
     }
 
-
     function goBack() {
         const article = document.getElementById('blog-article-content');
         const postView = document.getElementById('blog-post-view');
         const introView = document.getElementById('blog-intro-view');
-
 
         const activeItem = document.querySelector('.post-selector-item.active');
         if (!activeItem) {
@@ -462,15 +411,12 @@
             return;
         }
 
-
         document.querySelectorAll('.post-selector-item').forEach(item => {
             item.classList.remove('active');
         });
 
-
         introView.style.display = 'none';
         postView.style.display = 'block';
-
 
         loadBlogPostContent(previousPostId).then(post => {
             if (post) {
@@ -484,7 +430,6 @@
                     ${blogPostFooter}
                 `;
 
-
                 document.querySelectorAll('.post-selector-item').forEach((item) => {
                     item.classList.toggle('active', item.getAttribute('data-post-id') === previousPostId);
                 });
@@ -493,20 +438,17 @@
                     window.initializeLazyLoading();
                 }
 
-
                 const nextPostBtn = document.getElementById('next-post-btn');
                 if (nextPostBtn) {
                     const nextPostId = getNextPostId(previousPostId);
                     nextPostBtn.style.display = nextPostId ? 'inline-block' : 'none';
                 }
 
-
                 const backBtn = document.getElementById('blog-post-view').querySelector('.back-to-intro-btn:not(.next-post-btn)');
                 if (backBtn) {
                     const prevPostId = getPreviousPostId(previousPostId);
                     backBtn.style.display = prevPostId ? 'inline-block' : 'none';
                 }
-
 
                 if (typeof window.updateHash === 'function') {
                     window.updateHash('', previousPostId, false);
@@ -517,32 +459,25 @@
             }
         });
 
-
         setTimeout(window.saveAppState, 100);
     }
-
 
     function showBlogIntro() {
         document.getElementById('blog-post-view').style.display = 'none';
         document.getElementById('blog-intro-view').style.display = 'block';
 
-
         document.querySelectorAll('.post-selector-item').forEach(item => {
             item.classList.remove('active');
         });
 
-
         renderBlogPostSelectorGrid(blogPostMetadata);
-
 
         if (typeof window.updateHash === 'function') {
             window.updateHash('blogs', null, false);
         }
 
-
         setTimeout(window.saveAppState, 100);
     }
-
 
     window.fetchBlogPostMetadata = fetchBlogPostMetadata;
     window.preloadBlogPostContent = preloadBlogPostContent;

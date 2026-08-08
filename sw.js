@@ -1,7 +1,3 @@
-
-
-
-
 'use strict';
 
 const CACHE_NAME = 'pubic-static-blog-v2';
@@ -9,17 +5,12 @@ const STATIC_CACHE_NAME = 'static-assets-v2';
 const IMAGE_CACHE_NAME = 'images-v2';
 const CONTENT_CACHE_NAME = 'blog-content-v2';
 
-
-
-
 const pendingFetches = new Map();
-
 
 const STATIC_EXTENSIONS = /\.(html|css|js|json|webmanifest|ico|txt|xml)$/i;
 const IMAGE_EXTENSIONS = /\.(webp|png|jpg|jpeg|gif|svg|ico)(\?.*)?$/i;
 const MARKDOWN_EXTENSIONS = /\.(md|markdown)(\?.*)?$/i;
 const FONT_EXTENSIONS = /\.(woff|woff2|ttf|eot|otf)(\?.*)?$/i;
-
 
 const PRECACHE_ASSETS = [
     '/',
@@ -45,9 +36,6 @@ const PRECACHE_ASSETS = [
     '/media/bg-dark.webp',
     '/media/vt323.ttf',
 ];
-
-
-
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
@@ -78,9 +66,6 @@ self.addEventListener('install', (event) => {
     );
 });
 
-
-
-
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
@@ -106,57 +91,40 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-
-
-
 function getCacheStrategy(request) {
     const url = new URL(request.url);
     const pathname = url.pathname;
-
 
     if (url.origin !== self.location.origin) {
         return 'network-only';
     }
 
-
     if (pathname === '/' || pathname === '/index.html' || pathname.endsWith('.html')) {
         return 'network-first';
     }
-
-
 
     if (pathname === '/blog/posts.json') {
         return 'network-first';
     }
 
-
     if (STATIC_EXTENSIONS.test(pathname)) {
         return 'cache-first';
     }
-
 
     if (IMAGE_EXTENSIONS.test(pathname)) {
         return 'cache-first';
     }
 
-
     if (FONT_EXTENSIONS.test(pathname)) {
         return 'cache-first';
     }
-
-
-
 
     if (MARKDOWN_EXTENSIONS.test(pathname) || pathname.startsWith('/blog/')) {
         return 'cache-first';
     }
 
-
     return 'network-first';
 }
-
-
-
 
 function getCacheForRequest(request) {
     const url = new URL(request.url);
@@ -195,18 +163,13 @@ async function prefetchUrl(value, cache) {
     }
 }
 
-
-
-
 self.addEventListener('fetch', (event) => {
     const request = event.request;
     const url = new URL(request.url);
 
-
     if (request.method !== 'GET') {
         return;
     }
-
 
     if (url.origin !== self.location.origin) {
         if (url.hostname === 'cdnjs.cloudflare.com') {
@@ -220,9 +183,6 @@ self.addEventListener('fetch', (event) => {
 
     event.respondWith(handleRequest(request, strategy, cacheName));
 });
-
-
-
 
 async function handleRequest(request, strategy, cacheName) {
     const cache = await caches.open(cacheName);
@@ -240,26 +200,16 @@ async function handleRequest(request, strategy, cacheName) {
     }
 }
 
-
-
-
-
 async function cacheFirst(request, cache) {
     const cachedResponse = await cache.match(request);
 
     if (cachedResponse) {
 
-
         return cachedResponse;
     }
 
-
     return fetchAndCache(request, cache);
 }
-
-
-
-
 
 async function networkFirst(request, cache) {
     try {
@@ -279,7 +229,6 @@ async function networkFirst(request, cache) {
             return cachedResponse;
         }
 
-
         if (request.headers.get('accept')?.includes('text/html')) {
             return getOfflineShell(cache);
         }
@@ -288,13 +237,8 @@ async function networkFirst(request, cache) {
     }
 }
 
-
-
-
-
 async function staleWhileRevalidate(request, cache) {
     const cachedResponse = await cache.match(request);
-
 
     const fetchPromise = fetchAndCache(request, cache);
 
@@ -302,7 +246,6 @@ async function staleWhileRevalidate(request, cache) {
 
         return cachedResponse;
     }
-
 
     try {
         return await fetchPromise;
@@ -315,12 +258,8 @@ async function staleWhileRevalidate(request, cache) {
     }
 }
 
-
-
-
 async function fetchAndCache(request, cache) {
     const url = request.url;
-
 
     if (pendingFetches.has(url)) {
         return pendingFetches.get(url);
@@ -344,9 +283,6 @@ async function fetchAndCache(request, cache) {
     }
 }
 
-
-
-
 function updateCacheInBackground(request, cache) {
     const url = request.url;
 
@@ -369,9 +305,6 @@ function updateCacheInBackground(request, cache) {
     pendingFetches.set(url, updatePromise);
 }
 
-
-
-
 async function getOfflineShell(cache) {
     const shell = await cache.match('/index.html') || await cache.match('/');
     return shell || createOfflineFallback();
@@ -386,7 +319,7 @@ function createOfflineFallback() {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Offline - Michelle's DNS and Blog</title>
             <style>
-                * { box-sizing: border-box; margin: 0; padding: 0; }
+                * {box-sizing: border-box; margin: 0; padding: 0;}
                 body {
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
                     display: flex;
@@ -398,9 +331,9 @@ function createOfflineFallback() {
                     text-align: center;
                     padding: 20px;
                 }
-                .container { max-width: 400px; }
-                h1 { font-size: 2rem; margin-bottom: 1rem; color: #ff45fc; }
-                p { font-size: 1.1rem; margin-bottom: 1.5rem; color: #ccc; }
+                .container {max-width: 400px;}
+                h1 {font-size: 2rem; margin-bottom: 1rem; color: #ff45fc;}
+                p {font-size: 1.1rem; margin-bottom: 1.5rem; color: #ccc;}
                 button {
                     background: #ff45fc;
                     border: none;
@@ -411,8 +344,8 @@ function createOfflineFallback() {
                     cursor: pointer;
                     transition: background 0.2s;
                 }
-                button:hover { background: #e031e0; }
-                .icon { font-size: 4rem; margin-bottom: 1rem; }
+                button:hover {background: #e031e0;}
+                .icon {font-size: 4rem; margin-bottom: 1rem;}
             </style>
         </head>
         <body>
@@ -429,12 +362,9 @@ function createOfflineFallback() {
     return new Response(offlineHtml, {
         status: 200,
         statusText: 'OK',
-        headers: { 'Content-Type': 'text/html; charset=utf-8' }
+        headers: {'Content-Type': 'text/html; charset=utf-8'}
     });
 }
-
-
-
 
 self.addEventListener('message', (event) => {
     const data = event.data;
@@ -442,13 +372,12 @@ self.addEventListener('message', (event) => {
     if (data === 'clear-cache') {
         event.waitUntil(
             caches.keys().then((names) => Promise.all(names.map((name) => caches.delete(name))))
-                .then(() => event.ports[0]?.postMessage({ success: true }))
+                .then(() => event.ports[0]?.postMessage({success: true}))
         );
         return;
     }
 
     if (!data || !data.type) return;
-
 
     if (data.type === 'precache-bg' && data.url) {
         event.waitUntil(caches.open(IMAGE_CACHE_NAME).then((cache) => prefetchUrl(data.url, cache)));
@@ -466,25 +395,19 @@ self.addEventListener('message', (event) => {
         ));
     }
 
-
     if (data.type === 'precache-all') {
         event.waitUntil(precacheAllAssets());
     }
-
 
     if (data.type === 'skip-waiting') {
         self.skipWaiting();
     }
 });
 
-
-
-
 async function precacheAllAssets() {
     const staticCache = await caches.open(STATIC_CACHE_NAME);
     const imageCache = await caches.open(IMAGE_CACHE_NAME);
     const contentCache = await caches.open(CONTENT_CACHE_NAME);
-
 
     const mediaFiles = [
         '/media/apple.webp',
@@ -498,7 +421,6 @@ async function precacheAllAssets() {
         '/media/vt323.ttf',
     ];
 
-
     let blogPosts = [];
     try {
         const response = await fetch('/blog/posts.json');
@@ -509,7 +431,6 @@ async function precacheAllAssets() {
     } catch (e) {
         console.warn('Could not fetch posts.json for precaching');
     }
-
 
     const allAssets = [
         ...PRECACHE_ASSETS,
@@ -538,9 +459,6 @@ async function precacheAllAssets() {
     await Promise.all(cachePromises);
     console.log('All assets precached');
 }
-
-
-
 
 self.addEventListener('periodicsync', (event) => {
     if (event.tag === 'precache-assets') {
