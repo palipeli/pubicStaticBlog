@@ -145,9 +145,7 @@ body {
     background: var(--glass-bg);
     backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    isolation: isolate;
     will-change: transform;
-    transform: translateZ(0);
     backface-visibility: hidden;
     display: flex;
     justify-content: space-between;
@@ -241,8 +239,7 @@ body {
 
 .main-container {
     display: block;
-    margin-top: var(--header-height);
-    height: calc(100vh - var(--header-height));
+    height: 100vh;
     position: relative;
     margin-right: 280px;
     will-change: margin-right;
@@ -254,7 +251,7 @@ body {
 }
 
 .content-area {
-    padding: 15px;
+    padding: calc(var(--header-height) + 15px) 15px 15px;
     overflow-y: auto;
     height: 100%;
     width: 100%;
@@ -2144,7 +2141,6 @@ footer p {
 }
 
 .liquid-glass,
-.header,
 .sidebar,
 .template-card,
 .mc-btn {
@@ -2157,7 +2153,6 @@ footer p {
 }
 
 [data-theme="dark"] .liquid-glass,
-[data-theme="dark"] .header,
 [data-theme="dark"] .sidebar,
 [data-theme="dark"] .template-card,
 [data-theme="dark"] .mc-btn {
@@ -2166,7 +2161,6 @@ footer p {
 }
 
 [data-theme="light"] .liquid-glass,
-[data-theme="light"] .header,
 [data-theme="light"] .sidebar,
 [data-theme="light"] .template-card,
 [data-theme="light"] .mc-btn {
