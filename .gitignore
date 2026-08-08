@@ -1,2 +1,1 @@
-(js/state.js is just a source file, no build artifacts, dependencies, or temp files in the changes)
-.DS_Store
+(js/blog.js, js/state.js, js/ui.js)

@@ -2,6 +2,7 @@
     'use strict';
     const CONFIG = window.CONFIG || {};
     const STATE_STORAGE_KEY = CONFIG.STATE_STORAGE_KEY || 'blogPlatformState';
+    const SCROLL_STORAGE_KEY = CONFIG.SCROLL_STORAGE_KEY || 'blogPlatformScrollPositions';
     const STATE_SAVE_DELAY = CONFIG.STATE_SAVE_DELAY || 500;
     const SELECTORS = CONFIG.SELECTORS || {
         ACTIVE_SECTION: '.page-section.active',
@@ -35,6 +36,87 @@
         const activeThemeBtn = document.querySelector(SELECTORS.THEME_BTN + '.active');
         return activeThemeBtn ? activeThemeBtn.dataset.theme : 'auto';
     }
+    function getPageKey(pageId, postId) {
+        if (postId) {
+            return 'blog-' + postId;
+        }
+        return 'page-' + pageId;
+    }
+    function saveScrollPosition() {
+        const currentPage = getCurrentPage();
+        const activePostId = getActiveBlogPostId();
+        const pageKey = getPageKey(currentPage, activePostId);
+        const scrollPos = {
+            x: window.scrollX,
+            y: window.scrollY,
+            timestamp: Date.now()
+        };
+        let scrollPositions = {};
+        try {
+            const stored = localStorage.getItem(SCROLL_STORAGE_KEY);
+            if (stored) {
+                scrollPositions = JSON.parse(stored);
+            }
+        } catch (err) {
+            console.warn('Failed to load scroll positions:', err);
+            scrollPositions = {};
+        }
+        scrollPositions[pageKey] = scrollPos;
+        try {
+            localStorage.setItem(SCROLL_STORAGE_KEY, JSON.stringify(scrollPositions));
+        } catch (err) {
+            console.warn('Failed to save scroll position:', err);
+        }
+    }
+    function getSavedScrollPosition(pageId, postId) {
+        const pageKey = getPageKey(pageId, postId);
+        try {
+            const stored = localStorage.getItem(SCROLL_STORAGE_KEY);
+            if (stored) {
+                const scrollPositions = JSON.parse(stored);
+                return scrollPositions[pageKey] || null;
+            }
+        } catch (err) {
+            console.warn('Failed to load scroll positions:', err);
+        }
+        return null;
+    }
+    function restoreScrollPosition(pageId, postId, smooth) {
+        const scrollPos = getSavedScrollPosition(pageId, postId);
+        if (scrollPos) {
+            if (smooth) {
+                window.scrollTo({
+                    top: scrollPos.y,
+                    left: scrollPos.x,
+                    behavior: 'smooth'
+                });
+            } else {
+                window.scrollTo(scrollPos.x, scrollPos.y);
+            }
+            return true;
+        }
+        return false;
+    }
+    function clearScrollPosition(pageId, postId) {
+        const pageKey = getPageKey(pageId, postId);
+        try {
+            const stored = localStorage.getItem(SCROLL_STORAGE_KEY);
+            if (stored) {
+                const scrollPositions = JSON.parse(stored);
+                delete scrollPositions[pageKey];
+                localStorage.setItem(SCROLL_STORAGE_KEY, JSON.stringify(scrollPositions));
+            }
+        } catch (err) {
+            console.warn('Failed to clear scroll position:', err);
+        }
+    }
+    function clearAllScrollPositions() {
+        try {
+            localStorage.removeItem(SCROLL_STORAGE_KEY);
+        } catch (err) {
+            console.warn('Failed to clear all scroll positions:', err);
+        }
+    }
     function saveAppState() {
         const currentState = {
             currentPage: getCurrentPage(),
@@ -59,6 +141,7 @@
                 console.warn('Failed to save app state:', err);
             }
         }
+        saveScrollPosition();
     }
     function loadAppState() {
         try {
@@ -146,9 +229,17 @@
             setTimeout(saveAppState, STATE_SAVE_DELAY);
         }
     }
+    let scrollSaveTimeout = null;
+    function handleScroll() {
+        if (scrollSaveTimeout) {
+            clearTimeout(scrollSaveTimeout);
+        }
+        scrollSaveTimeout = setTimeout(saveScrollPosition, 200);
+    }
     function setupStatePersistence() {
         document.addEventListener('click', handleInteraction);
         window.addEventListener('beforeunload', saveAppState);
+        window.addEventListener('scroll', handleScroll, {passive: true});
     }
     window.saveAppState = saveAppState;
     window.loadAppState = loadAppState;
@@ -156,4 +247,9 @@
     window.setupStatePersistence = setupStatePersistence;
     window.getCurrentPage = getCurrentPage;
     window.processPendingBlogPostRestore = processPendingBlogPostRestore;
+    window.saveScrollPosition = saveScrollPosition;
+    window.getSavedScrollPosition = getSavedScrollPosition;
+    window.restoreScrollPosition = restoreScrollPosition;
+    window.clearScrollPosition = clearScrollPosition;
+    window.clearAllScrollPositions = clearAllScrollPositions;
 })();

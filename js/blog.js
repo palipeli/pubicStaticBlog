@@ -272,12 +272,17 @@
                 const previousPostId = getPreviousPostId(id);
                 backBtn.style.display = previousPostId ? 'inline-block' : 'none';
             }
+            setTimeout(() => {
+                const restored = window.restoreScrollPosition('blogs', id, false);
+                if (!restored) {
+                    window.scrollTo(0, 0);
+                }
+            }, 100);
         });
         if (typeof window.updateHash === 'function') {
             window.updateHash('', id, true);
         }
         setTimeout(window.saveAppState, 100);
-        window.scrollTo(0, 0);
     }
     function waitForBlogMetadata() {
         return new Promise((resolve) => {
@@ -350,6 +355,12 @@
                 if (typeof window.updateHash === 'function') {
                     window.updateHash('', previousPostId, false);
                 }
+                setTimeout(() => {
+                    const restored = window.restoreScrollPosition('blogs', previousPostId, false);
+                    if (!restored) {
+                        window.scrollTo(0, 0);
+                    }
+                }, 100);
             } else {
                 showBlogIntro();
             }
@@ -366,6 +377,12 @@
         if (typeof window.updateHash === 'function') {
             window.updateHash('blogs', null, false);
         }
+        setTimeout(() => {
+            const restored = window.restoreScrollPosition('blogs', null, false);
+            if (!restored) {
+                window.scrollTo(0, 0);
+            }
+        }, 100);
         setTimeout(window.saveAppState, 100);
     }
     window.fetchBlogPostMetadata = fetchBlogPostMetadata;

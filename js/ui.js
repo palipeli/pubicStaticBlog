@@ -16,7 +16,12 @@
         if (blogSidebarSection) {
             blogSidebarSection.style.display = 'block';
         }
-        window.scrollTo(0, 0);
+        setTimeout(() => {
+            const restored = window.restoreScrollPosition('blogs', null, false);
+            if (!restored) {
+                window.scrollTo(0, 0);
+            }
+        }, 100);
         if (typeof window.updateHash === 'function') {
             window.updateHash('blogs', null, true);
         }
@@ -187,7 +192,6 @@
                             if (typeof window.openBlogPostLazy === 'function' && savedState.activeBlogPost) {
                                 window.openBlogPostLazy(savedState.activeBlogPost);
                             }
-                            window.scrollTo(0, 0);
                             setTimeout(window.saveAppState, 100);
                             return;
                         } else {
@@ -195,7 +199,6 @@
                             navigateToBlogsPageWithoutPrefetch();
                             window.updateHash('blogs', null, true);
                             showBlogIntroView();
-                            window.scrollTo(0, 0);
                             saveStateAfterNavigation();
                             return;
                         }
@@ -204,7 +207,6 @@
                         navigateToBlogsPageWithoutPrefetch();
                         window.updateHash('blogs', null, true);
                         showBlogIntroView();
-                        window.scrollTo(0, 0);
                         saveStateAfterNavigation();
                         return;
                     }
@@ -221,12 +223,23 @@
                     updateBlogSidebarVisibility(blogSidebarSection, page);
                     if (page === 'home') {
                         window.updateHash('home', null, true);
+                        setTimeout(() => {
+                            const restored = window.restoreScrollPosition('home', null, false);
+                            if (!restored) {
+                                window.scrollTo(0, 0);
+                            }
+                        }, 100);
                     } else if (page === 'about') {
                         window.updateHash('about', null, true);
+                        setTimeout(() => {
+                            const restored = window.restoreScrollPosition('about', null, false);
+                            if (!restored) {
+                                window.scrollTo(0, 0);
+                            }
+                        }, 100);
                     } else if (page === 'blogs') {
                         window.updateHash('blogs', null, true);
                     }
-                    window.scrollTo(0, 0);
                     saveStateAfterNavigation();
                     return;
                 }
