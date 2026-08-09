@@ -1513,6 +1513,76 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     background: rgba(255, 255, 255, 0.3);
 }
 
+/* Custom scrollbars (see js/scrollbar.js). The main content area and the
+   sidebar keep scrolling visibly under the translucent fixed header, but their
+   native scrollbars would run up behind it: they always span the full height
+   of their scroll container. Hide them here and let js/scrollbar.js draw slim
+   custom scrollbars that only span the area below the header. The body only
+   scrolls to reach the decorative footer, and its scrollbar would sit behind
+   the fixed sidebar/header, so hide that one too. */
+.content-area,
+.sidebar-content-wrapper,
+body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.content-area::-webkit-scrollbar,
+.sidebar-content-wrapper::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    display: none;
+}
+
+.custom-scrollbar {
+    position: absolute;
+    top: var(--header-height);
+    right: 0;
+    bottom: 0;
+    width: 8px;
+    z-index: 998;
+    opacity: 1;
+    transition: opacity 0.25s ease;
+}
+
+.custom-scrollbar-track {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.custom-scrollbar-thumb {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    min-height: 24px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+    touch-action: none;
+    transition: background-color 0.15s ease;
+}
+
+.custom-scrollbar-thumb:hover,
+.custom-scrollbar.is-dragging .custom-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.custom-scrollbar.is-idle {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.sidebar.collapsed > .custom-scrollbar {
+    opacity: 0;
+    pointer-events: none;
+}
+
 @media (max-width: 768px) {
 
     .sidebar.collapsed {

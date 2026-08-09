@@ -24,6 +24,7 @@
 | `js/blog.js` | manifest fetch, post cache, prefetch, render, navigation | `window.blogPostMetadata`; `window.openBlogPostLazy` |
 | `js/home.js` | home CTA rendering and delayed post opening | `window.renderBlogButtonsLazy` |
 | `js/mobile-tray.js` | dynamic mobile menu/tray at `window.innerWidth <= 768` | `#mobile-nav-tray`, overlay, toggle |
+| `js/scrollbar.js` | custom scrollbars for `.content-area` + `.sidebar-content-wrapper`, drawn below the fixed header so they never overlap it | `window.setupCustomScrollbars` |
 | `warning.js` | flashing-light consent and interaction warning | `system_warning_consent`; `warning:cleared` event |
 | `sw.js` | install/activate, cache strategies, offline shell, prefetch messages | cache names and message types |
 | `blog/posts.json` | ordered post manifest | metadata schema below |
@@ -36,7 +37,7 @@
 `index.html` contains deferred scripts in this order:
 
 ```text
-config → markdown → lazyload → state → devotional → ui → blog → home → app
+config → markdown → lazyload → state → devotional → ui → blog → home → scrollbar → app
 ```
 
 `warning.js` and `js/mobile-tray.js` are non-deferred scripts after the deferred list. They install
@@ -49,7 +50,7 @@ Startup sequence in `js/app.js`:
 createParticles
 → setupNavigation + setupScrollPositionTracking + setupHashRouting
 → setupTemplates + setupSystemThemeListener + setupThemePrefetch
-→ setupSidebarToggle + setupStatePersistence
+→ setupSidebarToggle + setupCustomScrollbars + setupStatePersistence
 → monitorWarningAndStartDevotional + restoreAppState
 → fetchBlogPostMetadata
 → renderPostSelector + renderBlogButtonsLazy + renderBlogPostSelectorGrid
@@ -85,6 +86,7 @@ These selectors are cross-module interfaces, not incidental markup:
 #mobile-nav-tray, #mobile-tray-overlay, #mobile-tray-toggle
 .page-section, .nav-item, .post-selector-item, .theme-btn
 .back-to-intro-btn, .blog-card, .lazy-image[data-src]
+.custom-scrollbar, .custom-scrollbar-track, .custom-scrollbar-thumb
 ```
 
 When adding UI, prefer existing selectors and event functions. If a new selector is required, update

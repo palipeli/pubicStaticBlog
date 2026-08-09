@@ -27,6 +27,9 @@
         if (typeof window.setupSidebarToggle === 'function') {
             window.setupSidebarToggle();
         }
+        if (typeof window.setupCustomScrollbars === 'function') {
+            window.setupCustomScrollbars();
+        }
         if (typeof window.setupStatePersistence === 'function') {
             window.setupStatePersistence();
         }
