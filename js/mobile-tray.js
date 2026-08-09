@@ -86,11 +86,6 @@
         document.body.appendChild(overlay);
     }
     function createToggleButton() {
-        if (!isMobileView()) {
-            const existingToggle = document.getElementById('mobile-tray-toggle');
-            if (existingToggle) existingToggle.remove();
-            return;
-        }
         if (document.getElementById('mobile-tray-toggle')) return;
         const toggleBtn = document.createElement('button');
         toggleBtn.id = 'mobile-tray-toggle';
@@ -188,22 +183,22 @@
             if (isMobileView()) {
                 createMobileTray();
                 createOverlay();
-                createToggleButton();
                 syncThemeButtons();
             } else {
                 const tray = document.getElementById('mobile-nav-tray');
                 const overlay = document.getElementById('mobile-tray-overlay');
-                const toggleBtn = document.getElementById('mobile-tray-toggle');
                 if (tray) tray.remove();
                 if (overlay) overlay.remove();
-                if (toggleBtn) toggleBtn.remove();
                 closeTray();
             }
         }, 100);
     }
     function init() {
+        // The toggle stays in the DOM on every viewport so its width/opacity
+        // can transition smoothly across the breakpoint (sliding the nav
+        // items along with it); the CSS hides it on desktop.
+        createToggleButton();
         if (isMobileView()) {
-            createToggleButton();
             createMobileTray();
             createOverlay();
         }

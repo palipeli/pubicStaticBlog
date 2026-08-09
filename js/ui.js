@@ -332,6 +332,10 @@
         const sidebar = document.getElementById('sidebar');
         const mainContainer = document.querySelector('.main-container');
         if (!sidebarToggle || !sidebar || !mainContainer) return;
+        // True when the sidebar was auto-hidden only because the window lacked
+        // horizontal space (e.g. the split view was dragged narrow). Lets us
+        // restore the previously expanded state once space comes back.
+        let hiddenForSpace = false;
         function isMobileView() {
             return window.innerWidth <= 768;
         }
@@ -353,6 +357,9 @@
         initSidebarState();
         sidebarToggle.addEventListener('click', (e) => {
             e.stopPropagation();
+            // A manual toggle expresses the user's own preference; stop
+            // treating the sidebar as hidden-for-space.
+            hiddenForSpace = false;
             sidebar.classList.toggle('collapsed');
             sidebar.classList.toggle('expanded');
             mainContainer.classList.toggle('sidebar-collapsed');
@@ -367,12 +374,24 @@
             resizeTimeout = setTimeout(() => {
                 if (isMobileView()) {
                     if (!sidebar.classList.contains('collapsed')) {
+                        // Auto-hide the sidebar when horizontal space runs out;
+                        // remember it was hidden for space so it can be restored.
+                        hiddenForSpace = true;
                         sidebar.classList.add('collapsed');
                         sidebar.classList.remove('expanded');
                         mainContainer.classList.add('sidebar-collapsed');
                         sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
                         sidebarToggle.setAttribute('title', 'Open Sidebar');
                     }
+                } else if (hiddenForSpace) {
+                    // Space is back and the sidebar was only hidden because the
+                    // viewport was narrow: restore its previous expanded state.
+                    hiddenForSpace = false;
+                    sidebar.classList.remove('collapsed');
+                    sidebar.classList.add('expanded');
+                    mainContainer.classList.remove('sidebar-collapsed');
+                    sidebarToggle.setAttribute('aria-label', 'Collapse Sidebar');
+                    sidebarToggle.setAttribute('title', 'Collapse Sidebar');
                 } else {
                     if (!sidebar.classList.contains('collapsed') && !sidebar.classList.contains('expanded')) {
                         sidebar.classList.add('expanded');
@@ -381,7 +400,7 @@
                         sidebarToggle.setAttribute('title', 'Collapse Sidebar');
                     }
                 }
-            }, 200);
+            }, 80);
         });
     }
     function setupThemePrefetch() {

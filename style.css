@@ -1759,28 +1759,50 @@ html[data-theme="dark"] .mobile-theme-btn.active {
 }
 
 .mobile-tray-toggle {
-    display: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: transparent;
     border: none;
     cursor: pointer;
-    padding: 8px;
-    margin-right: 8px;
+    padding: 8px 0;
+    margin-right: 0;
     color: var(--text-primary);
     border-radius: 4px;
-    transition: all 0.2s ease;
+    /* Collapsed on desktop: zero width keeps it from affecting layout while
+       the transitions let it slide in/out of the header-right flex row. The
+       Home/Blogs/About nav items share that row, so as this button's width
+       animates they slide along with it instead of jumping. */
+    width: 0;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(12px);
+    pointer-events: none;
+    transition: width 0.25s ease, opacity 0.25s ease, transform 0.25s ease, margin 0.25s ease, padding 0.25s ease, visibility 0.25s ease;
 }
 
 .mobile-tray-toggle:hover {
     background: rgba(255, 255, 255, 0.06);
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .mobile-tray-toggle {
+        transition: none;
+    }
+}
+
 @media (max-width: 768px) {
     .mobile-tray-toggle {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        width: 40px;
+        padding: 8px;
         margin-left: auto;
+        margin-right: 8px;
         order: 10;
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(0);
+        pointer-events: auto;
     }
 
     .header-right .nav-item {
