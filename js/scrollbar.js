@@ -1,17 +1,18 @@
 (function() {
     'use strict';
 
-    // The fixed header is translucent so the sidebar and the main content can
-    // keep scrolling visibly underneath it. Native scrollbars cannot match that
-    // layout: they always span the full height of their scroll container, so no
-    // CSS-only offset can stop them from running up behind the header. This
-    // module hides the native scrollbars on the two main scroll containers and
-    // draws slim custom scrollbars that only span the area below the header.
+    // The fixed header is translucent so the main content can keep scrolling
+    // visibly underneath it. Native scrollbars cannot match that layout: they
+    // always span the full height of their scroll container, so no CSS-only
+    // offset can stop them from running up behind the header. This module hides
+    // the native scrollbar on the main content container and draws a slim
+    // custom scrollbar that only spans the area below the header. (The sidebar
+    // intentionally has no visible scrollbar at all.)
     //
-    // Each custom scrollbar is positioned against the same containing block the
-    // scroll container lives in (.main-container for the content area, .sidebar
-    // for the sidebar wrapper), so it follows sidebar collapse/expand and window
-    // resizing automatically without extra bookkeeping.
+    // The custom scrollbar is positioned against the same containing block the
+    // scroll container lives in (.main-container for the content area), so it
+    // follows sidebar collapse/expand and window resizing automatically
+    // without extra bookkeeping.
 
     const MIN_THUMB_HEIGHT = 24;
 
@@ -144,12 +145,6 @@
             // Sidebar collapse/expand animates margin-right and can reflow the
             // content width; refresh the thumb when the transition settles.
             mainContainer.addEventListener('transitionend', updateContentScrollbar);
-        }
-        const sidebar = document.getElementById('sidebar');
-        const sidebarWrapper = document.querySelector('.sidebar-content-wrapper');
-        if (sidebar && sidebarWrapper) {
-            const updateSidebarScrollbar = attachCustomScrollbar(sidebarWrapper, sidebar);
-            sidebar.addEventListener('transitionend', updateSidebarScrollbar);
         }
     }
 

@@ -24,7 +24,7 @@
 | `js/blog.js` | manifest fetch, post cache, prefetch, render, navigation | `window.blogPostMetadata`; `window.openBlogPostLazy` |
 | `js/home.js` | home CTA rendering and delayed post opening | `window.renderBlogButtonsLazy` |
 | `js/mobile-tray.js` | dynamic mobile menu/tray at `window.innerWidth <= 768` | `#mobile-nav-tray`, overlay, toggle |
-| `js/scrollbar.js` | custom scrollbars for `.content-area` + `.sidebar-content-wrapper`, drawn below the fixed header so they never overlap it | `window.setupCustomScrollbars` |
+| `js/scrollbar.js` | custom scrollbar for `.content-area`, drawn below the fixed header so it never overlaps it; the sidebar intentionally has no visible scrollbar | `window.setupCustomScrollbars` |
 | `warning.js` | flashing-light consent and interaction warning | `system_warning_consent`; `warning:cleared` event |
 | `sw.js` | install/activate, cache strategies, offline shell, prefetch messages | cache names and message types |
 | `blog/posts.json` | ordered post manifest | metadata schema below |
