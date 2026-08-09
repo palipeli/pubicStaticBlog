@@ -22,6 +22,11 @@
     --text-secondary: #5e5e5e;
     --border-color: rgba(0, 0, 0, 0.08);
     --header-height: 40px;
+    --sidebar-width: 280px;
+    /* Shared with .main-container's margin-right reflow: the sidebar's
+       collapse slide (transform: translateX(100%)) and the content's width
+       change MUST travel together, so they share one duration/easing. */
+    --sidebar-collapse-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --font-main: 'MesloLGS NF', 'Fira Code', Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
     --blur-overlay-brightness: 1.0;
     --dark-overlay-color: rgba(255, 255, 255, 0.92);
@@ -228,8 +233,6 @@ body {
 .nav-item:hover {
     color: var(--text-primary);
     background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
 }
 
 .nav-item.active {
@@ -241,9 +244,8 @@ body {
     display: block;
     height: 100vh;
     position: relative;
-    margin-right: 280px;
-    will-change: margin-right;
-    transition: margin-right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-right: var(--sidebar-width);
+    transition: margin-right var(--sidebar-collapse-transition);
 }
 
 .main-container.sidebar-collapsed {
@@ -355,8 +357,6 @@ body {
     position: absolute;
     border-radius: 8px;
     opacity: 0.8;
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
     will-change: transform;
     transform: translateZ(0);
     backface-visibility: hidden;
@@ -439,7 +439,7 @@ body {
 }
 
 .sidebar {
-    width: 280px;
+    width: var(--sidebar-width);
     background: var(--glass-bg);
     backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
@@ -453,11 +453,11 @@ body {
     height: 100vh;
     box-sizing: border-box;
     z-index: 999;
-    will-change: width, opacity, transform;
+    will-change: transform, opacity;
     backface-visibility: hidden;
     isolation: isolate;
     transform: translateZ(0);
-    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, transform 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
+    transition: transform var(--sidebar-collapse-transition), opacity 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
 }
 
 [data-theme="dark"] .sidebar {
@@ -475,7 +475,11 @@ body {
 }
 
 .sidebar.collapsed {
-    width: 0;
+    /* Slide off-screen on the compositor instead of animating width;
+       .main-container's margin-right reflow keeps content glued to the
+       sidebar's left edge with the exact same duration/easing, so the
+       visible motion is identical but much cheaper per frame. */
+    transform: translateX(100%);
 }
 
 .sidebar.collapsed .sidebar-content-wrapper {
@@ -485,9 +489,8 @@ body {
 
 @media (max-width: 768px) {
     .sidebar:not(.expanded) {
-        width: 0;
+        transform: translateX(100%);
         opacity: 0;
-        transform: translateX(20px);
         pointer-events: none;
     }
     .sidebar:not(.expanded) .sidebar-content-wrapper {
@@ -913,8 +916,6 @@ html[data-theme="dark"] .mobile-theme-btn.active {
 .blog-post-view .blog-article,
 .blog-intro-view .blog-article {
     background: var(--bg-panel);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
@@ -977,8 +978,6 @@ html[data-theme="dark"] .mobile-theme-btn.active {
 
 .blog-article {
     background: var(--bg-panel);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 15px;
@@ -1228,7 +1227,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     border: 1px solid var(--border-color);
     border-radius: 6px;
     overflow: visible;
-    will-change: transform, background-color, border-color, box-shadow;
+    will-change: transform;
     transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     animation: fadeIn 0.3s ease-out;
     animation-fill-mode: both;
@@ -1404,8 +1403,6 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     margin: 0 auto;
     text-align: center;
     background: var(--bg-panel);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
@@ -1474,8 +1471,6 @@ html[data-theme="dark"] .mobile-theme-btn.active {
 }
 .about-content {
     background: var(--bg-panel);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 15px;
@@ -1585,9 +1580,8 @@ body::-webkit-scrollbar {
 @media (max-width: 768px) {
 
     .sidebar.collapsed {
-        width: 0;
+        transform: translateX(100%);
         opacity: 0;
-        transform: translateX(20px);
         pointer-events: none;
     }
 
@@ -1887,8 +1881,6 @@ body::-webkit-scrollbar {
     width: 100vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
     z-index: 998;
     opacity: 0;
     visibility: hidden;
@@ -1906,8 +1898,6 @@ body::-webkit-scrollbar {
     left: 0;
     right: 0;
     background: var(--bg-panel);
-    backdrop-filter: blur(0px);
-    -webkit-backdrop-filter: blur(0px);
     border-bottom: 1px solid var(--border-color);
     z-index: 999;
     max-height: calc(100vh - var(--header-height));
@@ -1985,7 +1975,7 @@ body::-webkit-scrollbar {
     border-radius: 6px;
     padding: 14px 16px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
 }
 
 .mobile-post-item:hover {
@@ -2029,7 +2019,7 @@ body::-webkit-scrollbar {
     text-decoration: none;
     font-size: 14px;
     font-weight: 500;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
     display: block;
 }
 

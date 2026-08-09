@@ -41,6 +41,15 @@
         let isDragging = false;
         let dragStartY = 0;
         let dragStartTop = 0;
+        // Thumb vertical offset, cached so drag math never has to re-parse
+        // the transform string. Positioning via transform (instead of `top`)
+        // keeps scroll updates off the layout path entirely.
+        let thumbOffsetY = 0;
+
+        function setThumbOffset(y) {
+            thumbOffsetY = y;
+            thumb.style.transform = 'translate3d(0, ' + y + 'px, 0)';
+        }
 
         function updateThumb() {
             const clientHeight = scroller.clientHeight;
@@ -55,7 +64,7 @@
             const thumbHeight = Math.max(MIN_THUMB_HEIGHT, (clientHeight / scrollHeight) * trackHeight);
             thumb.style.height = thumbHeight + 'px';
             const ratio = scroller.scrollTop / maxScroll;
-            thumb.style.top = Math.max(0, ratio * (trackHeight - thumbHeight)) + 'px';
+            setThumbOffset(Math.max(0, ratio * (trackHeight - thumbHeight)));
         }
 
         function onThumbPointerDown(event) {
@@ -63,7 +72,7 @@
             event.preventDefault();
             isDragging = true;
             dragStartY = event.clientY;
-            dragStartTop = parseFloat(thumb.style.top) || 0;
+            dragStartTop = thumbOffsetY;
             scrollbar.classList.add('is-dragging');
             if (thumb.setPointerCapture) {
                 try {
@@ -82,7 +91,7 @@
             const thumbHeight = getThumbHeight(thumb);
             const maxTop = Math.max(0, trackHeight - thumbHeight);
             const newTop = Math.max(0, Math.min(maxTop, dragStartTop + (event.clientY - dragStartY)));
-            thumb.style.top = newTop + 'px';
+            setThumbOffset(newTop);
             const maxScroll = scroller.scrollHeight - scroller.clientHeight;
             if (maxScroll > 0 && maxTop > 0) {
                 scroller.scrollTop = (newTop / maxTop) * maxScroll;
