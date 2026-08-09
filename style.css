@@ -449,8 +449,8 @@ body {
     animation: slideLeft 0.5s ease-out;
     position: fixed;
     right: 0;
-    top: var(--header-height);
-    height: calc(100vh - var(--header-height));
+    top: 0;
+    height: 100vh;
     box-sizing: border-box;
     z-index: 999;
     will-change: width, opacity, transform;
@@ -465,7 +465,7 @@ body {
 }
 
 .sidebar-content-wrapper {
-    padding: 20px;
+    padding: calc(var(--header-height) + 20px) 20px 20px;
     height: 100%;
     overflow-y: auto;
     opacity: 1;
@@ -499,7 +499,7 @@ body {
 .sidebar-toggle {
     position: absolute;
     left: 0;
-    top: 50%;
+    top: calc(50% + var(--header-height) / 2);
     transform: translate(-100%, -50%);
     width: 24px;
     height: 48px;
