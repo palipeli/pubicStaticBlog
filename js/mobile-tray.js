@@ -1,4 +1,7 @@
 (function() {
+    function escapeHtml(str) {
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');
+    }
     const MOBILE_BREAKPOINT = 768;
     function isMobileView() {
         return window.innerWidth <= MOBILE_BREAKPOINT;
@@ -152,8 +155,8 @@
             const item = document.createElement('div');
             item.className = 'mobile-post-item';
             item.innerHTML = `
-                <div class="mobile-post-title">${post.icon} ${post.title}</div>
-                <div class="mobile-post-meta">${post.date}</div>
+                <div class="mobile-post-title">${escapeHtml(post.icon)} ${escapeHtml(post.title)}</div>
+                <div class="mobile-post-meta">${escapeHtml(post.date)}</div>
             `;
             item.addEventListener('touchstart', () => {
                 if (typeof window.preloadBlogPostContent === 'function') {

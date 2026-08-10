@@ -1,4 +1,7 @@
 (function() {
+    function escapeHtml(str) {
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');
+    }
     let pendingPostOpenTimer = null;
     let pendingPostOpenId = null;
     const homePageFooter = `
@@ -44,7 +47,7 @@
             };
             button.innerHTML = `
                 <i class="fa-solid fa-book"></i>
-                <span>${post.title}</span>
+                <span>${escapeHtml(post.title)}</span>
             `;
             container.appendChild(button);
         });

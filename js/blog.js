@@ -5,6 +5,10 @@
     let activeNavigationToken = 0;
     let blogPostMetadata = window.blogPostMetadata;
     let preloadTimeout = null;
+
+    function escapeHtml(str) {
+        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');
+    }
     async function fetchBlogPostMetadata() {
         try {
             const response = await fetch('/blog/posts.json');
@@ -115,8 +119,8 @@
                 preloadBlogPostContent(post.id);
             };
             item.innerHTML = `
-                <div class="post-selector-title">${post.icon} ${post.title}</div>
-                <div class="post-selector-meta">${post.date}</div>
+                <div class="post-selector-title">${escapeHtml(post.icon)} ${escapeHtml(post.title)}</div>
+                <div class="post-selector-meta">${escapeHtml(post.date)}</div>
             `;
             container.appendChild(item);
         });
@@ -135,10 +139,10 @@
             card.className = 'blog-card';
             card.style.animationDelay = (index * 0.03) + 's';
             card.innerHTML = `
-                <div class="blog-image">${post.icon}</div>
+                <div class="blog-image">${escapeHtml(post.icon)}</div>
                 <div class="blog-content">
-                    <h3 class="blog-title">${post.title}</h3>
-                    <p class="blog-meta">${post.category} • ${post.date}</p>
+                    <h3 class="blog-title">${escapeHtml(post.title)}</h3>
+                    <p class="blog-meta">${escapeHtml(post.category)} • ${escapeHtml(post.date)}</p>
                 </div>
             `;
             card.style.cursor = 'pointer';
@@ -238,10 +242,14 @@
             article.innerHTML = `
                 <div class="error-message">
                     <h2>Error Loading Post</h2>
-                    <p>${err.message}</p>
-                    <button onclick="window.openBlogPostLazy('${id}')">Retry</button>
+                    <p>${escapeHtml(err.message)}</p>
+                    <button id="blog-post-retry-btn">Retry</button>
                 </div>
             `;
+            const retryBtn = article.querySelector('#blog-post-retry-btn');
+            if (retryBtn) {
+                retryBtn.addEventListener('click', () => window.openBlogPostLazy(id));
+            }
             return;
         }
         if (navigationToken !== activeNavigationToken) return;
@@ -252,10 +260,10 @@
         requestAnimationFrame(() => {
             if (navigationToken !== activeNavigationToken) return;
             article.innerHTML = `
-                <h1>${post.icon} ${post.title}</h1>
+                <h1>${escapeHtml(post.icon)} ${escapeHtml(post.title)}</h1>
                 <div class="blog-meta" style="margin-bottom: 20px;">
-                    <span class="blog-date">${post.date}</span>
-                    <span style="margin-left: 15px;">${post.category}</span>
+                    <span class="blog-date">${escapeHtml(post.date)}</span>
+                    <span style="margin-left: 15px;">${escapeHtml(post.category)}</span>
                 </div>
                 <div class="blog-post-content">${post.htmlContent}</div>
                 ${blogPostFooter}
@@ -327,10 +335,10 @@
         loadBlogPostContent(previousPostId).then(post => {
             if (post) {
                 article.innerHTML = `
-                    <h1>${post.icon} ${post.title}</h1>
+                    <h1>${escapeHtml(post.icon)} ${escapeHtml(post.title)}</h1>
                     <div class="blog-meta" style="margin-bottom: 20px;">
-                        <span class="blog-date">${post.date}</span>
-                        <span style="margin-left: 15px;">${post.category}</span>
+                        <span class="blog-date">${escapeHtml(post.date)}</span>
+                        <span style="margin-left: 15px;">${escapeHtml(post.category)}</span>
                     </div>
                     <div class="blog-post-content">${post.htmlContent}</div>
                     ${blogPostFooter}
