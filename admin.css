@@ -244,11 +244,21 @@
     padding: 16px;
     font-family: var(--font-main);
     font-size: 12px;
+    line-height: 1.6;
+    tab-size: 4;
     white-space: pre-wrap;
     word-break: break-word;
     margin-bottom: 14px;
+    width: 100%;
+    min-height: 40vh;
     max-height: 45vh;
     overflow: auto;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.admin-output::placeholder {
+    color: #8a8a8a;
 }
 
 /* ---------- markdown viewer visibility ---------- */

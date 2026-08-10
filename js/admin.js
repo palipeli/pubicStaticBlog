@@ -23,6 +23,10 @@
     let uploadSeq = 0;
     let savedUploadRange = null;
     let imageBar = null;
+    let markdownOpen = false;
+    let isApplyingMarkdown = false;
+    let markdownPushTimer = null;
+    let markdownApplyTimer = null;
 
     function $(id) { return document.getElementById(id); }
 
@@ -96,6 +100,43 @@
     function exec(cmd, value) {
         editor.focus();
         document.execCommand(cmd, false, value);
+    }
+
+    function execFormatBlock(tag) {
+        editor.focus();
+        document.execCommand('formatBlock', false, tag);
+        if (!formatBlockApplied(tag)) {
+            document.execCommand('formatBlock', false, '<' + tag + '>');
+        }
+        if (!formatBlockApplied(tag)) {
+            wrapSelectionInBlock(tag);
+        }
+    }
+
+    function formatBlockApplied(tag) {
+        try {
+            const current = String(document.queryCommandValue('formatBlock') || '').toLowerCase();
+            return current === tag || current === '<' + tag + '>';
+        } catch (err) {
+            return false;
+        }
+    }
+
+    function wrapSelectionInBlock(tag) {
+        const sel = window.getSelection();
+        if (!sel || !sel.rangeCount) return;
+        const container = sel.getRangeAt(0).commonAncestorContainer;
+        const block = findClosest(container, 'p,div,h1,h2,h3,h4,h5,h6,li,blockquote');
+        const target = block || (container.nodeType === 1 ? container : container.parentNode);
+        if (!target || target === editor || !target.parentNode || target.nodeType !== 1) return;
+        const el = document.createElement(tag);
+        while (target.firstChild) el.appendChild(target.firstChild);
+        target.replaceWith(el);
+        const caret = document.createRange();
+        caret.selectNodeContents(el);
+        caret.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(caret);
     }
 
     function wrapSelectionInline(tag) {
@@ -427,7 +468,7 @@
         for (let i = 0; i < el.childNodes.length; i++) {
             const node = el.childNodes[i];
             if (node.nodeType === 3) {
-                out += escapeInlineText(normalizeText(node.textContent));
+                out += escapeInlineText(node.textContent.replace(/\u200B/g, '').replace(/\s+/g, ' '));
                 continue;
             }
             if (node.nodeType !== 1) continue;
@@ -969,6 +1010,7 @@
         if (!date && editingOriginalDate) {
             date = editingOriginalDate;
         }
+        flushMarkdownEdits();
         const content = serializeEditor().trim();
         const token = getToken();
 
@@ -1035,6 +1077,8 @@
             localStorage.removeItem(DRAFT_KEY);
             $('admin-discard-btn').hidden = true;
             hidePreview();
+            if (saveTimer) clearTimeout(saveTimer);
+            saveTimer = null;
             const verb = result.updated ? 'Updated' : 'Published';
             setStatus(verb + ' "' + escapeHtml(result.title) + '" — Cloudflare Pages is rebuilding. It will appear at <a href="/#blog-' + result.id + '">/#blog-' + result.id + '</a>.' + (warning ? ' ' + warning : ''), 'success');
             if (result.updated) {
@@ -1056,17 +1100,93 @@
     }
 
     function hidePreview() {
+        flushMarkdownEdits();
+        if (markdownPushTimer) clearTimeout(markdownPushTimer);
+        markdownPushTimer = null;
+        markdownOpen = false;
         outputEl.hidden = true;
         $('admin-preview-btn').textContent = 'View markdown';
         setPreviewOpen(false);
     }
 
+    function applyMarkdownToEditor(md) {
+        if (isApplyingMarkdown) return;
+        isApplyingMarkdown = true;
+        try {
+            editor.innerHTML = typeof window.parseMarkdown === 'function'
+                ? window.parseMarkdown(md)
+                : '<p>' + escapeHtml(md).replace(/\n+/g, '<br>') + '</p>';
+            editor.querySelectorAll('img').forEach(function(img) {
+                const dataSrc = img.getAttribute('data-src') || '';
+                if (dataSrc.indexOf(PENDING_IMAGE_MARKER) === 0) {
+                    img.setAttribute('data-upload-token', dataSrc.slice(PENDING_IMAGE_MARKER.length));
+                }
+                if (!img.getAttribute('src') && dataSrc) {
+                    img.setAttribute('src', dataSrc);
+                }
+            });
+            deselectImage();
+            updateCount();
+            scheduleDraftSave();
+        } finally {
+            isApplyingMarkdown = false;
+        }
+    }
+
+    function flushMarkdownEdits() {
+        if (markdownApplyTimer) {
+            clearTimeout(markdownApplyTimer);
+            markdownApplyTimer = null;
+            applyMarkdownToEditor(outputEl.value);
+        }
+    }
+
+    function scheduleMarkdownApply() {
+        if (markdownApplyTimer) clearTimeout(markdownApplyTimer);
+        markdownApplyTimer = setTimeout(function() {
+            markdownApplyTimer = null;
+            applyMarkdownToEditor(outputEl.value);
+        }, 500);
+    }
+
+    function pushEditorToMarkdown() {
+        if (isApplyingMarkdown || !markdownOpen || document.activeElement === outputEl) return;
+        outputEl.value = serializeEditor();
+    }
+
+    function scheduleMarkdownPush() {
+        if (!markdownOpen || isApplyingMarkdown) return;
+        if (markdownPushTimer) clearTimeout(markdownPushTimer);
+        markdownPushTimer = setTimeout(function() {
+            markdownPushTimer = null;
+            pushEditorToMarkdown();
+        }, 400);
+    }
+
+    function handleMarkdownKeydown(e) {
+        if (e.key === 'Tab') {
+            e.preventDefault();
+            const start = outputEl.selectionStart;
+            const end = outputEl.selectionEnd;
+            if (start == null || end == null) return;
+            outputEl.setRangeText('    ', start, end, 'end');
+            return;
+        }
+        if (e.key === 'Escape' || ((e.metaKey || e.ctrlKey) && e.key === 'Enter')) {
+            e.preventDefault();
+            hidePreview();
+            editor.focus();
+        }
+    }
+
     function togglePreview() {
         if (outputEl.hidden) {
-            outputEl.textContent = serializeEditor();
+            outputEl.value = serializeEditor();
+            markdownOpen = true;
             outputEl.hidden = false;
             $('admin-preview-btn').textContent = 'Hide markdown';
             setPreviewOpen(true);
+            outputEl.focus();
         } else {
             hidePreview();
         }
@@ -1138,10 +1258,10 @@
     }
 
     function runCommand(cmd) {
-        if (cmd === 'p') exec('formatBlock', '<p>');
-        else if (cmd === 'h1') exec('formatBlock', '<h1>');
-        else if (cmd === 'h2') exec('formatBlock', '<h2>');
-        else if (cmd === 'h3') exec('formatBlock', '<h3>');
+        if (cmd === 'p') execFormatBlock('p');
+        else if (cmd === 'h1') execFormatBlock('h1');
+        else if (cmd === 'h2') execFormatBlock('h2');
+        else if (cmd === 'h3') execFormatBlock('h3');
         else if (cmd === 'bold') exec('bold');
         else if (cmd === 'italic') exec('italic');
         else if (cmd === 'strike') exec('strikeThrough');
@@ -1151,7 +1271,7 @@
         else if (cmd === 'ul') exec('insertUnorderedList');
         else if (cmd === 'ol') exec('insertOrderedList');
         else if (cmd === 'task') insertTaskList();
-        else if (cmd === 'quote') exec('formatBlock', '<blockquote>');
+        else if (cmd === 'quote') execFormatBlock('blockquote');
         else if (cmd === 'codeblock') insertCodeBlock();
         else if (cmd === 'table') insertTable();
         else if (cmd === 'hr') exec('insertHorizontalRule');
@@ -1325,6 +1445,9 @@
         $('admin-toolbar').addEventListener('click', handleToolbarClick);
         $('admin-publish-btn').addEventListener('click', publish);
         $('admin-preview-btn').addEventListener('click', togglePreview);
+        outputEl.addEventListener('input', scheduleMarkdownApply);
+        outputEl.addEventListener('keydown', handleMarkdownKeydown);
+        outputEl.addEventListener('blur', flushMarkdownEdits);
         $('admin-discard-btn').addEventListener('click', discardDraft);
         $('admin-image-input').addEventListener('change', function() {
             const file = imageInput.files[0];
@@ -1342,6 +1465,7 @@
         editor.addEventListener('input', function() {
             updateCount();
             scheduleDraftSave();
+            scheduleMarkdownPush();
         });
         editor.addEventListener('paste', handlePaste);
         editor.addEventListener('drop', handleDrop);
