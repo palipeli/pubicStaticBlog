@@ -580,3 +580,38 @@
     }
 }
 
+/* ---------- WYSIWYG image management ---------- */
+
+.admin-editor img.admin-img-selected {
+    outline: 2px solid var(--accent-pink);
+    outline-offset: 2px;
+}
+
+.admin-image-bar {
+    position: fixed;
+    z-index: 180;
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 4px 6px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(12px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+}
+
+.admin-image-bar .admin-post-action {
+    font-size: 11px;
+}
+
+.admin-post-action-replace {
+    color: var(--accent-pink);
+}
+
+.admin-post-action-replace:hover {
+    color: var(--accent-pink-hover);
+    background: rgba(255, 69, 252, 0.12);
+}
+

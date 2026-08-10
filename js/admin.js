@@ -17,6 +17,9 @@
     let postListData = null;
     let editingId = null;
     let editingOriginalDate = null;
+    let selectedImage = null;
+    let pendingReplaceTarget = null;
+    let imageBar = null;
 
     function $(id) { return document.getElementById(id); }
 
@@ -137,6 +140,7 @@
             sel.removeAllRanges();
             sel.addRange(caret);
         }
+        return lastNode;
     }
 
     function insertLink() {
@@ -212,11 +216,12 @@
         insertHtmlIntoEditor(html);
     }
 
-    function openImagePicker() {
+    function openImagePicker(replaceTarget) {
+        pendingReplaceTarget = replaceTarget || null;
         imageInput.click();
     }
 
-    async function uploadImage(file) {
+    async function uploadImage(file, replaceTarget) {
         if (!file) return;
         if (!/^image\/(webp|png|jpeg|gif)$/i.test(file.type)) {
             setStatus('Only webp, png, jpg and gif images are allowed', 'error');
@@ -250,10 +255,117 @@
                 setStatus(result.error || 'Upload failed (' + res.status + ')', 'error');
                 return;
             }
-            insertHtmlIntoEditor('<img class="lazy-image" src="' + escapeHtml(result.url) + '" data-src="' + escapeHtml(result.url) + '" alt="">');
-            setStatus('Image uploaded: ' + result.url, 'success');
+            const url = String(result.url || '');
+            if (replaceTarget && replaceTarget.tagName === 'IMG') {
+                replaceTarget.setAttribute('src', url);
+                replaceTarget.setAttribute('data-src', url);
+                selectImage(replaceTarget);
+                setStatus('Image replaced: ' + url, 'success');
+            } else {
+                const inserted = insertHtmlIntoEditor('<img class="lazy-image" src="' + escapeHtml(url) + '" data-src="' + escapeHtml(url) + '" alt="">');
+                if (inserted && inserted.tagName === 'IMG') {
+                    selectImage(inserted);
+                }
+                setStatus('Image uploaded: ' + url, 'success');
+            }
         } catch (err) {
             setStatus('Upload error: ' + err.message, 'error');
+        }
+    }
+
+    function selectImage(img) {
+        if (selectedImage) {
+            selectedImage.classList.remove('admin-img-selected');
+        }
+        selectedImage = img || null;
+        if (!selectedImage || !editor.contains(selectedImage)) {
+            selectedImage = null;
+            if (imageBar) imageBar.hidden = true;
+            return;
+        }
+        selectedImage.classList.add('admin-img-selected');
+        imageBar.hidden = false;
+        positionImageBar();
+    }
+
+    function deselectImage() {
+        selectImage(null);
+    }
+
+    function positionImageBar() {
+        if (!selectedImage || !imageBar || imageBar.hidden) return;
+        const rect = selectedImage.getBoundingClientRect();
+        const barWidth = imageBar.offsetWidth;
+        const barHeight = imageBar.offsetHeight;
+        let top = rect.top - barHeight - 8;
+        if (top < 8) {
+            top = rect.bottom + 8;
+        }
+        let left = rect.left + (rect.width / 2) - (barWidth / 2);
+        left = Math.max(8, Math.min(left, window.innerWidth - barWidth - 8));
+        imageBar.style.top = top + 'px';
+        imageBar.style.left = left + 'px';
+    }
+
+    function moveSelectedImage(direction) {
+        if (!selectedImage) return;
+        const block = findClosest(selectedImage, 'p,div,li,blockquote,h1,h2,h3,h4,h5,h6') || selectedImage.parentNode;
+        if (!block || !block.parentNode) return;
+        const siblings = Array.from(block.parentNode.children).filter(function(child) {
+            return child.nodeType === 1;
+        });
+        const index = siblings.indexOf(block);
+        if (index === -1) return;
+        if (direction === 'up' && index > 0) {
+            block.parentNode.insertBefore(block, siblings[index - 1]);
+        } else if (direction === 'down' && index < siblings.length - 1) {
+            block.parentNode.insertBefore(block, siblings[index + 1].nextSibling);
+        } else {
+            return;
+        }
+        positionImageBar();
+        scheduleDraftSave();
+        updateCount();
+    }
+
+    function deleteSelectedImage() {
+        if (!selectedImage) return;
+        const img = selectedImage;
+        deselectImage();
+        img.remove();
+        scheduleDraftSave();
+        updateCount();
+        setStatus('Image removed from the post (file stays in /media)', 'success');
+    }
+
+    function copyImageUrl() {
+        if (!selectedImage) return;
+        const src = selectedImage.getAttribute('data-src') || selectedImage.getAttribute('src') || '';
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(src).then(function() {
+                setStatus('Image URL copied: ' + src, 'success');
+            }, function() {
+                setStatus('Image URL: ' + src, '');
+            });
+        } else {
+            setStatus('Image URL: ' + src, '');
+        }
+    }
+
+    function handleImageBarClick(e) {
+        const btn = e.target.closest ? e.target.closest('[data-img-action]') : null;
+        if (!btn) return;
+        const action = btn.getAttribute('data-img-action');
+        if (action === 'replace') {
+            if (selectedImage) openImagePicker(selectedImage);
+        } else if (action === 'up') {
+            moveSelectedImage('up');
+        } else if (action === 'down') {
+            moveSelectedImage('down');
+        } else if (action === 'copy') {
+            copyImageUrl();
+        } else if (action === 'delete') {
+            deleteSelectedImage();
         }
     }
 
@@ -680,6 +792,12 @@
                     editingOriginalDate = fmDate || null;
                 }
                 editor.innerHTML = typeof window.parseMarkdown === 'function' ? window.parseMarkdown(parsed.content) : parsed.content;
+                editor.querySelectorAll('img.lazy-image').forEach(function(img) {
+                    if (!img.getAttribute('src') && img.getAttribute('data-src')) {
+                        img.setAttribute('src', img.getAttribute('data-src'));
+                    }
+                });
+                deselectImage();
                 editingId = id;
                 $('admin-edit-title').textContent = fm.title || (post ? post.title : id) || id;
                 $('admin-edit-banner').hidden = false;
@@ -698,6 +816,7 @@
     function resetEditor() {
         editingId = null;
         editingOriginalDate = null;
+        deselectImage();
         $('admin-edit-banner').hidden = true;
         $('admin-edit-title').textContent = '';
         publishBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Publish';
@@ -1010,6 +1129,17 @@
     function handleKeydown(e) {
         const mod = e.metaKey || e.ctrlKey;
         const key = e.key.toLowerCase();
+        if (selectedImage) {
+            if (key === 'delete' || key === 'backspace') {
+                e.preventDefault();
+                deleteSelectedImage();
+                return;
+            }
+            if (key === 'escape') {
+                deselectImage();
+                return;
+            }
+        }
         if (mod && key === 's') {
             e.preventDefault();
             publish();
@@ -1116,8 +1246,11 @@
         $('admin-preview-btn').addEventListener('click', togglePreview);
         $('admin-discard-btn').addEventListener('click', discardDraft);
         $('admin-image-input').addEventListener('change', function() {
-            uploadImage(imageInput.files[0]);
+            const file = imageInput.files[0];
+            const replaceTarget = pendingReplaceTarget;
+            pendingReplaceTarget = null;
             imageInput.value = '';
+            uploadImage(file, replaceTarget);
         });
 
         editor.addEventListener('keydown', handleKeydown);
@@ -1127,6 +1260,22 @@
         });
         editor.addEventListener('paste', handlePaste);
         editor.addEventListener('drop', handleDrop);
+        editor.addEventListener('click', function(e) {
+            if (e.target && e.target.tagName === 'IMG') {
+                selectImage(e.target);
+            } else {
+                deselectImage();
+            }
+        });
+        document.addEventListener('click', function(e) {
+            if (imageBar && imageBar.contains(e.target)) return;
+            if (editor.contains(e.target)) return;
+            deselectImage();
+        });
+        imageBar = $('admin-image-bar');
+        imageBar.addEventListener('click', handleImageBarClick);
+        window.addEventListener('resize', positionImageBar);
+        editor.addEventListener('scroll', positionImageBar);
         document.addEventListener('selectionchange', updateToolbarState);
 
         ['post-title', 'post-category', 'post-icon', 'post-date'].forEach(function(id) {
