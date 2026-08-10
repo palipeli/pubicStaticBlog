@@ -264,6 +264,11 @@
             } else {
                 const inserted = insertHtmlIntoEditor('<img class="lazy-image" src="' + escapeHtml(url) + '" data-src="' + escapeHtml(url) + '" alt="">');
                 if (inserted && inserted.tagName === 'IMG') {
+                    if (inserted.parentNode === editor) {
+                        const p = document.createElement('p');
+                        editor.insertBefore(p, inserted);
+                        p.appendChild(inserted);
+                    }
                     selectImage(inserted);
                 }
                 setStatus('Image uploaded: ' + url, 'success');
@@ -393,8 +398,17 @@
         return out;
     }
 
+    function imageToMarkdown(node) {
+        const src = node.getAttribute('data-src') || node.getAttribute('src') || '';
+        const alt = String(node.getAttribute('alt') || '').replace(/[\[\]]/g, '');
+        return '![' + alt + '](' + cleanLinkTarget(src) + ')';
+    }
+
     function inlineToMarkdown(el, opts) {
         opts = opts || {};
+        if (el && el.nodeType === 1 && el.tagName && el.tagName.toLowerCase() === 'img') {
+            return imageToMarkdown(el);
+        }
         let out = '';
         for (let i = 0; i < el.childNodes.length; i++) {
             const node = el.childNodes[i];
@@ -425,9 +439,7 @@
                 const text = inlineToMarkdown(node) || href;
                 out += '[' + text + '](' + cleanLinkTarget(href) + ')';
             } else if (tag === 'img') {
-                const src = node.getAttribute('data-src') || node.getAttribute('src') || '';
-                const alt = String(node.getAttribute('alt') || '').replace(/[\[\]]/g, '');
-                out += '![' + alt + '](' + cleanLinkTarget(src) + ')';
+                out += imageToMarkdown(node);
             } else if (tag === 'input') {
                 if (opts.skipFirstInput) {
                     opts.skipFirstInput = false;
@@ -531,6 +543,10 @@
             for (let i = 1; i < rows.length; i++) {
                 lines.push(indent + '| ' + rowCells(rows[i]).join(' | ') + ' |');
             }
+            return lines;
+        }
+        if (tag === 'img') {
+            lines.push(indent + imageToMarkdown(el));
             return lines;
         }
         const text = inlineToMarkdown(el);
