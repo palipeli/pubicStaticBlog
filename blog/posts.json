@@ -79,5 +79,13 @@
     "date": "2026-08-10",
     "category": "Cat",
     "icon": "🐱"
+  },
+  {
+    "id": "cat-3",
+    "slug": "/blog/cat-3.md",
+    "title": "Cat #3",
+    "date": "2026-08-10",
+    "category": "Cat",
+    "icon": "🐱"
   }
 ]
