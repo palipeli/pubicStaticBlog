@@ -53,7 +53,8 @@
     "title": "Privacy Policy",
     "date": "Mar 25 2026",
     "category": "Legal",
-    "icon": "🔒"
+    "icon": "🔒",
+    "pinned": true
   },
   {
     "id": "shalom-new-post-management-and-image-upload",
