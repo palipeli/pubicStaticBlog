@@ -94,5 +94,13 @@
     "date": "2026-08-10",
     "category": "afwreferffsdfwefwef",
     "icon": "📄"
+  },
+  {
+    "id": "fuckingtest",
+    "slug": "/blog/fuckingtest.md",
+    "title": "fuckingtest",
+    "date": "2026-08-10",
+    "category": "fuckingtest",
+    "icon": "📄"
   }
 ]
