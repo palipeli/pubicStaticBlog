@@ -64,14 +64,6 @@
     "icon": "💾"
   },
   {
-    "id": "test",
-    "slug": "/blog/test.md",
-    "title": "test",
-    "date": "2026-08-10",
-    "category": "test",
-    "icon": "📄"
-  },
-  {
     "id": "fucking-hell",
     "slug": "/blog/fucking-hell.md",
     "title": "Fucking hell",
