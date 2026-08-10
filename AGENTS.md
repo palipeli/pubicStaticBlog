@@ -200,8 +200,8 @@ cdnjs requests are left to the browser. Current caches:
 
 ```text
 pubic-static-blog-v2  # compatibility/cleanup namespace
-static-assets-v2     # HTML/CSS/JS/JSON/etc.
-images-v2            # webp/png/jpg/etc.
+static-assets-v3     # HTML/CSS/JS/JSON/etc.
+images-v3            # webp/png/jpg/etc.
 blog-content-v2     # Markdown and /blog/ content
 ```
 

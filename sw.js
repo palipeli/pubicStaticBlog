@@ -1,7 +1,7 @@
 'use strict';
 const CACHE_NAME = 'pubic-static-blog-v2';
 const STATIC_CACHE_NAME = 'static-assets-v3';
-const IMAGE_CACHE_NAME = 'images-v2';
+const IMAGE_CACHE_NAME = 'images-v3';
 const CONTENT_CACHE_NAME = 'blog-content-v2';
 const pendingFetches = new Map();
 const STATIC_EXTENSIONS = /\.(html|css|js|json|webmanifest|ico|txt|xml)$/i;
@@ -41,9 +41,10 @@ self.addEventListener('install', (event) => {
         ]).then(([staticCache, imageCache]) => {
             const cachePromises = PRECACHE_ASSETS.map((url) => {
                 const targetCache = IMAGE_EXTENSIONS.test(url) ? imageCache : staticCache;
+                const cacheName = IMAGE_EXTENSIONS.test(url) ? IMAGE_CACHE_NAME : STATIC_CACHE_NAME;
                 return fetch(url)
                     .then((response) => {
-                        if (response.ok) {
+                        if (response.ok && responseMatchesCache(response, url, cacheName)) {
                             return targetCache.put(url, response);
                         }
                         console.warn(`Failed to precache ${url}: ${response.status}`);
@@ -118,6 +119,25 @@ function getCacheForRequest(request) {
     }
     return STATIC_CACHE_NAME;
 }
+function responseMatchesCache(response, request, cacheName) {
+    const url = new URL(request instanceof Request ? request.url : request, self.location.origin);
+    const pathname = url.pathname;
+    const type = (response.headers.get('content-type') || '').toLowerCase();
+    if (!type) return true;
+    const isHtmlAsset = pathname === '/' || pathname === '/index.html' || pathname.endsWith('.html');
+    if (cacheName === IMAGE_CACHE_NAME) {
+        return type.startsWith('image/');
+    }
+    if (cacheName === CONTENT_CACHE_NAME) {
+        return (type.startsWith('text/') && !type.startsWith('text/html')) || type.startsWith('application/json');
+    }
+    if (isHtmlAsset) {
+        return type.startsWith('text/html');
+    }
+    return (type.startsWith('text/') && !type.startsWith('text/html')) ||
+        type.startsWith('application/javascript') || type.startsWith('application/json') ||
+        type.startsWith('image/') || type.startsWith('font/');
+}
 function isCacheableMessageUrl(value) {
     try {
         const url = new URL(value, self.location.origin);
@@ -130,12 +150,12 @@ function isCacheableMessageUrl(value) {
         return false;
     }
 }
-async function prefetchUrl(value, cache) {
+async function prefetchUrl(value, cache, cacheName) {
     if (!isCacheableMessageUrl(value)) return;
     const request = new Request(new URL(value, self.location.origin).href);
     if (await cache.match(request)) return;
     try {
-        await fetchAndCache(request, cache);
+        await fetchAndCache(request, cache, cacheName);
     } catch (error) {
         console.warn('Prefetch failed:', request.url, error);
     }
@@ -160,27 +180,27 @@ async function handleRequest(request, strategy, cacheName) {
     const cache = await caches.open(cacheName);
     switch (strategy) {
         case 'cache-first':
-            return cacheFirst(request, cache);
+            return cacheFirst(request, cache, cacheName);
         case 'network-first':
-            return networkFirst(request, cache);
+            return networkFirst(request, cache, cacheName);
         case 'stale-while-revalidate':
-            return staleWhileRevalidate(request, cache);
+            return staleWhileRevalidate(request, cache, cacheName);
         case 'network-only':
         default:
             return fetch(request);
     }
 }
-async function cacheFirst(request, cache) {
+async function cacheFirst(request, cache, cacheName) {
     const cachedResponse = await cache.match(request);
     if (cachedResponse) {
         return cachedResponse;
     }
-    return fetchAndCache(request, cache);
+    return fetchAndCache(request, cache, cacheName);
 }
-async function networkFirst(request, cache) {
+async function networkFirst(request, cache, cacheName) {
     try {
         const networkResponse = await fetch(request);
-        if (networkResponse && networkResponse.ok) {
+        if (networkResponse && networkResponse.ok && responseMatchesCache(networkResponse, request, cacheName)) {
             await cache.put(request, networkResponse.clone());
         }
         return networkResponse;
@@ -195,9 +215,9 @@ async function networkFirst(request, cache) {
         throw error;
     }
 }
-async function staleWhileRevalidate(request, cache) {
+async function staleWhileRevalidate(request, cache, cacheName) {
     const cachedResponse = await cache.match(request);
-    const fetchPromise = fetchAndCache(request, cache);
+    const fetchPromise = fetchAndCache(request, cache, cacheName);
     if (cachedResponse) {
         return cachedResponse;
     }
@@ -210,14 +230,14 @@ async function staleWhileRevalidate(request, cache) {
         throw error;
     }
 }
-async function fetchAndCache(request, cache) {
+async function fetchAndCache(request, cache, cacheName) {
     const url = request.url;
     if (pendingFetches.has(url)) {
         return pendingFetches.get(url);
     }
     const fetchPromise = (async () => {
         const response = await fetch(request);
-        if (response && response.ok) {
+        if (response && response.ok && responseMatchesCache(response, request, cacheName)) {
             await cache.put(request, response.clone());
         }
         return response;
@@ -229,14 +249,14 @@ async function fetchAndCache(request, cache) {
         pendingFetches.delete(url);
     }
 }
-function updateCacheInBackground(request, cache) {
+function updateCacheInBackground(request, cache, cacheName) {
     const url = request.url;
     if (pendingFetches.has(url)) {
         return;
     }
     const updatePromise = fetch(request)
         .then((response) => {
-            if (response && response.ok) {
+            if (response && response.ok && responseMatchesCache(response, request, cacheName)) {
                 return cache.put(request, response.clone());
             }
         })
@@ -316,16 +336,16 @@ self.addEventListener('message', (event) => {
     }
     if (!data || !data.type) return;
     if (data.type === 'precache-bg' && data.url) {
-        event.waitUntil(caches.open(IMAGE_CACHE_NAME).then((cache) => prefetchUrl(data.url, cache)));
+        event.waitUntil(caches.open(IMAGE_CACHE_NAME).then((cache) => prefetchUrl(data.url, cache, IMAGE_CACHE_NAME)));
     }
     if (data.type === 'prefetch-bg' && Array.isArray(data.urls)) {
         event.waitUntil(caches.open(IMAGE_CACHE_NAME).then((cache) =>
-            Promise.all(data.urls.map((url) => prefetchUrl(url, cache)))
+            Promise.all(data.urls.map((url) => prefetchUrl(url, cache, IMAGE_CACHE_NAME)))
         ));
     }
     if (data.type === 'prefetch-posts' && Array.isArray(data.urls)) {
         event.waitUntil(caches.open(CONTENT_CACHE_NAME).then((cache) =>
-            Promise.all(data.urls.map((url) => prefetchUrl(url, cache)))
+            Promise.all(data.urls.map((url) => prefetchUrl(url, cache, CONTENT_CACHE_NAME)))
         ));
     }
     if (data.type === 'precache-all') {
@@ -379,9 +399,10 @@ async function precacheAllAssets() {
         '/blog/nt_verses_compact.json',
     ];
     const cachePromises = allAssets.map((url) => {
-        const cache = url.startsWith('/blog/') && url.endsWith('.md') ? contentCache :
-                      IMAGE_EXTENSIONS.test(url) ? imageCache : staticCache;
-        return prefetchUrl(url, cache);
+        const isPost = url.startsWith('/blog/') && url.endsWith('.md');
+        const cache = isPost ? contentCache : IMAGE_EXTENSIONS.test(url) ? imageCache : staticCache;
+        const cacheName = isPost ? CONTENT_CACHE_NAME : IMAGE_EXTENSIONS.test(url) ? IMAGE_CACHE_NAME : STATIC_CACHE_NAME;
+        return prefetchUrl(url, cache, cacheName);
     });
     await Promise.all(cachePromises);
     console.log('All assets precached');
