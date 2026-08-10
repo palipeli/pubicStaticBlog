@@ -52,6 +52,17 @@
 .admin-status.error { color: #e03131; }
 .admin-status.success { color: #2f9e44; }
 
+.admin-status a {
+    color: var(--accent-pink);
+    text-decoration: none;
+    font-family: var(--font-main);
+}
+
+.admin-status a:hover {
+    color: var(--accent-pink-hover);
+    text-decoration: underline;
+}
+
 .admin-theme-btn {
     width: 34px;
     height: 34px;
