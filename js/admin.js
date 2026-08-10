@@ -111,6 +111,7 @@
         if (!formatBlockApplied(tag)) {
             wrapSelectionInBlock(tag);
         }
+        editor.querySelectorAll('h1,h2,h3,h4,h5,h6').forEach(normalizeHeading);
     }
 
     function formatBlockApplied(tag) {
@@ -137,6 +138,79 @@
         caret.collapse(false);
         sel.removeAllRanges();
         sel.addRange(caret);
+    }
+
+    function normalizeHeading(el) {
+        if (!el || el.nodeType !== 1) return;
+        Array.prototype.slice.call(el.querySelectorAll('div,p,br')).forEach(function(node) {
+            const parent = node.parentNode;
+            if (!parent) return;
+            if (node.tagName.toLowerCase() === 'br') {
+                if (node.previousSibling && node.nextSibling && !/\s$/.test(parent.textContent)) {
+                    parent.insertBefore(document.createTextNode(' '), node);
+                }
+            } else {
+                while (node.firstChild) parent.insertBefore(node.firstChild, node);
+            }
+            parent.removeChild(node);
+        });
+    }
+
+    function splitHeadingAtCaret(heading) {
+        const sel = window.getSelection();
+        if (!sel || !sel.rangeCount) return false;
+        const range = sel.getRangeAt(0);
+        if (!range.collapsed) return false;
+        if (!heading.textContent.trim() && !heading.querySelector('img')) {
+            const p = document.createElement('p');
+            p.appendChild(document.createTextNode('\u200B'));
+            heading.replaceWith(p);
+            const caret = document.createRange();
+            caret.setStart(p.firstChild, 1);
+            caret.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(caret);
+            return true;
+        }
+        const contentsRange = document.createRange();
+        contentsRange.selectNodeContents(heading);
+        let atStart = false;
+        let atEnd = false;
+        try {
+            atStart = range.compareBoundaryPoints(Range.START_TO_START, contentsRange) === 0;
+            atEnd = range.compareBoundaryPoints(Range.END_TO_END, contentsRange) === 0;
+        } catch (err) {}
+        if (atStart || atEnd) {
+            const p = document.createElement('p');
+            p.appendChild(document.createTextNode('\u200B'));
+            heading.parentNode.insertBefore(p, atStart ? heading : heading.nextSibling);
+            const caret = document.createRange();
+            caret.setStart(p.firstChild, 1);
+            caret.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(caret);
+            return true;
+        }
+        const afterRange = document.createRange();
+        afterRange.setStart(range.startContainer, range.startOffset);
+        afterRange.setEndAfter(heading);
+        const frag = afterRange.extractContents();
+        heading.normalize();
+        const lastText = heading.lastChild;
+        if (lastText && lastText.nodeType === 3) {
+            lastText.textContent = lastText.textContent.replace(/\s+$/, '');
+        }
+        const p = document.createElement('p');
+        if (frag.textContent.trim() || frag.querySelector('img')) {
+            p.appendChild(frag);
+        }
+        heading.parentNode.insertBefore(p, heading.nextSibling);
+        const caret = document.createRange();
+        caret.setStart(p, 0);
+        caret.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(caret);
+        return true;
     }
 
     function wrapSelectionInline(tag) {
@@ -519,7 +593,7 @@
         if (el.nodeType !== 1) return lines;
         const tag = el.tagName.toLowerCase();
         if (tag === 'h1' || tag === 'h2' || tag === 'h3' || tag === 'h4' || tag === 'h5' || tag === 'h6') {
-            const text = inlineToMarkdown(el);
+            const text = inlineToMarkdown(el).replace(/\s*\n\s*/g, ' ').trim();
             lines.push(indent + '#'.repeat(parseInt(tag[1], 10)) + ' ' + escapeLineStart(text));
             return lines;
         }
@@ -1262,6 +1336,9 @@
         else if (cmd === 'h1') execFormatBlock('h1');
         else if (cmd === 'h2') execFormatBlock('h2');
         else if (cmd === 'h3') execFormatBlock('h3');
+        else if (cmd === 'h4') execFormatBlock('h4');
+        else if (cmd === 'h5') execFormatBlock('h5');
+        else if (cmd === 'h6') execFormatBlock('h6');
         else if (cmd === 'bold') exec('bold');
         else if (cmd === 'italic') exec('italic');
         else if (cmd === 'strike') exec('strikeThrough');
@@ -1315,6 +1392,9 @@
             else if (cmd === 'h1') active = block === 'h1';
             else if (cmd === 'h2') active = block === 'h2';
             else if (cmd === 'h3') active = block === 'h3';
+            else if (cmd === 'h4') active = block === 'h4';
+            else if (cmd === 'h5') active = block === 'h5';
+            else if (cmd === 'h6') active = block === 'h6';
             else if (cmd === 'quote') active = block === 'blockquote';
             btn.classList.toggle('active', active);
         });
@@ -1380,6 +1460,16 @@
             e.preventDefault();
             runCommand(key === '0' ? 'p' : 'h' + key);
             return;
+        }
+        if (e.key === 'Enter' && !mod) {
+            const sel = window.getSelection();
+            const anchor = (sel && sel.rangeCount) ? sel.getRangeAt(0).commonAncestorContainer : e.target;
+            const heading = findClosest(anchor, 'h1,h2,h3,h4,h5,h6');
+            if (heading) {
+                e.preventDefault();
+                splitHeadingAtCaret(heading);
+                return;
+            }
         }
         if (e.key === 'Tab') {
             const li = findClosest(e.target, 'li');
