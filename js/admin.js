@@ -3,7 +3,6 @@
 
     const PUBLISH_URL = '/api/publish';
     const PENDING_IMAGE_MARKER = '/__upload__/';
-    const TOKEN_KEY = 'adminToken';
     const DRAFT_KEY = 'adminDraft';
     const THEME_ORDER = ['light', 'dark', 'auto'];
 
@@ -41,9 +40,14 @@
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    function getToken() { return sessionStorage.getItem(TOKEN_KEY) || ''; }
-    function setToken(token) { sessionStorage.setItem(TOKEN_KEY, token); }
-    function clearToken() { sessionStorage.removeItem(TOKEN_KEY); }
+    let adminToken = '';
+    function getToken() { return adminToken; }
+    function setToken(token) { adminToken = token; }
+    function clearToken() { adminToken = ''; }
+
+    function isValidPostId(id) {
+        return /^[a-z0-9-]{1,80}$/.test(String(id || ''));
+    }
 
     function findClosest(node, selector) {
         let el = node && node.nodeType === 1 ? node : (node && node.parentNode);
@@ -62,7 +66,7 @@
     function setThemeCookie(theme) {
         const d = new Date();
         d.setTime(d.getTime() + 365 * 24 * 60 * 60 * 1000);
-        document.cookie = 'theme_preference=' + theme + ';expires=' + d.toUTCString() + ';path=/';
+        document.cookie = 'theme_preference=' + theme + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax;Secure';
     }
 
     function resolveTheme(theme) {
@@ -88,7 +92,12 @@
     }
 
     function setStatus(message, kind) {
-        statusEl.innerHTML = message;
+        statusEl.textContent = '';
+        if (typeof message === 'string') {
+            statusEl.textContent = message;
+        } else if (message && message.nodeType) {
+            statusEl.appendChild(message);
+        }
         statusEl.className = 'admin-status' + (kind ? ' ' + kind : '');
     }
 
@@ -943,8 +952,15 @@
 
     function loadPostList() {
         const container = $('admin-posts-list');
-        fetch('/api/posts')
-            .then(function(res) { return res.json(); })
+        const token = getToken();
+        const options = token ? {headers: {'Authorization': 'Bearer ' + token}} : {};
+        fetch('/api/posts', options)
+            .then(function(res) {
+                if (res.status === 401) {
+                    throw new Error('Enter your admin token to load the post list');
+                }
+                return res.json();
+            })
             .then(function(data) {
                 if (!data.posts) {
                     throw new Error(data.error || 'Failed to load posts');
@@ -1043,6 +1059,10 @@
     }
 
     function startEdit(id) {
+        if (!isValidPostId(id)) {
+            setStatus('Invalid post id', 'error');
+            return;
+        }
         const post = postListData && postListData.posts.find(function(p) { return p.id === id; });
         setStatus('Loading post…', '');
         fetch('/blog/' + id + '.md?ts=' + Date.now())
@@ -1078,7 +1098,7 @@
                 setEditLabel('Editing: ' + (fm.title || (post ? post.title : id) || id));
                 publishBtn.innerHTML = '<i class="fa-solid fa-pen"></i> Update Post';
                 hidePreview();
-                setStatus('Editing "' + escapeHtml(fm.title || id) + '" — Publish updates the existing post', 'success');
+                setStatus('Editing "' + (fm.title || id) + '" — Publish updates the existing post', 'success');
                 updateCount();
                 scheduleDraftSave();
             })
@@ -1105,6 +1125,10 @@
     }
 
     function togglePin(id) {
+        if (!isValidPostId(id)) {
+            setStatus('Invalid post id', 'error');
+            return;
+        }
         const token = getToken();
         if (!token) {
             setStatus('Enter your admin token first', 'error');
@@ -1122,7 +1146,7 @@
                 if (!result.ok) {
                     throw new Error(result.error || 'Pin failed');
                 }
-                setStatus((pinned ? 'Pinned "' : 'Unpinned "') + escapeHtml(post ? post.title : id) + '"', 'success');
+                setStatus((pinned ? 'Pinned "' : 'Unpinned "') + (post ? post.title : id) + '"', 'success');
                 loadPostList();
             })
             .catch(function(err) {
@@ -1131,6 +1155,10 @@
     }
 
     function deletePost(id) {
+        if (!isValidPostId(id)) {
+            setStatus('Invalid post id', 'error');
+            return;
+        }
         const token = getToken();
         if (!token) {
             setStatus('Enter your admin token first', 'error');
@@ -1161,6 +1189,10 @@
     }
 
     function copyPostLink(id) {
+        if (!isValidPostId(id)) {
+            setStatus('Invalid post id', 'error');
+            return;
+        }
         const url = window.location.origin + '/#blog-' + id;
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(url).then(function() {
@@ -1174,6 +1206,10 @@
     }
 
     function openPost(id) {
+        if (!isValidPostId(id)) {
+            setStatus('Invalid post id', 'error');
+            return;
+        }
         window.open('/#blog-' + id, '_blank');
     }
 
@@ -1282,7 +1318,16 @@
             if (saveTimer) clearTimeout(saveTimer);
             saveTimer = null;
             const verb = result.updated ? 'Updated' : 'Published';
-            setStatus(verb + ' "' + escapeHtml(result.title) + '" — Cloudflare Pages is rebuilding. It will appear at <a href="/#blog-' + result.id + '">/#blog-' + result.id + '</a>.' + (warning ? ' ' + warning : ''), 'success');
+            const frag = document.createDocumentFragment();
+            frag.appendChild(document.createTextNode(verb + ' "' + result.title + '" — Cloudflare Pages is rebuilding. It will appear at '));
+            const statusLink = document.createElement('a');
+            statusLink.href = '/#blog-' + result.id;
+            statusLink.textContent = '/#blog-' + result.id;
+            frag.appendChild(statusLink);
+            if (warning) {
+                frag.appendChild(document.createTextNode(' ' + warning));
+            }
+            setStatus(frag, 'success');
             if (result.updated) {
                 setEditLabel('Editing: ' + result.title);
             } else {
@@ -1625,6 +1670,7 @@
             $('admin-token-input').value = '';
             setupTokenUI();
             setStatus('Token saved for this session', 'success');
+            loadPostList();
         });
         $('admin-token-clear').addEventListener('click', function() {
             clearToken();

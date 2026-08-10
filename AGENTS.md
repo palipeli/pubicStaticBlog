@@ -155,10 +155,15 @@ Add a post atomically:
 Alternatively, `admin.html` does all four steps automatically: it serializes the WYSIWYG editor to Markdown,
 and `functions/api/publish.js` commits new media files, the post file, and the manifest entry to `main` in a single commit (Pages auto-rebuilds). Manual
 edits and admin publishes both work; the repo stays the single source of truth. The functions need Cloudflare
-Pages secrets: `ADMIN_TOKEN` (bearer token sent by the admin page) and `GITHUB_TOKEN` (fine-grained PAT with
-Contents read/write on this repo); optional `GITHUB_OWNER`/`GITHUB_REPO`/`GITHUB_BRANCH` (defaults
-`palipeli`/`pubicStaticBlog`/`main`). Service worker routing already passes non-GET requests through, so the
-publish/upload POSTs are never intercepted.
+Pages secrets: `ADMIN_TOKEN` (bearer token sent by the admin page; must be at least 32 chars — shorter values
+fail closed with 503; rotation is supported by setting a comma-separated list during transition) and
+`GITHUB_TOKEN` (fine-grained PAT with Contents read/write on this repo); optional `GITHUB_OWNER`/`GITHUB_REPO`/
+`GITHUB_BRANCH` (defaults `palipeli`/`pubicStaticBlog`/`main`). Optional KV bindings `RATE_LIMIT_KV` and
+`QUOTA_KV` enable per-IP auth-failure lockouts, per-IP GET throttling, and daily publish/upload quotas; all
+endpoints degrade gracefully when the bindings are absent. Both `GET` and `POST /api/posts` require the same
+bearer token; `GET /api/posts` is admin-only and performs GitHub tree reads, so it must never be served to
+unauthenticated clients (the service worker routes `/api/` as network-only). Service worker routing already
+passes non-GET requests through, so the publish/upload POSTs are never intercepted.
 
 The loader fetches `meta.slug`, parses the body, and lets frontmatter override manifest values for
 `title`, `date`, `category`, and `icon`. The parser is deliberately minimal:

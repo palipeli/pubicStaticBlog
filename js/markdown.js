@@ -858,6 +858,14 @@
         html = sanitizeHtml(html);
         return html;
     }
+    function isSafeUrl(value) {
+        const v = String(value).replace(/[\u0000-\u0020\u007f]+/g, '');
+        if (!v || !/^[a-zA-Z][a-zA-Z0-9+.\-]*:/.test(v)) {
+            return true;
+        }
+        const scheme = v.slice(0, v.indexOf(':')).toLowerCase();
+        return scheme === 'http' || scheme === 'https' || scheme === 'mailto';
+    }
     function sanitizeHtml(html) {
         const allowedTags = new Set([
             'p', 'b', 'i', 'em', 'strong', 'a', 'code', 'pre', 'blockquote',
@@ -896,16 +904,16 @@
                 }
                 attrsToRemove.forEach(attrName => el.removeAttribute(attrName));
                 if (tagName === 'a' && el.hasAttribute('href')) {
-                    const href = el.getAttribute('href');
-                    if (href.startsWith('javascript:') || href.startsWith('data:')) {
+                    if (!isSafeUrl(el.getAttribute('href'))) {
                         el.removeAttribute('href');
                     }
                 }
-                if (tagName === 'img' && el.hasAttribute('src')) {
-                    const src = el.getAttribute('src');
-                    if (src.startsWith('javascript:') || src.startsWith('data:')) {
-                        el.removeAttribute('src');
-                    }
+                if (tagName === 'img') {
+                    ['src', 'data-src'].forEach(function(attr) {
+                        if (el.hasAttribute(attr) && !isSafeUrl(el.getAttribute(attr))) {
+                            el.removeAttribute(attr);
+                        }
+                    });
                 }
                 if (tagName === 'input' && el.hasAttribute('type')) {
                     const type = el.getAttribute('type');
@@ -936,7 +944,13 @@
             const [key, ...valueParts] = line.split(':');
             if (key && valueParts.length > 0) {
                 let value = valueParts.join(':').trim();
-                value = value.replace(/^["']|["']$/g, '');
+                const first = value.charAt(0);
+                const last = value.charAt(value.length - 1);
+                if ((first === '"' && last === '"') || (first === "'" && last === "'")) {
+                    value = value.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+                } else {
+                    value = value.replace(/^["']|["']$/g, '');
+                }
                 frontmatter[key.trim()] = value;
             }
         });

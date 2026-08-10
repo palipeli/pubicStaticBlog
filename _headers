@@ -1,0 +1,16 @@
+# Cloudflare Pages headers — admin surface hardening
+# CSP hash covers the inline theme script in admin.html (keep in sync with it).
+/admin.html
+  Content-Security-Policy: default-src 'none'; script-src 'self' 'sha256-gRCGCLoH2gKPoJOpaXFCYNW4vYpiLASue5ZFyTxWiYY='; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: blob:; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Cache-Control: no-store
+
+/js/admin.js
+  X-Content-Type-Options: nosniff
+  Cache-Control: no-cache
+
+/admin.css
+  X-Content-Type-Options: nosniff
+  Cache-Control: no-cache

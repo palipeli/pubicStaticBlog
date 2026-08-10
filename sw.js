@@ -1,6 +1,6 @@
 'use strict';
 const CACHE_NAME = 'pubic-static-blog-v2';
-const STATIC_CACHE_NAME = 'static-assets-v5';
+const STATIC_CACHE_NAME = 'static-assets-v6';
 const IMAGE_CACHE_NAME = 'images-v3';
 const CONTENT_CACHE_NAME = 'blog-content-v2';
 const pendingFetches = new Map();
@@ -93,6 +93,9 @@ function getCacheStrategy(request) {
     }
     if (pathname === '/blog/posts.json') {
         return 'network-first';
+    }
+    if (pathname.startsWith('/api/')) {
+        return 'network-only';
     }
     if (STATIC_EXTENSIONS.test(pathname)) {
         return 'cache-first';

@@ -2,6 +2,8 @@ const API_BASE = 'https://api.github.com';
 const ALLOWED_IMAGE_TYPES = new Set(['image/webp', 'image/png', 'image/jpeg', 'image/gif']);
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 const MAX_IMAGES_PER_POST = 20;
+const MAX_REQUEST_BYTES = 45 * 1024 * 1024;
+const MAX_TOTAL_IMAGE_BYTES = 30 * 1024 * 1024;
 const UPLOAD_PLACEHOLDER = '/__upload__/';
 
 function json(data, status) {
@@ -12,22 +14,62 @@ function json(data, status) {
 }
 
 function secureCompare(a, b) {
-    if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) {
+    if (typeof a !== 'string' || typeof b !== 'string') {
         return false;
     }
-    let diff = 0;
-    for (let i = 0; i < a.length; i++) {
-        diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+    let diff = a.length ^ b.length;
+    const len = Math.max(a.length, b.length);
+    for (let i = 0; i < len; i++) {
+        diff |= (i < a.length ? a.charCodeAt(i) : 0) ^ (i < b.length ? b.charCodeAt(i) : 0);
     }
     return diff === 0;
 }
 
 function isAuthorized(request, env) {
-    const expected = 'Bearer ' + (env.ADMIN_TOKEN || '');
-    if (expected.length <= 7) {
+    const provided = request.headers.get('Authorization') || '';
+    const tokens = String(env.ADMIN_TOKEN || '').split(',').map(function(t) { return t.trim(); }).filter(Boolean);
+    return tokens.some(function(t) {
+        return secureCompare(provided, 'Bearer ' + t);
+    });
+}
+
+function authMisconfigured(env) {
+    const tokens = String(env.ADMIN_TOKEN || '').split(',').map(function(t) { return t.trim(); }).filter(Boolean);
+    return !tokens.length || tokens.some(function(t) { return t.length < 32; });
+}
+
+async function authFailureRateLimited(env, request) {
+    if (!env.RATE_LIMIT_KV) {
         return false;
     }
-    return secureCompare(request.headers.get('Authorization') || '', expected);
+    const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
+    const bucket = Math.floor(Date.now() / 1000 / 900);
+    const key = 'authfail:' + ip + ':' + bucket;
+    const count = parseInt((await env.RATE_LIMIT_KV.get(key)) || '0', 10);
+    if (count >= 10) {
+        return true;
+    }
+    await env.RATE_LIMIT_KV.put(key, String(count + 1), {expirationTtl: 901});
+    return false;
+}
+
+async function checkDailyQuota(env, scope, limit) {
+    if (!env.QUOTA_KV) {
+        return false;
+    }
+    const day = new Date().toISOString().slice(0, 10);
+    const count = parseInt((await env.QUOTA_KV.get('quota:' + scope + ':' + day)) || '0', 10);
+    return count >= limit;
+}
+
+async function recordDailyQuota(env, scope) {
+    if (!env.QUOTA_KV) {
+        return;
+    }
+    const day = new Date().toISOString().slice(0, 10);
+    const key = 'quota:' + scope + ':' + day;
+    const count = parseInt((await env.QUOTA_KV.get(key)) || '0', 10);
+    await env.QUOTA_KV.put(key, String(count + 1), {expirationTtl: 90000});
 }
 
 function githubHeaders(token) {
@@ -67,12 +109,19 @@ function slugify(str) {
     return base || 'post';
 }
 
+function escapeFrontmatterValue(value) {
+    return String(value)
+        .replace(/[\u0000-\u001f\u007f]/g, ' ')
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"');
+}
+
 function buildFrontmatter(fields) {
     return '---\n' +
-        'title: "' + fields.title + '"\n' +
-        'date: "' + fields.date + '"\n' +
-        'category: "' + fields.category + '"\n' +
-        'icon: "' + fields.icon + '"\n' +
+        'title: "' + escapeFrontmatterValue(fields.title) + '"\n' +
+        'date: "' + escapeFrontmatterValue(fields.date) + '"\n' +
+        'category: "' + escapeFrontmatterValue(fields.category) + '"\n' +
+        'icon: "' + escapeFrontmatterValue(fields.icon) + '"\n' +
         '---\n\n';
 }
 
@@ -106,7 +155,8 @@ async function githubGet(env, path) {
         return {notFound: true};
     }
     if (!response.ok) {
-        return {error: 'GitHub GET ' + path + ' failed: ' + response.status, status: 502};
+        console.error('GitHub GET ' + path + ' failed: ' + response.status);
+        return {error: 'GitHub request failed', status: 502};
     }
     return response.json();
 }
@@ -126,12 +176,76 @@ async function githubApi(env, method, path, body) {
         } catch (err) {
             // ignore parse failure
         }
+        console.error('GitHub ' + method + ' ' + path + ' failed: ' + response.status + (detail ? ' - ' + detail : ''));
         return {
-            error: 'GitHub ' + method + ' ' + path + ' failed: ' + response.status + (detail ? ' - ' + detail : ''),
+            error: 'GitHub request failed',
             status: 502
         };
     }
     return response.json();
+}
+
+function checkImageDimensions(bytes, mime) {
+    const MAX_DIMENSION = 8192;
+    const MAX_PIXELS = 30000000;
+    let width = 0;
+    let height = 0;
+    if (mime === 'image/png') {
+        if (bytes.length < 24) return true;
+        width = bytes[16] * 16777216 + bytes[17] * 65536 + bytes[18] * 256 + bytes[19];
+        height = bytes[20] * 16777216 + bytes[21] * 65536 + bytes[22] * 256 + bytes[23];
+    } else if (mime === 'image/gif') {
+        if (bytes.length < 10) return true;
+        width = bytes[6] | (bytes[7] << 8);
+        height = bytes[8] | (bytes[9] << 8);
+    } else if (mime === 'image/jpeg') {
+        let i = 2;
+        while (i + 9 < bytes.length) {
+            if (bytes[i] !== 0xFF) {
+                i++;
+                continue;
+            }
+            const marker = bytes[i + 1];
+            if (marker === 0x00 || marker === 0xFF) {
+                i += 2;
+                continue;
+            }
+            if (marker === 0xD8 || marker === 0x01 || (marker >= 0xD0 && marker <= 0xD7)) {
+                i += 2;
+                continue;
+            }
+            if (marker >= 0xC0 && marker <= 0xCF && marker !== 0xC4 && marker !== 0xC8 && marker !== 0xCC) {
+                height = (bytes[i + 5] << 8) | bytes[i + 6];
+                width = (bytes[i + 7] << 8) | bytes[i + 8];
+                break;
+            }
+            const segLen = (bytes[i + 2] << 8) | bytes[i + 3];
+            if (segLen < 2) break;
+            i += 2 + segLen;
+        }
+    } else if (mime === 'image/webp') {
+        if (bytes.length < 30) return true;
+        const fourcc = String.fromCharCode(bytes[12], bytes[13], bytes[14], bytes[15]);
+        if (fourcc === 'VP8X') {
+            width = 1 + (bytes[24] * 65536 + bytes[25] * 256 + bytes[26]);
+            height = 1 + (bytes[28] * 65536 + bytes[29] * 256 + bytes[30]);
+        } else if (fourcc === 'VP8L') {
+            const v = bytes[21] + bytes[22] * 256 + bytes[23] * 65536 + bytes[24] * 16777216;
+            width = 1 + (v % 16384);
+            height = 1 + (Math.floor(v / 16384) % 16384);
+        } else if (fourcc === 'VP8 ') {
+            width = bytes[23] | ((bytes[24] & 0x3F) << 8);
+            height = bytes[25] | ((bytes[26] & 0x3F) << 8);
+        } else {
+            return true;
+        }
+    } else {
+        return true;
+    }
+    if (!width || !height) {
+        return true;
+    }
+    return width <= MAX_DIMENSION && height <= MAX_DIMENSION && width * height <= MAX_PIXELS;
 }
 
 function parseImage(raw, index) {
@@ -165,6 +279,9 @@ function parseImage(raw, index) {
     }
     if (!sniffImage(bytes, mime)) {
         return {error: 'images[' + index + ']: file contents do not match ' + mime};
+    }
+    if (!checkImageDimensions(bytes, mime)) {
+        return {error: 'images[' + index + ']: image dimensions are too large (max 8192x8192, 30MP)'};
     }
     return {ok: true, token: token, name: name, mime: mime, base64Data: base64Data};
 }
@@ -212,38 +329,62 @@ async function githubCreateBlob(env, base64Content) {
 }
 
 async function commitAll(env, message, entries) {
-    const branch = env.GITHUB_BRANCH || 'main';
-    const ref = await githubApi(env, 'GET', 'git/ref/heads/' + branch);
-    if (ref.error) return ref;
-    const current = await githubApi(env, 'GET', 'git/commits/' + ref.object.sha);
-    if (current.error) return current;
-    const tree = await githubApi(env, 'POST', 'git/trees', {
-        base_tree: current.tree.sha,
-        tree: entries
-    });
-    if (tree.error) return tree;
-    const commit = await githubApi(env, 'POST', 'git/commits', {
-        message: message,
-        tree: tree.sha,
-        parents: [current.sha]
-    });
-    if (commit.error) return commit;
-    const update = await githubApi(env, 'PATCH', 'git/refs/heads/' + branch, {
-        sha: commit.sha,
-        force: false
-    });
-    if (update.error) return update;
-    return {ok: true, sha: commit.sha};
+    for (let attempt = 0; attempt < 2; attempt++) {
+        const branch = env.GITHUB_BRANCH || 'main';
+        const ref = await githubApi(env, 'GET', 'git/ref/heads/' + branch);
+        if (ref.error) return ref;
+        const current = await githubApi(env, 'GET', 'git/commits/' + ref.object.sha);
+        if (current.error) return current;
+        const tree = await githubApi(env, 'POST', 'git/trees', {
+            base_tree: current.tree.sha,
+            tree: entries
+        });
+        if (tree.error) return tree;
+        const commit = await githubApi(env, 'POST', 'git/commits', {
+            message: message,
+            tree: tree.sha,
+            parents: [current.sha]
+        });
+        if (commit.error) return commit;
+        const update = await githubApi(env, 'PATCH', 'git/refs/heads/' + branch, {
+            sha: commit.sha,
+            force: false
+        });
+        if (update.error) {
+            if (attempt === 0 && (update.status === 409 || update.status === 422)) {
+                continue;
+            }
+            return update;
+        }
+        return {ok: true, sha: commit.sha};
+    }
 }
 
 export async function onRequestPost(context) {
     const {request, env} = context;
 
+    if (authMisconfigured(env)) {
+        return json({error: 'Server auth is misconfigured: set ADMIN_TOKEN (min 32 chars) and restart'}, 503);
+    }
     if (!isAuthorized(request, env)) {
+        if (await authFailureRateLimited(env, request)) {
+            return json({error: 'Too many failed attempts, try again later'}, 429);
+        }
         return json({error: 'Unauthorized'}, 401);
     }
     if (!env.GITHUB_TOKEN) {
         return json({error: 'Server is missing the GITHUB_TOKEN secret'}, 500);
+    }
+    const contentType = request.headers.get('Content-Type') || '';
+    if (!contentType.includes('application/json')) {
+        return json({error: 'Content-Type must be application/json'}, 415);
+    }
+    const contentLength = Number(request.headers.get('Content-Length') || 0);
+    if (contentLength > MAX_REQUEST_BYTES) {
+        return json({error: 'Request body too large'}, 413);
+    }
+    if (await checkDailyQuota(env, 'publish', 60)) {
+        return json({error: 'Daily publish quota reached, try again tomorrow'}, 429);
     }
 
     let payload;
@@ -274,12 +415,17 @@ export async function onRequestPost(context) {
         return json({error: 'Too many images in one post (max ' + MAX_IMAGES_PER_POST + ')'}, 413);
     }
     const images = [];
+    let totalImageBytes = 0;
     for (let i = 0; i < rawImages.length; i++) {
         const parsed = parseImage(rawImages[i], i);
         if (parsed.error) {
             return json({error: parsed.error}, 400);
         }
+        totalImageBytes += parsed.base64Data.length;
         images.push(parsed);
+    }
+    if (totalImageBytes > MAX_TOTAL_IMAGE_BYTES) {
+        return json({error: 'Total image payload too large (max 30MB)'}, 413);
     }
 
     const manifestGet = await githubGet(env, 'blog/posts.json');
@@ -382,6 +528,7 @@ export async function onRequestPost(context) {
         return {token: image.token, name: media.names[index], url: '/media/' + media.names[index]};
     });
 
+    await recordDailyQuota(env, 'publish');
     return json({
         ok: true,
         id: postId,
