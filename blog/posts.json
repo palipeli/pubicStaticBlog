@@ -56,14 +56,6 @@
     "icon": "🔒"
   },
   {
-    "id": "this-is-test-2",
-    "slug": "/blog/this-is-test-2.md",
-    "title": "This is test",
-    "date": "2026-08-10",
-    "category": "test",
-    "icon": "📄"
-  },
-  {
     "id": "test1",
     "slug": "/blog/test1.md",
     "title": "test1",
