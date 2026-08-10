@@ -78,5 +78,13 @@
     "date": "2026-08-10",
     "category": "hell",
     "icon": "😭"
+  },
+  {
+    "id": "hell-hell",
+    "slug": "/blog/hell-hell.md",
+    "title": "hell hell",
+    "date": "2026-08-10",
+    "category": "hell",
+    "icon": "📄"
   }
 ]
