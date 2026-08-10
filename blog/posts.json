@@ -54,5 +54,13 @@
     "date": "Mar 25 2026",
     "category": "Legal",
     "icon": "🔒"
+  },
+  {
+    "id": "shalom-new-post-management-and-image-upload",
+    "slug": "/blog/shalom-new-post-management-and-image-upload.md",
+    "title": "SHALOM! New Post Management and Image Upload",
+    "date": "2026-08-10",
+    "category": "Update",
+    "icon": "🇮🇱"
   }
 ]
