@@ -24,6 +24,11 @@
 
     function $(id) { return document.getElementById(id); }
 
+    function setEditLabel(text) {
+        const label = $('admin-edit-label') || $('admin-edit-title');
+        if (label) label.textContent = text;
+    }
+
     function escapeHtml(str) {
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
@@ -829,7 +834,7 @@
                 });
                 deselectImage();
                 editingId = id;
-                $('admin-edit-label').textContent = 'Editing: ' + (fm.title || (post ? post.title : id) || id);
+                setEditLabel('Editing: ' + (fm.title || (post ? post.title : id) || id));
                 publishBtn.innerHTML = '<i class="fa-solid fa-pen"></i> Update Post';
                 outputEl.hidden = true;
                 $('admin-preview-btn').textContent = 'View markdown';
@@ -846,7 +851,7 @@
         editingId = null;
         editingOriginalDate = null;
         deselectImage();
-        $('admin-edit-label').textContent = 'New post';
+        setEditLabel('New post');
         publishBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Publish';
         $('post-title').value = '';
         $('post-category').value = '';
@@ -1011,7 +1016,7 @@
             const verb = result.updated ? 'Updated' : 'Published';
             setStatus(verb + ' "' + escapeHtml(result.title) + '" — Cloudflare Pages is rebuilding. It will appear at <a href="/#blog-' + result.id + '">/#blog-' + result.id + '</a>.' + (warning ? ' ' + warning : ''), 'success');
             if (result.updated) {
-                $('admin-edit-label').textContent = 'Editing: ' + result.title;
+                setEditLabel('Editing: ' + result.title);
             } else {
                 resetEditor();
             }
