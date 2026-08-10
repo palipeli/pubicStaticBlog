@@ -3,7 +3,11 @@ const API_BASE = 'https://api.github.com';
 function json(data, status) {
     return new Response(JSON.stringify(data), {
         status: status || 200,
-        headers: {'Content-Type': 'application/json; charset=utf-8'}
+        headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Cache-Control': 'no-store',
+            'X-Content-Type-Options': 'nosniff'
+        }
     });
 }
 
