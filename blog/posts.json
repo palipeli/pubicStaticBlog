@@ -78,5 +78,13 @@
     "date": "2026-08-10",
     "category": "blog",
     "icon": "📄"
+  },
+  {
+    "id": "hello-world-2",
+    "slug": "/blog/hello-world-2.md",
+    "title": "Hello world",
+    "date": "2026-08-10",
+    "category": "blog",
+    "icon": "📄"
   }
 ]
