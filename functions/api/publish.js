@@ -144,11 +144,8 @@ export async function onRequestPost(context) {
     }
     const category = String(payload.category || 'Blog').trim().replace(/\s+/g, ' ').slice(0, 60) || 'Blog';
     const icon = String(payload.icon || '📄').trim().slice(0, 8) || '📄';
-    const date = /^\d{4}-\d{2}-\d{2}$/.test(String(payload.date || ''))
-        ? String(payload.date)
-        : new Date().toISOString().slice(0, 10);
-
-    const baseId = slugify(title);
+    const date = String(payload.date || '').trim().slice(0, 50) || new Date().toISOString().slice(0, 10);
+    const editId = /^[a-z0-9-]{1,80}$/.test(String(payload.id || '')) ? String(payload.id) : null;
 
     const manifestGet = await githubGet(env, 'blog/posts.json');
     if (manifestGet.error) {
@@ -168,28 +165,62 @@ export async function onRequestPost(context) {
         manifestSha = manifestGet.sha;
     }
 
-    const existingIds = new Set(posts.map(function(p) { return p && p.id; }));
-    let postId = baseId;
-    let suffix = 2;
-    while (existingIds.has(postId)) {
-        postId = baseId + '-' + suffix;
-        suffix++;
-    }
-
-    const slug = '/blog/' + postId + '.md';
     const markdown = buildFrontmatter({title: title, date: date, category: category, icon: icon}) + content + '\n';
 
-    const mdWrite = await githubPut(env, 'blog/' + postId + '.md', utf8ToBase64(markdown), null, 'chore(blog): add post ' + postId);
+    let postId = null;
+    let slug = null;
+    let updated = false;
+    let mdSha = null;
+
+    if (editId) {
+        const existing = posts.find(function(p) { return p && p.id === editId; });
+        if (!existing) {
+            return json({error: 'Post "' + editId + '" is not in the manifest'}, 404);
+        }
+        const fileGet = await githubGet(env, 'blog/' + editId + '.md');
+        if (fileGet.notFound) {
+            return json({error: 'blog/' + editId + '.md is not on GitHub'}, 404);
+        }
+        if (fileGet.error) {
+            return json(fileGet, fileGet.status);
+        }
+        postId = editId;
+        slug = existing.slug || '/blog/' + editId + '.md';
+        mdSha = fileGet.sha;
+        updated = true;
+    } else {
+        const baseId = slugify(title);
+        const existingIds = new Set(posts.map(function(p) { return p && p.id; }));
+        postId = baseId;
+        let suffix = 2;
+        while (existingIds.has(postId)) {
+            postId = baseId + '-' + suffix;
+            suffix++;
+        }
+        slug = '/blog/' + postId + '.md';
+    }
+
+    const mdWrite = await githubPut(env, 'blog/' + postId + '.md', utf8ToBase64(markdown), mdSha, updated ? 'chore(blog): update post ' + postId : 'chore(blog): add post ' + postId);
     if (mdWrite.error) {
         return json(mdWrite, mdWrite.status);
     }
 
-    posts.push({id: postId, slug: slug, title: title, date: date, category: category, icon: icon});
+    if (updated) {
+        const entry = posts.find(function(p) { return p.id === postId; });
+        if (entry) {
+            entry.title = title;
+            entry.date = date;
+            entry.category = category;
+            entry.icon = icon;
+        }
+    } else {
+        posts.push({id: postId, slug: slug, title: title, date: date, category: category, icon: icon});
+    }
     const manifestJson = JSON.stringify(posts, null, 2) + '\n';
-    const manifestWrite = await githubPut(env, 'blog/posts.json', utf8ToBase64(manifestJson), manifestSha, 'chore(blog): register post ' + postId);
+    const manifestWrite = await githubPut(env, 'blog/posts.json', utf8ToBase64(manifestJson), manifestSha, updated ? 'chore(blog): update manifest for ' + postId : 'chore(blog): register post ' + postId);
     if (manifestWrite.error) {
         return json(manifestWrite, manifestWrite.status);
     }
 
-    return json({ok: true, id: postId, slug: slug, title: title, date: date});
+    return json({ok: true, id: postId, slug: slug, title: title, date: date, updated: updated});
 }

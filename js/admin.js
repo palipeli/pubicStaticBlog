@@ -14,6 +14,9 @@
     let countEl = null;
     let imageInput = null;
     let saveTimer = null;
+    let postListData = null;
+    let editingId = null;
+    let editingOriginalDate = null;
 
     function $(id) { return document.getElementById(id); }
 
@@ -45,9 +48,16 @@
         document.cookie = 'theme_preference=' + theme + ';expires=' + d.toUTCString() + ';path=/';
     }
 
+    function resolveTheme(theme) {
+        if (theme === 'auto') {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        return theme;
+    }
+
     function cycleTheme() {
         const next = THEME_ORDER[(THEME_ORDER.indexOf(getSavedTheme()) + 1) % THEME_ORDER.length];
-        document.documentElement.setAttribute('data-theme', next);
+        document.documentElement.setAttribute('data-theme', resolveTheme(next));
         setThemeCookie(next);
         updateThemeBtn();
     }
@@ -524,6 +534,247 @@
         }
     }
 
+    function loadPostList() {
+        const container = $('admin-posts-list');
+        fetch('/api/posts')
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (!data.posts) {
+                    throw new Error(data.error || 'Failed to load posts');
+                }
+                postListData = data;
+                renderPostList(data);
+                const count = data.posts.length;
+                const orphanNote = data.orphans && data.orphans.length ? ' · ' + data.orphans.length + ' unlisted' : '';
+                $('admin-sidebar-status').textContent = count + ' post' + (count === 1 ? '' : 's') + orphanNote;
+            })
+            .catch(function(err) {
+                container.innerHTML = '<div class="admin-posts-empty">Could not load posts: ' + escapeHtml(err.message) + '</div>';
+            });
+    }
+
+    function renderPostList(data) {
+        const container = $('admin-posts-list');
+        container.innerHTML = '';
+        const sorted = (data.posts || []).slice().sort(function(a, b) {
+            return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || new Date(b.date) - new Date(a.date);
+        });
+        sorted.forEach(function(post) {
+            container.appendChild(buildPostItem(post, false));
+        });
+        if (data.orphans && data.orphans.length) {
+            const heading = document.createElement('div');
+            heading.className = 'admin-posts-group';
+            heading.textContent = 'Unlisted (in repo only)';
+            container.appendChild(heading);
+            data.orphans.forEach(function(id) {
+                container.appendChild(buildPostItem({
+                    id: id, title: id, date: '', category: '', icon: '📄', pinned: false, onGithub: true
+                }, true));
+            });
+        }
+        if (!sorted.length && (!data.orphans || !data.orphans.length)) {
+            container.innerHTML = '<div class="admin-posts-empty">No posts yet. Write something!</div>';
+        }
+    }
+
+    function buildPostItem(post, orphan) {
+        const item = document.createElement('div');
+        item.className = 'admin-post-item' + (orphan ? ' is-orphan' : '');
+        const statusClass = orphan ? 'orphan' : (post.onGithub ? 'ok' : 'missing');
+        const statusLabel = orphan ? 'In repo, unlisted' : (post.onGithub ? 'Published on GitHub' : 'Not on GitHub');
+        const head = document.createElement('div');
+        head.className = 'admin-post-head';
+        head.innerHTML =
+            '<span class="admin-post-icon">' + escapeHtml(post.icon || '📄') + '</span>' +
+            '<div class="admin-post-meta">' +
+                '<div class="admin-post-title">' + escapeHtml(post.title || post.id) + '</div>' +
+                '<div class="admin-post-date">' + escapeHtml(post.date || '') + '</div>' +
+            '</div>' +
+            '<span class="admin-post-status" title="' + statusLabel + '"><span class="admin-status-dot ' + statusClass + '"></span>' + statusLabel + '</span>';
+        item.appendChild(head);
+        const actions = document.createElement('div');
+        actions.className = 'admin-post-actions';
+        if (orphan) {
+            actions.appendChild(actionBtn('Copy', 'copy', post.id));
+            actions.appendChild(actionBtn('Open', 'open', post.id));
+        } else {
+            actions.appendChild(actionBtn('Edit', 'edit', post.id));
+            actions.appendChild(actionBtn(post.pinned ? 'Unpin' : 'Pin', 'pin', post.id, false, post.pinned));
+            actions.appendChild(actionBtn('Copy', 'copy', post.id));
+            actions.appendChild(actionBtn('Open', 'open', post.id));
+            actions.appendChild(actionBtn('Delete', 'delete', post.id, true));
+        }
+        item.appendChild(actions);
+        return item;
+    }
+
+    function actionBtn(label, action, id, danger, active) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'admin-post-action' + (danger ? ' danger' : '') + (active ? ' active' : '');
+        btn.textContent = label;
+        btn.dataset.action = action;
+        btn.dataset.id = id;
+        return btn;
+    }
+
+    function handlePostListClick(e) {
+        const btn = e.target.closest ? e.target.closest('.admin-post-action') : null;
+        if (!btn) return;
+        const action = btn.getAttribute('data-action');
+        const id = btn.getAttribute('data-id');
+        if (action === 'edit') startEdit(id);
+        else if (action === 'pin') togglePin(id);
+        else if (action === 'delete') deletePost(id);
+        else if (action === 'copy') copyPostLink(id);
+        else if (action === 'open') openPost(id);
+    }
+
+    function startEdit(id) {
+        const post = postListData && postListData.posts.find(function(p) { return p.id === id; });
+        setStatus('Loading post…', '');
+        fetch('/blog/' + id + '.md?ts=' + Date.now())
+            .then(function(res) {
+                if (!res.ok) throw new Error('Failed to fetch post (' + res.status + ')');
+                return res.text();
+            })
+            .then(function(md) {
+                const parsed = window.parseFrontmatter(md);
+                const fm = parsed.frontmatter;
+                $('post-title').value = fm.title || (post ? post.title : '') || '';
+                $('post-category').value = fm.category || 'Blog';
+                $('post-icon').value = fm.icon || '📄';
+                const fmDate = fm.date || (post ? post.date : '') || '';
+                if (/^\d{4}-\d{2}-\d{2}$/.test(fmDate)) {
+                    $('post-date').value = fmDate;
+                    editingOriginalDate = null;
+                } else {
+                    $('post-date').value = '';
+                    editingOriginalDate = fmDate || null;
+                }
+                editor.innerHTML = typeof window.parseMarkdown === 'function' ? window.parseMarkdown(parsed.content) : parsed.content;
+                editingId = id;
+                $('admin-edit-title').textContent = fm.title || (post ? post.title : id) || id;
+                $('admin-edit-banner').hidden = false;
+                publishBtn.innerHTML = '<i class="fa-solid fa-pen"></i> Update Post';
+                outputEl.hidden = true;
+                $('admin-preview-btn').textContent = 'View markdown';
+                setStatus('Editing "' + escapeHtml(fm.title || id) + '" — Publish updates the existing post', 'success');
+                updateCount();
+                scheduleDraftSave();
+            })
+            .catch(function(err) {
+                setStatus('Edit error: ' + err.message, 'error');
+            });
+    }
+
+    function resetEditor() {
+        editingId = null;
+        editingOriginalDate = null;
+        $('admin-edit-banner').hidden = true;
+        $('admin-edit-title').textContent = '';
+        publishBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Publish';
+        $('post-title').value = '';
+        $('post-category').value = '';
+        $('post-icon').value = '📝';
+        $('post-date').value = new Date().toISOString().slice(0, 10);
+        editor.innerHTML = '';
+        outputEl.hidden = true;
+        $('admin-preview-btn').textContent = 'View markdown';
+        updateCount();
+        editor.focus();
+    }
+
+    function togglePin(id) {
+        const token = getToken();
+        if (!token) {
+            setStatus('Enter your admin token first', 'error');
+            return;
+        }
+        const post = postListData && postListData.posts.find(function(p) { return p.id === id; });
+        const pinned = post ? !post.pinned : true;
+        fetch('/api/posts', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token},
+            body: JSON.stringify({action: 'pin', id: id, pinned: pinned})
+        })
+            .then(function(res) { return res.json(); })
+            .then(function(result) {
+                if (!result.ok) {
+                    throw new Error(result.error || 'Pin failed');
+                }
+                setStatus((pinned ? 'Pinned "' : 'Unpinned "') + escapeHtml(post ? post.title : id) + '"', 'success');
+                loadPostList();
+            })
+            .catch(function(err) {
+                setStatus('Pin error: ' + err.message, 'error');
+            });
+    }
+
+    function deletePost(id) {
+        const token = getToken();
+        if (!token) {
+            setStatus('Enter your admin token first', 'error');
+            return;
+        }
+        if (!window.confirm('Delete "' + id + '" from GitHub and the post list? Git history keeps the file, but the published post is removed.')) {
+            return;
+        }
+        fetch('/api/posts', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token},
+            body: JSON.stringify({action: 'delete', id: id})
+        })
+            .then(function(res) { return res.json(); })
+            .then(function(result) {
+                if (!result.ok) {
+                    throw new Error(result.error || 'Delete failed');
+                }
+                setStatus('Deleted "' + id + '"', 'success');
+                if (editingId === id) {
+                    resetEditor();
+                }
+                loadPostList();
+            })
+            .catch(function(err) {
+                setStatus('Delete error: ' + err.message, 'error');
+            });
+    }
+
+    function copyPostLink(id) {
+        const url = window.location.origin + '/#blog-' + id;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(function() {
+                setStatus('Link copied: ' + url, 'success');
+            }, function() {
+                setStatus('Link: ' + url, '');
+            });
+        } else {
+            setStatus('Link: ' + url, '');
+        }
+    }
+
+    function openPost(id) {
+        window.open('/#blog-' + id, '_blank');
+    }
+
+    function setupSidebar() {
+        $('admin-posts-refresh').addEventListener('click', loadPostList);
+        $('admin-posts-new').addEventListener('click', function() {
+            resetEditor();
+            setStatus('New post', '');
+        });
+        $('admin-edit-cancel').addEventListener('click', function() {
+            resetEditor();
+            setStatus('Edit cancelled', '');
+        });
+        $('admin-sidebar-toggle').addEventListener('click', function() {
+            $('admin-sidebar').classList.toggle('open');
+        });
+        $('admin-posts-list').addEventListener('click', handlePostListClick);
+    }
+
     function roundTripWarning(markdown) {
         if (typeof window.parseMarkdown !== 'function') return '';
         try {
@@ -539,7 +790,10 @@
         const title = $('post-title').value.trim();
         const category = $('post-category').value.trim() || 'Blog';
         const icon = $('post-icon').value.trim() || '📄';
-        const date = $('post-date').value || new Date().toISOString().slice(0, 10);
+        let date = $('post-date').value;
+        if (!date && editingOriginalDate) {
+            date = editingOriginalDate;
+        }
         const content = serializeEditor().trim();
         const token = getToken();
 
@@ -563,10 +817,14 @@
         publishBtn.disabled = true;
         setStatus('Publishing…', '');
         try {
+            const payload = {title: title, category: category, icon: icon, date: date, content: content};
+            if (editingId) {
+                payload.id = editingId;
+            }
             const res = await fetch(PUBLISH_URL, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token},
-                body: JSON.stringify({title: title, category: category, icon: icon, date: date, content: content})
+                body: JSON.stringify(payload)
             });
             const result = await res.json();
             if (!res.ok || !result.ok) {
@@ -577,7 +835,14 @@
             $('admin-discard-btn').hidden = true;
             outputEl.hidden = true;
             $('admin-preview-btn').textContent = 'View markdown';
-            setStatus('Published "' + escapeHtml(result.title) + '" — Cloudflare Pages is rebuilding. It will appear at <a href="/#blog-' + result.id + '">/#blog-' + result.id + '</a>.' + (warning ? ' ' + warning : ''), 'success');
+            const verb = result.updated ? 'Updated' : 'Published';
+            setStatus(verb + ' "' + escapeHtml(result.title) + '" — Cloudflare Pages is rebuilding. It will appear at <a href="/#blog-' + result.id + '">/#blog-' + result.id + '</a>.' + (warning ? ' ' + warning : ''), 'success');
+            if (result.updated) {
+                $('admin-edit-title').textContent = result.title;
+            } else {
+                resetEditor();
+            }
+            loadPostList();
         } catch (err) {
             setStatus('Publish error: ' + err.message, 'error');
         } finally {
@@ -805,15 +1070,21 @@
             // older browsers keep div paragraphs; the serializer handles both
         }
 
-        document.documentElement.setAttribute('data-theme', getSavedTheme());
+        document.documentElement.setAttribute('data-theme', resolveTheme(getSavedTheme()));
         updateThemeBtn();
         $('admin-theme-btn').addEventListener('click', cycleTheme);
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+            if (getSavedTheme() === 'auto') {
+                document.documentElement.setAttribute('data-theme', resolveTheme('auto'));
+            }
+        });
 
         if (!$('post-date').value) {
             $('post-date').value = new Date().toISOString().slice(0, 10);
         }
 
         setupTokenUI();
+        setupSidebar();
         $('admin-toolbar').addEventListener('click', handleToolbarClick);
         $('admin-publish-btn').addEventListener('click', publish);
         $('admin-preview-btn').addEventListener('click', togglePreview);
@@ -843,6 +1114,7 @@
             setStatus('Draft restored', 'success');
         }
         editor.focus();
+        loadPostList();
     }
 
     document.addEventListener('DOMContentLoaded', init);

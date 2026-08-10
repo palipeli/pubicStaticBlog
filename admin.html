@@ -12,7 +12,10 @@
         (function() {
             var match = document.cookie.match(/theme_preference=([^;]+)/);
             var saved = match ? match[1] : 'auto';
-            document.documentElement.setAttribute('data-theme', saved);
+            var resolved = saved === 'auto'
+                ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                : saved;
+            document.documentElement.setAttribute('data-theme', resolved);
         })();
     </script>
 </head>
@@ -76,6 +79,11 @@
             <button type="button" class="admin-tool" data-cmd="undo" title="Undo (Ctrl+Z)"><i class="fa-solid fa-rotate-left"></i></button>
             <button type="button" class="admin-tool" data-cmd="redo" title="Redo (Ctrl+Shift+Z)"><i class="fa-solid fa-rotate-right"></i></button>
         </div>
+        <div class="admin-edit-banner" id="admin-edit-banner" hidden>
+            <span>Editing: <strong id="admin-edit-title"></strong></span>
+            <button type="button" class="admin-btn admin-btn-small" id="admin-edit-cancel">Cancel</button>
+        </div>
+
         <div class="admin-editor-wrap">
             <div class="blog-article">
                 <div class="blog-post-content admin-editor" id="post-editor" contenteditable="true" spellcheck="true" data-placeholder="Start writing…"></div>
@@ -97,6 +105,21 @@
 
         <input type="file" id="admin-image-input" accept="image/webp,image/png,image/jpeg,image/gif" hidden>
     </div>
+
+    <div class="admin-sidebar" id="admin-sidebar" aria-label="Post management">
+        <div class="admin-sidebar-header">
+            <span class="admin-sidebar-title">Posts</span>
+            <div class="admin-sidebar-actions">
+                <button type="button" class="admin-btn admin-btn-small" id="admin-posts-refresh" title="Refresh post list"><i class="fa-solid fa-arrows-rotate"></i></button>
+                <button type="button" class="admin-btn admin-btn-small admin-btn-primary" id="admin-posts-new" title="New post"><i class="fa-solid fa-plus"></i></button>
+            </div>
+        </div>
+        <div class="admin-posts-list" id="admin-posts-list">
+            <div class="admin-posts-empty">Loading posts…</div>
+        </div>
+        <div class="admin-sidebar-status" id="admin-sidebar-status"></div>
+    </div>
+    <button type="button" class="admin-sidebar-toggle" id="admin-sidebar-toggle" title="Toggle post list" hidden><i class="fa-solid fa-list-ul"></i></button>
 
     <script src="js/markdown.js"></script>
     <script src="js/admin.js"></script>

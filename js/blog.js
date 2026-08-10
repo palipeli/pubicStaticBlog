@@ -23,9 +23,10 @@
                 date: meta.date || '',
                 category: meta.category || 'Uncategorized',
                 icon: meta.icon || '📄',
+                pinned: !!meta.pinned,
                 _contentLoaded: false
             }));
-            blogPostMetadata = blogPostMetadata.sort((a, b) => new Date(b.date) - new Date(a.date));
+            blogPostMetadata = blogPostMetadata.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || new Date(b.date) - new Date(a.date));
             window.blogPostMetadata = blogPostMetadata;
             document.dispatchEvent(new CustomEvent('blog:metadata-loaded', {detail: blogPostMetadata}));
             return blogPostMetadata;
