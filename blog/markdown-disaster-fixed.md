@@ -1,4 +1,11 @@
-Hi everyone, it's me again. So, you know how I was trying to be all smart and technical with the website? Yeah, well... I kind of made a huge mess. Like, a *really* big mess. 
+---
+title: "Rewriting The Shitty Markdown Renderer Slop"
+date: "Jul 28 2026"
+category: "Blog"
+icon: "📄"
+---
+
+**Hi everyone**, it's me again. So, you know how I was trying to be all smart and technical with the website? Yeah, well... I kind of made a huge mess. Like, a *really* big mess. 
 
 ## The "Wait, Why is Everything Code?" Disaster
 
@@ -43,11 +50,8 @@ Markdown has rules! Actual, proper rules! And one of them is that code blocks ne
 So I rewrote the renderer in `app.js` to actually follow the real markdown standard. Here's what I changed (try to stay awake):
 
 1. **Strict Newline Checking**: Now, the code *demands* that there's a newline character right after the opening \`\`\`. No more "oh, I guess this counts." If it's not on its own line, it's not a code block. Period.
-
 2. **Proper Closing**: Same thing for the closing \`\`\`. It has to be on its own line too. No cheating!
-
 3. **No More Greedy Matching**: The old code was super greedy. It would grab everything from the first \`\`\` to the end of the universe if it could. Now it stops at the *first* valid closing \`\`\` it finds. Like a good little parser should.
-
 4. **Inline Code Too**: I also fixed inline code (the single backtick stuff like `this`). Turns out, I was messing that up too. Whoops.
 
 ## Testing Until My Eyes Crossed
@@ -55,6 +59,7 @@ So I rewrote the renderer in `app.js` to actually follow the real markdown stand
 I didn't just fix it and hope for the best (even though that's usually my strategy). I actually tested it! Like, a lot.
 
 I made test files with:
+
 - Normal code blocks (the ones that work)
 - Broken code blocks (the ones that broke everything before)
 - Inline code mixed with blocks
@@ -77,7 +82,6 @@ If you visited the site while I was debugging this, sorry if you saw a bunch of 
 
 Thanks for bearing with my clumsiness! 💕
 
-Until next time (when I inevitably break something else),
-A very embarrassed but slightly wiser developer
+Until next time (when I inevitably break something else), A very embarrassed but slightly wiser developer
 
 P.S. If you see any other weird formatting issues, please tell me! But gently, okay? I'm still recovering from this trauma. 😅
