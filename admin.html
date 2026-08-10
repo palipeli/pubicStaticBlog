@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="auto">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Editor — kamikami.eu</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="admin.css">
+    <link rel="icon" type="image/webp" href="media/favicon-circle.webp">
+    <script>
+        (function() {
+            var match = document.cookie.match(/theme_preference=([^;]+)/);
+            var saved = match ? match[1] : 'auto';
+            document.documentElement.setAttribute('data-theme', saved);
+        })();
+    </script>
+</head>
+<body class="admin-page">
+    <div class="admin-header">
+        <a class="admin-brand" href="/">kamikami.eu<span class="admin-brand-sub">post editor</span></a>
+        <div class="admin-header-actions">
+            <span class="admin-status" id="admin-status" role="status"></span>
+            <div class="admin-token-wrap" id="admin-token-wrap">
+                <input type="password" id="admin-token-input" placeholder="Admin token" autocomplete="off">
+                <button type="button" class="admin-btn" id="admin-token-save">Save</button>
+                <button type="button" class="admin-btn" id="admin-token-clear" hidden>Clear</button>
+            </div>
+            <button type="button" class="admin-theme-btn" id="admin-theme-btn" title="Toggle theme"></button>
+        </div>
+    </div>
+
+    <div class="admin-shell">
+        <div class="admin-meta">
+            <label class="admin-field admin-field-title">
+                <span>Title</span>
+                <input type="text" id="post-title" placeholder="Post title" maxlength="200">
+            </label>
+            <label class="admin-field">
+                <span>Category</span>
+                <input type="text" id="post-category" placeholder="Blog" maxlength="60">
+            </label>
+            <label class="admin-field admin-field-icon">
+                <span>Icon</span>
+                <input type="text" id="post-icon" placeholder="📝" maxlength="8">
+            </label>
+            <label class="admin-field admin-field-date">
+                <span>Date</span>
+                <input type="date" id="post-date">
+            </label>
+        </div>
+
+        <div class="admin-toolbar" id="admin-toolbar" role="toolbar" aria-label="Formatting toolbar">
+            <button type="button" class="admin-tool" data-cmd="p" title="Paragraph (Ctrl+Alt+0)"><i class="fa-solid fa-paragraph"></i></button>
+            <button type="button" class="admin-tool admin-tool-heading" data-cmd="h1" title="Heading 1 (Ctrl+Alt+1)">H1</button>
+            <button type="button" class="admin-tool admin-tool-heading" data-cmd="h2" title="Heading 2 (Ctrl+Alt+2)">H2</button>
+            <button type="button" class="admin-tool admin-tool-heading" data-cmd="h3" title="Heading 3 (Ctrl+Alt+3)">H3</button>
+            <span class="admin-tool-sep"></span>
+            <button type="button" class="admin-tool" data-cmd="bold" title="Bold (Ctrl+B)"><i class="fa-solid fa-bold"></i></button>
+            <button type="button" class="admin-tool" data-cmd="italic" title="Italic (Ctrl+I)"><i class="fa-solid fa-italic"></i></button>
+            <button type="button" class="admin-tool" data-cmd="strike" title="Strikethrough (Ctrl+Shift+X)"><i class="fa-solid fa-strikethrough"></i></button>
+            <button type="button" class="admin-tool" data-cmd="code" title="Inline code (Ctrl+E)"><i class="fa-solid fa-code"></i></button>
+            <span class="admin-tool-sep"></span>
+            <button type="button" class="admin-tool" data-cmd="link" title="Link (Ctrl+K)"><i class="fa-solid fa-link"></i></button>
+            <button type="button" class="admin-tool" data-cmd="image" title="Image (upload to /media)"><i class="fa-solid fa-image"></i></button>
+            <span class="admin-tool-sep"></span>
+            <button type="button" class="admin-tool" data-cmd="ul" title="Bullet list (Ctrl+Shift+7)"><i class="fa-solid fa-list-ul"></i></button>
+            <button type="button" class="admin-tool" data-cmd="ol" title="Numbered list (Ctrl+Shift+8)"><i class="fa-solid fa-list-ol"></i></button>
+            <button type="button" class="admin-tool" data-cmd="task" title="Task list"><i class="fa-solid fa-list-check"></i></button>
+            <button type="button" class="admin-tool" data-cmd="quote" title="Quote"><i class="fa-solid fa-quote-left"></i></button>
+            <span class="admin-tool-sep"></span>
+            <button type="button" class="admin-tool" data-cmd="codeblock" title="Code block (Ctrl+Shift+E)"><i class="fa-solid fa-terminal"></i></button>
+            <button type="button" class="admin-tool" data-cmd="table" title="Insert table"><i class="fa-solid fa-table"></i></button>
+            <button type="button" class="admin-tool" data-cmd="hr" title="Horizontal rule"><i class="fa-solid fa-minus"></i></button>
+            <span class="admin-tool-sep"></span>
+            <button type="button" class="admin-tool" data-cmd="undo" title="Undo (Ctrl+Z)"><i class="fa-solid fa-rotate-left"></i></button>
+            <button type="button" class="admin-tool" data-cmd="redo" title="Redo (Ctrl+Shift+Z)"><i class="fa-solid fa-rotate-right"></i></button>
+        </div>
+        <div class="admin-editor-wrap">
+            <div class="blog-article">
+                <div class="blog-post-content admin-editor" id="post-editor" contenteditable="true" spellcheck="true" data-placeholder="Start writing…"></div>
+            </div>
+        </div>
+
+        <div class="admin-output" id="admin-output" hidden></div>
+
+        <div class="admin-footer">
+            <div class="admin-footer-left">
+                <span class="admin-count" id="admin-count">0 words</span>
+                <button type="button" class="admin-btn admin-btn-small" id="admin-discard-btn" hidden>Discard draft</button>
+            </div>
+            <div class="admin-footer-actions">
+                <button type="button" class="admin-btn" id="admin-preview-btn">View markdown</button>
+                <button type="button" class="admin-btn admin-btn-primary" id="admin-publish-btn"><i class="fa-solid fa-paper-plane"></i> Publish</button>
+            </div>
+        </div>
+
+        <input type="file" id="admin-image-input" accept="image/webp,image/png,image/jpeg,image/gif" hidden>
+    </div>
+
+    <script src="js/markdown.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
+

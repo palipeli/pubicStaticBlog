@@ -26,6 +26,11 @@
 | `js/mobile-tray.js` | dynamic mobile menu/tray at `window.innerWidth <= 768` | `#mobile-nav-tray`, overlay, toggle |
 | `js/scrollbar.js` | custom scrollbar for `.content-area`, drawn below the fixed header so it never overlaps it; the sidebar intentionally has no visible scrollbar | `window.setupCustomScrollbars` |
 | `warning.js` | flashing-light consent and interaction warning | `system_warning_consent`; `warning:cleared` event |
+| `admin.html` | standalone WYSIWYG post editor (not part of the SPA) | `#post-editor` contenteditable, `.admin-toolbar`, `/api/publish` |
+| `js/admin.js` | editor logic: formatting commands, shortcuts, paste sanitizer, Markdown serializer, publish/upload calls, draft autosave | reads `js/markdown.js` via `window.parseMarkdown` |
+| `admin.css` | chrome-only styles for the admin page; editor content renders through `style.css` `.blog-article`/`.blog-post-content` | reuses existing CSS variables |
+| `functions/api/publish.js` | Pages Function: auth + slugify + GitHub Contents API commit of `blog/<id>.md` and `blog/posts.json` | `POST /api/publish`; env secrets below |
+| `functions/api/upload.js` | Pages Function: validates image magic bytes, uploads to `media/` via GitHub Contents API | `POST /api/upload`; returns `/media/<name>` |
 | `sw.js` | install/activate, cache strategies, offline shell, prefetch messages | cache names and message types |
 | `blog/posts.json` | ordered post manifest | metadata schema below |
 | `blog/*.md` | post source | optional `---` frontmatter + Markdown body |
@@ -146,6 +151,14 @@ Add a post atomically:
 2. Add one manifest object with matching `id` and `slug`.
 3. Ensure JSON parses and the manifest slug points to the new file.
 4. If title/date/category/icon are in Markdown frontmatter, verify they intentionally match the index.
+
+Alternatively, `admin.html` does all four steps automatically: it serializes the WYSIWYG editor to Markdown,
+and `functions/api/publish.js` commits the file + manifest entry to `main` (Pages auto-rebuilds). Manual
+edits and admin publishes both work; the repo stays the single source of truth. The functions need Cloudflare
+Pages secrets: `ADMIN_TOKEN` (bearer token sent by the admin page) and `GITHUB_TOKEN` (fine-grained PAT with
+Contents read/write on this repo); optional `GITHUB_OWNER`/`GITHUB_REPO`/`GITHUB_BRANCH` (defaults
+`palipeli`/`pubicStaticBlog`/`main`). Service worker routing already passes non-GET requests through, so the
+publish/upload POSTs are never intercepted.
 
 The loader fetches `meta.slug`, parses the body, and lets frontmatter override manifest values for
 `title`, `date`, `category`, and `icon`. The parser is deliberately minimal:
