@@ -834,8 +834,7 @@
                 editingId = id;
                 setEditLabel('Editing: ' + (fm.title || (post ? post.title : id) || id));
                 publishBtn.innerHTML = '<i class="fa-solid fa-pen"></i> Update Post';
-                outputEl.hidden = true;
-                $('admin-preview-btn').textContent = 'View markdown';
+                hidePreview();
                 setStatus('Editing "' + escapeHtml(fm.title || id) + '" — Publish updates the existing post', 'success');
                 updateCount();
                 scheduleDraftSave();
@@ -857,8 +856,7 @@
         $('post-icon').value = '📝';
         $('post-date').value = new Date().toISOString().slice(0, 10);
         editor.innerHTML = '';
-        outputEl.hidden = true;
-        $('admin-preview-btn').textContent = 'View markdown';
+        hidePreview();
         updateCount();
         editor.focus();
     }
@@ -1036,8 +1034,7 @@
             clearPendingUploads();
             localStorage.removeItem(DRAFT_KEY);
             $('admin-discard-btn').hidden = true;
-            outputEl.hidden = true;
-            $('admin-preview-btn').textContent = 'View markdown';
+            hidePreview();
             const verb = result.updated ? 'Updated' : 'Published';
             setStatus(verb + ' "' + escapeHtml(result.title) + '" — Cloudflare Pages is rebuilding. It will appear at <a href="/#blog-' + result.id + '">/#blog-' + result.id + '</a>.' + (warning ? ' ' + warning : ''), 'success');
             if (result.updated) {
@@ -1053,14 +1050,25 @@
         }
     }
 
+    function setPreviewOpen(open) {
+        const shell = document.querySelector('.admin-shell');
+        if (shell) shell.classList.toggle('markdown-open', open);
+    }
+
+    function hidePreview() {
+        outputEl.hidden = true;
+        $('admin-preview-btn').textContent = 'View markdown';
+        setPreviewOpen(false);
+    }
+
     function togglePreview() {
         if (outputEl.hidden) {
             outputEl.textContent = serializeEditor();
             outputEl.hidden = false;
             $('admin-preview-btn').textContent = 'Hide markdown';
+            setPreviewOpen(true);
         } else {
-            outputEl.hidden = true;
-            $('admin-preview-btn').textContent = 'View markdown';
+            hidePreview();
         }
     }
 

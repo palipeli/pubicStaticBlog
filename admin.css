@@ -251,6 +251,13 @@
     overflow: auto;
 }
 
+/* ---------- markdown viewer visibility ---------- */
+
+.admin-shell.markdown-open .admin-editor-wrap {
+    min-height: 0;
+    max-height: max(160px, calc(55vh - 278px));
+}
+
 .admin-footer {
     display: flex;
     justify-content: space-between;
