@@ -115,6 +115,30 @@
         return /\s/.test(value) ? '<' + value + '>' : value;
     }
 
+    function insertHtmlIntoEditor(html) {
+        editor.focus();
+        const sel = window.getSelection();
+        let range = null;
+        if (sel && sel.rangeCount && editor.contains(sel.anchorNode)) {
+            range = sel.getRangeAt(0);
+        } else {
+            range = document.createRange();
+            range.selectNodeContents(editor);
+            range.collapse(false);
+        }
+        const fragment = range.createContextualFragment(html);
+        const lastNode = fragment.lastChild || null;
+        range.deleteContents();
+        range.insertNode(fragment);
+        if (lastNode) {
+            const caret = document.createRange();
+            caret.setStartAfter(lastNode);
+            caret.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(caret);
+        }
+    }
+
     function insertLink() {
         const sel = window.getSelection();
         const url = window.prompt('Link URL (https://, mailto:, or /path):', 'https://');
@@ -126,8 +150,7 @@
         }
         let text = sel && !sel.isCollapsed ? sel.toString() : '';
         if (!text) text = window.prompt('Link text:', href) || href;
-        editor.focus();
-        document.execCommand('insertHTML', false, '<a href="' + escapeHtml(href) + '">' + escapeHtml(text) + '</a>');
+        insertHtmlIntoEditor('<a href="' + escapeHtml(href) + '">' + escapeHtml(text) + '</a>');
     }
 
     function insertCodeBlock() {
@@ -136,7 +159,7 @@
         const cleanLang = String(lang || '').trim().replace(/[^\w-]/g, '').slice(0, 30);
         const html = '<pre><code' + (cleanLang ? ' class="language-' + cleanLang + '"' : '') + '>\n\n</code></pre>';
         const before = editor.querySelectorAll('pre').length;
-        document.execCommand('insertHTML', false, html);
+        insertHtmlIntoEditor(html);
         const pres = editor.querySelectorAll('pre');
         if (pres.length > before) {
             const codeEl = pres[before].querySelector('code');
@@ -154,21 +177,22 @@
     function insertTaskList() {
         editor.focus();
         const sel = window.getSelection();
-        if (!sel.rangeCount) return;
-        const li = findClosest(sel.getRangeAt(0).commonAncestorContainer, 'li');
-        if (li) {
-            const checkbox = li.querySelector('input[type=checkbox]');
-            if (checkbox) {
-                checkbox.remove();
-            } else {
-                const cb = document.createElement('input');
-                cb.type = 'checkbox';
-                li.insertBefore(cb, li.firstChild);
-                li.insertBefore(document.createTextNode(' '), cb.nextSibling);
+        if (sel && sel.rangeCount) {
+            const li = findClosest(sel.getRangeAt(0).commonAncestorContainer, 'li');
+            if (li) {
+                const checkbox = li.querySelector('input[type=checkbox]');
+                if (checkbox) {
+                    checkbox.remove();
+                } else {
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    li.insertBefore(cb, li.firstChild);
+                    li.insertBefore(document.createTextNode(' '), cb.nextSibling);
+                }
+                return;
             }
-            return;
         }
-        document.execCommand('insertHTML', false, '<ul class="task-list-item"><li><input type="checkbox"> </li></ul>');
+        insertHtmlIntoEditor('<ul class="task-list-item"><li><input type="checkbox"> </li></ul>');
     }
 
     function insertTable() {
@@ -185,8 +209,7 @@
             html += '</tr>\n';
         }
         html += '</tbody></table>\n<p><br></p>';
-        editor.focus();
-        document.execCommand('insertHTML', false, html);
+        insertHtmlIntoEditor(html);
     }
 
     function openImagePicker() {
@@ -227,8 +250,7 @@
                 setStatus(result.error || 'Upload failed (' + res.status + ')', 'error');
                 return;
             }
-            editor.focus();
-            document.execCommand('insertHTML', false, '<img class="lazy-image" src="' + escapeHtml(result.url) + '" data-src="' + escapeHtml(result.url) + '" alt="">');
+            insertHtmlIntoEditor('<img class="lazy-image" src="' + escapeHtml(result.url) + '" data-src="' + escapeHtml(result.url) + '" alt="">');
             setStatus('Image uploaded: ' + result.url, 'success');
         } catch (err) {
             setStatus('Upload error: ' + err.message, 'error');
