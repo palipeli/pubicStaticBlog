@@ -5,7 +5,7 @@ category: "Update"
 icon: "🇮🇱"
 ---
 
-## Now I can send images directly from here without editing the repo
+## Now I can send images directly from here without editing the repo, such as this turd:
 
 ![](/media/il-feel.webp) 
 
