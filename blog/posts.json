@@ -94,5 +94,13 @@
     "date": "2026-08-10",
     "category": "test",
     "icon": "🇮🇱"
+  },
+  {
+    "id": "testlorem",
+    "slug": "/blog/testlorem.md",
+    "title": "testlorem",
+    "date": "2026-08-10",
+    "category": "test",
+    "icon": "📄"
   }
 ]
