@@ -62,5 +62,13 @@
     "date": "2026-08-10",
     "category": "Update",
     "icon": "🇮🇱"
+  },
+  {
+    "id": "cat-1",
+    "slug": "/blog/cat-1.md",
+    "title": "Cat #1",
+    "date": "2026-08-10",
+    "category": "Cat",
+    "icon": "🐱"
   }
 ]
