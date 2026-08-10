@@ -260,11 +260,6 @@
     color: var(--text-secondary);
 }
 
-.admin-footer-actions {
-    display: flex;
-    gap: 8px;
-}
-
 .admin-btn {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
@@ -537,6 +532,21 @@
     color: var(--text-primary);
     font-family: var(--font-main);
     font-size: 12px;
+}
+
+.admin-edit-label {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.admin-edit-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
 }
 
 .admin-sidebar-toggle {

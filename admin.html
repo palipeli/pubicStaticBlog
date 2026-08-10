@@ -79,9 +79,13 @@
             <button type="button" class="admin-tool" data-cmd="undo" title="Undo (Ctrl+Z)"><i class="fa-solid fa-rotate-left"></i></button>
             <button type="button" class="admin-tool" data-cmd="redo" title="Redo (Ctrl+Shift+Z)"><i class="fa-solid fa-rotate-right"></i></button>
         </div>
-        <div class="admin-edit-banner" id="admin-edit-banner" hidden>
-            <span>Editing: <strong id="admin-edit-title"></strong></span>
-            <button type="button" class="admin-btn admin-btn-small" id="admin-edit-cancel">Cancel</button>
+        <div class="admin-edit-banner" id="admin-edit-banner">
+            <span class="admin-edit-label" id="admin-edit-label">New post</span>
+            <div class="admin-edit-actions">
+                <button type="button" class="admin-btn admin-btn-small" id="admin-preview-btn">View markdown</button>
+                <button type="button" class="admin-btn admin-btn-small admin-btn-primary" id="admin-publish-btn"><i class="fa-solid fa-paper-plane"></i> Publish</button>
+                <button type="button" class="admin-btn admin-btn-small" id="admin-edit-cancel">Cancel</button>
+            </div>
         </div>
 
         <div class="admin-editor-wrap">
@@ -104,10 +108,6 @@
             <div class="admin-footer-left">
                 <span class="admin-count" id="admin-count">0 words</span>
                 <button type="button" class="admin-btn admin-btn-small" id="admin-discard-btn" hidden>Discard draft</button>
-            </div>
-            <div class="admin-footer-actions">
-                <button type="button" class="admin-btn" id="admin-preview-btn">View markdown</button>
-                <button type="button" class="admin-btn admin-btn-primary" id="admin-publish-btn"><i class="fa-solid fa-paper-plane"></i> Publish</button>
             </div>
         </div>
 
