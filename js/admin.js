@@ -27,6 +27,8 @@
     let isApplyingMarkdown = false;
     let markdownPushTimer = null;
     let markdownApplyTimer = null;
+    let normalizeTimer = null;
+    let isComposing = false;
 
     function $(id) { return document.getElementById(id); }
 
@@ -112,6 +114,7 @@
             wrapSelectionInBlock(tag);
         }
         editor.querySelectorAll('h1,h2,h3,h4,h5,h6').forEach(normalizeHeading);
+        normalizeEditorDom();
     }
 
     function formatBlockApplied(tag) {
@@ -154,6 +157,94 @@
             }
             parent.removeChild(node);
         });
+    }
+
+    function setCaretAtTextOffset(el, offset) {
+        const sel = window.getSelection();
+        if (!sel) return;
+        if (!el.textContent) {
+            const range = document.createRange();
+            range.setStart(el, 0);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            return;
+        }
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+        let node = walker.nextNode();
+        let remaining = offset;
+        while (node) {
+            if (remaining <= node.textContent.length) {
+                const range = document.createRange();
+                range.setStart(node, remaining);
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
+                return;
+            }
+            remaining -= node.textContent.length;
+            node = walker.nextNode();
+        }
+        const range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
+
+    function replaceParagraphBlock(oldEl, tag) {
+        const sel = window.getSelection();
+        const range = sel && sel.rangeCount ? sel.getRangeAt(0) : null;
+        let caretOffset = -1;
+        if (range && range.collapsed && oldEl.contains(range.startContainer)) {
+            const before = document.createRange();
+            before.selectNodeContents(oldEl);
+            before.setEnd(range.startContainer, range.startOffset);
+            caretOffset = before.toString().length;
+        }
+        const el = document.createElement(tag);
+        while (oldEl.firstChild) el.appendChild(oldEl.firstChild);
+        oldEl.replaceWith(el);
+        if (caretOffset >= 0 && sel) {
+            setCaretAtTextOffset(el, caretOffset);
+        }
+    }
+
+    function normalizeEditorDom() {
+        if (!editor) return;
+        editor.querySelectorAll('b').forEach(function(el) {
+            const strong = document.createElement('strong');
+            while (el.firstChild) strong.appendChild(el.firstChild);
+            el.replaceWith(strong);
+        });
+        editor.querySelectorAll('i').forEach(function(el) {
+            const em = document.createElement('em');
+            while (el.firstChild) em.appendChild(el.firstChild);
+            el.replaceWith(em);
+        });
+        editor.querySelectorAll('strike,s').forEach(function(el) {
+            const del = document.createElement('del');
+            while (el.firstChild) del.appendChild(el.firstChild);
+            el.replaceWith(del);
+        });
+        Array.prototype.slice.call(editor.children).forEach(function(el) {
+            if (el.nodeType === 1 && el.tagName.toLowerCase() === 'div' &&
+                !el.querySelector('p,div,h1,h2,h3,h4,h5,h6,ul,ol,pre,blockquote,table,hr')) {
+                replaceParagraphBlock(el, 'p');
+            }
+        });
+    }
+
+    function scheduleEditorNormalization() {
+        if (normalizeTimer) clearTimeout(normalizeTimer);
+        normalizeTimer = setTimeout(function() {
+            normalizeTimer = null;
+            if (isComposing) {
+                scheduleEditorNormalization();
+                return;
+            }
+            normalizeEditorDom();
+        }, 700);
     }
 
     function splitHeadingAtCaret(heading) {
@@ -944,6 +1035,7 @@
                         img.setAttribute('src', img.getAttribute('data-src'));
                     }
                 });
+                normalizeEditorDom();
                 deselectImage();
                 clearPendingUploads();
                 editingId = id;
@@ -1199,6 +1291,7 @@
                     img.setAttribute('src', dataSrc);
                 }
             });
+            normalizeEditorDom();
             deselectImage();
             updateCount();
             scheduleDraftSave();
@@ -1313,6 +1406,7 @@
         $('post-date').value = raw.date || '';
         editor.innerHTML = raw.html;
         normalizeEditorImageSrcs();
+        normalizeEditorDom();
         $('admin-discard-btn').hidden = false;
         return true;
     }
@@ -1556,9 +1650,12 @@
             updateCount();
             scheduleDraftSave();
             scheduleMarkdownPush();
+            scheduleEditorNormalization();
         });
         editor.addEventListener('paste', handlePaste);
         editor.addEventListener('drop', handleDrop);
+        editor.addEventListener('compositionstart', function() { isComposing = true; });
+        editor.addEventListener('compositionend', function() { isComposing = false; });
         editor.addEventListener('click', function(e) {
             if (e.target && e.target.tagName === 'IMG') {
                 selectImage(e.target);
