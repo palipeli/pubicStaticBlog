@@ -4,6 +4,6 @@ date: "2026-08-10"
 category: "blog"
 icon: "📄"
 ---
-## Hello world
+## Hello dead world
 
 ![](/media/flag-of-israel-svg.webp)
