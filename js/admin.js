@@ -19,6 +19,7 @@
     let editingOriginalDate = null;
     let selectedImage = null;
     let pendingReplaceTarget = null;
+    let savedUploadRange = null;
     let imageBar = null;
 
     function $(id) { return document.getElementById(id); }
@@ -122,7 +123,10 @@
         editor.focus();
         const sel = window.getSelection();
         let range = null;
-        if (sel && sel.rangeCount && editor.contains(sel.anchorNode)) {
+        if (savedUploadRange && editor.contains(savedUploadRange.commonAncestorContainer)) {
+            range = savedUploadRange;
+            savedUploadRange = null;
+        } else if (sel && sel.rangeCount && editor.contains(sel.anchorNode)) {
             range = sel.getRangeAt(0);
         } else {
             range = document.createRange();
@@ -218,6 +222,13 @@
 
     function openImagePicker(replaceTarget) {
         pendingReplaceTarget = replaceTarget || null;
+        savedUploadRange = null;
+        if (!pendingReplaceTarget) {
+            const sel = window.getSelection();
+            if (sel && sel.rangeCount && editor.contains(sel.anchorNode)) {
+                savedUploadRange = sel.getRangeAt(0).cloneRange();
+            }
+        }
         imageInput.click();
     }
 
@@ -256,13 +267,14 @@
                 return;
             }
             const url = String(result.url || '');
+            const previewSrc = (typeof URL !== 'undefined' && URL.createObjectURL) ? URL.createObjectURL(file) : url;
             if (replaceTarget && replaceTarget.tagName === 'IMG') {
-                replaceTarget.setAttribute('src', url);
+                replaceTarget.setAttribute('src', previewSrc);
                 replaceTarget.setAttribute('data-src', url);
                 selectImage(replaceTarget);
                 setStatus('Image replaced: ' + url, 'success');
             } else {
-                const inserted = insertHtmlIntoEditor('<img class="lazy-image" src="' + escapeHtml(url) + '" data-src="' + escapeHtml(url) + '" alt="">');
+                const inserted = insertHtmlIntoEditor('<img class="lazy-image" src="' + escapeHtml(previewSrc) + '" data-src="' + escapeHtml(url) + '" alt="">');
                 if (inserted && inserted.tagName === 'IMG') {
                     if (inserted.parentNode === editor) {
                         const p = document.createElement('p');
@@ -674,6 +686,7 @@
         e.preventDefault();
         const files = e.dataTransfer && e.dataTransfer.files;
         if (files && files.length) {
+            savedUploadRange = null;
             uploadImage(files[0]);
             return;
         }
@@ -809,7 +822,8 @@
                 }
                 editor.innerHTML = typeof window.parseMarkdown === 'function' ? window.parseMarkdown(parsed.content) : parsed.content;
                 editor.querySelectorAll('img.lazy-image').forEach(function(img) {
-                    if (!img.getAttribute('src') && img.getAttribute('data-src')) {
+                    const src = img.getAttribute('src') || '';
+                    if ((!src || src.indexOf('blob:') === 0) && img.getAttribute('data-src')) {
                         img.setAttribute('src', img.getAttribute('data-src'));
                     }
                 });
@@ -1042,6 +1056,16 @@
         }
     }
 
+    function normalizeEditorImageSrcs() {
+        editor.querySelectorAll('img').forEach(function(img) {
+            const src = img.getAttribute('src') || '';
+            const dataSrc = img.getAttribute('data-src');
+            if (src.indexOf('blob:') === 0 && dataSrc) {
+                img.setAttribute('src', dataSrc);
+            }
+        });
+    }
+
     function restoreDraft() {
         let raw = null;
         try {
@@ -1055,6 +1079,7 @@
         $('post-icon').value = raw.icon || '📝';
         $('post-date').value = raw.date || '';
         editor.innerHTML = raw.html;
+        normalizeEditorImageSrcs();
         $('admin-discard-btn').hidden = false;
         return true;
     }
@@ -1266,6 +1291,10 @@
             const replaceTarget = pendingReplaceTarget;
             pendingReplaceTarget = null;
             imageInput.value = '';
+            if (!file) {
+                savedUploadRange = null;
+                return;
+            }
             uploadImage(file, replaceTarget);
         });
 
