@@ -130,7 +130,7 @@ export async function onRequestPost(context) {
 
     const fileName = String(payload.name || '').trim();
     const dataUrl = String(payload.data || '');
-    const dataUrlMatch = dataUrl.match(/^data:([a-zA-Z0-9.+-]+);base64,([A-Za-z0-9+/=\s]+)$/);
+    const dataUrlMatch = dataUrl.match(/^data:([a-zA-Z0-9.+/-]+);base64,([A-Za-z0-9+/=\s]+)$/);
     if (!fileName || !dataUrlMatch) {
         return json({error: 'name and a base64 data URL are required'}, 400);
     }
