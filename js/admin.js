@@ -210,6 +210,29 @@
         }
     }
 
+    function normalizeBlockquote(el) {
+        if (!el || el.nodeType !== 1) return;
+        let pending = null;
+        Array.prototype.slice.call(el.childNodes).forEach(function(node) {
+            const isBlock = node.nodeType === 1 &&
+                ['P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'UL', 'OL', 'BLOCKQUOTE', 'PRE', 'TABLE', 'HR'].indexOf(node.tagName) !== -1;
+            if (isBlock) {
+                if (pending) {
+                    el.insertBefore(pending, node);
+                    pending = null;
+                }
+                return;
+            }
+            if (!pending) {
+                pending = document.createElement('p');
+            }
+            pending.appendChild(node);
+        });
+        if (pending) {
+            el.appendChild(pending);
+        }
+    }
+
     function normalizeEditorDom() {
         if (!editor) return;
         editor.querySelectorAll('b').forEach(function(el) {
@@ -233,6 +256,7 @@
                 replaceParagraphBlock(el, 'p');
             }
         });
+        editor.querySelectorAll('blockquote').forEach(normalizeBlockquote);
     }
 
     function scheduleEditorNormalization() {
@@ -371,7 +395,9 @@
         }
         let text = sel && !sel.isCollapsed ? sel.toString() : '';
         if (!text) text = window.prompt('Link text:', href) || href;
-        insertHtmlIntoEditor('<a href="' + escapeHtml(href) + '">' + escapeHtml(text) + '</a>');
+        const title = window.prompt('Link title (optional):', '');
+        const titleAttr = title ? ' title="' + escapeHtml(title) + '"' : '';
+        insertHtmlIntoEditor('<a href="' + escapeHtml(href) + '"' + titleAttr + '>' + escapeHtml(text) + '</a>');
     }
 
     function insertCodeBlock() {
@@ -407,13 +433,14 @@
                 } else {
                     const cb = document.createElement('input');
                     cb.type = 'checkbox';
+                    cb.setAttribute('disabled', '');
                     li.insertBefore(cb, li.firstChild);
                     li.insertBefore(document.createTextNode(' '), cb.nextSibling);
                 }
                 return;
             }
         }
-        insertHtmlIntoEditor('<ul class="task-list-item"><li><input type="checkbox"> </li></ul>');
+        insertHtmlIntoEditor('<ul class="task-list-item"><li><input disabled type="checkbox"> </li></ul>');
     }
 
     function insertTable() {
@@ -656,8 +683,9 @@
                 out += delim + codeText + delim;
             } else if (tag === 'a') {
                 const href = node.getAttribute('href') || '';
+                const title = node.getAttribute('title') || '';
                 const text = inlineToMarkdown(node) || href;
-                out += '[' + text + '](' + cleanLinkTarget(href) + ')';
+                out += '[' + text + '](' + cleanLinkTarget(href) + (title ? ' "' + String(title).replace(/"/g, "'") + '"' : '') + ')';
             } else if (tag === 'img') {
                 out += imageToMarkdown(node);
             } else if (tag === 'input') {
@@ -757,9 +785,17 @@
                     return inlineToMarkdown(cell).replace(/\|/g, '¦').replace(/\n/g, ' ');
                 });
             };
-            const header = rowCells(rows[0]);
+            const headerRow = rows[0];
+            const header = rowCells(headerRow);
+            const separators = Array.from(headerRow.querySelectorAll('th,td')).map(function(cell) {
+                const align = (cell.getAttribute('align') || '').toLowerCase();
+                if (align === 'left') return ':---';
+                if (align === 'center') return ':---:';
+                if (align === 'right') return '---:';
+                return '---';
+            });
             lines.push(indent + '| ' + header.join(' | ') + ' |');
-            lines.push(indent + '| ' + header.map(function() { return '---'; }).join(' | ') + ' |');
+            lines.push(indent + '| ' + separators.join(' | ') + ' |');
             for (let i = 1; i < rows.length; i++) {
                 lines.push(indent + '| ' + rowCells(rows[i]).join(' | ') + ' |');
             }
@@ -805,7 +841,7 @@
             return '<code' + (cls ? ' class="' + cls + '"' : '') + '>' + (node.textContent.trim() || ' ') + '</code>';
         }
         if (tag === 'input') {
-            return node.checked ? '<input checked type="checkbox">' : '<input type="checkbox">';
+            return '<input' + (node.checked ? ' checked' : '') + (node.hasAttribute('disabled') ? ' disabled' : '') + ' type="checkbox">';
         }
         if (tag === 'th' || tag === 'td') {
             const align = node.getAttribute('align') || '';
