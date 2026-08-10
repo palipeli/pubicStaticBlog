@@ -54,5 +54,13 @@
     "date": "Mar 25 2026",
     "category": "Legal",
     "icon": "🔒"
+  },
+  {
+    "id": "this-is-test",
+    "slug": "/blog/this-is-test.md",
+    "title": "This is test",
+    "date": "2026-08-10",
+    "category": "test",
+    "icon": "📄"
   }
 ]
