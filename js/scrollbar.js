@@ -1,21 +1,8 @@
 (function() {
     'use strict';
-
     // The fixed header is translucent so the main content can keep scrolling
-    // visibly underneath it. Native scrollbars cannot match that layout: they
-    // always span the full height of their scroll container, so no CSS-only
-    // offset can stop them from running up behind the header. This module hides
-    // the native scrollbar on the main content container and draws a slim
-    // custom scrollbar that only spans the area below the header. (The sidebar
-    // intentionally has no visible scrollbar at all.)
-    //
-    // The custom scrollbar is positioned against the same containing block the
-    // scroll container lives in (.main-container for the content area), so it
-    // follows sidebar collapse/expand and window resizing automatically
-    // without extra bookkeeping.
-
+    // visibly underneath it. 
     const MIN_THUMB_HEIGHT = 24;
-
     function createScrollbarElement() {
         const scrollbar = document.createElement('div');
         scrollbar.className = 'custom-scrollbar';
@@ -27,17 +14,14 @@
         scrollbar.appendChild(track);
         return scrollbar;
     }
-
     function getThumbHeight(thumb) {
         return parseFloat(thumb.style.height) || MIN_THUMB_HEIGHT;
     }
-
     function attachCustomScrollbar(scroller, host) {
         const scrollbar = createScrollbarElement();
         host.appendChild(scrollbar);
         const track = scrollbar.querySelector('.custom-scrollbar-track');
         const thumb = scrollbar.querySelector('.custom-scrollbar-thumb');
-
         let isDragging = false;
         let dragStartY = 0;
         let dragStartTop = 0;
@@ -45,12 +29,10 @@
         // the transform string. Positioning via transform (instead of `top`)
         // keeps scroll updates off the layout path entirely.
         let thumbOffsetY = 0;
-
         function setThumbOffset(y) {
             thumbOffsetY = y;
             thumb.style.transform = 'translate3d(0, ' + y + 'px, 0)';
         }
-
         function updateThumb() {
             const clientHeight = scroller.clientHeight;
             const scrollHeight = scroller.scrollHeight;
@@ -66,7 +48,6 @@
             const ratio = scroller.scrollTop / maxScroll;
             setThumbOffset(Math.max(0, ratio * (trackHeight - thumbHeight)));
         }
-
         function onThumbPointerDown(event) {
             if (event.pointerType === 'mouse' && event.button !== 0) return;
             event.preventDefault();
@@ -84,7 +65,6 @@
                 }
             }
         }
-
         function onThumbPointerMove(event) {
             if (!isDragging) return;
             const trackHeight = track.clientHeight;
@@ -97,13 +77,11 @@
                 scroller.scrollTop = (newTop / maxTop) * maxScroll;
             }
         }
-
         function onThumbPointerUp() {
             if (!isDragging) return;
             isDragging = false;
             scrollbar.classList.remove('is-dragging');
         }
-
         function onTrackClick(event) {
             if (event.target === thumb || event.button !== 0) return;
             const trackRect = track.getBoundingClientRect();
@@ -118,7 +96,6 @@
             }
             updateThumb();
         }
-
         scroller.addEventListener('scroll', updateThumb, {passive: true});
         window.addEventListener('resize', updateThumb);
         thumb.addEventListener('pointerdown', onThumbPointerDown);
@@ -132,7 +109,6 @@
         if (document.fonts && document.fonts.ready) {
             document.fonts.ready.then(updateThumb).catch(() => {});
         }
-
         const observer = new MutationObserver(updateThumb);
         observer.observe(scroller, {
             childList: true,
@@ -140,12 +116,9 @@
             attributes: true,
             characterData: true
         });
-
         updateThumb();
-
         return updateThumb;
     }
-
     function setupCustomScrollbars() {
         const contentArea = document.querySelector('.content-area');
         const mainContainer = document.querySelector('.main-container');
@@ -156,6 +129,5 @@
             mainContainer.addEventListener('transitionend', updateContentScrollbar);
         }
     }
-
     window.setupCustomScrollbars = setupCustomScrollbars;
 })();
