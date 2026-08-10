@@ -467,7 +467,6 @@
     window.navigateToBlogsPageWithoutPrefetch = navigateToBlogsPageWithoutPrefetch;
     window.createParticles = createParticles;
     window.setupNavigation = setupNavigation;
-    window.wrapHomeContentInRectangle = wrapHomeContentInRectangle;
     window.getSavedTheme = getSavedTheme;
     window.saveThemePreference = saveThemePreference;
     window.applyTheme = applyTheme;

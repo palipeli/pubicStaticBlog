@@ -171,6 +171,5 @@
             }
         }, 500);
     }
-    window.runDevotional = runDevotional;
     window.monitorWarningAndStartDevotional = monitorWarningAndStartDevotional;
 })();

@@ -7,8 +7,6 @@
     let bypassWarning = false;
     window.addEventListener('click', (e) => {
         if (e.target.closest('a') ||
-            e.target.closest('#themeToggle') ||
-            e.target.closest('.menu-toggle') ||
             e.target.closest('.theme-btn') ||
             e.target.closest('.nav-item') ||
             e.target.closest('.blue-button') ||
@@ -16,9 +14,7 @@
             e.target.closest('.post-selector-item') ||
             e.target.closest('.sidebar-toggle') ||
             e.target.closest('.mobile-tray-toggle') ||
-            e.target.closest('.mobile-tray-close') ||
             e.target.closest('.mobile-theme-btn') ||
-            e.target.closest('.mobile-nav-item') ||
             e.target.closest('.mobile-post-item') ||
             e.target.closest('#mobile-nav-tray') ||
             e.target.closest('#mobile-tray-overlay') ||
@@ -173,8 +169,6 @@
             if (e && e.target && (
                 e.target.closest('#consent-overlay') ||
                 e.target.closest('a') ||
-                e.target.closest('#themeToggle') ||
-                e.target.closest('.menu-toggle') ||
                 e.target.closest('.theme-btn') ||
                 e.target.closest('.nav-item') ||
                 e.target.closest('.blue-button') ||
@@ -182,9 +176,7 @@
                 e.target.closest('.post-selector-item') ||
                 e.target.closest('.sidebar-toggle') ||
                 e.target.closest('.mobile-tray-toggle') ||
-                e.target.closest('.mobile-tray-close') ||
                 e.target.closest('.mobile-theme-btn') ||
-                e.target.closest('.mobile-nav-item') ||
                 e.target.closest('.mobile-post-item') ||
                 e.target.closest('#mobile-nav-tray') ||
                 e.target.closest('#mobile-tray-overlay') ||

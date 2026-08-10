@@ -166,8 +166,7 @@
         '.blog-card',
         '.blog-btn',
         '.blue-button',
-        '.mobile-post-item',
-        '.mobile-nav-item'
+        '.mobile-post-item'
     ];
     let scrollPositions = null;
     let scrollSaveTimer = null;
