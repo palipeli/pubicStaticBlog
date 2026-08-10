@@ -201,6 +201,9 @@
     padding: 26px 30px;
     margin-bottom: 14px;
     min-height: 55vh;
+    max-height: calc(100vh - 250px);
+    overflow-y: auto;
+    scrollbar-width: thin;
 }
 
 .admin-editor {
@@ -440,8 +443,8 @@
     font-family: var(--font-main);
     font-size: 10px;
     color: var(--text-secondary);
-    flex-shrink: 0;
     white-space: nowrap;
+    margin-bottom: 6px;
 }
 
 .admin-status-dot {
@@ -490,9 +493,26 @@
     background: rgba(255, 69, 252, 0.12);
 }
 
-.admin-post-action.danger:hover {
+.admin-post-action-edit {
+    color: #1098ad;
+}
+
+.admin-post-action-edit:hover {
+    color: #0b7285;
+    background: rgba(16, 152, 173, 0.14);
+}
+
+.admin-post-action-delete {
     color: #e03131;
-    background: rgba(224, 49, 49, 0.12);
+}
+
+.admin-post-action-delete:hover {
+    color: #c92a2a;
+    background: rgba(224, 49, 49, 0.14);
+}
+
+.admin-post-action-pin.active {
+    color: var(--accent-pink);
 }
 
 .admin-sidebar-status {
@@ -540,7 +560,8 @@
 
 @media (min-width: 901px) {
     .admin-shell {
-        margin-right: 340px;
+        max-width: none;
+        margin: 22px 360px 90px 24px;
     }
     .admin-sidebar-toggle {
         display: none !important;

@@ -583,6 +583,11 @@
         item.className = 'admin-post-item' + (orphan ? ' is-orphan' : '');
         const statusClass = orphan ? 'orphan' : (post.onGithub ? 'ok' : 'missing');
         const statusLabel = orphan ? 'In repo, unlisted' : (post.onGithub ? 'Published on GitHub' : 'Not on GitHub');
+        const status = document.createElement('div');
+        status.className = 'admin-post-status';
+        status.title = statusLabel;
+        status.innerHTML = '<span class="admin-status-dot ' + statusClass + '"></span>' + statusLabel;
+        item.appendChild(status);
         const head = document.createElement('div');
         head.className = 'admin-post-head';
         head.innerHTML =
@@ -590,8 +595,7 @@
             '<div class="admin-post-meta">' +
                 '<div class="admin-post-title">' + escapeHtml(post.title || post.id) + '</div>' +
                 '<div class="admin-post-date">' + escapeHtml(post.date || '') + '</div>' +
-            '</div>' +
-            '<span class="admin-post-status" title="' + statusLabel + '"><span class="admin-status-dot ' + statusClass + '"></span>' + statusLabel + '</span>';
+            '</div>';
         item.appendChild(head);
         const actions = document.createElement('div');
         actions.className = 'admin-post-actions';
@@ -600,19 +604,19 @@
             actions.appendChild(actionBtn('Open', 'open', post.id));
         } else {
             actions.appendChild(actionBtn('Edit', 'edit', post.id));
-            actions.appendChild(actionBtn(post.pinned ? 'Unpin' : 'Pin', 'pin', post.id, false, post.pinned));
+            actions.appendChild(actionBtn(post.pinned ? 'Unpin' : 'Pin', 'pin', post.id, post.pinned));
             actions.appendChild(actionBtn('Copy', 'copy', post.id));
             actions.appendChild(actionBtn('Open', 'open', post.id));
-            actions.appendChild(actionBtn('Delete', 'delete', post.id, true));
+            actions.appendChild(actionBtn('Delete', 'delete', post.id));
         }
         item.appendChild(actions);
         return item;
     }
 
-    function actionBtn(label, action, id, danger, active) {
+    function actionBtn(label, action, id, active) {
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'admin-post-action' + (danger ? ' danger' : '') + (active ? ' active' : '');
+        btn.className = 'admin-post-action admin-post-action-' + action + (active ? ' active' : '');
         btn.textContent = label;
         btn.dataset.action = action;
         btn.dataset.id = id;
