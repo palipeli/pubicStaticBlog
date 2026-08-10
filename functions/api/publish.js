@@ -199,6 +199,18 @@ async function resolveMediaNames(env, images) {
     return {ok: true, names: names};
 }
 
+async function githubCreateBlob(env, base64Content) {
+    const blob = await githubApi(env, 'POST', 'git/blobs', {
+        content: base64Content,
+        encoding: 'base64'
+    });
+    if (blob.error) return blob;
+    if (!blob.sha) {
+        return {error: 'GitHub POST git/blobs returned no sha', status: 502};
+    }
+    return {ok: true, sha: blob.sha};
+}
+
 async function commitAll(env, message, entries) {
     const branch = env.GITHUB_BRANCH || 'main';
     const ref = await githubApi(env, 'GET', 'git/ref/heads/' + branch);
@@ -344,15 +356,18 @@ export async function onRequestPost(context) {
     const manifestJson = JSON.stringify(posts, null, 2) + '\n';
 
     const entries = [];
-    images.forEach(function(image, index) {
+    for (let i = 0; i < images.length; i++) {
+        const blob = await githubCreateBlob(env, images[i].base64Data);
+        if (blob.error) {
+            return json(blob, blob.status);
+        }
         entries.push({
-            path: 'media/' + media.names[index],
+            path: 'media/' + media.names[i],
             mode: '100644',
             type: 'blob',
-            content: image.base64Data,
-            encoding: 'base64'
+            sha: blob.sha
         });
-    });
+    }
     entries.push({path: 'blog/' + postId + '.md', mode: '100644', type: 'blob', content: markdown});
     entries.push({path: 'blog/posts.json', mode: '100644', type: 'blob', content: manifestJson});
 
