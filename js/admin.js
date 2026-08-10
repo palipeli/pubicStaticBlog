@@ -2,7 +2,7 @@
     'use strict';
 
     const PUBLISH_URL = '/api/publish';
-    const UPLOAD_URL = '/api/upload';
+    const PENDING_IMAGE_MARKER = '/__upload__/';
     const TOKEN_KEY = 'adminToken';
     const DRAFT_KEY = 'adminDraft';
     const THEME_ORDER = ['light', 'dark', 'auto'];
@@ -19,6 +19,8 @@
     let editingOriginalDate = null;
     let selectedImage = null;
     let pendingReplaceTarget = null;
+    let pendingUploads = new Map();
+    let uploadSeq = 0;
     let savedUploadRange = null;
     let imageBar = null;
 
@@ -237,7 +239,7 @@
         imageInput.click();
     }
 
-    async function uploadImage(file, replaceTarget) {
+    function queueImageFile(file, replaceTarget) {
         if (!file) return;
         if (!/^image\/(webp|png|jpeg|gif)$/i.test(file.type)) {
             setStatus('Only webp, png, jpg and gif images are allowed', 'error');
@@ -247,39 +249,18 @@
             setStatus('Image too large (max 5MB)', 'error');
             return;
         }
-        const token = getToken();
-        if (!token) {
-            setStatus('Enter your admin token first', 'error');
-            return;
-        }
-        setStatus('Uploading image…', '');
-        try {
-            const bytes = new Uint8Array(await file.arrayBuffer());
-            let binary = '';
-            const chunkSize = 0x8000;
-            for (let i = 0; i < bytes.length; i += chunkSize) {
-                binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
-            }
-            const dataUrl = 'data:' + file.type + ';base64,' + btoa(binary);
-            const res = await fetch(UPLOAD_URL, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token},
-                body: JSON.stringify({name: file.name, data: dataUrl})
-            });
-            const result = await res.json();
-            if (!res.ok || !result.ok) {
-                setStatus(result.error || 'Upload failed (' + res.status + ')', 'error');
-                return;
-            }
-            const url = String(result.url || '');
-            const previewSrc = (typeof URL !== 'undefined' && URL.createObjectURL) ? URL.createObjectURL(file) : url;
+        const imageToken = 'up' + (++uploadSeq);
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            pendingUploads.set(imageToken, {file: file, dataUrl: String(e.target.result || '')});
+            const previewSrc = (typeof URL !== 'undefined' && URL.createObjectURL) ? URL.createObjectURL(file) : String(e.target.result || '');
             if (replaceTarget && replaceTarget.tagName === 'IMG') {
                 replaceTarget.setAttribute('src', previewSrc);
-                replaceTarget.setAttribute('data-src', url);
+                replaceTarget.removeAttribute('data-src');
+                replaceTarget.setAttribute('data-upload-token', imageToken);
                 selectImage(replaceTarget);
-                setStatus('Image replaced: ' + url, 'success');
             } else {
-                const inserted = insertHtmlIntoEditor('<img class="lazy-image" src="' + escapeHtml(previewSrc) + '" data-src="' + escapeHtml(url) + '" alt="">');
+                const inserted = insertHtmlIntoEditor('<img class="lazy-image" src="' + escapeHtml(previewSrc) + '" data-upload-token="' + imageToken + '" alt="">');
                 if (inserted && inserted.tagName === 'IMG') {
                     if (inserted.parentNode === editor) {
                         const p = document.createElement('p');
@@ -288,11 +269,19 @@
                     }
                     selectImage(inserted);
                 }
-                setStatus('Image uploaded: ' + url, 'success');
             }
-        } catch (err) {
-            setStatus('Upload error: ' + err.message, 'error');
-        }
+            setStatus('Image queued — it uploads when you publish', 'success');
+            scheduleDraftSave();
+            updateCount();
+        };
+        reader.onerror = function() {
+            setStatus('Could not read the selected file', 'error');
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function clearPendingUploads() {
+        pendingUploads.clear();
     }
 
     function selectImage(img) {
@@ -353,11 +342,15 @@
     function deleteSelectedImage() {
         if (!selectedImage) return;
         const img = selectedImage;
+        const imageToken = img.getAttribute('data-upload-token');
         deselectImage();
+        if (imageToken) {
+            pendingUploads.delete(imageToken);
+        }
         img.remove();
         scheduleDraftSave();
         updateCount();
-        setStatus('Image removed from the post (file stays in /media)', 'success');
+        setStatus(imageToken ? 'Image removed — queued upload cancelled' : 'Image removed from the post (file stays in /media)', 'success');
     }
 
     function copyImageUrl() {
@@ -416,8 +409,12 @@
     }
 
     function imageToMarkdown(node) {
-        const src = node.getAttribute('data-src') || node.getAttribute('src') || '';
         const alt = String(node.getAttribute('alt') || '').replace(/[\[\]]/g, '');
+        const token = node.getAttribute('data-upload-token');
+        if (token) {
+            return '![' + alt + '](' + PENDING_IMAGE_MARKER + token + ')';
+        }
+        const src = node.getAttribute('data-src') || node.getAttribute('src') || '';
         return '![' + alt + '](' + cleanLinkTarget(src) + ')';
     }
 
@@ -692,7 +689,7 @@
         const files = e.dataTransfer && e.dataTransfer.files;
         if (files && files.length) {
             savedUploadRange = null;
-            uploadImage(files[0]);
+            queueImageFile(files[0]);
             return;
         }
         const html = e.dataTransfer && e.dataTransfer.getData('text/html');
@@ -833,6 +830,7 @@
                     }
                 });
                 deselectImage();
+                clearPendingUploads();
                 editingId = id;
                 setEditLabel('Editing: ' + (fm.title || (post ? post.title : id) || id));
                 publishBtn.innerHTML = '<i class="fa-solid fa-pen"></i> Update Post';
@@ -851,6 +849,7 @@
         editingId = null;
         editingOriginalDate = null;
         deselectImage();
+        clearPendingUploads();
         setEditLabel('New post');
         publishBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Publish';
         $('post-title').value = '';
@@ -991,11 +990,21 @@
             return;
         }
 
-        const warning = roundTripWarning(content);
+        const images = [];
+        pendingUploads.forEach(function(pending, imageToken) {
+            if (content.indexOf(PENDING_IMAGE_MARKER + imageToken) !== -1) {
+                images.push({token: imageToken, name: pending.file.name, data: pending.dataUrl});
+            }
+        });
+
+        const warning = pendingUploads.size ? '' : roundTripWarning(content);
         publishBtn.disabled = true;
         setStatus('Publishing…', '');
         try {
             const payload = {title: title, category: category, icon: icon, date: date, content: content};
+            if (images.length) {
+                payload.images = images;
+            }
             if (editingId) {
                 payload.id = editingId;
             }
@@ -1009,6 +1018,22 @@
                 setStatus(result.error || 'Publish failed (' + res.status + ')', 'error');
                 return;
             }
+            if (Array.isArray(result.images) && result.images.length) {
+                const urlByToken = {};
+                result.images.forEach(function(image) {
+                    urlByToken[image.token] = image.url;
+                });
+                editor.querySelectorAll('img[data-upload-token]').forEach(function(img) {
+                    const imageToken = img.getAttribute('data-upload-token');
+                    const url = urlByToken[imageToken];
+                    if (url) {
+                        img.setAttribute('data-src', url);
+                        img.setAttribute('src', url);
+                    }
+                    img.removeAttribute('data-upload-token');
+                });
+            }
+            clearPendingUploads();
             localStorage.removeItem(DRAFT_KEY);
             $('admin-discard-btn').hidden = true;
             outputEl.hidden = true;
@@ -1066,6 +1091,9 @@
             if (src.indexOf('blob:') === 0 && dataSrc) {
                 img.setAttribute('src', dataSrc);
             }
+            if (img.hasAttribute('data-upload-token')) {
+                img.removeAttribute('data-upload-token');
+            }
         });
     }
 
@@ -1089,6 +1117,7 @@
 
     function discardDraft() {
         localStorage.removeItem(DRAFT_KEY);
+        clearPendingUploads();
         $('post-title').value = '';
         $('post-category').value = '';
         $('post-icon').value = '📝';
@@ -1298,7 +1327,7 @@
                 savedUploadRange = null;
                 return;
             }
-            uploadImage(file, replaceTarget);
+            queueImageFile(file, replaceTarget);
         });
 
         editor.addEventListener('keydown', handleKeydown);

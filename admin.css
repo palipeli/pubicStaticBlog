@@ -623,6 +623,10 @@
     backdrop-filter: blur(12px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
 }
 
+.admin-image-bar[hidden] {
+    display: none;
+}
+
 .admin-image-bar .admin-post-action {
     font-size: 11px;
 }
