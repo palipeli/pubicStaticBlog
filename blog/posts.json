@@ -54,53 +54,5 @@
     "date": "Mar 25 2026",
     "category": "Legal",
     "icon": "🔒"
-  },
-  {
-    "id": "test1",
-    "slug": "/blog/test1.md",
-    "title": "test1",
-    "date": "2026-08-10",
-    "category": "test",
-    "icon": "📄"
-  },
-  {
-    "id": "test-image-upload",
-    "slug": "/blog/test-image-upload.md",
-    "title": "test image upload",
-    "date": "2026-08-10",
-    "category": "test",
-    "icon": "👀"
-  },
-  {
-    "id": "hello-world",
-    "slug": "/blog/hello-world.md",
-    "title": "Hello world",
-    "date": "2026-08-10",
-    "category": "blog",
-    "icon": "📄"
-  },
-  {
-    "id": "hello-world-2",
-    "slug": "/blog/hello-world-2.md",
-    "title": "Hello world",
-    "date": "2026-08-10",
-    "category": "blog",
-    "icon": "📄"
-  },
-  {
-    "id": "lorem-ipsum",
-    "slug": "/blog/lorem-ipsum.md",
-    "title": "Lorem Ipsum",
-    "date": "2026-08-10",
-    "category": "test",
-    "icon": "🇮🇱"
-  },
-  {
-    "id": "testlorem",
-    "slug": "/blog/testlorem.md",
-    "title": "testlorem",
-    "date": "2026-08-10",
-    "category": "test",
-    "icon": "📄"
   }
 ]
