@@ -25,6 +25,7 @@
 | `js/home.js` | home CTA rendering and delayed post opening | `window.renderBlogButtonsLazy` |
 | `js/mobile-tray.js` | dynamic mobile menu/tray at `window.innerWidth <= 768` | `#mobile-nav-tray`, overlay, toggle |
 | `js/scrollbar.js` | custom scrollbar for `.content-area`, drawn below the fixed header so it never overlaps it; the sidebar intentionally has no visible scrollbar | `window.setupCustomScrollbars` |
+| `js/oneko.js` | self-starting cursor-following cat sprite animation (oneko.js); opts out on `prefers-reduced-motion`; sits at `z-index` 2147483645, below the consent overlay | `#oneko` element; `localStorage['oneko']` position persistence |
 | `warning.js` | flashing-light consent and interaction warning | `system_warning_consent`; `warning:cleared` event |
 | `admin.html` | standalone WYSIWYG post editor (not part of the SPA) | `#post-editor` contenteditable, `.admin-toolbar`, `/api/publish` |
 | `js/admin.js` | editor logic: formatting commands, shortcuts, paste sanitizer, Markdown serializer, deferred image uploads, publish, draft autosave | reads `js/markdown.js` via `window.parseMarkdown` |
@@ -41,11 +42,12 @@
 `index.html` contains deferred scripts in this order:
 
 ```text
-config → markdown → lazyload → state → devotional → ui → blog → home → scrollbar → app
+config → markdown → lazyload → state → devotional → ui → blog → home → scrollbar → oneko → app
 ```
 
 `warning.js` and `js/mobile-tray.js` are non-deferred scripts after the deferred list. They install
-their own DOM-ready behavior; `app.js` is the final coordinator. Do not convert scripts to ES modules
+their own DOM-ready behavior; `js/oneko.js` is a deferred self-starting script with no `window`
+dependency; `app.js` is the final coordinator. Do not convert scripts to ES modules
 or reorder them casually: modules communicate through `window`, not imports.
 
 Startup sequence in `js/app.js`:

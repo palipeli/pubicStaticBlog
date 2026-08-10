@@ -20,6 +20,7 @@ const PRECACHE_ASSETS = [
     '/js/ui.js',
     '/js/blog.js',
     '/js/home.js',
+    '/js/oneko.js',
     '/js/github-graph.js',
     '/js/dns-graph.js',
     '/js/mobile-tray.js',
@@ -29,6 +30,7 @@ const PRECACHE_ASSETS = [
     '/blog/posts.json',
     '/media/favicon-circle.webp',
     '/media/logo.webp',
+    '/media/oneko.gif',
     '/media/bg-light.webp',
     '/media/bg-dark.webp',
     '/media/vt323.ttf',
@@ -370,6 +372,7 @@ async function precacheAllAssets() {
         '/media/dns.webp',
         '/media/favicon-circle.webp',
         '/media/logo.webp',
+        '/media/oneko.gif',
         '/media/signing.webp',
         '/media/vt323.ttf',
     ];
