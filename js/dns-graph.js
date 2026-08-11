@@ -223,9 +223,5 @@
             if (wrap) resizeObserver.observe(wrap);
         }
     }
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initDnsGraph);
-    } else {
-        initDnsGraph();
-    }
+    window.initDnsGraph = initDnsGraph;
 })();

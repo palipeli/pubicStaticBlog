@@ -184,7 +184,7 @@
             i++;
             if (isImage) {
                 return {
-                    html: '<img class="lazy-image" data-src="' + escapeHtml(dest) + '" alt="' + escapeHtml(label) + '">',
+                    html: '<img class="lazy-image" data-src="' + escapeHtml(dest) + '" alt="' + escapeHtml(label) + '" loading="lazy" decoding="async">',
                     end: i
                 };
             } else {

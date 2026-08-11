@@ -186,8 +186,6 @@ async function handleRequest(request, strategy, cacheName) {
             return cacheFirst(request, cache, cacheName);
         case 'network-first':
             return networkFirst(request, cache, cacheName);
-        case 'stale-while-revalidate':
-            return staleWhileRevalidate(request, cache, cacheName);
         case 'network-only':
         default:
             return fetch(request);
@@ -218,21 +216,6 @@ async function networkFirst(request, cache, cacheName) {
         throw error;
     }
 }
-async function staleWhileRevalidate(request, cache, cacheName) {
-    const cachedResponse = await cache.match(request);
-    const fetchPromise = fetchAndCache(request, cache, cacheName);
-    if (cachedResponse) {
-        return cachedResponse;
-    }
-    try {
-        return await fetchPromise;
-    } catch (error) {
-        if (request.headers.get('accept')?.includes('text/html')) {
-            return getOfflineShell(cache);
-        }
-        throw error;
-    }
-}
 async function fetchAndCache(request, cache, cacheName) {
     const url = request.url;
     if (pendingFetches.has(url)) {
@@ -251,24 +234,6 @@ async function fetchAndCache(request, cache, cacheName) {
     } finally {
         pendingFetches.delete(url);
     }
-}
-function updateCacheInBackground(request, cache, cacheName) {
-    const url = request.url;
-    if (pendingFetches.has(url)) {
-        return;
-    }
-    const updatePromise = fetch(request)
-        .then((response) => {
-            if (response && response.ok && responseMatchesCache(response, request, cacheName)) {
-                return cache.put(request, response.clone());
-            }
-        })
-        .catch(() => {
-        })
-        .finally(() => {
-            pendingFetches.delete(url);
-        });
-    pendingFetches.set(url, updatePromise);
 }
 async function getOfflineShell(cache) {
     const shell = await cache.match('/index.html') || await cache.match('/');

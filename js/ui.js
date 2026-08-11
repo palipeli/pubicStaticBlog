@@ -24,22 +24,48 @@
     function setActiveNavigationItem(navItems, activeItem) {
         navItems.forEach(nav => nav.classList.toggle('active', nav === activeItem));
     }
+    const CHART_JS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+    let chartsLoadingPromise = null;
+    function ensureChartsLoaded() {
+        if (typeof window.Chart !== 'undefined') return Promise.resolve();
+        if (chartsLoadingPromise) return chartsLoadingPromise;
+        chartsLoadingPromise = new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = CHART_JS_URL;
+            script.async = true;
+            script.crossOrigin = 'anonymous';
+            script.referrerPolicy = 'no-referrer';
+            script.onload = () => resolve();
+            script.onerror = () => {
+                chartsLoadingPromise = null;
+                reject(new Error('Failed to load Chart.js'));
+            };
+            document.head.appendChild(script);
+        });
+        return chartsLoadingPromise;
+    }
     function showPageSection(sections, page) {
         sections.forEach(section => {
             section.classList.toggle('active', section.id === page);
         });
+        if (page === 'home') {
+            ensureChartsLoaded().then(() => {
+                if (typeof window.initDnsGraph === 'function') {
+                    window.initDnsGraph();
+                }
+                if (typeof window.initGithubGraphs === 'function') {
+                    window.initGithubGraphs();
+                }
+            }).catch(() => {});
+        }
         if (page === 'about') {
             const aboutHero = document.querySelector('.about-hero');
-            if (aboutHero && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                aboutHero.classList.remove('about-animate');
-                void aboutHero.offsetWidth;
+            if (aboutHero && !aboutHero.classList.contains('about-animate') && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
                 aboutHero.classList.add('about-animate');
             }
         } else if (page === 'home') {
             const homeHero = document.querySelector('.home-hero');
-            if (homeHero && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                homeHero.classList.remove('home-animate');
-                void homeHero.offsetWidth;
+            if (homeHero && !homeHero.classList.contains('home-animate') && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
                 homeHero.classList.add('home-animate');
             }
         }
@@ -169,6 +195,14 @@
         let hasRestoredBlogSession = false;
         let wasReadingBlogPost = false;
         wrapHomeContentInRectangle();
+        // Initialize charts lazily on first paint if the initial section is home.
+        const initialActive = document.querySelector('.page-section.active');
+        if (initialActive) {
+            const hash = window.location.hash.substring(1);
+            if (!hash || hash === 'home') {
+                showPageSection(sections, initialActive.id);
+            }
+        }
         navItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();

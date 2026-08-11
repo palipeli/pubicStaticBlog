@@ -86,11 +86,6 @@
         }
         currentAnimationFrameId = requestAnimationFrame(step);
     }
-    function stopAnimations() {
-        cancelAnimation();
-        devotionalActive = false;
-        isAnimating = false;
-    }
     async function runDevotional() {
         if (devotionalActive || isAnimating) return;
         devotionalActive = true;

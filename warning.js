@@ -26,12 +26,14 @@
             setTimeout(() => {bypassWarning = false;}, 1000);
         }
     });
-    window.addEventListener('beforeunload', (e) => {
-        if (!bypassWarning) {
-            e.preventDefault();
-            e.returnValue = '';
-        }
-    });
+    function registerBeforeUnload() {
+        window.addEventListener('beforeunload', (e) => {
+            if (!bypassWarning) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+    }
     let isAccepted = false;
     let areAssetsLoaded = false;
     let touchStartX = 0;
@@ -116,6 +118,7 @@
     if (hasPriorConsent) {
         consentOverlay.style.display = 'none';
         isAccepted = true;
+        registerBeforeUnload();
     }
     consentOverlay.innerHTML = `
         <div id="consent-box">
@@ -149,6 +152,7 @@
             setTimeout(() => {
                 consentOverlay.style.display = 'none';
                 isAccepted = true;
+                registerBeforeUnload();
             }, 300);
         });
         declineBtn.addEventListener('click', async () => {

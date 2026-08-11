@@ -5,6 +5,7 @@
     let activeNavigationToken = 0;
     let blogPostMetadata = window.blogPostMetadata;
     let preloadTimeout = null;
+    let lastPreloadedPostId = null;
 
     function escapeHtml(str) {
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');
@@ -93,10 +94,13 @@
         return loadPromise;
     }
     function preloadBlogPostContent(postId) {
+        if (postId === lastPreloadedPostId) return;
+        lastPreloadedPostId = postId;
         if (preloadTimeout) {
             clearTimeout(preloadTimeout);
         }
         preloadTimeout = setTimeout(() => {
+            preloadTimeout = null;
             if (!blogContentCache.has(postId)) {
                 loadBlogPostContent(postId).then(post => {
                     if (post) {

@@ -14,3 +14,24 @@
 /admin.css
   X-Content-Type-Options: nosniff
   Cache-Control: no-cache
+
+# Long-lived immutable caching for static media (content-stable; new uploads are
+# new filenames). Immutable lets the browser and CDN skip revalidation entirely.
+/media/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Un-hashed app assets: the service worker is the caching layer here (cache-first
+# + cache-version bumps on deploy). HTTP must revalidate so a SW update can never
+# cache a stale copy from the browser's HTTP cache.
+/js/*
+  Cache-Control: public, max-age=0, must-revalidate
+/style.css
+  Cache-Control: public, max-age=0, must-revalidate
+
+# HTML and the post manifest must stay fresh: revalidate on every request.
+/blog/posts.json
+  Cache-Control: public, max-age=0, must-revalidate
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+/
+  Cache-Control: public, max-age=0, must-revalidate

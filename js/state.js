@@ -276,6 +276,9 @@
             windowY: Math.max(0, pos.windowY),
             timestamp: Date.now()
         };
+    }
+    function persistScrollPositionsNow() {
+        saveScrollPosition();
         persistScrollPositions();
     }
     function applyScrollPosition(pageKey, x, y, windowY) {
@@ -346,11 +349,11 @@
             clearTimeout(scrollSaveTimer);
             scrollSaveTimer = setTimeout(saveScrollPosition, SCROLL_SAVE_DELAY);
         }, {passive: true, capture: true});
-        window.addEventListener('beforeunload', saveScrollPosition);
-        window.addEventListener('pagehide', saveScrollPosition);
+        window.addEventListener('beforeunload', persistScrollPositionsNow);
+        window.addEventListener('pagehide', persistScrollPositionsNow);
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') {
-                saveScrollPosition();
+                persistScrollPositionsNow();
             }
         });
         document.addEventListener('click', (e) => {
@@ -358,10 +361,10 @@
                 e.target.closest?.(selector)
             );
             if (isNavigation) {
-                saveScrollPosition();
+                persistScrollPositionsNow();
             }
         }, true);
-        window.addEventListener('popstate', saveScrollPosition);
+        window.addEventListener('popstate', persistScrollPositionsNow);
         reapplySavedPositionWhenContentSettles();
         restoreInitialPagePosition();
     }
@@ -374,5 +377,6 @@
     window.processPendingBlogPostRestore = processPendingBlogPostRestore;
     window.setupScrollPositionTracking = setupScrollPositionTracking;
     window.saveScrollPosition = saveScrollPosition;
+    window.persistScrollPositionsNow = persistScrollPositionsNow;
     window.restoreScrollPosition = restoreScrollPosition;
 })();

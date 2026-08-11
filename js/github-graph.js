@@ -244,9 +244,5 @@
             if (container) resizeObserver.observe(container);
         }
     }
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initGithubGraphs);
-    } else {
-        initGithubGraphs();
-    }
+    window.initGithubGraphs = initGithubGraphs;
 })();

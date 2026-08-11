@@ -183,7 +183,12 @@
     <script src="js/ui.js" defer></script>
     <script src="js/blog.js" defer></script>
     <script src="js/home.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- Chart.js is only needed when the home section (with its DNS/GitHub graphs) is
+         actually rendered. Loading it eagerly would force ~205 KB of parse on every
+         visit, even for users who land on a blog post or the About page. The link
+         below just warms the HTTP cache; js/ui.js injects the executable script tag
+         on demand (see ensureChartsLoaded). -->
+    <link rel="preload" as="script" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer">
     <script src="js/github-graph.js" defer></script>
     <script src="js/dns-graph.js" defer></script>
     <script src="warning.js"></script>
