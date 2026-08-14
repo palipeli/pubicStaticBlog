@@ -55,9 +55,9 @@
                     if (blogSidebarSection) {
                         blogSidebarSection.style.display = 'block';
                     }
-                    if (typeof window.processPendingBlogPostRestore === 'function') {
-                        window.processPendingBlogPostRestore();
-                    }
+                }
+                if (typeof window.processPendingBlogPostRestore === 'function') {
+                    window.processPendingBlogPostRestore();
                 }
             });
         }

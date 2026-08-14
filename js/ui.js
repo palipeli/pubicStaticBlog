@@ -96,6 +96,10 @@
             const homeNavItem = document.querySelector('.nav-item[data-page="home"]');
             if (homeNavItem) homeNavItem.click();
         } else if (hash === 'blogs') {
+            if (window.pendingBlogPostRestore ||
+                (typeof window.isBlogPostLoading === 'function' && window.isBlogPostLoading())) {
+                return;
+            }
             const blogsNavItem = document.querySelector('.nav-item[data-page="blogs"]');
             if (blogsNavItem) {
                 blogsNavItem.click();
@@ -112,13 +116,7 @@
         } else if (hash && hash.startsWith('blog-')) {
             const postId = getBlogPostIdFromHash(hash);
             if (postId && typeof window.openBlogPostLazy === 'function') {
-                if (!window.blogPostMetadata || window.blogPostMetadata.length === 0) {
-                    window.waitForBlogMetadata().then(() => {
-                        window.openBlogPostLazy(postId);
-                    });
-                } else {
-                    window.openBlogPostLazy(postId);
-                }
+                window.openBlogPostLazy(postId);
             }
         }
     }
@@ -184,8 +182,11 @@
                             wasReadingBlogPost = false;
                             navigateToBlogsPageWithoutPrefetch();
                             window.updateHash('blogs', null, true);
-                            if (typeof window.openBlogPostLazy === 'function' && savedState.activeBlogPost) {
-                                window.openBlogPostLazy(savedState.activeBlogPost);
+                            if (savedState.activeBlogPost) {
+                                window.pendingBlogPostRestore = savedState.activeBlogPost;
+                                if (typeof window.processPendingBlogPostRestore === 'function') {
+                                    window.processPendingBlogPostRestore();
+                                }
                             }
                             window.scrollTo(0, 0);
                             setTimeout(window.saveAppState, 100);

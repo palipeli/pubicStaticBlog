@@ -1,6 +1,6 @@
 'use strict';
 const CACHE_NAME = 'pubic-static-blog-v2';
-const STATIC_CACHE_NAME = 'static-assets-v6';
+const STATIC_CACHE_NAME = 'static-assets-v7';
 const IMAGE_CACHE_NAME = 'images-v3';
 const CONTENT_CACHE_NAME = 'blog-content-v2';
 const pendingFetches = new Map();
@@ -239,11 +239,17 @@ async function fetchAndCache(request, cache, cacheName) {
         return pendingFetches.get(url);
     }
     const fetchPromise = (async () => {
-        const response = await fetch(request);
-        if (response && response.ok && responseMatchesCache(response, request, cacheName)) {
-            await cache.put(request, response.clone());
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 15000);
+        try {
+            const response = await fetch(request, {signal: controller.signal});
+            if (response && response.ok && responseMatchesCache(response, request, cacheName)) {
+                await cache.put(request, response.clone());
+            }
+            return response;
+        } finally {
+            clearTimeout(timer);
         }
-        return response;
     })();
     pendingFetches.set(url, fetchPromise);
     try {
@@ -257,7 +263,9 @@ function updateCacheInBackground(request, cache, cacheName) {
     if (pendingFetches.has(url)) {
         return;
     }
-    const updatePromise = fetch(request)
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 15000);
+    const updatePromise = fetch(request, {signal: controller.signal})
         .then((response) => {
             if (response && response.ok && responseMatchesCache(response, request, cacheName)) {
                 return cache.put(request, response.clone());
@@ -266,6 +274,7 @@ function updateCacheInBackground(request, cache, cacheName) {
         .catch(() => {
         })
         .finally(() => {
+            clearTimeout(timer);
             pendingFetches.delete(url);
         });
     pendingFetches.set(url, updatePromise);

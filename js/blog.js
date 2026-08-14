@@ -5,13 +5,30 @@
     let activeNavigationToken = 0;
     let blogPostMetadata = window.blogPostMetadata;
     let preloadTimeout = null;
+    const CONTENT_FETCH_TIMEOUT_MS = 10000;
+    const METADATA_WAIT_TIMEOUT_MS = 5000;
+    let currentlyRenderedPostId = null;
+    let isPostLoading = false;
 
     function escapeHtml(str) {
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');
     }
+    function fetchWithTimeout(url, timeoutMs) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), timeoutMs);
+        return fetch(url, {signal: controller.signal}).finally(() => clearTimeout(timer));
+    }
+    function isPostViewShowing() {
+        const postView = document.getElementById('blog-post-view');
+        if (!postView || postView.style.display === 'none' || postView.style.display === '') {
+            return false;
+        }
+        const blogsSection = document.getElementById('blogs');
+        return !!(blogsSection && blogsSection.classList.contains('active'));
+    }
     async function fetchBlogPostMetadata() {
         try {
-            const response = await fetch('/blog/posts.json');
+            const response = await fetchWithTimeout('/blog/posts.json', CONTENT_FETCH_TIMEOUT_MS);
             if (!response.ok) {
                 throw new Error('Could not fetch blog manifest');
             }
@@ -55,7 +72,7 @@
         let lastError = null;
         for (let attempt = 1; attempt <= maxRetries; attempt++) {
             try {
-                const mdResponse = await fetch(meta.slug);
+                const mdResponse = await fetchWithTimeout(meta.slug, CONTENT_FETCH_TIMEOUT_MS);
                 if (!mdResponse.ok) throw new Error(`Failed to fetch content: ${mdResponse.status}`);
                 const mdContent = await mdResponse.text();
                 const {frontmatter, content} = window.parseFrontmatter(mdContent);
@@ -198,10 +215,22 @@
         }
     }
     async function openBlogPostLazy(id) {
-        const navigationToken = ++activeNavigationToken;
         const article = document.getElementById('blog-article-content');
+        if (!article) return;
+        if (currentlyRenderedPostId === id && isPostViewShowing()) {
+            if (typeof window.restoreScrollPosition === 'function') {
+                window.restoreScrollPosition();
+            }
+            return;
+        }
+        const navigationToken = ++activeNavigationToken;
         if (!window.blogPostMetadata || window.blogPostMetadata.length === 0) {
             await waitForBlogMetadata();
+        }
+        if (navigationToken !== activeNavigationToken) return;
+        if (!window.blogPostMetadata || window.blogPostMetadata.length === 0) {
+            showBlogIntro();
+            return;
         }
         const currentPage = document.querySelector('.page-section.active');
         let previousPage = null;
@@ -227,6 +256,8 @@
         });
         document.getElementById('blog-intro-view').style.display = 'none';
         document.getElementById('blog-post-view').style.display = 'block';
+        currentlyRenderedPostId = null;
+        isPostLoading = true;
         article.innerHTML = `
             <div class="loading-container">
                 <div class="loading-spinner"></div>
@@ -238,6 +269,7 @@
             post = await loadBlogPostContent(id);
         } catch (err) {
             if (navigationToken !== activeNavigationToken) return;
+            isPostLoading = false;
             console.error('Error loading blog post:', err);
             article.innerHTML = `
                 <div class="error-message">
@@ -254,11 +286,14 @@
         }
         if (navigationToken !== activeNavigationToken) return;
         if (!post) {
+            isPostLoading = false;
             article.innerHTML = '<p style="color: var(--text-secondary);">Error loading post.</p>';
             return;
         }
         requestAnimationFrame(() => {
             if (navigationToken !== activeNavigationToken) return;
+            isPostLoading = false;
+            currentlyRenderedPostId = id;
             article.innerHTML = `
                 <h1>${escapeHtml(post.icon)} ${escapeHtml(post.title)}</h1>
                 <div class="blog-meta" style="margin-bottom: 20px;">
@@ -289,12 +324,12 @@
             window.updateHash('', id, true);
         }
         setTimeout(window.saveAppState, 100);
-        window.scrollTo(0, 0);
     }
     function waitForBlogMetadata() {
         return new Promise((resolve) => {
+            const deadline = Date.now() + METADATA_WAIT_TIMEOUT_MS;
             const checkMetadata = () => {
-                if (window.blogPostMetadata && window.blogPostMetadata.length > 0) {
+                if ((window.blogPostMetadata && window.blogPostMetadata.length > 0) || Date.now() >= deadline) {
                     resolve();
                 } else {
                     setTimeout(checkMetadata, 100);
@@ -343,6 +378,8 @@
                     <div class="blog-post-content">${post.htmlContent}</div>
                     ${blogPostFooter}
                 `;
+                isPostLoading = false;
+                currentlyRenderedPostId = previousPostId;
                 document.querySelectorAll('.post-selector-item').forEach((item) => {
                     item.classList.toggle('active', item.getAttribute('data-post-id') === previousPostId);
                 });
@@ -372,6 +409,8 @@
         setTimeout(window.saveAppState, 100);
     }
     function showBlogIntro() {
+        currentlyRenderedPostId = null;
+        isPostLoading = false;
         document.getElementById('blog-post-view').style.display = 'none';
         document.getElementById('blog-intro-view').style.display = 'block';
         document.querySelectorAll('.post-selector-item').forEach(item => {
@@ -386,8 +425,12 @@
         }
         setTimeout(window.saveAppState, 100);
     }
+    function isBlogPostLoading() {
+        return isPostLoading;
+    }
     window.fetchBlogPostMetadata = fetchBlogPostMetadata;
     window.preloadBlogPostContent = preloadBlogPostContent;
+    window.isBlogPostLoading = isBlogPostLoading;
     window.renderPostSelector = renderPostSelector;
     window.renderBlogPostSelectorGrid = renderBlogPostSelectorGrid;
     window.openBlogPostLazy = openBlogPostLazy;
