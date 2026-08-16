@@ -924,8 +924,8 @@
             }
             return doc.body.innerHTML;
         } catch (err) {
-            console.warn('HTML sanitization failed, stripping tags:', err);
-            return html.replace(/<[^>]*>/g, '');
+            console.warn('HTML sanitization failed, escaping tags:', err);
+            return html.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
     }
     function parseFrontmatter(content) {

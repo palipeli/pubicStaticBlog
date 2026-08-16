@@ -1,0 +1,5 @@
+Contact: mailto:sel@kamikami.eu
+Expires: 2027-08-16T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://www.kamikami.eu/.well-known/security.txt
+Policy: https://www.kamikami.eu/#blog-privacy-policy

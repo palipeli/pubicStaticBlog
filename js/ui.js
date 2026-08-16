@@ -243,6 +243,10 @@
                 return;
             });
         });
+        const blueButton = document.querySelector('.blue-button');
+        if (blueButton) {
+            blueButton.addEventListener('click', handleClickMe);
+        }
     }
     function wrapHomeContentInRectangle() {
         const homeHero = document.getElementById('home-hero-content');
