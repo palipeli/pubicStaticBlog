@@ -2,12 +2,12 @@
 <html lang="en" data-theme="auto">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-C0Ba+CvLsUvb+yW9j5KsKqBlb5yGl6qvApG8JaXGVvg='; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https:; font-src 'self' https://cdnjs.cloudflare.com; connect-src 'self' https://graph.kamikami.workers.dev https://github-contributions-api.jogruber.de; base-uri 'none'; form-action 'none'; object-src 'none'; worker-src 'self'">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Michelle's DNS and Blog</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
     <link rel="icon" type="image/webp" href="media/favicon-circle.webp">
+    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kamikami.eu/">
@@ -46,7 +46,7 @@
     <div class="particles" id="particles"></div>
     <header class="header">
         <div class="header-left">
-            <button class="blue-button"><span>kamikami.eu</span></button>
+            <button class="blue-button" onclick="handleClickMe()"><span>kamikami.eu</span></button>
         </div>
         <div class="header-right">
             <a href="#" class="nav-item active" data-page="home">Home</a>
@@ -113,8 +113,8 @@
                         </div>
                         <div class="blog-post-view" id="blog-post-view" style="display: none;">
                             <div class="blog-post-nav">
-                                <button class="back-to-intro-btn">← Back</button>
-                                <button class="back-to-intro-btn next-post-btn" id="next-post-btn" style="display: none;">Next →</button>
+                                <button class="back-to-intro-btn" onclick="goBack()" onmouseenter="window.preloadPreviousPageOnHover()">← Back</button>
+                                <button class="back-to-intro-btn next-post-btn" id="next-post-btn" onclick="goToNextPost()" onmouseenter="window.preloadNextPostOnHover()" style="display: none;">Next →</button>
                             </div>
                             <article class="blog-article" id="blog-article-content">
                             </article>
@@ -183,7 +183,7 @@
     <script src="js/ui.js" defer></script>
     <script src="js/blog.js" defer></script>
     <script src="js/home.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer crossorigin="anonymous" referrerpolicy="no-referrer" integrity="sha384-bs/nf9FbdNouRbMiFcrcZfLXYPKiPaGVGplVbv7dLGECccEXDW+S3zjqSKR5ZEaD"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="js/github-graph.js" defer></script>
     <script src="js/dns-graph.js" defer></script>
     <script src="warning.js"></script>

@@ -437,19 +437,6 @@
     window.showBlogIntro = showBlogIntro;
     window.goBack = goBack;
     window.waitForBlogMetadata = waitForBlogMetadata;
-    function setupPostNavButtons() {
-        const backBtn = document.querySelector('.back-to-intro-btn:not(.next-post-btn)');
-        if (backBtn) {
-            backBtn.addEventListener('click', goBack);
-            backBtn.addEventListener('mouseenter', preloadPreviousPageOnHover);
-        }
-        const nextPostBtn = document.getElementById('next-post-btn');
-        if (nextPostBtn) {
-            nextPostBtn.addEventListener('click', goToNextPost);
-            nextPostBtn.addEventListener('mouseenter', preloadNextPostOnHover);
-        }
-    }
-    setupPostNavButtons();
     window.goToNextPost = goToNextPost;
     window.preloadNextPostOnHover = preloadNextPostOnHover;
     window.preloadPreviousPageOnHover = preloadPreviousPageOnHover;

@@ -1,2 +1,0 @@
-# Serve security.txt at the standard path (rewrite; evaluated before the SPA 404 fallback).
-/.well-known/security.txt /security.txt 200

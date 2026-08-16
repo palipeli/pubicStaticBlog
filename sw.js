@@ -2,7 +2,7 @@
 const CACHE_NAME = 'pubic-static-blog-v2';
 const STATIC_CACHE_NAME = 'static-assets-v7';
 const IMAGE_CACHE_NAME = 'images-v3';
-const CONTENT_CACHE_NAME = 'blog-content-v3';
+const CONTENT_CACHE_NAME = 'blog-content-v2';
 const pendingFetches = new Map();
 const STATIC_EXTENSIONS = /\.(html|css|js|json|webmanifest|ico|txt|xml)$/i;
 const IMAGE_EXTENSIONS = /\.(webp|png|jpg|jpeg|gif|svg|ico)(\?.*)?$/i;
@@ -107,7 +107,7 @@ function getCacheStrategy(request) {
         return 'cache-first';
     }
     if (MARKDOWN_EXTENSIONS.test(pathname) || pathname.startsWith('/blog/')) {
-        return 'stale-while-revalidate';
+        return 'cache-first';
     }
     return 'network-first';
 }

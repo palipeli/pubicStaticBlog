@@ -1,12 +1,3 @@
-# Cloudflare Pages headers — main site hardening.
-# The main-site CSP is a <meta> tag in index.html: a header-based /* CSP would
-# merge with the stricter /admin.html CSP below (Pages merges headers across
-# all matching _headers rules) and break the admin page. frame-ancestors is
-# covered by X-Frame-Options on all responses.
-/*
-  X-Frame-Options: DENY
-  Access-Control-Allow-Origin: https://www.kamikami.eu
-
 # Cloudflare Pages headers — admin surface hardening
 # CSP hash covers the inline theme script in admin.html (keep in sync with it).
 /admin.html
