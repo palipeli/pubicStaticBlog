@@ -129,15 +129,16 @@
         container.innerHTML = '';
         posts.forEach(post => {
             const item = document.createElement('div');
-            item.className = 'post-selector-item';
+            item.className = 'post-selector-item' + (post.pinned ? ' pinned' : '');
             item.setAttribute('data-post-id', post.id);
             item.onclick = () => window.openBlogPostLazy(post.id);
             item.onmouseenter = () => {
                 preloadBlogPostContent(post.id);
             };
             item.innerHTML = `
-                <div class="post-selector-title">${escapeHtml(post.icon)} ${escapeHtml(post.title)}</div>
-                <div class="post-selector-meta">${escapeHtml(post.date)}</div>
+                <div class="post-selector-title">${escapeHtml(post.title)}</div>
+                <div class="post-selector-meta">${escapeHtml(post.icon)} ${escapeHtml(post.date)} • ${escapeHtml(post.category)}</div>
+                ${post.pinned ? '<div class="post-selector-pin" title="Pinned post" aria-hidden="true">📌</div>' : ''}
             `;
             container.appendChild(item);
         });

@@ -153,10 +153,11 @@
         container.innerHTML = '';
         posts.forEach(post => {
             const item = document.createElement('div');
-            item.className = 'mobile-post-item';
+            item.className = 'mobile-post-item' + (post.pinned ? ' pinned' : '');
             item.innerHTML = `
-                <div class="mobile-post-title">${escapeHtml(post.icon)} ${escapeHtml(post.title)}</div>
-                <div class="mobile-post-meta">${escapeHtml(post.date)}</div>
+                <div class="mobile-post-title">${escapeHtml(post.title)}</div>
+                <div class="mobile-post-meta">${escapeHtml(post.icon)} ${escapeHtml(post.date)} • ${escapeHtml(post.category)}</div>
+                ${post.pinned ? '<div class="mobile-post-pin" title="Pinned post" aria-hidden="true">📌</div>' : ''}
             `;
             item.addEventListener('touchstart', () => {
                 if (typeof window.preloadBlogPostContent === 'function') {

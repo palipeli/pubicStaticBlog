@@ -1209,6 +1209,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-color);
     border-radius: 6px;
+    position: relative;
     padding: 12px 15px;
     cursor: pointer;
     transition: transform 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
@@ -1227,6 +1228,19 @@ html[data-theme="dark"] .mobile-theme-btn.active {
 
 .post-selector-item.active .post-selector-title {
     color: var(--accent-pink);
+}
+
+.post-selector-item.pinned {
+    padding-right: 28px;
+}
+
+.post-selector-pin {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    line-height: 1;
 }
 
 .post-selector-title {
@@ -1997,6 +2011,7 @@ body::-webkit-scrollbar {
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--border-color);
     border-radius: 6px;
+    position: relative;
     padding: 14px 16px;
     cursor: pointer;
     transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
@@ -2014,6 +2029,19 @@ body::-webkit-scrollbar {
 
 .mobile-post-item.active .mobile-post-title {
     color: var(--accent-pink);
+}
+
+.mobile-post-item.pinned {
+    padding-right: 28px;
+}
+
+.mobile-post-pin {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    line-height: 1;
 }
 
 .mobile-post-title {
