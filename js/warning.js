@@ -60,7 +60,7 @@
         }
     });
     window.addEventListener('beforeunload', (e) => {
-        if (!bypassWarning) {
+        if (!bypassWarning && !window.__devtoolClosing) {
             e.preventDefault();
             e.returnValue = '';
         }
@@ -70,6 +70,9 @@
     let touchStartX = 0;
     let touchStartY = 0;
     const hasPriorConsent = localStorage.getItem(STORAGE_KEY) === 'true';
+    const selBlock = document.createElement('style');
+    selBlock.textContent = 'body { -webkit-user-select:none; user-select:none; }';
+    document.head.appendChild(selBlock);
     const style = document.createElement('style');
     style.innerHTML = `
         #consent-overlay {
@@ -284,12 +287,26 @@
                 isPlaying = false;
             }
             setTimeout(() => {flashOverlay.style.opacity = '0';}, 100);
+            window.dispatchEvent(new Event('warning:flash'));
         }, 5);
         setTimeout(() => {preFlashOverlay.style.opacity = '0';}, 25);
     }
     initAudio();
     window.addEventListener('keydown', (e) => isAccepted && triggerWarning(e));
     window.addEventListener('mousedown', (e) => isAccepted && triggerWarning(e));
+    window.addEventListener('selectstart', (e) => {
+        if (!isAccepted) return;
+        e.preventDefault();
+        window.getSelection().removeAllRanges();
+        triggerWarning(e);
+        window.dispatchEvent(new Event('denied:flash'));
+    });
+    window.addEventListener('contextmenu', (e) => {
+        if (!isAccepted) return;
+        e.preventDefault();
+        triggerWarning(e);
+        window.dispatchEvent(new Event('denied:flash'));
+    });
     window.addEventListener('touchstart', (e) => {
         if(isAccepted && e.touches.length > 0) {
             touchStartX = e.touches[0].screenX;
