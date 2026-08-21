@@ -158,7 +158,7 @@
     function detectRegToString() {
         if (!regRegex) return;
         regSpyCount = 0;
-        try { nativeLog(regRegex); nativeClear(); } catch (e) { /* ignored */ }
+        try { nativeLog(regRegex); } catch (e) { /* ignored */ }
         if (regSpyCount >= 2) onDevToolOpen();
     }
 
@@ -182,7 +182,7 @@
     function detectDefineId() {
         if (!defineIdEl) return;
         defineIdSpy = 0;
-        try { nativeLog(defineIdEl); nativeClear(); } catch (e) { /* ignored */ }
+        try { nativeLog(defineIdEl); } catch (e) { /* ignored */ }
         if (defineIdSpy >= 2) onDevToolOpen();
     }
 
@@ -224,7 +224,7 @@
     function detectDateToString() {
         if (!testDate) return;
         dateSpyCount = 0;
-        try { nativeLog(testDate); nativeClear(); } catch (e) { /* ignored */ }
+        try { nativeLog(testDate); } catch (e) { /* ignored */ }
         if (dateSpyCount >= 2) onDevToolOpen();
     }
 
@@ -247,7 +247,7 @@
     function detectFuncToString() {
         if (!testFunc) return;
         funcSpyCount = 0;
-        try { nativeLog(testFunc); nativeClear(); } catch (e) { /* ignored */ }
+        try { nativeLog(testFunc); } catch (e) { /* ignored */ }
         if (funcSpyCount >= 2) onDevToolOpen();
     }
 
@@ -285,8 +285,6 @@
             nativeLog(largeObjArray);
             var logTime = performance.now() - start2;
 
-            nativeClear();
-
             maxTableTime = Math.max(maxTableTime, tableTime);
             if (logTime === 0 || maxTableTime === 0) return;
             if (tableTime > 10 * maxTableTime) {
@@ -306,7 +304,6 @@
                     return false;
                 }
             });
-            nativeClear();
             if (count >= 1) onDevToolOpen();
         } catch (e) { /* ignored */ }
     }
