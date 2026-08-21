@@ -171,9 +171,9 @@ self.addEventListener('fetch', (event) => {
         return;
     }
     if (url.origin !== self.location.origin) {
-        if (url.hostname === 'cdnjs.cloudflare.com') {
-            return;
-        }
+        return;
+    }
+    if (/\.(webm|mp4|mp3|ogg|wav|m4a|flac|aac)(\?.*)?$/i.test(url.pathname)) {
         return;
     }
     const strategy = getCacheStrategy(request);
@@ -191,7 +191,7 @@ async function handleRequest(request, strategy, cacheName) {
             return staleWhileRevalidate(request, cache, cacheName);
         case 'network-only':
         default:
-            return fetch(request);
+            return fetch(request).catch(() => new Response(null, { status: 404, statusText: 'Not Found' }));
     }
 }
 async function cacheFirst(request, cache, cacheName) {
@@ -216,7 +216,7 @@ async function networkFirst(request, cache, cacheName) {
         if (request.headers.get('accept')?.includes('text/html')) {
             return getOfflineShell(cache);
         }
-        throw error;
+        return new Response(null, { status: 404, statusText: 'Not Found' });
     }
 }
 async function staleWhileRevalidate(request, cache, cacheName) {
@@ -231,7 +231,7 @@ async function staleWhileRevalidate(request, cache, cacheName) {
         if (request.headers.get('accept')?.includes('text/html')) {
             return getOfflineShell(cache);
         }
-        throw error;
+        return new Response(null, { status: 404, statusText: 'Not Found' });
     }
 }
 async function fetchAndCache(request, cache, cacheName) {
