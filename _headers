@@ -1,6 +1,6 @@
 # Disable Cloudflare Speculation-Rules (causes net::ERR_ABORTED)
 /*
-  Speculation-Rules: ""
+  Speculation-Rules: {}
 
 # Cloudflare Pages headers — admin surface hardening
 # CSP hash covers the inline theme script in admin.html (keep in sync with it).
