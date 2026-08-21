@@ -343,15 +343,11 @@
         }
     }
 
-    /* ── Tick: lightweight detectors only (no debugger!) ────────────── */
+    /* ── Tick: lightweight detectors only ───────────────────────────── */
     function tick() {
         if (fired) return;
         clearConsole();
         detectSize();
-        detectRegToString();
-        detectDefineId();
-        detectDateToString();
-        detectFuncToString();
         detectConsoleGetter();
     }
 
