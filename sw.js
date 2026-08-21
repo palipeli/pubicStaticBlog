@@ -95,7 +95,7 @@ function getCacheStrategy(request) {
     if (pathname === '/blog/posts.json') {
         return 'network-first';
     }
-    if (pathname.startsWith('/api/')) {
+    if (pathname.startsWith('/api/') || pathname.startsWith('/cdn-cgi/')) {
         return 'network-only';
     }
     if (STATIC_EXTENSIONS.test(pathname)) {
