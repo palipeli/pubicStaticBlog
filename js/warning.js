@@ -1,9 +1,38 @@
 (function() {
     const STORAGE_KEY = 'system_warning_consent';
     const SCROLL_THRESHOLD = 10;
+    const VOLUME_GAIN = 4.0;
+    const AUDIO_LAYERS = 6;
     const phrases = [
-        "STOP", "PLS", "STOPPPPPP!", "STAHPPP", "ARE YOU INSANE?"
+        // English
+        "STOP", "DON'T TOUCH", "NO!", "YAMETEEEEEE!",
+        "DAME!", "BAKA!", "ERROR", "FATAL", "FORBIDDEN",
+        "ASU", "KYAAAAA!", "ANJING", "BUTO", "BABI", "PUKIMAK", "ANJING",
+
+        // Japanese
+        "やめて!",
+        "触らないで!",
+        "ダメ!",
+        "うるさい!",
+        "警告",
+        "エラー",
+
+        // Chinese
+        "不要!",
+        "禁止",
+        "错误",
+        "停下",
+        "住手",
+        "別碰"
     ];
+    const audioSources = [
+        '/media/tracks/intro1.mp3', '/media/tracks/intro2.mp3',
+        '/media/tracks/intro3.mp3', '/media/tracks/intro4.mp3'
+    ];
+    let audioContext = null;
+    let audioBuffers = [];
+    let isPlaying = false;
+    let lastAudioIndex = -1;
     let bypassWarning = false;
     window.addEventListener('click', (e) => {
         if (e.target.closest('a') ||
@@ -126,7 +155,7 @@
             <div class="consent-content-wrapper">
                 <div class="consent-text">
                     <h3>₊˚⊹ᰔ✨ ⚠️FLASHING LIGHTS NOTICE!⚠️</h3>
-                    <p>Web contents may be unsuitable for individuals with epileptic photosensitivity. Agreeing loads resources without data collection (excluding Cloudflare stats). Rejecting displays contents at increased intensity.</p>
+                    <p>Web contents may be unsuitable for individuals with epileptic photosensitivity and/or loud noises. Agreeing loads resources without data collection (excluding Cloudflare stats). Rejecting displays contents at increased intensity.</p>
                     <p id="loading-status">Loading Assets...</p>
                 </div>
                 <div class="btn-group">
@@ -137,16 +166,58 @@
         </div>
     `;
     document.body.appendChild(consentOverlay);
+    async function loadAudio(url) {
+        if (!audioContext) return null;
+        try {
+            const response = await fetch(url);
+            if (!response.ok) return null;
+            const arrayBuffer = await response.arrayBuffer();
+            return await audioContext.decodeAudioData(arrayBuffer);
+        } catch (err) {
+            console.warn('Failed to load audio:', url, err);
+            return null;
+        }
+    }
+    function playSound(buffer) {
+        if (!audioContext || !buffer) return;
+        for (let i = 0; i < AUDIO_LAYERS; i++) {
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            const gainNode = audioContext.createGain();
+            gainNode.gain.value = VOLUME_GAIN;
+            source.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            source.start(0);
+            if (i === AUDIO_LAYERS - 1) {
+                source.onended = () => { isPlaying = false; };
+            }
+        }
+    }
     async function initAudio() {
         const acceptBtn = document.getElementById('accept-btn');
         const declineBtn = document.getElementById('decline-btn');
         const loadText = document.getElementById('loading-status');
+        try {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (err) {
+            console.warn('Web Audio API not available:', err);
+        }
+        const loadPromises = audioSources.map(src => loadAudio(src));
+        const results = await Promise.allSettled(loadPromises);
+        audioBuffers = results
+            .filter(r => r.status === 'fulfilled' && r.value)
+            .map(r => r.value);
         areAssetsLoaded = true;
-        loadText.innerText = "Assets Loaded.";
+        loadText.innerText = audioBuffers.length > 0
+            ? `Assets Loaded. (${audioBuffers.length} tracks)`
+            : "Assets Loaded.";
         acceptBtn.innerText = "ACCEPT";
         acceptBtn.disabled = false;
         declineBtn.disabled = false;
-        acceptBtn.addEventListener('click', () => {
+        acceptBtn.addEventListener('click', async () => {
+            if (audioContext && audioContext.state === 'suspended') {
+                await audioContext.resume();
+            }
             localStorage.setItem(STORAGE_KEY, 'true');
             consentOverlay.style.opacity = '0';
             document.dispatchEvent(new CustomEvent('warning:cleared'));
@@ -169,7 +240,7 @@
     }
     async function triggerWarning(e, force = false) {
         if (!force) {
-            if (!isAccepted || !areAssetsLoaded) return;
+            if (!isAccepted || !areAssetsLoaded || isPlaying) return;
             if (e && e.target && (
                 e.target.closest('#consent-overlay') ||
                 e.target.closest('a') ||
@@ -194,10 +265,24 @@
                 e.target.closest('.github-graph-range-btn')
             )) return;
         }
+        if (audioContext && audioContext.state === 'suspended') {
+            await audioContext.resume();
+        }
+        if (!force) isPlaying = true;
         preFlashOverlay.style.opacity = '1';
         setTimeout(() => {
             textSpan.innerText = phrases[Math.floor(Math.random() * phrases.length)];
             flashOverlay.style.opacity = '1';
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * audioBuffers.length);
+            } while (newIndex === lastAudioIndex && audioBuffers.length > 1);
+            lastAudioIndex = newIndex;
+            if (audioBuffers[newIndex]) {
+                playSound(audioBuffers[newIndex]);
+            } else {
+                isPlaying = false;
+            }
             setTimeout(() => {flashOverlay.style.opacity = '0';}, 100);
         }, 5);
         setTimeout(() => {preFlashOverlay.style.opacity = '0';}, 25);

@@ -25,7 +25,7 @@
 | `js/home.js` | home CTA rendering and delayed post opening | `window.renderBlogButtonsLazy` |
 | `js/mobile-tray.js` | dynamic mobile menu/tray at `window.innerWidth <= 768` | `#mobile-nav-tray`, overlay, toggle |
 | `js/scrollbar.js` | custom scrollbar for `.content-area`, drawn below the fixed header so it never overlaps it; the sidebar intentionally has no visible scrollbar | `window.setupCustomScrollbars` |
-| `warning.js` | flashing-light consent and interaction warning | `system_warning_consent`; `warning:cleared` event |
+| `js/warning.js` | flashing-light consent and interaction warning | `system_warning_consent`; `warning:cleared` event |
 | `admin.html` | standalone WYSIWYG post editor (not part of the SPA) | `#post-editor` contenteditable, `.admin-toolbar`, `/api/publish` |
 | `js/admin.js` | editor logic: formatting commands, shortcuts, paste sanitizer, Markdown serializer, deferred image uploads, publish, draft autosave | reads `js/markdown.js` via `window.parseMarkdown` |
 | `admin.css` | chrome-only styles for the admin page; editor content renders through `style.css` `.blog-article`/`.blog-post-content` | reuses existing CSS variables |

@@ -25,7 +25,7 @@ const PRECACHE_ASSETS = [
     '/js/mobile-tray.js',
     '/js/scrollbar.js',
     '/js/app.js',
-    '/warning.js',
+    '/js/warning.js',
     '/blog/posts.json',
     '/media/favicon-circle.webp',
     '/media/logo.webp',
@@ -146,7 +146,7 @@ function isCacheableMessageUrl(value) {
         const url = new URL(value, self.location.origin);
         return url.origin === self.location.origin &&
             (url.pathname === '/' || url.pathname === '/index.html' ||
-             url.pathname === '/style.css' || url.pathname === '/warning.js' ||
+             url.pathname === '/style.css' || url.pathname === '/js/warning.js' ||
              url.pathname.startsWith('/js/') || url.pathname.startsWith('/media/') ||
              url.pathname.startsWith('/blog/'));
     } catch (error) {
