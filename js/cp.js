@@ -343,12 +343,11 @@
         }
     }
 
-    /* ── Tick: lightweight detectors only ───────────────────────────── */
+    /* ── Tick: zero console output ──────────────────────────────────── */
     function tick() {
         if (fired) return;
         clearConsole();
         detectSize();
-        detectConsoleGetter();
     }
 
     /* ── Initialization ────────────────────────────────────────────── */
