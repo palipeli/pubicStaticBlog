@@ -151,6 +151,7 @@
             return;
         }
         container.innerHTML = '';
+        const fragment = document.createDocumentFragment();
         posts.forEach(post => {
             const item = document.createElement('div');
             item.className = 'mobile-post-item' + (post.pinned ? ' pinned' : '');
@@ -177,8 +178,9 @@
                 }
                 closeTray();
             });
-            container.appendChild(item);
+            fragment.appendChild(item);
         });
+        container.appendChild(fragment);
     }
     let resizeTimeout;
     function handleResize() {

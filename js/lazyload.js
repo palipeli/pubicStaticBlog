@@ -1,16 +1,24 @@
 (function() {
+    let delegatedEventsInstalled = false;
     function initializeLazyLoading() {
+        if (!delegatedEventsInstalled) {
+            delegatedEventsInstalled = true;
+            document.addEventListener('mouseenter', (e) => {
+                if (e.target && e.target.matches('img.lazy-image[data-src]')) {
+                    window.loadImage(e.target);
+                }
+            }, { passive: true });
+            document.addEventListener('touchstart', (e) => {
+                if (e.target && e.target.matches('img.lazy-image[data-src]')) {
+                    window.loadImage(e.target);
+                }
+            }, { passive: true });
+        }
         const lazyImages = document.querySelectorAll('img.lazy-image[data-src]');
         lazyImages.forEach(img => {
             if (img.dataset.lazyInitialized === 'true') return;
             img.dataset.lazyInitialized = 'true';
             img.loading = 'lazy';
-            img.addEventListener('mouseenter', () => {
-                loadImage(img);
-            }, {passive: true});
-            img.addEventListener('touchstart', () => {
-                loadImage(img);
-            }, {passive: true});
             if ('IntersectionObserver' in window) {
                 const imgObserver = new IntersectionObserver((entries, observer) => {
                     entries.forEach(entry => {
@@ -45,6 +53,7 @@
         };
     }
     window.initializeLazyLoading = initializeLazyLoading;
+    window.loadImage = loadImage;
     if (typeof document !== 'undefined') {
         document.addEventListener('DOMContentLoaded', () => {
             initializeLazyLoading();

@@ -127,6 +127,7 @@
         const container = document.getElementById('post-selector-list');
         if (!container) return;
         container.innerHTML = '';
+        const fragment = document.createDocumentFragment();
         posts.forEach(post => {
             const item = document.createElement('div');
             item.className = 'post-selector-item' + (post.pinned ? ' pinned' : '');
@@ -140,8 +141,9 @@
                 <div class="post-selector-meta">${escapeHtml(post.icon)} ${escapeHtml(post.date)} • ${escapeHtml(post.category)}</div>
                 ${post.pinned ? '<div class="post-selector-pin" title="Pinned post" aria-hidden="true">📌</div>' : ''}
             `;
-            container.appendChild(item);
+            fragment.appendChild(item);
         });
+        container.appendChild(fragment);
     }
     function renderBlogPostSelectorGrid(posts) {
         const container = document.getElementById('blog-post-selector-grid');
@@ -152,6 +154,7 @@
             container.innerHTML = '<p style="color: var(--text-secondary);">No posts found.</p>';
             return;
         }
+        const fragment = document.createDocumentFragment();
         posts.forEach((post, index) => {
             const card = document.createElement('div');
             card.className = 'blog-card';
@@ -170,8 +173,9 @@
             card.onmouseenter = () => {
                 preloadBlogPostContent(post.id);
             };
-            container.appendChild(card);
+            fragment.appendChild(card);
         });
+        container.appendChild(fragment);
     }
     const blogPostFooter = `
         <footer class="home-page-footer">

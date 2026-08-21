@@ -406,6 +406,7 @@
     }
     function setupThemePrefetch() {
         let bgPrefetched = false;
+        let lastMouseMoveCheck = 0;
         function triggerPrefetch() {
             if (bgPrefetched) return;
             if (!navigator.serviceWorker || !navigator.serviceWorker.controller) return;
@@ -429,6 +430,9 @@
         const sidebar = document.getElementById('sidebar');
         if (sidebar) {
             sidebar.addEventListener('mousemove', function(e) {
+                const now = Date.now();
+                if (now - lastMouseMoveCheck < 100) return;
+                lastMouseMoveCheck = now;
                 if (bgPrefetched) return;
                 const chooser = sidebar.querySelector('.theme-chooser');
                 if (!chooser) return;

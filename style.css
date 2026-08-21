@@ -148,8 +148,8 @@ body {
     right: 0;
     height: var(--header-height);
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     will-change: transform;
     backface-visibility: hidden;
     display: flex;
@@ -272,8 +272,8 @@ body {
 
 .home-layout-container .home-hero {
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     border: 1px solid var(--glass-border);
     border-radius: var(--glass-radius);
     padding: 20px;
@@ -441,8 +441,8 @@ body {
 .sidebar {
     width: var(--sidebar-width);
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     border-left: 1px solid var(--glass-border);
     box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
     padding: 0;
@@ -508,8 +508,8 @@ body {
     height: 56px;
     border-radius: 14px 0 0 14px;
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     border: 1px solid var(--glass-border);
     cursor: pointer;
     display: flex;
@@ -609,8 +609,8 @@ body {
 
 .template-card {
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     border: 1px solid var(--glass-border);
     border-radius: var(--glass-radius);
     padding: 15px;
@@ -1476,8 +1476,8 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
     border: 1px solid var(--glass-border);
     cursor: pointer;
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     will-change: transform;
     transform: translateZ(0);
 }
@@ -2247,8 +2247,8 @@ footer p {
 
 .blog-post-selector-grid .template-card {
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
 }
 
 [data-theme="dark"] .nav-item:hover {
@@ -2260,8 +2260,8 @@ footer p {
 
 .mobile-tray {
     background: var(--glass-bg);
-    backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: blur(0px) saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    -webkit-backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     border: 1px solid var(--glass-border);
 }
 
