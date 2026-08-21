@@ -5,6 +5,8 @@
     DisableDevtool({
         disableMenu: false,
         detectors: 'all',
+        interval: 50,
+        clearIntervalWhenDevOpenTrigger: true,
         ondevtoolopen: function() {
             window.__devtoolClosing = true;
             try {
@@ -15,9 +17,7 @@
             } catch(e) {
                 console.log(e);
             }
-            setTimeout(function() {
-                window.location.href = 'https://theajack.github.io/disable-devtool/404.html?h=' + encodeURIComponent(location.host);
-            }, 500);
+            window.location.replace(location.origin + '/media/tracks/I_see_what_you_doing.webm');
         }
     });
 })();
