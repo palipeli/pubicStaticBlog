@@ -147,7 +147,7 @@
                         <footer class="home-page-footer">
                             <p style="font-size:0.7rem;">What the fuck are you looking at? All the contents are above, but thanks for looking at though!</p>
                             <p style="font-size:0.6rem; color:#666;">Idjen Boulevard No.48, Kota Malang 65112, Indonesia.</p>
-                            <p style="font-size:0.6rem; color:#666;">sel@kamikami.eu.</p>
+                            <p style="font-size:0.6rem; color:#666;"><span class="email-render" data-user="sel" data-domain="kamikami.eu"></span>.</p>
                             <p style="font-size:0.6rem; color:#666;">Copyright © Michelle, 2026</p>
                         </footer>
                     </div>
@@ -196,8 +196,25 @@
     <footer>
         <p style="font-size:0.7rem;">What the fuck are you looking at? All the contents are above, but thanks for looking at though!</p>
         <p style="font-size:0.6rem; color:#666;">Idjen Boulevard No.48, Kota Malang 65112, Indonesia.</p>
-        <p style="font-size:0.6rem; color:#666;">sel@kamikami.eu.</p>
+        <p style="font-size:0.6rem; color:#666;"><span class="email-render" data-user="sel" data-domain="kamikami.eu"></span>.</p>
         <p style="font-size:0.6rem; color:#666;">Copyright © Michelle, 2026</p>
     </footer>
+    <script>
+    (function() {
+        var els = document.querySelectorAll('.email-render');
+        for (var i = 0; i < els.length; i++) {
+            var el = els[i];
+            var user = el.getAttribute('data-user');
+            var domain = el.getAttribute('data-domain');
+            if (user && domain) {
+                var addr = user + '@' + domain;
+                var a = document.createElement('a');
+                a.href = 'mailto:' + addr;
+                a.textContent = addr;
+                el.parentNode.replaceChild(a, el);
+            }
+        }
+    })();
+    </script>
 </body>
 </html>
