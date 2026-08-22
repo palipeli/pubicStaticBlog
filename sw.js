@@ -1,7 +1,7 @@
 'use strict';
 const CACHE_NAME = 'pubic-static-blog-v2';
-const STATIC_CACHE_NAME = 'static-assets-v14';
-const IMAGE_CACHE_NAME = 'images-v3';
+const STATIC_CACHE_NAME = 'static-assets-v15';
+const IMAGE_CACHE_NAME = 'images-v4';
 const CONTENT_CACHE_NAME = 'blog-content-v2';
 const pendingFetches = new Map();
 const STATIC_EXTENSIONS = /\.(html|css|js|json|webmanifest|ico|txt|xml)$/i;
@@ -22,11 +22,12 @@ const PRECACHE_ASSETS = [
     '/js/home.js',
     '/js/github-graph.js',
     '/js/dns-graph.js',
+    '/js/warning.js',
+    '/js/chat-cloud.js',
     '/js/mobile-tray.js',
     '/js/scrollbar.js',
     '/js/app.js',
     '/js/cp.js',
-    '/js/warning.js',
     '/blog/posts.json',
     '/media/favicon-circle.webp',
     '/media/logo.webp',
@@ -380,10 +381,19 @@ async function precacheAllAssets() {
         '/media/background.webp',
         '/media/bg-dark.webp',
         '/media/bg-light.webp',
+        '/media/big-kitty.jpg',
+        '/media/car-dumdum.jpg',
+        '/media/denied_left.png',
+        '/media/denied_right.png',
         '/media/dns.webp',
         '/media/favicon-circle.webp',
+        '/media/il-feel.webp',
+        '/media/kittler.jpg',
         '/media/logo.webp',
+        '/media/post-editor.jpg',
         '/media/signing.webp',
+        '/media/speechbuba_left.png',
+        '/media/speechbuba_right.png',
         '/media/vt323.ttf',
     ];
     let blogPosts = [];
@@ -396,25 +406,28 @@ async function precacheAllAssets() {
     } catch (e) {
         console.warn('Could not fetch posts.json for precaching');
     }
-    const allAssets = [
+    const allAssets = [...new Set([
         ...PRECACHE_ASSETS,
         ...mediaFiles,
         ...blogPosts,
-        '/js/cp.js',
-        '/js/app.js',
-        '/js/blog.js',
+        '/js/config.js',
+        '/js/markdown.js',
+        '/js/lazyload.js',
+        '/js/state.js',
         '/js/devotional.js',
+        '/js/ui.js',
+        '/js/blog.js',
         '/js/home.js',
         '/js/github-graph.js',
         '/js/dns-graph.js',
-        '/js/lazyload.js',
-        '/js/markdown.js',
-    '/js/mobile-tray.js',
-    '/js/scrollbar.js',
-    '/js/state.js',
-    '/js/ui.js',
+        '/js/warning.js',
+        '/js/chat-cloud.js',
+        '/js/mobile-tray.js',
+        '/js/scrollbar.js',
+        '/js/app.js',
+        '/js/cp.js',
         '/blog/nt_verses_compact.json',
-    ];
+    ])];
     const cachePromises = allAssets.map((url) => {
         const isPost = url.startsWith('/blog/') && url.endsWith('.md');
         const cache = isPost ? contentCache : IMAGE_EXTENSIONS.test(url) ? imageCache : staticCache;
