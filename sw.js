@@ -1,6 +1,6 @@
 'use strict';
 const CACHE_NAME = 'pubic-static-blog-v2';
-const STATIC_CACHE_NAME = 'static-assets-v13';
+const STATIC_CACHE_NAME = 'static-assets-v14';
 const IMAGE_CACHE_NAME = 'images-v3';
 const CONTENT_CACHE_NAME = 'blog-content-v2';
 const pendingFetches = new Map();
@@ -87,6 +87,9 @@ function getCacheStrategy(request) {
     const url = new URL(request.url);
     const pathname = url.pathname;
     if (url.origin !== self.location.origin) {
+        return 'network-only';
+    }
+    if (pathname === '/js/cp.js') {
         return 'network-only';
     }
     if (pathname === '/' || pathname === '/index.html' || pathname.endsWith('.html')) {

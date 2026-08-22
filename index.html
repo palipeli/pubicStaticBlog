@@ -2,85 +2,81 @@
 <html lang="en" data-theme="auto">
 <head>
     <meta charset="UTF-8">
+    <style>html:not([data-cp-verified]){visibility:hidden}</style>
     <script>
-    /* CP bootstrap — hard gate: hide content until CP verifies; if blocked/open, nuke before anything loads */
+    /* CP bootstrap — hard gate: hide content until CP verifies; if blocked/open, nuke before anything loads. No loops/delays on redirect path. */
     (function(){
         try{ document.documentElement.style.visibility='hidden'; }catch(e){}
+        var _origReplace=null; var _origHrefSetter=null;
+        try{ _origReplace=Location.prototype.replace; }catch(e){}
+        try{
+            var _d=Object.getOwnPropertyDescriptor(Location.prototype,'href');
+            if(!_d||!_d.set) _d=Object.getOwnPropertyDescriptor(window.Location&&window.Location.prototype,'href');
+            if(_d&&_d.set) _origHrefSetter=_d.set;
+        }catch(e){}
+        try{ window.__CP_ORIG_REPLACE=_origReplace; }catch(e){}
+        try{ window.__CP_ORIG_HREF_SETTER=_origHrefSetter; }catch(e){}
         window.__CP_VERIFIED=false; window.__CP_ALLOW_LOAD=false;
-        window.__CP_FAIL=function(){
+        var _failFn=function(){
             try{ window.__devtoolClosing=true; }catch(e){}
             try{ window.stop(); }catch(e){}
             try{ document.documentElement.style.display='none'; }catch(e){}
+            try{ document.open(); document.write(''); document.close(); }catch(e){}
             try{ document.documentElement.innerHTML=''; }catch(e){}
             var u=(location.origin||'')+'/media/tracks/I_see_what_you_doing.webm';
-            try{ location.replace(u); }catch(e){ try{ location.href=u; }catch(e2){} }
-            /* throw to halt parser */
+            try{ if(_origReplace) _origReplace.call(window.location,u); else location.replace(u); }catch(e){ try{ location.replace(u);}catch(e2){} }
+            try{ if(_origHrefSetter) _origHrefSetter.call(window.location,u); else location.href=u; }catch(e){ try{location.href=u;}catch(e2){} }
+            try{ window.location=u; }catch(e){}
+            try{ window.open(u,'_self'); }catch(e){}
+            try{ document.documentElement.innerHTML='<meta http-equiv="refresh" content="0;url='+u+'">'; }catch(e){}
             throw new Error('CP gate blocked');
         };
-        /* fallback: if cp.js never defined window.CP within 1.8s (blocked), fail */
-        setTimeout(function(){
+        try{ Object.defineProperty(window,'__CP_FAIL',{value:_failFn,writable:false,configurable:false}); }catch(e){ window.__CP_FAIL=_failFn; }
+        var _rafFail=function(){
             try{
-                if(!window.CP || typeof window.CP.isRunning!=='function' || !window.CP.isRunning() || (window.CP.isDevToolOpened && window.CP.isDevToolOpened())){
+                if(!window.CP || typeof window.CP.isRunning!=='function' || !window.CP.version || window.CP.version!=='2.3.1-foolproof' || !window.CP.isRunning() || (window.CP.isDevToolOpened && window.CP.isDevToolOpened()) || (Object.isFrozen&&!Object.isFrozen(window.CP))){
                     window.__CP_FAIL();
+                } else if(window.__CP_GATE && window.__CP_GATE.isWindowSizeIndicatingDevTools && window.__CP_GATE.isWindowSizeIndicatingDevTools()){
+                    try{window.CP.trigger();}catch(e){} window.__CP_FAIL();
                 }
             }catch(e){ try{window.__CP_FAIL();}catch(e2){} }
-        }, 1800);
+        };
+        try{
+            if(typeof requestAnimationFrame==='function'){
+                requestAnimationFrame(function(){ requestAnimationFrame(_rafFail); });
+            } else if(typeof queueMicrotask==='function'){ queueMicrotask(_rafFail); }
+        }catch(e){}
     })();
     </script>
     <link rel="preload" as="script" href="js/cp.js">
-    <script src="js/cp.js" onerror="window.__CP_FAIL()"></script>
+    <script src="js/cp.js" onerror="window.__CP_FAIL()" onload="try{if(!window.CP||typeof CP.isRunning!=='function'||!CP.version||CP.version!=='2.3.1-foolproof'||!CP.isRunning()||(CP.isDevToolOpened&&CP.isDevToolOpened())||(Object.isFrozen&&!Object.isFrozen(CP)))window.__CP_FAIL()}catch(e){try{window.__CP_FAIL()}catch(e2){}}"></script>
     <script>
-    /* CP gate — keeps page hidden until CP proves browser is clean.
-       If cp.js blocked or devtools pre-open, page stays hidden and redirects before
-       any content renders (window.stop + location.replace). Final check is now
-       near-instant (80ms) — initial sync check (size + isDevToolOpened) already
-       catches docked devtools without waiting for Performance probe. Interval is
-       50ms so post-open detection is <100ms, not 680ms. */
+    /* CP gate — synchronous: if CP not verified or devtools pre-open, nuke instantly before any content renders. No timers on redirect. */
     (function(){
-        var _gateRetries=0;
-        function finalizeGate(){
-            try{
-                if(!window.CP || typeof window.CP.isRunning!=='function'){ window.__CP_FAIL(); return; }
-                try{
-                    var _ratio=window.devicePixelRatio||1;
-                    if(window.outerWidth!==0 || window.outerHeight!==0){
-                        var _w=window.outerWidth - window.innerWidth*_ratio;
-                        var _h=window.outerHeight - window.innerHeight*_ratio;
-                        if(_w>160 || _h>160){ try{window.CP.trigger();}catch(e){} window.__CP_FAIL(); return; }
-                    } else {
-                        _gateRetries++;
-                        if(_gateRetries<4){ setTimeout(finalizeGate, 40); return; }
-                    }
-                }catch(e){}
-                if(window.CP.isDevToolOpened && window.CP.isDevToolOpened()){ try{window.CP.trigger();}catch(e){} window.__CP_FAIL(); return; }
-                if(!window.CP.isRunning()){ window.__CP_FAIL(); return; }
-                if(window.__CP_GATE && window.__CP_GATE.isWindowSizeIndicatingDevTools && window.__CP_GATE.isWindowSizeIndicatingDevTools()){ try{window.CP.trigger();}catch(e){} window.__CP_FAIL(); return; }
-                window.__CP_VERIFIED=true; window.__CP_ALLOW_LOAD=true;
-                try{ document.documentElement.style.visibility=''; }catch(e){}
-                /* watch for late tampering / devtools open (now 50ms tick, so <100ms) */
-                var _checks=0;
-                var _iv=setInterval(function(){
-                    _checks++;
-                    try{
-                        if(!window.CP || (window.CP.isDevToolOpened && window.CP.isDevToolOpened())){ clearInterval(_iv); try{window.CP.trigger();}catch(e){} window.__CP_FAIL(); }
-                        if(!window.__CP_VERIFIED || !window.__CP_ALLOW_LOAD){ clearInterval(_iv); window.__CP_FAIL(); }
-                    }catch(e){}
-                    if(_checks>90) clearInterval(_iv);
-                },100);
-            }catch(e){ try{window.__CP_FAIL();}catch(e2){} }
-        }
+        function _doFail(){ try{ window.CP&&window.CP.trigger&&window.CP.trigger(); }catch(e){} try{window.__CP_FAIL();}catch(e2){} }
         try{
-            if(!window.CP || typeof window.CP.isRunning!=='function'){ window.__CP_FAIL(); return; }
+            if(!window.CP || typeof window.CP.isRunning!=='function' || !window.CP.version || window.CP.version!=='2.3.1-foolproof' || (Object.isFrozen&&!Object.isFrozen(window.CP))){ _doFail(); return; }
             try{
                 var _r=window.devicePixelRatio||1;
                 if(window.outerWidth!==0 || window.outerHeight!==0){
-                    var _ww=window.outerWidth - window.innerWidth*_r;
-                    var _hh=window.outerHeight - window.innerHeight*_r;
-                    if(_ww>160 || _hh>160){ try{window.CP.trigger();}catch(e){} window.__CP_FAIL(); return; }
+                    var _w=window.outerWidth - window.innerWidth*_r;
+                    var _h=window.outerHeight - window.innerHeight*_r;
+                    if(_w>160 || _h>160){ _doFail(); return; }
                 }
             }catch(e){}
-            if(window.CP.isDevToolOpened && window.CP.isDevToolOpened()){ try{window.CP.trigger();}catch(e){} window.__CP_FAIL(); return; }
-            setTimeout(finalizeGate, 80);
+            if(window.CP.isDevToolOpened && window.CP.isDevToolOpened()){ _doFail(); return; }
+            if(!window.CP.isRunning()){ _doFail(); return; }
+            if(window.__CP_GATE && window.__CP_GATE.isWindowSizeIndicatingDevTools && window.__CP_GATE.isWindowSizeIndicatingDevTools()){ _doFail(); return; }
+            window.__CP_VERIFIED=true; window.__CP_ALLOW_LOAD=true;
+            try{ document.documentElement.setAttribute('data-cp-verified','1'); }catch(e){}
+            try{ document.documentElement.style.visibility=''; }catch(e){}
+            try{
+                if(window.outerWidth===0 && window.outerHeight===0 && typeof requestAnimationFrame==='function'){
+                    requestAnimationFrame(function(){
+                        try{ if(window.__CP_GATE&&window.__CP_GATE.isWindowSizeIndicatingDevTools&&window.__CP_GATE.isWindowSizeIndicatingDevTools()) _doFail(); }catch(e){}
+                    });
+                }
+            }catch(e){}
         }catch(e){ try{window.__CP_FAIL();}catch(e2){} }
     })();
     </script>

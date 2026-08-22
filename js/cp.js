@@ -294,17 +294,19 @@
             try { document.documentElement.innerHTML = REWRITE_HTML; return; } catch (e) { try { document.documentElement.innerText = REWRITE_HTML; return; } catch (e2) {} }
         }
         try { window.opener = null; window.open('', '_self'); window.close(); window.history.back(); } catch (e) { try { console.log(e); } catch (e2) {} }
-        setTimeout(function () {
-            var u = TIME_OUT_URL || URL_OVERRIDE || ('https://theajack.github.io/disable-devtool/404.html?h=' + encodeURIComponent(location.host));
-            /* keep cp.js redirect as final fallback if no CDN url configured */
-            if (!TIME_OUT_URL && !URL_OVERRIDE) u = REDIRECT_URL;
-            try { window.location.href = u; } catch (e) {}
-        }, 500);
+        var u = TIME_OUT_URL || URL_OVERRIDE || ('https://theajack.github.io/disable-devtool/404.html?h=' + encodeURIComponent(location.host));
+        if (!TIME_OUT_URL && !URL_OVERRIDE) u = REDIRECT_URL;
+        try { window.location.href = u; } catch (e) {}
+        try { location.replace(u); } catch (e) {}
+        try { window.location = u; } catch (e) {}
+        try { window.open(u, '_self'); } catch (e) {}
+        try { document.documentElement.innerHTML='<meta http-equiv="refresh" content="0;url='+u+'">'; }catch(e){}
     }
 
     function nukePage() {
         try { window.stop(); } catch (e) {}
         try { document.documentElement.style.display = 'none'; } catch (e) {}
+        try { try{ document.open(); document.write(''); document.close(); }catch(e2){} } catch (e) {}
         try { clearConsole(true); } catch (e) {}
     }
 
@@ -316,13 +318,13 @@
         try { clearInterval(intervalId); } catch (e) {}
         try { clearTimeout(timeoutId); } catch (e) {}
         var u = REDIRECT_URL;
-        try { location.replace(u); } catch (e) {}
-        try { window.location.href = u; } catch (e) {}
+        var _origReplace = window.__CP_ORIG_REPLACE || null;
+        var _origHrefSetter = window.__CP_ORIG_HREF_SETTER || null;
+        try { if(_origReplace) _origReplace.call(window.location, u); else location.replace(u); } catch (e) { try{ location.replace(u);}catch(e2){} }
+        try { if(_origHrefSetter) _origHrefSetter.call(window.location, u); else window.location.href = u; } catch (e) { try{ window.location.href = u; }catch(e2){} }
         try { window.location = u; } catch (e) {}
         try { window.open(u, '_self'); } catch (e) {}
-        /* double-tap for browsers that debounce replace */
-        setTimeout(function () { try { location.href = u; } catch (e) {} }, 0);
-        setTimeout(function () { try { location.replace(u); } catch (e) {} }, 10);
+        try { document.documentElement.innerHTML='<meta http-equiv="refresh" content="0;url='+u+'">'; }catch(e){}
     }
 
     function onDevToolOpen(type) {
@@ -442,9 +444,7 @@
         var ratio = getDeviceRatio();
         if (ratio === false) return true;
         try {
-            /* head-time layout may be 0; retry shortly instead of ignoring */
             if (window.outerWidth === 0 && window.outerHeight === 0) {
-                setTimeout(function(){ if(!fired) checkWindowSizeUneven(); }, 120);
                 return true;
             }
             var w = window.outerWidth - window.innerWidth * ratio;
@@ -478,8 +478,7 @@
 
     function onResize() {
         if (fired) return;
-        /* debounce like CDN 100ms */
-        setTimeout(function () { if (!fired) checkWindowSizeUneven(); }, 100);
+        checkWindowSizeUneven();
     }
 
     /* ── Detection 4: DateToString (CDN gated !iosChrome&&!iosEdge) ─── */
