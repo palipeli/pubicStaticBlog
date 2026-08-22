@@ -79,13 +79,5 @@
     "date": "2026-08-10",
     "category": "Cat",
     "icon": "🐱"
-  },
-  {
-    "id": "hi",
-    "slug": "/blog/hi.md",
-    "title": "hi",
-    "date": "2026-08-22",
-    "category": "hi",
-    "icon": "👋"
   }
 ]
