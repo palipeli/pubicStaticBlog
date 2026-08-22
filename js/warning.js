@@ -211,9 +211,32 @@
             .filter(r => r.status === 'fulfilled' && r.value)
             .map(r => r.value);
         areAssetsLoaded = true;
-        loadText.innerText = audioBuffers.length > 0
-            ? `Assets Loaded. (${audioBuffers.length} tracks)`
-            : "Assets Loaded.";
+        var cpOk = !!(window.__CP_VERIFIED && window.__CP_ALLOW_LOAD && window.CP && typeof window.CP.isRunning === 'function' && window.CP.isRunning() && !(window.CP.isDevToolOpened && window.CP.isDevToolOpened()));
+        if (cpOk && window.__CP_GATE && typeof window.__CP_GATE.isWindowSizeIndicatingDevTools === 'function' && window.__CP_GATE.isWindowSizeIndicatingDevTools()) cpOk = false;
+        if (cpOk) {
+            loadText.innerText = 'Browser verified \u2713 \u2014 ' + (audioBuffers.length > 0 ? `Assets Loaded. (${audioBuffers.length} tracks)` : 'Assets Loaded.');
+            loadText.style.color = '#7cff7c';
+            loadText.title = 'CP verification passed — assets decrypted';
+        } else {
+            loadText.innerText = audioBuffers.length > 0
+                ? `Assets Loaded. (${audioBuffers.length} tracks)`
+                : "Assets Loaded.";
+        }
+        window.__WARNING_ASSETS_LOADED = true;
+        window.__WARNING_CP_OK = cpOk;
+        try { window.dispatchEvent(new CustomEvent('warning:assets-loaded', {detail:{cpOk:cpOk, tracks:audioBuffers.length}})); } catch(e){}
+        if (hasPriorConsent && cpOk) {
+            try {
+                var badge = document.createElement('div');
+                badge.id = 'browser-verified-badge';
+                badge.textContent = 'Browser verified \u2713';
+                badge.setAttribute('role','status');
+                badge.style.cssText = 'position:fixed;bottom:12px;left:12px;z-index:2147483645;background:rgba(0,0,0,0.78);color:#7cff7c;border:1px solid #7cff7c;padding:6px 10px;font-family:VT323,monospace;font-size:12px;letter-spacing:0.5px;border-radius:4px;opacity:0;transition:opacity 0.35s ease;pointer-events:none;';
+                document.body.appendChild(badge);
+                requestAnimationFrame(function(){ badge.style.opacity='1'; });
+                setTimeout(function(){ badge.style.opacity='0'; setTimeout(function(){ if(badge.parentNode) badge.parentNode.removeChild(badge); }, 400); }, 4200);
+            } catch(e){}
+        }
         acceptBtn.innerText = "ACCEPT";
         acceptBtn.disabled = false;
         declineBtn.disabled = false;

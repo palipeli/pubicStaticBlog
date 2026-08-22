@@ -2,8 +2,88 @@
 <html lang="en" data-theme="auto">
 <head>
     <meta charset="UTF-8">
+    <script>
+    /* CP bootstrap — hard gate: hide content until CP verifies; if blocked/open, nuke before anything loads */
+    (function(){
+        try{ document.documentElement.style.visibility='hidden'; }catch(e){}
+        window.__CP_VERIFIED=false; window.__CP_ALLOW_LOAD=false;
+        window.__CP_FAIL=function(){
+            try{ window.__devtoolClosing=true; }catch(e){}
+            try{ window.stop(); }catch(e){}
+            try{ document.documentElement.style.display='none'; }catch(e){}
+            try{ document.documentElement.innerHTML=''; }catch(e){}
+            var u=(location.origin||'')+'/media/tracks/I_see_what_you_doing.webm';
+            try{ location.replace(u); }catch(e){ try{ location.href=u; }catch(e2){} }
+            /* throw to halt parser */
+            throw new Error('CP gate blocked');
+        };
+        /* fallback: if cp.js never defined window.CP within 1.8s (blocked), fail */
+        setTimeout(function(){
+            try{
+                if(!window.CP || typeof window.CP.isRunning!=='function' || !window.CP.isRunning() || (window.CP.isDevToolOpened && window.CP.isDevToolOpened())){
+                    window.__CP_FAIL();
+                }
+            }catch(e){ try{window.__CP_FAIL();}catch(e2){} }
+        }, 1800);
+    })();
+    </script>
     <link rel="preload" as="script" href="js/cp.js">
-    <script src="js/cp.js"></script>
+    <script src="js/cp.js" onerror="window.__CP_FAIL()"></script>
+    <script>
+    /* CP gate — keeps page hidden until CP proves browser is clean.
+       If cp.js blocked or devtools pre-open, page stays hidden and redirects before
+       any content renders (window.stop + location.replace). Final check is now
+       near-instant (80ms) — initial sync check (size + isDevToolOpened) already
+       catches docked devtools without waiting for Performance probe. Interval is
+       50ms so post-open detection is <100ms, not 680ms. */
+    (function(){
+        var _gateRetries=0;
+        function finalizeGate(){
+            try{
+                if(!window.CP || typeof window.CP.isRunning!=='function'){ window.__CP_FAIL(); return; }
+                try{
+                    var _ratio=window.devicePixelRatio||1;
+                    if(window.outerWidth!==0 || window.outerHeight!==0){
+                        var _w=window.outerWidth - window.innerWidth*_ratio;
+                        var _h=window.outerHeight - window.innerHeight*_ratio;
+                        if(_w>160 || _h>160){ try{window.CP.trigger();}catch(e){} window.__CP_FAIL(); return; }
+                    } else {
+                        _gateRetries++;
+                        if(_gateRetries<4){ setTimeout(finalizeGate, 40); return; }
+                    }
+                }catch(e){}
+                if(window.CP.isDevToolOpened && window.CP.isDevToolOpened()){ try{window.CP.trigger();}catch(e){} window.__CP_FAIL(); return; }
+                if(!window.CP.isRunning()){ window.__CP_FAIL(); return; }
+                if(window.__CP_GATE && window.__CP_GATE.isWindowSizeIndicatingDevTools && window.__CP_GATE.isWindowSizeIndicatingDevTools()){ try{window.CP.trigger();}catch(e){} window.__CP_FAIL(); return; }
+                window.__CP_VERIFIED=true; window.__CP_ALLOW_LOAD=true;
+                try{ document.documentElement.style.visibility=''; }catch(e){}
+                /* watch for late tampering / devtools open (now 50ms tick, so <100ms) */
+                var _checks=0;
+                var _iv=setInterval(function(){
+                    _checks++;
+                    try{
+                        if(!window.CP || (window.CP.isDevToolOpened && window.CP.isDevToolOpened())){ clearInterval(_iv); try{window.CP.trigger();}catch(e){} window.__CP_FAIL(); }
+                        if(!window.__CP_VERIFIED || !window.__CP_ALLOW_LOAD){ clearInterval(_iv); window.__CP_FAIL(); }
+                    }catch(e){}
+                    if(_checks>90) clearInterval(_iv);
+                },100);
+            }catch(e){ try{window.__CP_FAIL();}catch(e2){} }
+        }
+        try{
+            if(!window.CP || typeof window.CP.isRunning!=='function'){ window.__CP_FAIL(); return; }
+            try{
+                var _r=window.devicePixelRatio||1;
+                if(window.outerWidth!==0 || window.outerHeight!==0){
+                    var _ww=window.outerWidth - window.innerWidth*_r;
+                    var _hh=window.outerHeight - window.innerHeight*_r;
+                    if(_ww>160 || _hh>160){ try{window.CP.trigger();}catch(e){} window.__CP_FAIL(); return; }
+                }
+            }catch(e){}
+            if(window.CP.isDevToolOpened && window.CP.isDevToolOpened()){ try{window.CP.trigger();}catch(e){} window.__CP_FAIL(); return; }
+            setTimeout(finalizeGate, 80);
+        }catch(e){ try{window.__CP_FAIL();}catch(e2){} }
+    })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Michelle's DNS and Blog</title>
     <link rel="stylesheet" href="style.css">
@@ -177,22 +257,26 @@
             </div>
         </aside>
     </div>
-    <script src="js/config.js" defer></script>
-    <script src="js/markdown.js" defer></script>
-    <script src="js/lazyload.js" defer></script>
-    <script src="js/state.js" defer></script>
-    <script src="js/devotional.js" defer></script>
-    <script src="js/ui.js" defer></script>
-    <script src="js/blog.js" defer></script>
-    <script src="js/home.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="js/github-graph.js" defer></script>
-    <script src="js/dns-graph.js" defer></script>
-    <script src="js/warning.js"></script>
-    <script src="js/chat-cloud.js"></script>
-    <script src="js/mobile-tray.js" defer></script>
-    <script src="js/scrollbar.js" defer></script>
-    <script src="js/app.js" defer></script>
+    <script src="js/config.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
+    <script src="js/markdown.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
+    <script src="js/lazyload.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
+    <script src="js/state.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
+    <script src="js/devotional.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
+    <script src="js/ui.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
+    <script src="js/blog.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
+    <script src="js/home.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer crossorigin="anonymous" referrerpolicy="no-referrer" onerror="try{window.__CP_FAIL();}catch(e){}"></script>
+    <script src="js/github-graph.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
+    <script src="js/dns-graph.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
+    <script src="js/warning.js" onerror="try{window.__CP_FAIL();}catch(e){}"></script>
+    <script src="js/chat-cloud.js" onerror="try{window.__CP_FAIL();}catch(e){}"></script>
+    <script src="js/mobile-tray.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
+    <script src="js/scrollbar.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
+    <script src="js/app.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
+    <noscript>
+        <style>html{visibility:visible !important}</style>
+        <p style="text-align:center;color:#ff45fc;font-family:VT323,monospace">Enable JavaScript — and don't block js/cp.js — to view this site.</p>
+    </noscript>
     <footer>
         <p style="font-size:0.7rem;">What the fuck are you looking at? All the contents are above, but thanks for looking at though!</p>
         <p style="font-size:0.6rem; color:#666;">Idjen Boulevard No.48, Kota Malang 65112, Indonesia.</p>
