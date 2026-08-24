@@ -216,13 +216,8 @@
             });
         });
         observer.observe(document.documentElement, {attributes: true});
-        if (typeof window.ResizeObserver !== 'undefined') {
-            const resizeObserver = new ResizeObserver(function() {
-                if (chart) chart.resize();
-            });
-            const wrap = document.querySelector('.dns-graph-canvas-wrap');
-            if (wrap) resizeObserver.observe(wrap);
-        }
+        // Chart.js (responsive: true) observes the canvas container itself;
+        // an extra ResizeObserver here would only trigger duplicate resizes.
     }
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initDnsGraph);

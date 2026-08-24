@@ -9,6 +9,11 @@
     var styleEl = null;
     var lastX = -1;
     var lastY = -1;
+    // Cached bubble box, refreshed when the sprite image finishes loading so
+    // mousemove handling never has to read offsetWidth/offsetHeight (forced
+    // layout) while dragging the bubble around.
+    var bubbleW = 0;
+    var bubbleH = 0;
 
     var BUBBLE_LEFT = '/media/speechbuba_left.png';
     var BUBBLE_RIGHT = '/media/speechbuba_right.png';
@@ -24,11 +29,13 @@
         styleEl.id = 'pixel-chat-cloud-css';
         styleEl.textContent =
             '#pixel-chat-cloud {' +
-            '  position:fixed; z-index:2147483647; pointer-events:none;' +
+            '  position:fixed; left:0; top:0; z-index:2147483647; pointer-events:none;' +
+            '  will-change:transform;' +
             '  opacity:0; transition:opacity 350ms steps(5);' +
             '}' +
             '#pixel-chat-cloud.visible { opacity:1; }' +
             '#pixel-chat-cloud.hiding  { opacity:0; }' +
+            '.cloud-float { will-change:transform; }' +
             '.cloud-bubble-img {' +
             '  display:block; max-width:480px; width:auto; height:auto;' +
             '  image-rendering:pixelated; image-rendering:crisp-edges;' +
@@ -43,10 +50,10 @@
             '  0%,100% { transform:translateY(0); }' +
             '  50% { transform:translateY(-8px); }' +
             '}' +
-            '#pixel-chat-cloud.entering {' +
+            '#pixel-chat-cloud.entering .cloud-float {' +
             '  animation:cloudBounceIn 0.35s steps(6) forwards;' +
             '}' +
-            '#pixel-chat-cloud.visible {' +
+            '#pixel-chat-cloud.visible .cloud-float {' +
             '  animation:cloudFloat 2.2s steps(6) infinite;' +
             '}' +
             '.cloud-pixel-pop {' +
@@ -84,6 +91,8 @@
     function createCloud() {
         removeCloud();
         injectStyles();
+        bubbleW = 0;
+        bubbleH = 0;
 
         var isLeft = lastX < window.innerWidth / 2;
         var img = document.createElement('img');
@@ -92,14 +101,28 @@
             ? (deniedMode ? DENIED_LEFT : BUBBLE_LEFT)
             : (deniedMode ? DENIED_RIGHT : BUBBLE_RIGHT);
 
+        // Bounce/float animations live on this inner wrapper so the outer
+        // element's inline transform (positioning) is never overridden.
+        var floatWrap = document.createElement('div');
+        floatWrap.className = 'cloud-float';
+        floatWrap.appendChild(img);
+
         cloudEl = document.createElement('div');
         cloudEl.id = 'pixel-chat-cloud';
-        cloudEl.appendChild(img);
+        cloudEl.appendChild(floatWrap);
         document.body.appendChild(cloudEl);
 
+        var measureBubble = function() {
+            if (!cloudEl) return;
+            bubbleW = cloudEl.offsetWidth || 480;
+            bubbleH = cloudEl.offsetHeight || 65;
+        };
+        img.addEventListener('load', measureBubble);
+        measureBubble();
+
         var curSide = isLeft;
-        var cw = cloudEl.offsetWidth || 480;
-        var ch = cloudEl.offsetHeight || 65;
+        var cw = bubbleW;
+        var ch = bubbleH;
         var sx = lastX >= 0 ? lastX : window.innerWidth / 2;
         var sy = lastY >= 0 ? lastY : window.innerHeight / 2;
         var px = isLeft ? sx - cw / 3 : sx - cw * 2 / 3;
@@ -108,13 +131,12 @@
         if (px < 10) px = 10;
         if (py < 10) py = 10;
         if (py + ch > window.innerHeight - 10) py = window.innerHeight - ch - 10;
-        cloudEl.style.left = px + 'px';
-        cloudEl.style.top = py + 'px';
+        setCloudPosition(px, py);
 
         moveHandler = function(e) {
             if (!cloudEl) return;
-            var w = cloudEl.offsetWidth || 480;
-            var h = cloudEl.offsetHeight || 65;
+            var w = bubbleW || (cloudEl.offsetWidth || 480);
+            var h = bubbleH || (cloudEl.offsetHeight || 65);
             var side = e.clientX < window.innerWidth / 2;
             if (side !== curSide) {
                 curSide = side;
@@ -128,8 +150,7 @@
             if (mx < 10) mx = 10;
             if (my < 10) my = 10;
             if (my + h > window.innerHeight - 10) my = window.innerHeight - h - 10;
-            cloudEl.style.left = mx + 'px';
-            cloudEl.style.top = my + 'px';
+            setCloudPosition(mx, my);
         };
         document.addEventListener('mousemove', moveHandler);
 
@@ -151,6 +172,11 @@
             cloudEl.classList.add('hiding');
             fadeTimer = setTimeout(removeCloud, FADE_MS);
         }, DISPLAY_MS);
+    }
+
+    function setCloudPosition(x, y) {
+        if (!cloudEl) return;
+        cloudEl.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
     }
 
     function removeCloud() {

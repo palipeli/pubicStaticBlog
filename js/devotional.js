@@ -39,12 +39,25 @@
             currentAnimationFrameId = null;
         }
     }
+    // Typing mutates the DOM every frame; skip the per-frame work entirely
+    // when nobody can see it and settle on the exact final state instead.
+    function isHomeVisible() {
+        if (document.hidden) return false;
+        const homeSection = document.getElementById('home');
+        return !!(homeSection && homeSection.classList.contains('active'));
+    }
     function typeDeleteAnimation(element, callback) {
         const text = element.textContent;
         let index = 0;
         let lastTime = 0;
         const interval = 15;
         function step(timestamp) {
+            if (!isHomeVisible()) {
+                element.textContent = '';
+                currentAnimationFrameId = null;
+                if (callback) callback();
+                return;
+            }
             if (!lastTime) lastTime = timestamp;
             const delta = timestamp - lastTime;
             if (delta >= interval) {
@@ -69,6 +82,12 @@
         const interval = 20;
         element.textContent = '';
         function step(timestamp) {
+            if (!isHomeVisible()) {
+                element.textContent = text;
+                currentAnimationFrameId = null;
+                if (callback) callback();
+                return;
+            }
             if (!lastTime) lastTime = timestamp;
             const delta = timestamp - lastTime;
             if (delta >= interval) {

@@ -469,6 +469,11 @@
             });
         });
         observer.observe(document.body, {childList: true, subtree: true});
+        // Safety valve: the tray is created during startup on mobile, so a
+        // long-lived body-wide observer only burns cycles on desktop.
+        setTimeout(function() {
+            observer.disconnect();
+        }, 30000);
     }
     window.navigateToBlogsPageWithoutPrefetch = navigateToBlogsPageWithoutPrefetch;
     window.createParticles = createParticles;

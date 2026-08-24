@@ -104,13 +104,26 @@
         thumb.addEventListener('pointerup', onThumbPointerUp);
         thumb.addEventListener('pointercancel', onThumbPointerUp);
         track.addEventListener('click', onTrackClick);
+        // Bursts of invalidations (markdown rendering, lazy-image swaps,
+        // character mutations from the typing animation) coalesce into one
+        // thumb refresh per frame, so listeners never force layout more than
+        // once per frame.
+        let thumbUpdateScheduled = false;
+        function scheduleThumbUpdate() {
+            if (thumbUpdateScheduled) return;
+            thumbUpdateScheduled = true;
+            requestAnimationFrame(() => {
+                thumbUpdateScheduled = false;
+                updateThumb();
+            });
+        }
         // Lazy images swap data-src -> src and fire capture-phase load events;
         // fonts reflow layout when they arrive. Both can change scroll height.
-        document.addEventListener('load', updateThumb, true);
+        document.addEventListener('load', scheduleThumbUpdate, true);
         if (document.fonts && document.fonts.ready) {
             document.fonts.ready.then(updateThumb).catch(() => {});
         }
-        const observer = new MutationObserver(updateThumb);
+        const observer = new MutationObserver(scheduleThumbUpdate);
         observer.observe(scroller, {
             childList: true,
             subtree: true,
