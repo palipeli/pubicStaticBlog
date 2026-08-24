@@ -216,8 +216,21 @@
             });
         });
         observer.observe(document.documentElement, {attributes: true});
-        // Chart.js (responsive: true) observes the canvas container itself;
-        // an extra ResizeObserver here would only trigger duplicate resizes.
+        if (typeof window.ResizeObserver !== 'undefined') {
+            const resizeObserver = new ResizeObserver(function() {
+                if (chart) chart.resize();
+            });
+            const wrap = document.querySelector('.dns-graph-canvas-wrap');
+            if (wrap) resizeObserver.observe(wrap);
+            const card = document.querySelector('.dns-graph-card');
+            if (card) resizeObserver.observe(card);
+            const mainContainer = document.querySelector('.main-container');
+            if (mainContainer) resizeObserver.observe(mainContainer);
+        } else {
+            window.addEventListener('resize', function() {
+                if (chart) chart.resize();
+            });
+        }
     }
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initDnsGraph);

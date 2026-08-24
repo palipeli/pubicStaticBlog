@@ -5,7 +5,6 @@ const MAX_IMAGES_PER_POST = 20;
 const MAX_REQUEST_BYTES = 45 * 1024 * 1024;
 const MAX_TOTAL_IMAGE_BYTES = 30 * 1024 * 1024;
 const UPLOAD_PLACEHOLDER = '/__upload__/';
-
 function json(data, status) {
     return new Response(JSON.stringify(data), {
         status: status || 200,
@@ -16,7 +15,6 @@ function json(data, status) {
         }
     });
 }
-
 function secureCompare(a, b) {
     if (typeof a !== 'string' || typeof b !== 'string') {
         return false;
@@ -28,7 +26,6 @@ function secureCompare(a, b) {
     }
     return diff === 0;
 }
-
 function isAuthorized(request, env) {
     const provided = request.headers.get('Authorization') || '';
     const tokens = String(env.ADMIN_TOKEN || '').split(',').map(function(t) { return t.trim(); }).filter(Boolean);
@@ -36,12 +33,10 @@ function isAuthorized(request, env) {
         return secureCompare(provided, 'Bearer ' + t);
     });
 }
-
 function authMisconfigured(env) {
     const tokens = String(env.ADMIN_TOKEN || '').split(',').map(function(t) { return t.trim(); }).filter(Boolean);
     return !tokens.length || tokens.some(function(t) { return t.length < 32; });
 }
-
 async function authFailureRateLimited(env, request) {
     if (!env.RATE_LIMIT_KV) {
         return false;
@@ -56,7 +51,6 @@ async function authFailureRateLimited(env, request) {
     await env.RATE_LIMIT_KV.put(key, String(count + 1), {expirationTtl: 901});
     return false;
 }
-
 async function checkDailyQuota(env, scope, limit) {
     if (!env.QUOTA_KV) {
         return false;
@@ -65,7 +59,6 @@ async function checkDailyQuota(env, scope, limit) {
     const count = parseInt((await env.QUOTA_KV.get('quota:' + scope + ':' + day)) || '0', 10);
     return count >= limit;
 }
-
 async function recordDailyQuota(env, scope) {
     if (!env.QUOTA_KV) {
         return;
@@ -75,7 +68,6 @@ async function recordDailyQuota(env, scope) {
     const count = parseInt((await env.QUOTA_KV.get(key)) || '0', 10);
     await env.QUOTA_KV.put(key, String(count + 1), {expirationTtl: 90000});
 }
-
 function githubHeaders(token) {
     return {
         'Authorization': 'Bearer ' + token,
@@ -84,7 +76,6 @@ function githubHeaders(token) {
         'User-Agent': 'pubic-static-blog-admin'
     };
 }
-
 function utf8ToBase64(str) {
     const bytes = new TextEncoder().encode(str);
     let binary = '';
@@ -94,13 +85,11 @@ function utf8ToBase64(str) {
     }
     return btoa(binary);
 }
-
 function base64ToUtf8(base64) {
     const binary = atob(base64);
     const bytes = Uint8Array.from(binary, function(ch) { return ch.charCodeAt(0); });
     return new TextDecoder().decode(bytes);
 }
-
 function slugify(str) {
     const base = String(str)
         .toLowerCase()
@@ -112,14 +101,12 @@ function slugify(str) {
         .slice(0, 80);
     return base || 'post';
 }
-
 function escapeFrontmatterValue(value) {
     return String(value)
         .replace(/[\u0000-\u001f\u007f]/g, ' ')
         .replace(/\\/g, '\\\\')
         .replace(/"/g, '\\"');
 }
-
 function buildFrontmatter(fields) {
     return '---\n' +
         'title: "' + escapeFrontmatterValue(fields.title) + '"\n' +
@@ -128,7 +115,6 @@ function buildFrontmatter(fields) {
         'icon: "' + escapeFrontmatterValue(fields.icon) + '"\n' +
         '---\n\n';
 }
-
 function sniffImage(bytes, mime) {
     if (bytes.length < 12) {
         return false;
@@ -148,7 +134,6 @@ function sniffImage(bytes, mime) {
     }
     return false;
 }
-
 async function githubGet(env, path) {
     const owner = env.GITHUB_OWNER || 'palipeli';
     const repo = env.GITHUB_REPO || 'pubicStaticBlog';
@@ -164,7 +149,6 @@ async function githubGet(env, path) {
     }
     return response.json();
 }
-
 async function githubApi(env, method, path, body) {
     const owner = env.GITHUB_OWNER || 'palipeli';
     const repo = env.GITHUB_REPO || 'pubicStaticBlog';
@@ -178,7 +162,6 @@ async function githubApi(env, method, path, body) {
         try {
             detail = (await response.json()).message || '';
         } catch (err) {
-            // ignore parse failure
         }
         console.error('GitHub ' + method + ' ' + path + ' failed: ' + response.status + (detail ? ' - ' + detail : ''));
         return {
@@ -188,7 +171,6 @@ async function githubApi(env, method, path, body) {
     }
     return response.json();
 }
-
 function checkImageDimensions(bytes, mime) {
     const MAX_DIMENSION = 8192;
     const MAX_PIXELS = 30000000;
@@ -251,7 +233,6 @@ function checkImageDimensions(bytes, mime) {
     }
     return width <= MAX_DIMENSION && height <= MAX_DIMENSION && width * height <= MAX_PIXELS;
 }
-
 function parseImage(raw, index) {
     if (!raw || typeof raw !== 'object') {
         return {error: 'images[' + index + '] must be an object'};
@@ -289,7 +270,6 @@ function parseImage(raw, index) {
     }
     return {ok: true, token: token, name: name, mime: mime, base64Data: base64Data};
 }
-
 async function resolveMediaNames(env, images) {
     if (!images.length) {
         return {ok: true, names: []};
@@ -319,7 +299,6 @@ async function resolveMediaNames(env, images) {
     });
     return {ok: true, names: names};
 }
-
 async function githubCreateBlob(env, base64Content) {
     const blob = await githubApi(env, 'POST', 'git/blobs', {
         content: base64Content,
@@ -331,7 +310,6 @@ async function githubCreateBlob(env, base64Content) {
     }
     return {ok: true, sha: blob.sha};
 }
-
 async function commitAll(env, message, entries) {
     for (let attempt = 0; attempt < 2; attempt++) {
         const branch = env.GITHUB_BRANCH || 'main';
@@ -363,10 +341,8 @@ async function commitAll(env, message, entries) {
         return {ok: true, sha: commit.sha};
     }
 }
-
 export async function onRequestPost(context) {
     const {request, env} = context;
-
     if (authMisconfigured(env)) {
         return json({error: 'Server auth is misconfigured: set ADMIN_TOKEN (min 32 chars) and restart'}, 503);
     }
@@ -390,14 +366,12 @@ export async function onRequestPost(context) {
     if (await checkDailyQuota(env, 'publish', 60)) {
         return json({error: 'Daily publish quota reached, try again tomorrow'}, 429);
     }
-
     let payload;
     try {
         payload = await request.json();
     } catch (err) {
         return json({error: 'Invalid JSON body'}, 400);
     }
-
     const title = String(payload.title || '').trim().slice(0, 200);
     const content = String(payload.content || '').trim();
     if (!title) {
@@ -413,7 +387,6 @@ export async function onRequestPost(context) {
     const icon = String(payload.icon || '📄').trim().slice(0, 8) || '📄';
     const date = String(payload.date || '').trim().slice(0, 50) || new Date().toISOString().slice(0, 10);
     const editId = /^[a-z0-9-]{1,80}$/.test(String(payload.id || '')) ? String(payload.id) : null;
-
     const rawImages = Array.isArray(payload.images) ? payload.images : [];
     if (rawImages.length > MAX_IMAGES_PER_POST) {
         return json({error: 'Too many images in one post (max ' + MAX_IMAGES_PER_POST + ')'}, 413);
@@ -431,7 +404,6 @@ export async function onRequestPost(context) {
     if (totalImageBytes > MAX_TOTAL_IMAGE_BYTES) {
         return json({error: 'Total image payload too large (max 30MB)'}, 413);
     }
-
     const manifestGet = await githubGet(env, 'blog/posts.json');
     if (manifestGet.error) {
         return json(manifestGet, manifestGet.status);
@@ -447,13 +419,10 @@ export async function onRequestPost(context) {
             posts = [];
         }
     }
-
     let markdown = buildFrontmatter({title: title, date: date, category: category, icon: icon}) + content + '\n';
-
     let postId = null;
     let slug = null;
     let updated = false;
-
     if (editId) {
         const existing = posts.find(function(p) { return p && p.id === editId; });
         if (!existing) {
@@ -480,18 +449,15 @@ export async function onRequestPost(context) {
         }
         slug = '/blog/' + postId + '.md';
     }
-
     const media = await resolveMediaNames(env, images);
     if (media.error) {
         return json(media, media.status);
     }
-
     images.forEach(function(image, index) {
         if (image.token) {
             markdown = markdown.split(UPLOAD_PLACEHOLDER + image.token).join('/media/' + media.names[index]);
         }
     });
-
     if (updated) {
         const entry = posts.find(function(p) { return p.id === postId; });
         if (entry) {
@@ -504,7 +470,6 @@ export async function onRequestPost(context) {
         posts.push({id: postId, slug: slug, title: title, date: date, category: category, icon: icon});
     }
     const manifestJson = JSON.stringify(posts, null, 2) + '\n';
-
     const entries = [];
     for (let i = 0; i < images.length; i++) {
         const blob = await githubCreateBlob(env, images[i].base64Data);
@@ -520,18 +485,15 @@ export async function onRequestPost(context) {
     }
     entries.push({path: 'blog/' + postId + '.md', mode: '100644', type: 'blob', content: markdown});
     entries.push({path: 'blog/posts.json', mode: '100644', type: 'blob', content: manifestJson});
-
     const mediaLabel = images.length ? ' with ' + images.length + ' media file' + (images.length === 1 ? '' : 's') : '';
     const message = (updated ? 'chore(blog): update post ' : 'chore(blog): add post ') + postId + mediaLabel;
     const commit = await commitAll(env, message, entries);
     if (commit.error) {
         return json(commit, commit.status);
     }
-
     const imageResults = images.map(function(image, index) {
         return {token: image.token, name: media.names[index], url: '/media/' + media.names[index]};
     });
-
     await recordDailyQuota(env, 'publish');
     return json({
         ok: true,

@@ -1,5 +1,4 @@
 const API_BASE = 'https://api.github.com';
-
 function json(data, status) {
     return new Response(JSON.stringify(data), {
         status: status || 200,
@@ -10,7 +9,6 @@ function json(data, status) {
         }
     });
 }
-
 function secureCompare(a, b) {
     if (typeof a !== 'string' || typeof b !== 'string') {
         return false;
@@ -22,7 +20,6 @@ function secureCompare(a, b) {
     }
     return diff === 0;
 }
-
 function isAuthorized(request, env) {
     const provided = request.headers.get('Authorization') || '';
     const tokens = String(env.ADMIN_TOKEN || '').split(',').map(function(t) { return t.trim(); }).filter(Boolean);
@@ -30,12 +27,10 @@ function isAuthorized(request, env) {
         return secureCompare(provided, 'Bearer ' + t);
     });
 }
-
 function authMisconfigured(env) {
     const tokens = String(env.ADMIN_TOKEN || '').split(',').map(function(t) { return t.trim(); }).filter(Boolean);
     return !tokens.length || tokens.some(function(t) { return t.length < 32; });
 }
-
 async function authFailureRateLimited(env, request) {
     if (!env.RATE_LIMIT_KV) {
         return false;
@@ -50,7 +45,6 @@ async function authFailureRateLimited(env, request) {
     await env.RATE_LIMIT_KV.put(key, String(count + 1), {expirationTtl: 901});
     return false;
 }
-
 async function requestRateLimited(env, request, scope, limit, windowSeconds) {
     if (!env.RATE_LIMIT_KV) {
         return false;
@@ -65,7 +59,6 @@ async function requestRateLimited(env, request, scope, limit, windowSeconds) {
     await env.RATE_LIMIT_KV.put(key, String(count + 1), {expirationTtl: windowSeconds + 1});
     return false;
 }
-
 function githubHeaders(token) {
     return {
         'Authorization': 'Bearer ' + token,
@@ -74,7 +67,6 @@ function githubHeaders(token) {
         'User-Agent': 'pubic-static-blog-admin'
     };
 }
-
 function utf8ToBase64(str) {
     const bytes = new TextEncoder().encode(str);
     let binary = '';
@@ -84,13 +76,11 @@ function utf8ToBase64(str) {
     }
     return btoa(binary);
 }
-
 function base64ToUtf8(base64) {
     const binary = atob(base64);
     const bytes = Uint8Array.from(binary, function(ch) { return ch.charCodeAt(0); });
     return new TextDecoder().decode(bytes);
 }
-
 async function githubGet(env, path) {
     const owner = env.GITHUB_OWNER || 'palipeli';
     const repo = env.GITHUB_REPO || 'pubicStaticBlog';
@@ -106,7 +96,6 @@ async function githubGet(env, path) {
     }
     return response.json();
 }
-
 async function githubPut(env, path, content, sha, message) {
     const owner = env.GITHUB_OWNER || 'palipeli';
     const repo = env.GITHUB_REPO || 'pubicStaticBlog';
@@ -124,7 +113,6 @@ async function githubPut(env, path, content, sha, message) {
         try {
             detail = (await response.json()).message || '';
         } catch (err) {
-            // ignore parse failure
         }
         console.error('GitHub PUT ' + path + ' failed: ' + response.status + (detail ? ' - ' + detail : ''));
         return {
@@ -134,7 +122,6 @@ async function githubPut(env, path, content, sha, message) {
     }
     return response.json();
 }
-
 async function githubDelete(env, path, sha, message) {
     const owner = env.GITHUB_OWNER || 'palipeli';
     const repo = env.GITHUB_REPO || 'pubicStaticBlog';
@@ -152,7 +139,6 @@ async function githubDelete(env, path, sha, message) {
         try {
             detail = (await response.json()).message || '';
         } catch (err) {
-            // ignore parse failure
         }
         console.error('GitHub DELETE ' + path + ' failed: ' + response.status + (detail ? ' - ' + detail : ''));
         return {
@@ -162,7 +148,6 @@ async function githubDelete(env, path, sha, message) {
     }
     return {ok: true};
 }
-
 async function githubTree(env) {
     const owner = env.GITHUB_OWNER || 'palipeli';
     const repo = env.GITHUB_REPO || 'pubicStaticBlog';
@@ -177,7 +162,6 @@ async function githubTree(env) {
     const paths = (data.tree || []).map(function(entry) { return entry.path; });
     return {paths: paths};
 }
-
 async function loadManifest(env) {
     const manifestGet = await githubGet(env, 'blog/posts.json');
     if (manifestGet.error) {
@@ -197,9 +181,7 @@ async function loadManifest(env) {
     }
     return {posts: posts, sha: manifestGet.sha};
 }
-
 const PROTECTED_MEDIA = new Set(['favicon-circle.webp', 'logo.webp', 'bg-light.webp', 'bg-dark.webp', 'vt323.ttf']);
-
 async function deletePostMedia(env, deletedId, deletedMdBase64) {
     const mediaRegex = /(["'(=:\s])\/media\/([A-Za-z0-9._-]+)/g;
     const referenced = new Set();
@@ -253,7 +235,6 @@ async function deletePostMedia(env, deletedId, deletedMdBase64) {
     }
     return {removed: removed, skipped: skipped};
 }
-
 export async function onRequestGet(context) {
     const {request, env} = context;
     if (!env.GITHUB_TOKEN) {
@@ -303,7 +284,6 @@ export async function onRequestGet(context) {
     });
     return json({posts: posts, orphans: orphans});
 }
-
 export async function onRequestPost(context) {
     const {request, env} = context;
     if (authMisconfigured(env)) {
@@ -337,12 +317,10 @@ export async function onRequestPost(context) {
     if (!/^[a-z0-9-]{1,80}$/.test(id)) {
         return json({error: 'Invalid post id'}, 400);
     }
-
     if (action === 'delete') {
         const fileGet = await githubGet(env, 'blog/' + id + '.md');
         const mediaNotes = [];
         if (fileGet.notFound) {
-            // nothing to delete on disk; continue to the manifest cleanup
         } else if (fileGet.error) {
             return json(fileGet, fileGet.status);
         } else {
@@ -377,7 +355,6 @@ export async function onRequestPost(context) {
         }
         return json({ok: true, id: id, note: mediaNotes.length ? mediaNotes.join('; ') : undefined});
     }
-
     if (action === 'pin') {
         const pinned = !!payload.pinned;
         const manifest = await loadManifest(env);
@@ -400,6 +377,5 @@ export async function onRequestPost(context) {
         }
         return json({ok: true, id: id, pinned: pinned});
     }
-
     return json({error: 'Unknown action'}, 400);
 }

@@ -39,8 +39,6 @@
             currentAnimationFrameId = null;
         }
     }
-    // Typing mutates the DOM every frame; skip the per-frame work entirely
-    // when nobody can see it and settle on the exact final state instead.
     function isHomeVisible() {
         if (document.hidden) return false;
         const homeSection = document.getElementById('home');

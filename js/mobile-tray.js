@@ -3,7 +3,7 @@
     function escapeHtml(str) {
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');
     }
-    const MOBILE_BREAKPOINT = 768;
+    const MOBILE_BREAKPOINT = 1024;
     function isMobileView() {
         return window.innerWidth <= MOBILE_BREAKPOINT;
     }
@@ -107,9 +107,28 @@
         toggleBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
+            if (!isMobileView()) {
+                const sidebarToggle = document.getElementById('sidebar-toggle');
+                if (sidebarToggle) {
+                    sidebarToggle.click();
+                }
+                return;
+            }
             const tray = document.getElementById('mobile-nav-tray');
             const overlay = document.getElementById('mobile-tray-overlay');
-            if (!tray) return;
+            if (!tray) {
+                createMobileTray();
+                createOverlay();
+                const newTray = document.getElementById('mobile-nav-tray');
+                const newOverlay = document.getElementById('mobile-tray-overlay');
+                if (newTray) {
+                    newTray.classList.add('open');
+                    if (newOverlay) newOverlay.classList.add('open');
+                    document.body.classList.add('mobile-tray-open');
+                    updateBlogPostsVisibility();
+                }
+                return;
+            }
             const isOpen = tray.classList.contains('open');
             if (isOpen) {
                 tray.classList.remove('open');
@@ -201,9 +220,6 @@
         }, 100);
     }
     function init() {
-        // The toggle stays in the DOM on every viewport so its width/opacity
-        // can transition smoothly across the breakpoint (sliding the nav
-        // items along with it); the CSS hides it on desktop.
         createToggleButton();
         if (isMobileView()) {
             createMobileTray();

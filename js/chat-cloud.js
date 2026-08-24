@@ -1,7 +1,6 @@
 (function() {
     'use strict';
     try{ if(!window.__CP_VERIFIED||!window.__CP_ALLOW_LOAD||!window.CP||typeof window.CP.isRunning!=='function'||!window.CP.version||window.CP.version!=='2.3.1-foolproof'||(Object.isFrozen&&!Object.isFrozen(window.CP))||!window.CP.isRunning()||(window.CP.isDevToolOpened&&window.CP.isDevToolOpened())){ try{window.__CP_FAIL&&window.__CP_FAIL()}catch(e){} throw new Error('CP not verified'); } if(window.__CP_GATE&&window.__CP_GATE.isWindowSizeIndicatingDevTools&&window.__CP_GATE.isWindowSizeIndicatingDevTools()){ try{window.CP.trigger()}catch(e){} try{window.__CP_FAIL&&window.__CP_FAIL()}catch(e){} throw new Error('CP size gate'); } }catch(e){ try{window.__CP_FAIL&&window.__CP_FAIL()}catch(e2){} throw e; }
-
     var cloudEl = null;
     var moveHandler = null;
     var disappearTimer = null;
@@ -9,12 +8,8 @@
     var styleEl = null;
     var lastX = -1;
     var lastY = -1;
-    // Cached bubble box, refreshed when the sprite image finishes loading so
-    // mousemove handling never has to read offsetWidth/offsetHeight (forced
-    // layout) while dragging the bubble around.
     var bubbleW = 0;
     var bubbleH = 0;
-
     var BUBBLE_LEFT = '/media/speechbuba_left.png';
     var BUBBLE_RIGHT = '/media/speechbuba_right.png';
     var DENIED_LEFT = '/media/denied_left.png';
@@ -22,7 +17,6 @@
     var DISPLAY_MS = 3000;
     var FADE_MS = 350;
     var deniedMode = false;
-
     function injectStyles() {
         if (styleEl) return;
         styleEl = document.createElement('style');
@@ -66,7 +60,6 @@
             '}';
         document.head.appendChild(styleEl);
     }
-
     function burst(cx, cy) {
         for (var i = 0; i < 8; i++) {
             var el = document.createElement('div');
@@ -87,31 +80,24 @@
             })(el);
         }
     }
-
     function createCloud() {
         removeCloud();
         injectStyles();
         bubbleW = 0;
         bubbleH = 0;
-
         var isLeft = lastX < window.innerWidth / 2;
         var img = document.createElement('img');
         img.className = 'cloud-bubble-img';
         img.src = isLeft
             ? (deniedMode ? DENIED_LEFT : BUBBLE_LEFT)
             : (deniedMode ? DENIED_RIGHT : BUBBLE_RIGHT);
-
-        // Bounce/float animations live on this inner wrapper so the outer
-        // element's inline transform (positioning) is never overridden.
         var floatWrap = document.createElement('div');
         floatWrap.className = 'cloud-float';
         floatWrap.appendChild(img);
-
         cloudEl = document.createElement('div');
         cloudEl.id = 'pixel-chat-cloud';
         cloudEl.appendChild(floatWrap);
         document.body.appendChild(cloudEl);
-
         var measureBubble = function() {
             if (!cloudEl) return;
             bubbleW = cloudEl.offsetWidth || 480;
@@ -119,7 +105,6 @@
         };
         img.addEventListener('load', measureBubble);
         measureBubble();
-
         var curSide = isLeft;
         var cw = bubbleW;
         var ch = bubbleH;
@@ -132,7 +117,6 @@
         if (py < 10) py = 10;
         if (py + ch > window.innerHeight - 10) py = window.innerHeight - ch - 10;
         setCloudPosition(px, py);
-
         moveHandler = function(e) {
             if (!cloudEl) return;
             var w = bubbleW || (cloudEl.offsetWidth || 480);
@@ -153,7 +137,6 @@
             setCloudPosition(mx, my);
         };
         document.addEventListener('mousemove', moveHandler);
-
         requestAnimationFrame(function() {
             if (!cloudEl) return;
             cloudEl.classList.add('entering');
@@ -163,9 +146,7 @@
                 cloudEl.classList.add('visible');
             }, 350);
         });
-
         burst(lastX, lastY);
-
         disappearTimer = setTimeout(function() {
             if (!cloudEl) return;
             cloudEl.classList.remove('visible');
@@ -173,12 +154,10 @@
             fadeTimer = setTimeout(removeCloud, FADE_MS);
         }, DISPLAY_MS);
     }
-
     function setCloudPosition(x, y) {
         if (!cloudEl) return;
         cloudEl.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
     }
-
     function removeCloud() {
         if (disappearTimer) { clearTimeout(disappearTimer); disappearTimer = null; }
         if (fadeTimer) { clearTimeout(fadeTimer); fadeTimer = null; }
@@ -189,7 +168,6 @@
         if (cloudEl && cloudEl.parentNode) cloudEl.parentNode.removeChild(cloudEl);
         cloudEl = null;
     }
-
     window.addEventListener('mousedown', function(e) {
         lastX = e.clientX;
         lastY = e.clientY;

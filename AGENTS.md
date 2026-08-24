@@ -14,7 +14,7 @@
 | Path | Responsibility | Public contract |
 |---|---|---|
 | `index.html` | SPA shell, sections, fixed header/sidebar, script order, SW registration | IDs/classes consumed by every UI module |
-| `style.css` | global reset, theme tokens, layout, responsive/mobile styles | CSS variables, `data-theme`, `768px` breakpoint |
+| `style.css` | global reset, theme tokens, layout, responsive/mobile styles | CSS variables, `data-theme`, `768px` (mobile) / `1024px` (sidebar/tray) breakpoints |
 | `js/config.js` | shared constants | `window.CONFIG` |
 | `js/markdown.js` | custom Markdown/frontmatter parser + sanitizer | `window.parseMarkdown`, `window.parseFrontmatter` |
 | `js/lazyload.js` | `img.lazy-image[data-src]` loading | `window.initializeLazyLoading` |
@@ -23,13 +23,19 @@
 | `js/ui.js` | navigation, hash routing, theme, particles, sidebar | `window.*` navigation/theme API |
 | `js/blog.js` | manifest fetch, post cache, prefetch, render, navigation | `window.blogPostMetadata`; `window.openBlogPostLazy` |
 | `js/home.js` | home CTA rendering and delayed post opening | `window.renderBlogButtonsLazy` |
-| `js/mobile-tray.js` | dynamic mobile menu/tray at `window.innerWidth <= 768` | `#mobile-nav-tray`, overlay, toggle |
+| `js/mobile-tray.js` | dynamic mobile menu/tray at `window.innerWidth <= 1024` | `#mobile-nav-tray`, overlay, toggle |
 | `js/scrollbar.js` | custom scrollbar for `.content-area`, drawn below the fixed header so it never overlaps it; the sidebar intentionally has no visible scrollbar | `window.setupCustomScrollbars` |
 | `js/warning.js` | flashing-light consent and interaction warning | `system_warning_consent`; `warning:cleared` event |
+| `js/chat-cloud.js` | speech-bubble that follows cursor on flash/denied | listens `warning:flash` / `denied:flash`; no public API |
+| `js/cp.js` | anti-devtools gate + redirect | `window.CP`, `window.__CP_GATE`, `window.__CP_VERIFIED` |
+| `js/github-graph.js` | GitHub contribution charts (Chart.js) + range filter + ResizeObserver | self-init on `DOMContentLoaded` |
+| `js/dns-graph.js` | DNS request chart (Chart.js) | self-init on `DOMContentLoaded` |
 | `admin.html` | standalone WYSIWYG post editor (not part of the SPA) | `#post-editor` contenteditable, `.admin-toolbar`, `/api/publish` |
 | `js/admin.js` | editor logic: formatting commands, shortcuts, paste sanitizer, Markdown serializer, deferred image uploads, publish, draft autosave | reads `js/markdown.js` via `window.parseMarkdown` |
 | `admin.css` | chrome-only styles for the admin page; editor content renders through `style.css` `.blog-article`/`.blog-post-content` | reuses existing CSS variables |
+| `js/app.js` | startup coordinator (see Startup sequence) | runs on `DOMContentLoaded`; no public API |
 | `functions/api/publish.js` | Pages Function: auth + slugify + single Git Data API commit of new `media/` files, `blog/<id>.md`, and `blog/posts.json` | `POST /api/publish`; env secrets below |
+| `functions/api/posts.js` | Pages Function: admin post list + pin/delete + orphan media | `GET`/`POST /api/posts`; same auth as publish |
 | `sw.js` | install/activate, cache strategies, offline shell, prefetch messages | cache names and message types |
 | `blog/posts.json` | ordered post manifest | metadata schema below |
 | `blog/*.md` | post source | optional `---` frontmatter + Markdown body |
@@ -38,15 +44,17 @@
 
 ## Runtime and dependency graph
 
-`index.html` contains deferred scripts in this order:
+`index.html` deferred scripts at end of `<body>` (exact order, with CDN Chart.js shims):
 
 ```text
-config → markdown → lazyload → state → devotional → ui → blog → home → scrollbar → app
+js/config.js → js/markdown.js → js/lazyload.js → js/state.js → js/devotional.js →
+js/ui.js → js/blog.js → js/home.js → https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js →
+js/github-graph.js → js/dns-graph.js → js/mobile-tray.js → js/scrollbar.js → js/app.js
++ non-deferred after the deferred list: js/warning.js, js/chat-cloud.js (both self-init on DOM-ready)
++ early head preload: js/cp.js (anti-devtools gate, must load before any app code)
 ```
 
-`warning.js` and `js/mobile-tray.js` are non-deferred scripts after the deferred list. They install
-their own DOM-ready behavior; `app.js` is the final coordinator. Do not convert scripts to ES modules
-or reorder them casually: modules communicate through `window`, not imports.
+All JS/CSS files have been stripped of inline comments and unnecessary vertical whitespace; authoritative behavioral documentation lives here and in `SITE_SPEC.md`, not inline. Do not reintroduce per-file header comments or blank-line padding — update the markdown specs instead. `app.js` is the final coordinator. Do not convert scripts to ES modules or reorder them casually: modules communicate through `window`, not imports.
 
 Startup sequence in `js/app.js`:
 
@@ -204,8 +212,8 @@ cdnjs requests are left to the browser. Current caches:
 
 ```text
 pubic-static-blog-v2  # compatibility/cleanup namespace
-static-assets-v3     # HTML/CSS/JS/JSON/etc.
-images-v3            # webp/png/jpg/etc.
+static-assets-v17     # HTML/CSS/JS/JSON/etc.
+images-v4            # webp/png/jpg/etc.
 blog-content-v2     # Markdown and /blog/ content
 ```
 
@@ -235,7 +243,7 @@ Keep `pendingFetches` deduplication and same-origin validation intact.
 - Reuse existing CSS custom properties (`--bg-*`, `--text-*`, `--accent-pink`, `--glass-*`) rather
   than hardcoding parallel theme values.
 - Desktop reserves a fixed 280px sidebar; `.main-container.sidebar-collapsed` removes that margin.
-- Mobile breakpoint is `max-width: 768px`; the dynamic tray replaces normal navigation affordances.
+- Mobile breakpoint is `max-width: 768px`; the dynamic tray/sidebar collapse is `max-width: 1024px` and the burger appears whenever the sidebar is collapsed (auto or manual) so it can be reopened.
 - Respect `prefers-reduced-motion`; particle creation already opts out. Do not make flashing behavior
   more intense without updating the consent warning.
 - Keep asset URLs root-relative to match CSS and SW behavior.
@@ -247,7 +255,9 @@ explicitly changes to require them.
 ## Agent guardrails
 
 - Inspect existing code and preserve behavior before editing; do not “modernize” to a framework.
-- Make the smallest coherent change; do not reformat unrelated large files (`style.css`, parser, SW).
+- Make the smallest coherent change; JS/CSS files are intentionally stripped of inline comments and
+  unnecessary vertical whitespace — do not reintroduce per-file header comments or blank-line padding;
+  update `AGENTS.md`/`SITE_SPEC.md` instead.
 - Never modify `LICENSE` or remove existing posts/assets without explicit instruction.
 - Do not add dependencies, build artifacts, lockfiles, or generated files.
 - Keep manifest, Markdown path, and service-worker asset coverage consistent in the same change.

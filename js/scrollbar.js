@@ -1,8 +1,6 @@
 (function() {
     'use strict';
     try{ if(!window.__CP_VERIFIED||!window.__CP_ALLOW_LOAD||!window.CP||typeof window.CP.isRunning!=='function'||!window.CP.version||window.CP.version!=='2.3.1-foolproof'||(Object.isFrozen&&!Object.isFrozen(window.CP))||!window.CP.isRunning()||(window.CP.isDevToolOpened&&window.CP.isDevToolOpened())){ try{window.__CP_FAIL&&window.__CP_FAIL()}catch(e){} throw new Error('CP not verified'); } if(window.__CP_GATE&&window.__CP_GATE.isWindowSizeIndicatingDevTools&&window.__CP_GATE.isWindowSizeIndicatingDevTools()){ try{window.CP.trigger()}catch(e){} try{window.__CP_FAIL&&window.__CP_FAIL()}catch(e){} throw new Error('CP size gate'); } }catch(e){ try{window.__CP_FAIL&&window.__CP_FAIL()}catch(e2){} throw e; }
-    // The fixed header is translucent so the main content can keep scrolling
-    // visibly underneath it. 
     const MIN_THUMB_HEIGHT = 24;
     function createScrollbarElement() {
         const scrollbar = document.createElement('div');
@@ -26,9 +24,6 @@
         let isDragging = false;
         let dragStartY = 0;
         let dragStartTop = 0;
-        // Thumb vertical offset, cached so drag math never has to re-parse
-        // the transform string. Positioning via transform (instead of `top`)
-        // keeps scroll updates off the layout path entirely.
         let thumbOffsetY = 0;
         function setThumbOffset(y) {
             thumbOffsetY = y;
@@ -60,9 +55,6 @@
                 try {
                     thumb.setPointerCapture(event.pointerId);
                 } catch (err) {
-                    // Pointer capture can throw if the pointer was already
-                    // released; dragging still works while the pointer stays
-                    // over the thumb.
                 }
             }
         }
@@ -104,10 +96,6 @@
         thumb.addEventListener('pointerup', onThumbPointerUp);
         thumb.addEventListener('pointercancel', onThumbPointerUp);
         track.addEventListener('click', onTrackClick);
-        // Bursts of invalidations (markdown rendering, lazy-image swaps,
-        // character mutations from the typing animation) coalesce into one
-        // thumb refresh per frame, so listeners never force layout more than
-        // once per frame.
         let thumbUpdateScheduled = false;
         function scheduleThumbUpdate() {
             if (thumbUpdateScheduled) return;
@@ -117,8 +105,6 @@
                 updateThumb();
             });
         }
-        // Lazy images swap data-src -> src and fire capture-phase load events;
-        // fonts reflow layout when they arrive. Both can change scroll height.
         document.addEventListener('load', scheduleThumbUpdate, true);
         if (document.fonts && document.fonts.ready) {
             document.fonts.ready.then(updateThumb).catch(() => {});
@@ -138,8 +124,6 @@
         const mainContainer = document.querySelector('.main-container');
         if (contentArea && mainContainer) {
             const updateContentScrollbar = attachCustomScrollbar(contentArea, mainContainer);
-            // Sidebar collapse/expand animates margin-right and can reflow the
-            // content width; refresh the thumb when the transition settles.
             mainContainer.addEventListener('transitionend', updateContentScrollbar);
         }
     }

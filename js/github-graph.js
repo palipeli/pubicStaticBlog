@@ -234,8 +234,28 @@
             });
         });
         observer.observe(document.documentElement, {attributes: true});
-        // Chart.js (responsive: true) observes the canvas container itself;
-        // an extra ResizeObserver here would only trigger duplicate resizes.
+        if (typeof window.ResizeObserver !== 'undefined') {
+            const resizeObserver = new ResizeObserver(function() {
+                Object.keys(charts).forEach(function(canvasId) {
+                    const chart = charts[canvasId];
+                    if (chart) chart.resize();
+                });
+            });
+            document.querySelectorAll('.github-graph-canvas-wrap').forEach(function(wrap) {
+                resizeObserver.observe(wrap);
+            });
+            const graphsContainer = document.querySelector('.github-graphs-container');
+            if (graphsContainer) resizeObserver.observe(graphsContainer);
+            const mainContainer = document.querySelector('.main-container');
+            if (mainContainer) resizeObserver.observe(mainContainer);
+        } else {
+            window.addEventListener('resize', function() {
+                Object.keys(charts).forEach(function(canvasId) {
+                    const chart = charts[canvasId];
+                    if (chart) chart.resize();
+                });
+            });
+        }
     }
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initGithubGraphs);

@@ -1,6 +1,6 @@
 'use strict';
 const CACHE_NAME = 'pubic-static-blog-v2';
-const STATIC_CACHE_NAME = 'static-assets-v16';
+const STATIC_CACHE_NAME = 'static-assets-v17';
 const IMAGE_CACHE_NAME = 'images-v4';
 const CONTENT_CACHE_NAME = 'blog-content-v2';
 const pendingFetches = new Map();

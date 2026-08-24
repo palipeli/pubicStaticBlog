@@ -5,20 +5,15 @@
     const VOLUME_GAIN = 4.0;
     const AUDIO_LAYERS = 6;
     const phrases = [
-        // English
         "STOP", "DON'T TOUCH", "NO!", "YAMETEEEEEE!",
         "DAME!", "BAKA!", "ERROR", "FATAL", "FORBIDDEN",
         "ASU", "KYAAAAA!", "ANJING", "BUTO", "BABI", "PUKIMAK", "ANJING",
-
-        // Japanese
         "やめて!",
         "触らないで!",
         "ダメ!",
         "うるさい!",
         "警告",
         "エラー",
-
-        // Chinese
         "不要!",
         "禁止",
         "错误",

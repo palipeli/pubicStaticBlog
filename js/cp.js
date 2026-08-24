@@ -1,7 +1,5 @@
 (function () {
     'use strict';
-
-    /* ── Configuration ─────────────────────────────────────────────── */
     var REDIRECT          = '/media/tracks/I_see_what_you_doing.webm';
     var TIME_OUT_URL      = '';
     var INTERVAL          = 50;
@@ -12,23 +10,19 @@
     var DISABLE_PASTE     = true;
     var CLEAR_LOG         = false;
     var SEO_BOT           = false;
-
-    /* CDN parity additions — defaults preserve cp.js behaviour */
-    var DETECTORS         = 'all'; /* 'all' or array like [0,1,2,3,4,5,6,7] ; CDN default is [1,3,4,5,6,7] */
-    var URL_OVERRIDE      = '';    /* overrides REDIRECT if non-empty (CDN `url`) */
-    var REWRITE_HTML      = '';    /* CDN `rewriteHTML` — paints document if set */
-    var TOKEN_MD5         = '';    /* hex md5 of bypass token; empty = no bypass */
+    var DETECTORS         = 'all';
+    var URL_OVERRIDE      = '';
+    var REWRITE_HTML      = '';
+    var TOKEN_MD5         = '';
     var TOKEN_NAME        = 'ddtk';
-    var STOP_INTERVAL_TIME = 5000; /* ms — auto-clear on mobile after this (CDN) */
+    var STOP_INTERVAL_TIME = 5000;
     var CLEAR_INTERVAL_WHEN_OPEN = false;
     var DISABLE_IFRAME_PARENTS = true;
-    var DISABLE_SELECT_INPUT = false; /* CDN disableInputSelect */
+    var DISABLE_SELECT_INPUT = false;
     var DETECTOR_TYPE = { Unknown: -1, RegToString: 0, DefineId: 1, Size: 2, DateToString: 3, FuncToString: 4, Debugger: 5, Performance: 6, DebugLib: 7 };
-
-    /* ── State ─────────────────────────────────────────────────────── */
     var fired       = false;
     var devOpen     = false;
-    var S           = {}; /* OpenState map type -> bool */
+    var S           = {};
     var wasOpen     = false;
     var nativeLog   = console.log;
     var nativeTable = console.table;
@@ -39,40 +33,27 @@
     var timeoutId   = 0;
     var timeCount   = 0;
     var detectorCalls = [];
-
-    /* CPConfig override disabled for foolproof mode — previously allowed disabling
-       detectors via window.CPConfig / window.DisableDevtoolConfig injection before load.
-       Kept inert: only TOKEN_MD5 via server-side build would be honoured, but this
-       build ships with no token bypass. */
     try {
         var _cfg = window.CPConfig || window.DisableDevtoolConfig || null;
         if (_cfg && typeof _cfg === 'object' && TOKEN_MD5) {
             if (typeof _cfg.md5 === 'string' && _cfg.md5 === TOKEN_MD5) {
-                /* token holder already bypasses via isTokenPassed(); no other overrides */
             }
         }
-        /* clear any pre-injected config to prevent later abuse */
         try { window.CPConfig = undefined; window.DisableDevtoolConfig = undefined; } catch (e) {}
-    } catch (e) { /* ignore */ }
-
-    /* ── Helpers ───────────────────────────────────────────────────── */
+    } catch (e) {  }
     function isSEOBot() {
         if (!SEO_BOT) return false;
         return /bot|spider|crawl|slurp|mediapartners|AdsBot|Googlebot/i
             .test(navigator.userAgent);
     }
-
-    /* ── IS detection (CDN src/utils/util.ts) ─────────────────────── */
     var IS = {
         iframe: false, pc: false, qqBrowser: false, firefox: false,
         macos: false, edge: false, oldEdge: false, ie: false,
         iosChrome: false, iosEdge: false, chrome: false, seoBot: false, mobile: false
     };
-
     function isMobileByUa() {
         return /(iphone|ipad|ipod|ios|android)/i.test(navigator.userAgent.toLowerCase());
     }
-
     function isMobile() {
         try {
             var platform = navigator.platform;
@@ -83,10 +64,9 @@
                 if (/(mac|win)/i.test(v)) return false;
                 if (/(android|iphone|ipad|ipod|arch)/i.test(v)) return true;
             }
-        } catch (e) { /* ignore */ }
+        } catch (e) {  }
         return isMobileByUa();
     }
-
     function initIS() {
         var ua = navigator.userAgent.toLowerCase();
         function has(name) { return ua.indexOf(name) !== -1; }
@@ -108,8 +88,6 @@
         IS.iosChrome = iosChrome; IS.iosEdge = iosEdge; IS.chrome = chrome;
         IS.seoBot = seoBot; IS.mobile = mobile;
     }
-
-    /* ── console refs (CDN src/utils/log.ts) ───────────────────────── */
     function initLogs() {
         var c = window.console || { log: function () {}, table: function () {}, clear: function () {} };
         if (IS.ie) {
@@ -122,14 +100,11 @@
             nativeClear = c.clear ? c.clear.bind(c) : function () {};
         }
     }
-
     function clearConsole(force) {
         if (CLEAR_LOG || force) {
             try { nativeClear(); } catch (e) {}
         }
     }
-
-    /* ── OpenState (CDN src/utils/open-state.ts) ───────────────────── */
     function clearOpenState(type) { S[type] = false; }
     function markOpenState(type) { S[type] = true; devOpen = true; }
     function isDevToolOpened() { for (var k in S) if (S[k]) return true; return false; }
@@ -141,8 +116,6 @@
         wasOpen = nowOpen;
         if (!nowOpen) devOpen = false;
     }
-
-    /* ── MD5 (minimal, for token bypass) ──────────────────────────── */
     function md5(str) {
         function L(k, d) { return (k << d) | (k >>> (32 - d)); }
         function K(G, k) {
@@ -213,7 +186,6 @@
         a=K(a,AA);b=K(b,BB);c=K(c,CC);d=K(d,DD);}
         return(WordToHex(a)+WordToHex(b)+WordToHex(c)+WordToHex(d)).toLowerCase();
     }
-
     function getToken(name) {
         var search = window.location.search;
         var hash = window.location.hash;
@@ -224,20 +196,16 @@
         if (match !== null) return decodeURIComponent(match[2]);
         return '';
     }
-
     function isTokenPassed() {
         if (!TOKEN_MD5) return false;
         var tk = getToken(TOKEN_NAME);
         if (!tk) return false;
         try { return md5(tk) === TOKEN_MD5; } catch (e) { return false; }
     }
-
-    /* ── Time helpers (CDN) ────────────────────────────────────────── */
     function now() {
         try { return performance.now(); } catch (e) { return (new Date()).getTime(); }
     }
     function calculateTime(fn) { var s = now(); try { fn(); } catch (e) {} return now() - s; }
-    /* reduced size for instant redirect: 150 keys x 20 rows = 3k cells (was 500x50=25k) — still 10x slowdown when devtools open */
     function createLargeObject() {
         var o = {};
         for (var i = 0; i < 150; i++) o['' + i] = '' + i;
@@ -249,8 +217,6 @@
         for (var i = 0; i < 20; i++) arr.push(obj);
         return arr;
     }
-
-    /* ── Anti-pause helpers (CDN src/utils/util.ts) ────────────────── */
     function hackAlert(before, after) {
         var _alert = window.alert;
         var _confirm = window.confirm;
@@ -265,7 +231,6 @@
         }
         try { window.alert = mod(_alert); window.confirm = mod(_confirm); window.prompt = mod(_prompt); } catch (e) {}
     }
-
     function onPageShowHide(onShow, onHide) {
         var doc = document;
         var hidden, state, visibilityChange;
@@ -281,11 +246,8 @@
         try { doc.removeEventListener(visibilityChange, cb, false); } catch (e) {}
         doc.addEventListener(visibilityChange, cb, false);
     }
-
-    /* ── Action on detection (robust) ──────────────────────────────── */
     var ONDEVTOOL_OPEN = null;
     var ONDEVTOOL_CLOSE = null;
-
     function closeWindowFallback() {
         if (URL_OVERRIDE) {
             try { window.location.href = URL_OVERRIDE; return; } catch (e) {}
@@ -302,14 +264,12 @@
         try { window.open(u, '_self'); } catch (e) {}
         try { document.documentElement.innerHTML='<meta http-equiv="refresh" content="0;url='+u+'">'; }catch(e){}
     }
-
     function nukePage() {
         try { window.stop(); } catch (e) {}
         try { document.documentElement.style.display = 'none'; } catch (e) {}
         try { try{ document.open(); document.write(''); document.close(); }catch(e2){} } catch (e) {}
         try { clearConsole(true); } catch (e) {}
     }
-
     function trigger() {
         if (fired) return;
         fired = true;
@@ -326,7 +286,6 @@
         try { window.open(u, '_self'); } catch (e) {}
         try { document.documentElement.innerHTML='<meta http-equiv="refresh" content="0;url='+u+'">'; }catch(e){}
     }
-
     function onDevToolOpen(type) {
         if (fired) return;
         if (typeof type === 'undefined') type = DETECTOR_TYPE.Unknown;
@@ -340,8 +299,6 @@
         }
         trigger();
     }
-
-    /* ── Block content interaction (CDN src/utils/key-menu.ts parity) ─ */
     function preventEvent(e, win) {
         if (window.CP && window.CP.isSuspend) return false;
         win = win || window;
@@ -351,15 +308,12 @@
         try { e.preventDefault(); } catch (e2) {}
         return false;
     }
-
     function blockContextMenu(e) {
         if (!DISABLE_MENU) return;
         if (e.pointerType === 'touch') return;
         e.preventDefault();
     }
-
     function blockSelect(e) {
-        /* CDN: allow in inputs unless disableInputSelect */
         var t = e.target;
         var tag = t && t.tagName;
         var isInput = tag === 'INPUT' || tag === 'TEXTAREA' || (t && t.getAttribute && t.getAttribute('contenteditable') === 'true');
@@ -369,15 +323,11 @@
         }
         if (DISABLE_SELECT) e.preventDefault();
     }
-
     function blockCopy(e) { if (DISABLE_COPY) e.preventDefault(); }
     function blockCut(e) { if (DISABLE_CUT) e.preventDefault(); }
     function blockPaste(e) { if (DISABLE_PASTE) e.preventDefault(); }
-
-    /* ── Detection 1: RegToString (CDN gated qqBrowser||firefox) ────── */
     var regLastTime = 0;
     var regRegex = null;
-
     function initRegToString() {
         try {
             var re = /./;
@@ -392,9 +342,8 @@
                 return '';
             };
             regRegex = re;
-        } catch (e) { /* unsupported */ }
+        } catch (e) {  }
     }
-
     function detectRegToString() {
         if (fired) return;
         if (!regRegex) return;
@@ -402,10 +351,7 @@
         try { nativeLog(regRegex); } catch (e) {}
         clearConsole(true);
     }
-
-    /* ── Detection 2: DefineId (DOM element id getter) ─────────────── */
     var defineIdEl = null;
-
     function initDefineId() {
         try {
             var el = document.createElement('div');
@@ -418,17 +364,14 @@
                 configurable: true
             });
             defineIdEl = el;
-        } catch (e) { /* unsupported */ }
+        } catch (e) {  }
     }
-
     function detectDefineId() {
         if (fired) return;
         if (!defineIdEl) return;
         try { nativeLog(defineIdEl); } catch (e) {}
         clearConsole(true);
     }
-
-    /* ── Detection 3: Size (DPI-aware, CDN src/detector/sub-detector/size.ts) */
     function getDeviceRatio() {
         try {
             if (window.devicePixelRatio != null) return window.devicePixelRatio;
@@ -439,7 +382,6 @@
         } catch (e) {}
         return false;
     }
-
     function checkWindowSizeUneven() {
         var ratio = getDeviceRatio();
         if (ratio === false) return true;
@@ -449,16 +391,12 @@
             }
             var w = window.outerWidth - window.innerWidth * ratio;
             var h = window.outerHeight - window.innerHeight * ratio;
-            /* lower thresholds for earlier catch when devtools already open at boot */
             if (w > 160 || h > 160) { onDevToolOpen(DETECTOR_TYPE.Size); return false; }
-            /* also catch detached devtools via large chrome gap on any side */
             if (w > 200 || h > 300) { onDevToolOpen(DETECTOR_TYPE.Size); return false; }
             clearOpenState(DETECTOR_TYPE.Size);
-        } catch (e) { /* ignore */ }
+        } catch (e) {  }
         return true;
     }
-
-    /* fast synchronous probe for gate script — no side effects beyond trigger */
     function isWindowSizeIndicatingDevTools() {
         try {
             var ratio = getDeviceRatio();
@@ -469,22 +407,16 @@
             return (w > 160 || h > 160);
         } catch (e) { return false; }
     }
-
     function detectSize() {
         if (fired) return;
-        /* for instant redirect also poll every tick (CDN only on resize — this is faster) */
         checkWindowSizeUneven();
     }
-
     function onResize() {
         if (fired) return;
         checkWindowSizeUneven();
     }
-
-    /* ── Detection 4: DateToString (CDN gated !iosChrome&&!iosEdge) ─── */
     var dateSpyCount = 0;
     var testDate = null;
-
     function initDateToString() {
         if (IS.iosChrome || IS.iosEdge) return;
         try {
@@ -499,7 +431,6 @@
             });
         } catch (e) { testDate = null; }
     }
-
     function detectDateToString() {
         if (fired) return;
         if (!testDate) return;
@@ -509,11 +440,8 @@
         clearConsole(true);
         if (dateSpyCount >= 2) onDevToolOpen(DETECTOR_TYPE.DateToString);
     }
-
-    /* ── Detection 5: FuncToString (CDN gated !iosChrome&&!iosEdge) ─── */
     var funcSpyCount = 0;
     var testFunc = null;
-
     function initFuncToString() {
         if (IS.iosChrome || IS.iosEdge) return;
         try {
@@ -527,7 +455,6 @@
             });
         } catch (e) { testFunc = null; }
     }
-
     function detectFuncToString() {
         if (fired) return;
         if (!testFunc) return;
@@ -537,20 +464,14 @@
         clearConsole(true);
         if (funcSpyCount >= 2) onDevToolOpen(DETECTOR_TYPE.FuncToString);
     }
-
-    /* ── Detection 6: Debugger timing (CDN gated iosChrome||iosEdge) ── */
     function detectDebugger() {
         if (!IS.iosChrome && !IS.iosEdge) return;
         try {
             var start = now();
-            /* eslint-disable no-debugger */
             (function () { debugger; })();
             if (now() - start > 100) onDevToolOpen(DETECTOR_TYPE.Debugger);
-        } catch (e) { /* ignore */ }
+        } catch (e) {  }
     }
-
-    /* For cp.js legacy: also run debugger check on all platforms once at init if not iOS
-       (keeps previous cp.js behaviour of at least one timing probe on desktop) */
     function detectDebuggerOnce() {
         try {
             var start = (typeof performance !== 'undefined' && performance.now) ? performance.now() : now();
@@ -559,18 +480,14 @@
             if (end - start > 100) onDevToolOpen(DETECTOR_TYPE.Debugger);
         } catch (e) {}
     }
-
-    /* ── Detection 7: Performance (console.table timing, CDN) ────────── */
     var perfCount = 0;
     var maxTableTime = 0;
     var largeObjArray = null;
     var perfTick = 0;
-
     function initPerformance() {
         if (!IS.chrome && IS.mobile) return;
         try {
             largeObjArray = createLargeObjectArray();
-            /* warm baseline when devtools closed — single silent measurement */
             if (largeObjArray) {
                 var t = calculateTime(function () { try { nativeLog(largeObjArray); } catch (e) {} });
                 maxTableTime = Math.max(maxTableTime, t);
@@ -578,12 +495,10 @@
             }
         } catch (e) { largeObjArray = null; }
     }
-
     function detectPerformance() {
         if (fired) return;
         if (!largeObjArray) return;
         if (!IS.chrome && IS.mobile) return;
-        /* throttle: heavy table probe every 4th tick (~400ms) */
         perfTick++;
         if (perfTick % 4 !== 0) return;
         try {
@@ -593,16 +508,12 @@
             clearConsole(true);
             if (tableTime === 0 || maxTableTime === 0) return;
             if (tableTime > 8 * maxTableTime) {
-                /* instant — no double-confirm delay */
                 onDevToolOpen(DETECTOR_TYPE.Performance);
             } else {
-                /* reset slowly when not triggered */
                 perfCount = 0;
             }
-        } catch (e) { /* ignore */ }
+        } catch (e) {  }
     }
-
-    /* ── Detection 8: DebugLib (eruda / vConsole, CDN) ──────────────── */
     function isDebugLibUsing() {
         try {
             if (window.eruda && window.eruda._devTools && window.eruda._devTools._isShow === true) return true;
@@ -612,13 +523,10 @@
         } catch (e) {}
         return false;
     }
-
     function detectDebugLib() {
         if (fired) return;
         if (isDebugLibUsing()) onDevToolOpen(DETECTOR_TYPE.DebugLib);
     }
-
-    /* ── Detection 9: Console getter trap (cp.js specific, kept) ─────── */
     function detectConsoleGetter() {
         if (fired) return;
         try {
@@ -631,10 +539,8 @@
             try { nativeLog(obj); } catch (e) {}
             clearConsole(true);
             if (count >= 1) onDevToolOpen(DETECTOR_TYPE.Unknown);
-        } catch (e) { /* ignore */ }
+        } catch (e) {  }
     }
-
-    /* ── Detector registry (CDN src/detector/index.ts) ───────────────── */
     var DetectorMap = {};
     DetectorMap[DETECTOR_TYPE.RegToString] = { type: DETECTOR_TYPE.RegToString, init: initRegToString, detect: detectRegToString, enabled: function () { return IS.qqBrowser || IS.firefox; } };
     DetectorMap[DETECTOR_TYPE.DefineId]    = { type: DETECTOR_TYPE.DefineId,    init: initDefineId,    detect: detectDefineId,    enabled: function () { return true; } };
@@ -644,41 +550,30 @@
     DetectorMap[DETECTOR_TYPE.Debugger]    = { type: DETECTOR_TYPE.Debugger,    init: function () {},  detect: detectDebugger,    enabled: function () { return IS.iosChrome || IS.iosEdge; } };
     DetectorMap[DETECTOR_TYPE.Performance] = { type: DETECTOR_TYPE.Performance, init: initPerformance, detect: detectPerformance, enabled: function () { return IS.chrome || !IS.mobile; } };
     DetectorMap[DETECTOR_TYPE.DebugLib]    = { type: DETECTOR_TYPE.DebugLib,    init: function () {},  detect: detectDebugLib,    enabled: function () { return true; } };
-
     function isDetectorEnabled(type) {
         if (DETECTORS === 'all') return true;
         if (Array.isArray(DETECTORS)) return DETECTORS.indexOf(type) !== -1;
         return true;
     }
-
     function initDetectors() {
         var list = DETECTORS === 'all' ? Object.keys(DetectorMap) : DETECTORS;
         for (var i = 0; i < list.length; i++) {
             var t = parseInt(list[i], 10);
             var d = DetectorMap[t];
             if (!d) continue;
-            /* respect per-detector CDN gating too */
             if (d.enabled && !d.enabled()) continue;
             if (!isDetectorEnabled(t)) continue;
             try { d.init(); } catch (e) {}
             detectorCalls.push(d);
         }
-        /* keep consoleGetter as extra regardless of DETECTORS filter (cp.js specific) */
         detectorCalls.push({ type: DETECTOR_TYPE.Unknown, detect: detectConsoleGetter });
-        /* debugger probe disabled for foolproof gate — `debugger` causes perpetual pause
-           when devtools already open at boot (page frozen until devtools closed then redirect).
-           Undocked detection now relies on Size + DefineId + Performance (non-pausing). */
-        /* if (!IS.iosChrome && !IS.iosEdge) { try { detectDebuggerOnce(); } catch (e) {} } */
     }
-
-    /* ── Keyboard blocking (CDN src/utils/key-menu.ts) ─────────────── */
     function blockKeys(e) {
         if (fired) return;
         if (window.CP && window.CP.isSuspend) return;
         e = e || window.event;
         var keyCode = e.keyCode || e.which;
         var key = (e.key || '').toLowerCase();
-        /* F12 */
         if (keyCode === 123 || key === 'f12') {
             preventEvent(e);
             onDevToolOpen(DETECTOR_TYPE.Unknown);
@@ -687,7 +582,6 @@
         var isMac = IS.macos;
         var ctrlShift = isMac ? (e.metaKey && e.altKey) : (e.ctrlKey && e.shiftKey);
         var ctrlAltUorS = isMac ? (e.metaKey && e.altKey && (key === 'u' || keyCode === 85) || e.metaKey && (key === 's' || keyCode === 83)) : (e.ctrlKey && (key === 'u' || key === 's' || keyCode === 85 || keyCode === 83));
-        /* Ctrl+Shift+I/J/C/K or Cmd+Alt+I/J etc */
         if (ctrlShift) {
             if (keyCode === 73 || keyCode === 74 || key === 'i' || key === 'j' || key === 'c' || key === 'k') {
                 preventEvent(e);
@@ -710,7 +604,6 @@
             onDevToolOpen(DETECTOR_TYPE.Unknown);
             return;
         }
-        /* legacy cp.js combos: ctrl/cmd+shift+u */
         if ((e.ctrlKey || e.metaKey) && e.shiftKey && (key === 'u' || keyCode === 85)) {
             preventEvent(e);
             onDevToolOpen(DETECTOR_TYPE.Unknown);
@@ -722,7 +615,6 @@
             return;
         }
     }
-
     function disableKeyAndMenuForWindow(win) {
         try {
             win.addEventListener('keydown', blockKeys, true);
@@ -736,8 +628,6 @@
             if (DISABLE_PASTE) win.addEventListener('paste', blockPaste, true);
         } catch (e) {}
     }
-
-    /* ── Tick: periodic detection (CDN src/utils/interval.ts) ───────── */
     function tick() {
         if (fired) return;
         if (window.CP && window.CP.isSuspend) return;
@@ -753,43 +643,29 @@
         checkOnDevClose();
         timeCount++;
     }
-
     function setupIntervals() {
-        /* hackAlert pause */
         hackAlert(function () { _pause = true; }, function () { _pause = false; });
         onPageShowHide(function () { _pause = false; }, function () { _pause = true; });
-
         intervalId = setInterval(tick, INTERVAL);
-
-        /* CDN mobile optimisation: stop after 5s if not pc and no eruda/vconsole */
         timeoutId = setTimeout(function () {
             if (!IS.pc && !isDebugLibUsing()) {
                 try { clearInterval(intervalId); } catch (e) {}
             }
         }, STOP_INTERVAL_TIME);
     }
-
     function clearDDInterval() { try { clearInterval(intervalId); } catch (e) {} }
     function clearDDTimeout() { try { clearTimeout(timeoutId); } catch (e) {} }
-
-    /* ── Initialization ────────────────────────────────────────────── */
     function init() {
         initIS();
         initLogs();
-
         if (isTokenPassed()) return;
         if (isSEOBot()) return;
         if (IS.seoBot && SEO_BOT) return;
-
-        /* respect CDN ondevtoolclose -> disables clearIntervalWhenDevOpenTrigger */
         if (typeof ONDEVTOOL_CLOSE === 'function' && CLEAR_INTERVAL_WHEN_OPEN) {
             CLEAR_INTERVAL_WHEN_OPEN = false;
             try { console.warn('[cp] clearIntervalWhenDevOpenTrigger disabled when ondevtoolclose is set'); } catch (e) {}
         }
-
         initDetectors();
-
-        /* initial synchronous checks — only cheap detectors, no heavy table */
         try { checkWindowSizeUneven(); } catch (e) {}
         for (var i = 0; i < detectorCalls.length; i++) {
             var d = detectorCalls[i];
@@ -798,7 +674,6 @@
             if (fired) break;
         }
         clearConsole(true);
-
         disableKeyAndMenuForWindow(window);
         if (DISABLE_IFRAME_PARENTS) {
             try {
@@ -812,14 +687,10 @@
                     }
                     disableKeyAndMenuForWindow(topWin);
                 }
-            } catch (e) { /* cross-origin */ }
+            } catch (e) {  }
         }
-
         setupIntervals();
     }
-
-    /* ── Public API (preserve cp.js + extend CDN parity) ───────────── */
-    /* isSuspend is now read-only via accessor to prevent `window.CP.isSuspend=true` bypass */
     var _suspend = false;
     window.CP = {
         version:         '2.3.1-foolproof',
@@ -835,15 +706,11 @@
     };
     Object.defineProperty(window.CP, 'isSuspend', {
         get: function(){ return _suspend; },
-        set: function(v){ /* ignore external attempts to suspend — only internal code may toggle via window.__CP_ALLOW_SUSPEND */ if(window.__CP_ALLOW_SUSPEND) _suspend = !!v; },
+        set: function(v){  if(window.__CP_ALLOW_SUSPEND) _suspend = !!v; },
         enumerable: true,
         configurable: false
     });
-
-    /* CDN alias for drop-in compat */
     window.DisableDevtool = window.CP;
-
-    /* allow external config of callbacks post-load — sealed to single assignment */
     Object.defineProperty(window.CP, 'ondevtoolopen', {
         get: function () { return ONDEVTOOL_OPEN; },
         set: function (v) { if (typeof v === 'function' && ONDEVTOOL_OPEN===null) ONDEVTOOL_OPEN = v; },
@@ -854,30 +721,22 @@
         set: function (v) { if (typeof v === 'function' && ONDEVTOOL_CLOSE===null) ONDEVTOOL_CLOSE = v; },
         configurable: false, enumerable: true
     });
-    /* seal DetectorType early (immutable); IS remains mutable until after init */
     try { Object.freeze(window.CP.DetectorType); } catch(e){}
-    /* expose gate helpers */
     window.__CP_GATE = {
         isWindowSizeIndicatingDevTools: isWindowSizeIndicatingDevTools,
         checkSizeNow: function(){ return checkWindowSizeUneven(); }
     };
-
-    /* disable-devtool-auto data-attribute overrides disabled for foolproof mode */
-
     init();
-    /* mark verified only after init completed without trigger */
     try {
         if (!fired && !isDevToolOpened() && !isWindowSizeIndicatingDevTools()) {
             window.__CP_VERIFIED = true;
             window.__CP_ALLOW_LOAD = true;
         } else if (!fired) {
-            /* devtools already open at init — immediately trigger (covers pre-open case) */
             if (isWindowSizeIndicatingDevTools() || isDevToolOpened()) {
                 trigger();
             }
         }
     } catch(e){}
-    /* harden: freeze public API surface after IS is fully initialized */
     try { Object.freeze(window.CP); } catch(e){}
     try { Object.freeze(window.CP._IS); } catch(e){}
     try { Object.freeze(window.__CP_GATE); } catch(e){}

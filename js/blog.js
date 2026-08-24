@@ -10,7 +10,6 @@
     const METADATA_WAIT_TIMEOUT_MS = 5000;
     let currentlyRenderedPostId = null;
     let isPostLoading = false;
-
     function escapeHtml(str) {
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');
     }

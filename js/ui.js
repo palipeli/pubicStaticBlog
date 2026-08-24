@@ -334,12 +334,13 @@
         const sidebar = document.getElementById('sidebar');
         const mainContainer = document.querySelector('.main-container');
         if (!sidebarToggle || !sidebar || !mainContainer) return;
-        // True when the sidebar was auto-hidden only because the window lacked
-        // horizontal space (e.g. the split view was dragged narrow). Lets us
-        // restore the previously expanded state once space comes back.
+        const SIDEBAR_COLLAPSE_BREAKPOINT = 1024;
         let hiddenForSpace = false;
         function isMobileView() {
-            return window.innerWidth <= 768;
+            return window.innerWidth <= SIDEBAR_COLLAPSE_BREAKPOINT;
+        }
+        function syncBodyCollapsedClass() {
+            document.body.classList.toggle('sidebar-collapsed', sidebar.classList.contains('collapsed'));
         }
         function initSidebarState() {
             if (isMobileView()) {
@@ -355,12 +356,11 @@
                 sidebarToggle.setAttribute('aria-label', 'Collapse Sidebar');
                 sidebarToggle.setAttribute('title', 'Collapse Sidebar');
             }
+            syncBodyCollapsedClass();
         }
         initSidebarState();
         sidebarToggle.addEventListener('click', (e) => {
             e.stopPropagation();
-            // A manual toggle expresses the user's own preference; stop
-            // treating the sidebar as hidden-for-space.
             hiddenForSpace = false;
             sidebar.classList.toggle('collapsed');
             sidebar.classList.toggle('expanded');
@@ -368,6 +368,7 @@
             const isCollapsed = sidebar.classList.contains('collapsed');
             sidebarToggle.setAttribute('aria-label', isCollapsed ? 'Open Sidebar' : 'Collapse Sidebar');
             sidebarToggle.setAttribute('title', isCollapsed ? 'Open Sidebar' : 'Collapse Sidebar');
+            syncBodyCollapsedClass();
             setTimeout(window.saveAppState, 100);
         });
         let resizeTimeout;
@@ -376,30 +377,31 @@
             resizeTimeout = setTimeout(() => {
                 if (isMobileView()) {
                     if (!sidebar.classList.contains('collapsed')) {
-                        // Auto-hide the sidebar when horizontal space runs out;
-                        // remember it was hidden for space so it can be restored.
                         hiddenForSpace = true;
                         sidebar.classList.add('collapsed');
                         sidebar.classList.remove('expanded');
                         mainContainer.classList.add('sidebar-collapsed');
                         sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
                         sidebarToggle.setAttribute('title', 'Open Sidebar');
+                        syncBodyCollapsedClass();
                     }
                 } else if (hiddenForSpace) {
-                    // Space is back and the sidebar was only hidden because the
-                    // viewport was narrow: restore its previous expanded state.
                     hiddenForSpace = false;
                     sidebar.classList.remove('collapsed');
                     sidebar.classList.add('expanded');
                     mainContainer.classList.remove('sidebar-collapsed');
                     sidebarToggle.setAttribute('aria-label', 'Collapse Sidebar');
                     sidebarToggle.setAttribute('title', 'Collapse Sidebar');
+                    syncBodyCollapsedClass();
                 } else {
                     if (!sidebar.classList.contains('collapsed') && !sidebar.classList.contains('expanded')) {
                         sidebar.classList.add('expanded');
                         mainContainer.classList.remove('sidebar-collapsed');
                         sidebarToggle.setAttribute('aria-label', 'Collapse Sidebar');
                         sidebarToggle.setAttribute('title', 'Collapse Sidebar');
+                        syncBodyCollapsedClass();
+                    } else {
+                        syncBodyCollapsedClass();
                     }
                 }
             }, 80);
@@ -469,8 +471,6 @@
             });
         });
         observer.observe(document.body, {childList: true, subtree: true});
-        // Safety valve: the tray is created during startup on mobile, so a
-        // long-lived body-wide observer only burns cycles on desktop.
         setTimeout(function() {
             observer.disconnect();
         }, 30000);
