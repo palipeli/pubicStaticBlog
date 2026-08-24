@@ -36,8 +36,8 @@
             '}' +
             '@keyframes cloudBounceIn {' +
             '  0%   { transform:scale(0); }' +
-            '  35%  { transform:scale(1.1); }' +
-            '  65%  { transform:scale(0.93); }' +
+            '  35%  { transform:scale(1.04); }' +
+            '  65%  { transform:scale(0.97); }' +
             '  100% { transform:scale(1); }' +
             '}' +
             '@keyframes cloudFloat {' +
@@ -52,7 +52,7 @@
             '}' +
             '.cloud-pixel-pop {' +
             '  position:fixed; pointer-events:none; z-index:2147483647;' +
-            '  width:4px; height:4px; image-rendering:pixelated;' +
+            '  width:3px; height:3px; image-rendering:pixelated;' +
             '}' +
             '@keyframes pixelPop {' +
             '  0%   { transform:translate(0,0) scale(1); opacity:1; }' +
@@ -65,7 +65,7 @@
             var el = document.createElement('div');
             el.className = 'cloud-pixel-pop';
             var a = Math.PI * 2 * i / 8;
-            var d = 84 + Math.random() * 144;
+            var d = 32 + Math.random() * 48;
             el.style.left = cx + 'px';
             el.style.top = cy + 'px';
             el.style.setProperty('--px', Math.cos(a) * d + 'px');
