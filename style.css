@@ -2056,6 +2056,26 @@ html[data-theme="light"] .github-graph-range-btn.active {
     border-color: #50D096;
     color: #50D096;
 }
+#print-watermark{display:none}
+@media print{
+*{ -webkit-print-color-adjust:exact !important; print-color-adjust:exact !important; }
+@page{ margin:8mm; }
+html{ height:auto !important; overflow:visible !important; }
+body{ height:auto !important; overflow:visible !important; background:#fff !important; }
+body::before{ display:none !important; }
+.header,.sidebar,.sidebar-toggle,.custom-scrollbar,.custom-scrollbar-track,.custom-scrollbar-thumb,.particles,#particles,#consent-overlay,#warning-flash,#hdr-pre-flash,#browser-verified-badge,.mobile-nav-tray,.mobile-tray-overlay{ display:none !important; }
+.main-container{ margin:0 !important; height:auto !important; }
+.content-area{ overflow:visible !important; height:auto !important; padding:0 !important; }
+.blog-article,.blog-post-content,.home-hero,.about-hero{ background:#fff !important; border:none !important; box-shadow:none !important; }
+.blog-post-content p,.blog-post-content li,.blog-post-content h1,.blog-post-content h2,.blog-post-content h3,.blog-post-content h4,.blog-post-content h5,.blog-post-content h6,.blog-post-content blockquote,.blog-post-content td,.blog-post-content th,.blog-post-content a,.blog-post-content strong,.blog-post-content span,.blog-post-content div,.blog-article h1,.blog-article h2,.blog-article p,.home-content p,.about-hero p,.about-hero h1{ color:#b8b8b8 !important; opacity:0.38 !important; filter:blur(0.5px) !important; text-shadow:0 0 0 transparent !important; }
+.blog-post-content pre,.blog-post-content code,.blog-article pre,.blog-article code{ background:#f8f8f8 !important; color:#c2c2c2 !important; border-color:#eee !important; opacity:0.32 !important; filter:blur(0.45px) !important; }
+.blog-post-content img,.home-hero img,.profile-img{ opacity:0.28 !important; filter:grayscale(1) blur(0.6px) !important; }
+#print-watermark{ display:block !important; position:fixed !important; inset:0 !important; z-index:9999 !important; pointer-events:none !important; opacity:1 !important; overflow:hidden !important; }
+#print-watermark::before{ content:""; position:absolute; inset:-60%; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='180' viewBox='0 0 420 180'%3E%3Ctext x='10' y='65' transform='rotate(-28 210 90)' font-family='VT323,monospace' font-size='42' font-weight='900' fill='%23ff45fc' fill-opacity='0.42'%3EKAMIKAMI.EU %E2%80%A2 DO NOT COPY%3C/text%3E%3C/svg%3E"); background-repeat:repeat; background-size:420px 180px; opacity:1; }
+#print-watermark::after{ content:""; position:absolute; inset:-60%; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='380' height='160' viewBox='0 0 380 160'%3E%3Ctext x='10' y='60' transform='rotate(-28 190 80)' font-family='monospace' font-size='16' font-weight='700' fill='%23000000' fill-opacity='0.28'%3E%C2%A9 Michelle 2026 %E2%80%A2 VIEW ONLINE ONLY %E2%80%A2 CONFIDENTIAL%3C/text%3E%3C/svg%3E"); background-repeat:repeat; background-size:380px 160px; opacity:1; }
+#print-watermark .print-watermark-hatch{ position:absolute; inset:-60%; background:repeating-linear-gradient(-28deg, transparent 0 46px, rgba(255,69,252,0.055) 46px 47px); opacity:1; }
+body::after{ content:"PRINT DISABLED \2014 VISIT https://kamikami.eu TO READ ONLINE"; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%) rotate(-28deg); font-family:VT323,monospace; font-size:26px; font-weight:900; letter-spacing:2px; color:rgba(255,69,252,0.13); border:5px solid rgba(255,69,252,0.16); padding:14px 22px; white-space:nowrap; z-index:10000; pointer-events:none; background:rgba(255,255,255,0.6); box-shadow:0 0 0 6px rgba(255,255,255,0.6); }
+}
 @media (max-width: 768px) {
     .github-graph-card {
         flex: 1 1 100%;

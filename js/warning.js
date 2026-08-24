@@ -69,6 +69,15 @@
     const selBlock = document.createElement('style');
     selBlock.textContent = 'body { -webkit-user-select:none; user-select:none; }';
     document.head.appendChild(selBlock);
+    try{
+        var printWm=document.createElement('div');
+        printWm.id='print-watermark';
+        printWm.setAttribute('aria-hidden','true');
+        var hatch=document.createElement('div');
+        hatch.className='print-watermark-hatch';
+        printWm.appendChild(hatch);
+        document.body.appendChild(printWm);
+    }catch(e){}
     const style = document.createElement('style');
     style.innerHTML = `
         #consent-overlay {
