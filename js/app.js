@@ -1,6 +1,20 @@
 (function() {
     try{ if(!window.__CP_VERIFIED||!window.__CP_ALLOW_LOAD||!window.CP||typeof window.CP.isRunning!=='function'||!window.CP.version||window.CP.version!=='2.3.1-foolproof'||(Object.isFrozen&&!Object.isFrozen(window.CP))||!window.CP.isRunning()||(window.CP.isDevToolOpened&&window.CP.isDevToolOpened())){ try{window.__CP_FAIL&&window.__CP_FAIL()}catch(e){} throw new Error('CP not verified'); } if(window.__CP_GATE&&window.__CP_GATE.isWindowSizeIndicatingDevTools&&window.__CP_GATE.isWindowSizeIndicatingDevTools()){ try{window.CP.trigger()}catch(e){} try{window.__CP_FAIL&&window.__CP_FAIL()}catch(e){} throw new Error('CP size gate'); } }catch(e){ try{window.__CP_FAIL&&window.__CP_FAIL()}catch(e2){} throw e; }
     document.addEventListener('DOMContentLoaded', function() {
+        try{
+            var isIOSHybrid = false;
+            try{
+                isIOSHybrid = (typeof CSS!=='undefined' && CSS.supports && CSS.supports('-webkit-touch-callout','none')) || window.matchMedia('(pointer: coarse)').matches;
+            }catch(e){}
+            if(isIOSHybrid){
+                var outerFooter=document.querySelector('body > footer');
+                var contentArea=document.querySelector('.content-area');
+                if(outerFooter && contentArea && !contentArea.querySelector(':scope > footer')){
+                    var clone=outerFooter.cloneNode(true);
+                    contentArea.appendChild(clone);
+                }
+            }
+        }catch(e){}
         if (typeof window.createParticles === 'function') {
             window.createParticles();
         }

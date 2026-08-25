@@ -133,6 +133,10 @@
         return updateThumb;
     }
     function setupCustomScrollbars() {
+        try{
+            if(typeof CSS!=='undefined' && CSS.supports && CSS.supports('-webkit-touch-callout','none')) return;
+            if(window.matchMedia && window.matchMedia('(pointer: coarse)').matches) return;
+        }catch(e){}
         const contentArea = document.querySelector('.content-area');
         const mainContainer = document.querySelector('.main-container');
         if (contentArea && mainContainer) {

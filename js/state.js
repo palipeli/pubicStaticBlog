@@ -210,7 +210,17 @@
     }
     function getScrollContainer() {
         const container = document.querySelector(SCROLL_CONTAINER_SELECTOR);
-        if (container) return container;
+        if (container) {
+            try{
+                var isIOSHybrid = (typeof CSS!=='undefined' && CSS.supports && CSS.supports('-webkit-touch-callout','none')) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+                if(isIOSHybrid){
+                    var cs = window.getComputedStyle(container);
+                    if(cs.overflowY === 'visible' || cs.overflow === 'visible') return document.scrollingElement || document.documentElement;
+                    if(container.clientHeight >= container.scrollHeight - 2) return document.scrollingElement || document.documentElement;
+                }
+            }catch(e){}
+            return container;
+        }
         return document.scrollingElement || document.documentElement;
     }
     function isWindowContainer(container) {
