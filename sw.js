@@ -1,8 +1,8 @@
 'use strict';
-const CACHE_NAME = 'pubic-static-blog-v4';
-const STATIC_CACHE_NAME = 'static-assets-v20';
-const IMAGE_CACHE_NAME = 'images-v6';
-const CONTENT_CACHE_NAME = 'blog-content-v4';
+const CACHE_NAME = 'pubic-static-blog-v5';
+const STATIC_CACHE_NAME = 'static-assets-v22';
+const IMAGE_CACHE_NAME = 'images-v8';
+const CONTENT_CACHE_NAME = 'blog-content-v6';
 const pendingFetches = new Map();
 const STATIC_EXTENSIONS = /\.(html|css|js|json|webmanifest|ico|txt|xml)$/i;
 const IMAGE_EXTENSIONS = /\.(webp|png|jpg|jpeg|gif|svg|ico)(\?.*)?$/i;
@@ -20,6 +20,7 @@ const PRECACHE_ASSETS = [
     '/js/ui.js',
     '/js/blog.js',
     '/js/home.js',
+    '/js/chart-loader.js',
     '/js/github-graph.js',
     '/js/dns-graph.js',
     '/js/warning.js',
@@ -31,8 +32,7 @@ const PRECACHE_ASSETS = [
     '/blog/posts.json',
     '/media/favicon-circle.webp',
     '/media/logo.webp',
-    '/media/bg-light.webp',
-    '/media/bg-dark.webp',
+    '/media/vt323.woff2',
     '/media/vt323.ttf',
 ];
 self.addEventListener('install', (event) => {
@@ -394,6 +394,7 @@ async function precacheAllAssets() {
         '/media/signing.webp',
         '/media/speechbuba_left.png',
         '/media/speechbuba_right.png',
+        '/media/vt323.woff2',
         '/media/vt323.ttf',
     ];
     let blogPosts = [];
@@ -411,6 +412,7 @@ async function precacheAllAssets() {
         ...mediaFiles,
         ...blogPosts,
         '/js/config.js',
+        '/js/util.js',
         '/js/markdown.js',
         '/js/lazyload.js',
         '/js/state.js',
@@ -418,6 +420,7 @@ async function precacheAllAssets() {
         '/js/ui.js',
         '/js/blog.js',
         '/js/home.js',
+        '/js/chart-loader.js',
         '/js/github-graph.js',
         '/js/dns-graph.js',
         '/js/warning.js',

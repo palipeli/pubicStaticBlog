@@ -199,41 +199,49 @@
         msg.textContent = 'Could not load DNS request data.';
         wrap.appendChild(msg);
     }
+    var dnsChartStarted=false;
+    function ensureDnsChart(){
+        if(dnsChartStarted) return;
+        dnsChartStarted=true;
+        var run=function(){
+            fetchDnsData().then(function(data){ createChart(data); }).catch(function(){ showError(); });
+        };
+        if(window.Chart) run();
+        else if(window.loadChartJs) window.loadChartJs().then(run).catch(showError);
+        else run();
+    }
     function initDnsGraph() {
-        if (typeof window.Chart === 'undefined') return;
-        fetchDnsData()
-            .then(function(data) {
-                createChart(data);
-            })
-            .catch(function() {
-                showError();
-            });
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.attributeName === 'data-theme') {
-                    updateChartTheme();
-                }
+        var card=document.querySelector('.dns-graph-card')||document.getElementById('dns-graph');
+        if(!card) return;
+        if('IntersectionObserver' in window){
+            var io=new IntersectionObserver(function(entries){
+                entries.forEach(function(e){ if(e.isIntersecting){ io.disconnect(); ensureDnsChart(); }});
+            },{rootMargin:'300px'});
+            io.observe(card);
+            if(card.getBoundingClientRect().top<window.innerHeight+300) ensureDnsChart();
+        } else {
+            ensureDnsChart();
+        }
+        var themeObs=new MutationObserver(function(mutations){
+            mutations.forEach(function(mutation){
+                if(mutation.attributeName==='data-theme') updateChartTheme();
             });
         });
-        observer.observe(document.documentElement, {attributes: true});
-        if (typeof window.ResizeObserver !== 'undefined') {
-            const resizeObserver = new ResizeObserver(function() {
-                if (chart) chart.resize();
-            });
-            const wrap = document.querySelector('.dns-graph-canvas-wrap');
-            if (wrap) resizeObserver.observe(wrap);
-            const card = document.querySelector('.dns-graph-card');
-            if (card) resizeObserver.observe(card);
-            const mainContainer = document.querySelector('.main-container');
-            if (mainContainer) resizeObserver.observe(mainContainer);
+        themeObs.observe(document.documentElement,{attributes:true});
+        if(typeof window.ResizeObserver!=='undefined'){
+            var ro=new ResizeObserver(function(){ if(chart) chart.resize(); });
+            var wrap=document.querySelector('.dns-graph-canvas-wrap');
+            if(wrap) ro.observe(wrap);
+            var cardEl=document.querySelector('.dns-graph-card');
+            if(cardEl) ro.observe(cardEl);
+            var mainContainer=document.querySelector('.main-container');
+            if(mainContainer) ro.observe(mainContainer);
         } else {
-            window.addEventListener('resize', function() {
-                if (chart) chart.resize();
-            });
+            window.addEventListener('resize',function(){ if(chart) chart.resize(); });
         }
     }
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initDnsGraph);
+    if(document.readyState==='loading'){
+        document.addEventListener('DOMContentLoaded',initDnsGraph);
     } else {
         initDnsGraph();
     }

@@ -10,9 +10,7 @@
     const METADATA_WAIT_TIMEOUT_MS = 5000;
     let currentlyRenderedPostId = null;
     let isPostLoading = false;
-    function escapeHtml(str) {
-        return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;');
-    }
+    var escapeHtml=window.escapeHtml||function(str){ return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;'); };
     function fetchWithTimeout(url, timeoutMs) {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), timeoutMs);

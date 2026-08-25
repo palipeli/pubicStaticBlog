@@ -3,7 +3,7 @@
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    src: url('/media/vt323.ttf') format('truetype');
+    src: url('/media/vt323.woff2') format('woff2'), url('/media/vt323.ttf') format('truetype');
 }
 * {
     margin: 0;
@@ -136,6 +136,8 @@ body {
     box-shadow: var(--glass-shadow);
     animation: slideDown 0.5s ease-out;
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
+    contain: paint;
+    transform: translateZ(0);
 }
 @keyframes slideDown {
     from {
@@ -238,6 +240,8 @@ body {
     padding: 20px;
     box-shadow: var(--glass-shadow);
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
+    contain: paint;
+    transform: translateZ(0);
 }
 .home-hero.home-animate > img {
     animation: homeLogoEnter 0.7s ease-out 0.15s both;
@@ -317,6 +321,8 @@ body {
     box-sizing: border-box;
     z-index: 999;
     isolation: isolate;
+    contain: paint;
+    transform: translateZ(0);
     transition: transform var(--sidebar-collapse-transition), opacity 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
 }
 [data-theme="dark"] .sidebar {
@@ -370,6 +376,7 @@ body {
     box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
     color: var(--text-primary);
     padding: 0;
+    contain: paint;
 }
 .sidebar-toggle svg {
     width: 22px;
@@ -453,6 +460,8 @@ body {
     cursor: pointer;
     box-shadow: var(--glass-shadow);
     transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, box-shadow var(--theme-transition-duration) ease;
+    contain: paint;
+    transform: translateZ(0);
 }
 .template-card:hover {
     background: rgba(255, 255, 255, 0.75);
@@ -1019,6 +1028,7 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     min-width: 0;
     position: relative;
     z-index: 1;
+    contain: paint;
 }
 .blog-card:hover {
     background: rgba(255, 69, 252, 0.08);
@@ -1191,6 +1201,8 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     cursor: pointer;
     backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
     -webkit-backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    contain: paint;
+    transform: translateZ(0);
 }
 .mc-btn:hover {
     transform: translateY(-2px);
@@ -1790,6 +1802,7 @@ footer p {
     height: auto;
     display: block;
     margin: 1em 0;
+    content-visibility: auto;
 }
 .blog-post-content del {
     text-decoration: line-through;
@@ -1928,6 +1941,8 @@ footer p {
     border: 1px solid #30363d;
     border-radius: 12px;
     padding: 16px;
+    min-height: 260px;
+    contain: paint;
 }
 html[data-theme="light"] .dns-graph-card {
     background: rgba(255, 255, 255, 0.85);

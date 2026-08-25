@@ -89,8 +89,8 @@
             }
             updateThumb();
         }
-        scroller.addEventListener('scroll', updateThumb, {passive: true});
-        window.addEventListener('resize', updateThumb);
+        scroller.addEventListener('scroll', function(){ requestAnimationFrame(updateThumb); }, {passive:true});
+        window.addEventListener('resize', scheduleThumbUpdate);
         thumb.addEventListener('pointerdown', onThumbPointerDown);
         thumb.addEventListener('pointermove', onThumbPointerMove);
         thumb.addEventListener('pointerup', onThumbPointerUp);
@@ -107,15 +107,15 @@
         }
         document.addEventListener('load', scheduleThumbUpdate, true);
         if (document.fonts && document.fonts.ready) {
-            document.fonts.ready.then(updateThumb).catch(() => {});
+            document.fonts.ready.then(updateThumb).catch(function(){});
         }
-        const observer = new MutationObserver(scheduleThumbUpdate);
-        observer.observe(scroller, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            characterData: true
-        });
+        var observer=new MutationObserver(scheduleThumbUpdate);
+        observer.observe(scroller,{childList:true,subtree:false,attributes:false,characterData:false});
+        if('ResizeObserver' in window){
+            var ro=new ResizeObserver(scheduleThumbUpdate);
+            ro.observe(scroller);
+            ro.observe(host);
+        }
         updateThumb();
         return updateThumb;
     }

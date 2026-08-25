@@ -212,49 +212,64 @@
         msg.textContent = 'Could not load ' + username + ' contribution data.';
         wrap.appendChild(msg);
     }
+    var chartLoadStarted=false;
+    function ensureChartAndInit(){
+        if(chartLoadStarted) return;
+        chartLoadStarted=true;
+        var doInit=function(){
+            setupRangeButtons();
+            GITHUB_GRAPH_ACCOUNTS.forEach(function(username) {
+                var canvasId='github-graph-'+username;
+                fetchContributions(username).then(function(data){
+                    allData[username]=data;
+                    createChart(canvasId,username,data);
+                }).catch(function(){ showError(canvasId,username); });
+            });
+        };
+        if(window.Chart) doInit();
+        else if(window.loadChartJs) window.loadChartJs().then(doInit).catch(function(){ GITHUB_GRAPH_ACCOUNTS.forEach(function(u){ showError('github-graph-'+u,u); }); });
+        else doInit();
+    }
     function initGithubGraphs() {
-        if (typeof window.Chart === 'undefined') return;
-        setupRangeButtons();
-        GITHUB_GRAPH_ACCOUNTS.forEach(function(username) {
-            const canvasId = 'github-graph-' + username;
-            fetchContributions(username)
-                .then(function(data) {
-                    allData[username] = data;
-                    createChart(canvasId, username, data);
-                })
-                .catch(function() {
-                    showError(canvasId, username);
-                });
-        });
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.attributeName === 'data-theme') {
-                    updateChartTheme();
-                }
+        var container=document.querySelector('.github-graphs-container')||document.querySelector('.github-graph-card');
+        if(!container) return;
+        var themeObserver=new MutationObserver(function(mutations){
+            mutations.forEach(function(mutation){
+                if(mutation.attributeName==='data-theme') updateChartTheme();
             });
         });
-        observer.observe(document.documentElement, {attributes: true});
-        if (typeof window.ResizeObserver !== 'undefined') {
-            const resizeObserver = new ResizeObserver(function() {
-                Object.keys(charts).forEach(function(canvasId) {
-                    const chart = charts[canvasId];
-                    if (chart) chart.resize();
+        themeObserver.observe(document.documentElement,{attributes:true});
+        var resizeObs=null;
+        if(typeof window.ResizeObserver!=='undefined'){
+            resizeObs=new ResizeObserver(function(){
+                Object.keys(charts).forEach(function(canvasId){
+                    var chart=charts[canvasId];
+                    if(chart) chart.resize();
                 });
             });
-            document.querySelectorAll('.github-graph-canvas-wrap').forEach(function(wrap) {
-                resizeObserver.observe(wrap);
-            });
-            const graphsContainer = document.querySelector('.github-graphs-container');
-            if (graphsContainer) resizeObserver.observe(graphsContainer);
-            const mainContainer = document.querySelector('.main-container');
-            if (mainContainer) resizeObserver.observe(mainContainer);
+            document.querySelectorAll('.github-graph-canvas-wrap').forEach(function(wrap){ resizeObs.observe(wrap); });
+            var graphsContainer=document.querySelector('.github-graphs-container');
+            if(graphsContainer) resizeObs.observe(graphsContainer);
+            var mainContainer=document.querySelector('.main-container');
+            if(mainContainer) resizeObs.observe(mainContainer);
         } else {
-            window.addEventListener('resize', function() {
-                Object.keys(charts).forEach(function(canvasId) {
-                    const chart = charts[canvasId];
-                    if (chart) chart.resize();
+            window.addEventListener('resize',function(){
+                Object.keys(charts).forEach(function(canvasId){
+                    var chart=charts[canvasId];
+                    if(chart) chart.resize();
                 });
             });
+        }
+        if('IntersectionObserver' in window){
+            var io=new IntersectionObserver(function(entries){
+                entries.forEach(function(e){
+                    if(e.isIntersecting){ io.disconnect(); ensureChartAndInit(); }
+                });
+            },{rootMargin:'300px'});
+            io.observe(container);
+            if(container.getBoundingClientRect().top<window.innerHeight+300) ensureChartAndInit();
+        } else {
+            ensureChartAndInit();
         }
     }
     if (document.readyState === 'loading') {

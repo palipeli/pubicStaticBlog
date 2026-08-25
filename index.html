@@ -82,8 +82,24 @@
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Michelle's DNS and Blog</title>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://github-contributions-api.jogruber.de">
+    <link rel="dns-prefetch" href="https://github-contributions-api.jogruber.de">
+    <link rel="preconnect" href="https://graph.kamikami.workers.dev">
+    <link rel="dns-prefetch" href="https://graph.kamikami.workers.dev">
+    <link rel="preload" as="style" href="style.css">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="preload" as="font" type="font/woff2" href="/media/vt323.woff2" crossorigin>
+    <link rel="preload" as="image" href="media/logo.webp" fetchpriority="high">
+    <link rel="preload" as="image" href="media/bg-light.webp" media="(prefers-color-scheme: light)">
+    <link rel="preload" as="image" href="media/bg-dark.webp" media="(prefers-color-scheme: dark)">
+    <link rel="preload" as="fetch" href="/blog/nt_verses_compact.json" crossorigin>
+    <link rel="preload" as="fetch" href="/blog/posts.json" crossorigin>
+    <link rel="preload" as="fetch" href="/media/tracks/intro1.mp3" crossorigin>
+    <link rel="preload" as="fetch" href="/media/tracks/intro2.mp3" crossorigin>
+    <link rel="preload" as="fetch" href="/media/tracks/intro3.mp3" crossorigin>
+    <link rel="preload" as="fetch" href="/media/tracks/intro4.mp3" crossorigin>
     <link rel="icon" type="image/webp" href="media/favicon-circle.webp">
     <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"></noscript>
@@ -137,7 +153,7 @@
             <section id="home" class="page-section active">
                 <div class="home-hero" id="home-hero-content">
                     <p class="home-lead">WELCOME TO MY SUPER-CUTE-BUT-SHITTY WEBSITE! TAKE VICODIN IF YOU CAME FROM WSFTEAM.XYZ</p>
-                    <img src="media/logo.webp" alt="Blog Logo" width="560" height="315" style="display: block; margin: 20px auto; width: 70%; max-width: 560px; height: auto;">
+                    <img src="media/logo.webp" alt="Blog Logo" width="560" height="315" fetchpriority="high" decoding="async" style="display: block; margin: 20px auto; width: 70%; max-width: 560px; height: auto;">
                     <div class="blog-buttons-container" id="blog-buttons-container" style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin: 25px 0;">
                     </div>
                     <div class="home-content">
@@ -203,7 +219,7 @@
             <section id="about" class="page-section">
                 <div class="about-layout-container">
                     <div class="about-hero">
-                        <img src="media/favicon-circle.webp" alt="Michelle" class="profile-img" width="150" height="150">
+                        <img src="media/favicon-circle.webp" alt="Michelle" class="profile-img" width="150" height="150" decoding="async" loading="lazy">
                         <div class="social-links">
                             <a href="https://discord.com/users/654535856950083603" target="_blank" class="blog-btn category-discord">
                                 <i class="fa-brands fa-discord"></i> Discord
@@ -254,6 +270,7 @@
         </aside>
     </div>
     <script src="js/config.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
+    <script src="js/util.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
     <script src="js/markdown.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
     <script src="js/lazyload.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
     <script src="js/state.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
@@ -261,7 +278,7 @@
     <script src="js/ui.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
     <script src="js/blog.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
     <script src="js/home.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer crossorigin="anonymous" referrerpolicy="no-referrer" onerror="try{window.__CP_FAIL();}catch(e){}"></script>
+    <script src="js/chart-loader.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
     <script src="js/github-graph.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
     <script src="js/dns-graph.js" defer onerror="try{window.__CP_FAIL();}catch(e){}"></script>
     <script src="js/warning.js" onerror="try{window.__CP_FAIL();}catch(e){}"></script>

@@ -52,7 +52,7 @@
             '}' +
             '.cloud-pixel-pop {' +
             '  position:fixed; pointer-events:none; z-index:2147483647;' +
-            '  width:3px; height:3px; image-rendering:pixelated;' +
+            '  width:2.5px; height:2.5px; image-rendering:pixelated;' +
             '}' +
             '@keyframes pixelPop {' +
             '  0%   { transform:translate(0,0) scale(1); opacity:1; }' +
@@ -65,7 +65,7 @@
             var el = document.createElement('div');
             el.className = 'cloud-pixel-pop';
             var a = Math.PI * 2 * i / 8;
-            var d = 32 + Math.random() * 48;
+            var d = 28 + Math.random() * 42;
             el.style.left = cx + 'px';
             el.style.top = cy + 'px';
             el.style.setProperty('--px', Math.cos(a) * d + 'px');
