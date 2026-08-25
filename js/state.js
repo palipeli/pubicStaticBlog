@@ -85,9 +85,35 @@
         if (state.sidebarCollapsed) {
             const sidebar = document.getElementById(SELECTORS.SIDEBAR.substring(1));
             if (sidebar && !sidebar.classList.contains('collapsed')) {
-                const toggleBtn = document.getElementById(SELECTORS.SIDEBAR_TOGGLE.substring(1));
-                if (toggleBtn) {
-                    toggleBtn.click();
+                const isConstrained = window.innerWidth <= 1024;
+                if (isConstrained) {
+                    sidebar.classList.add('no-anim');
+                    const mc = document.querySelector('.main-container');
+                    if (mc) mc.classList.add('no-anim');
+                    const toggleBtn = document.getElementById(SELECTORS.SIDEBAR_TOGGLE.substring(1));
+                    if (toggleBtn) {
+                        sidebar.classList.add('collapsed');
+                        sidebar.classList.remove('expanded');
+                        if (mc) mc.classList.add('sidebar-collapsed');
+                        toggleBtn.setAttribute('aria-label', 'Open Sidebar');
+                        toggleBtn.setAttribute('title', 'Open Sidebar');
+                        document.body.classList.toggle('sidebar-collapsed', true);
+                        void sidebar.offsetWidth;
+                        requestAnimationFrame(function(){
+                            requestAnimationFrame(function(){
+                                sidebar.classList.remove('no-anim');
+                                if (mc) mc.classList.remove('no-anim');
+                            });
+                        });
+                    } else {
+                        sidebar.classList.remove('no-anim');
+                        if (mc) mc.classList.remove('no-anim');
+                    }
+                } else {
+                    const toggleBtn = document.getElementById(SELECTORS.SIDEBAR_TOGGLE.substring(1));
+                    if (toggleBtn) {
+                        toggleBtn.click();
+                    }
                 }
             }
         }

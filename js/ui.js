@@ -354,6 +354,8 @@
             document.body.classList.toggle('sidebar-collapsed', sidebar.classList.contains('collapsed'));
         }
         function initSidebarState() {
+            sidebar.classList.add('no-anim');
+            mainContainer.classList.add('no-anim');
             if (isMobileView()) {
                 sidebar.classList.add('collapsed');
                 sidebar.classList.remove('expanded');
@@ -368,6 +370,14 @@
                 sidebarToggle.setAttribute('title', 'Collapse Sidebar');
             }
             syncBodyCollapsedClass();
+            void sidebar.offsetWidth;
+            void mainContainer.offsetWidth;
+            requestAnimationFrame(function(){
+                requestAnimationFrame(function(){
+                    sidebar.classList.remove('no-anim');
+                    mainContainer.classList.remove('no-anim');
+                });
+            });
         }
         function setAnimating(on){
             if(on){

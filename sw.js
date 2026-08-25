@@ -1,8 +1,8 @@
 'use strict';
-const CACHE_NAME = 'pubic-static-blog-v8';
-const STATIC_CACHE_NAME = 'static-assets-v27';
-const IMAGE_CACHE_NAME = 'images-v13';
-const CONTENT_CACHE_NAME = 'blog-content-v9';
+const CACHE_NAME = 'pubic-static-blog-v9';
+const STATIC_CACHE_NAME = 'static-assets-v28';
+const IMAGE_CACHE_NAME = 'images-v14';
+const CONTENT_CACHE_NAME = 'blog-content-v10';
 const pendingFetches = new Map();
 const STATIC_EXTENSIONS = /\.(html|css|js|json|webmanifest|ico|txt|xml)$/i;
 const IMAGE_EXTENSIONS = /\.(webp|png|jpg|jpeg|gif|svg|ico)(\?.*)?$/i;
