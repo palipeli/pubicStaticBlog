@@ -91,6 +91,7 @@
         }
         scroller.addEventListener('scroll', function(){ requestAnimationFrame(updateThumb); }, {passive:true});
         window.addEventListener('resize', scheduleThumbUpdate);
+        if(window.visualViewport) window.visualViewport.addEventListener('resize', scheduleThumbUpdate);
         thumb.addEventListener('pointerdown', onThumbPointerDown);
         thumb.addEventListener('pointermove', onThumbPointerMove);
         thumb.addEventListener('pointerup', onThumbPointerUp);
@@ -110,13 +111,25 @@
             document.fonts.ready.then(updateThumb).catch(function(){});
         }
         var observer=new MutationObserver(scheduleThumbUpdate);
-        observer.observe(scroller,{childList:true,subtree:false,attributes:false,characterData:false});
+        observer.observe(scroller,{childList:true,subtree:true,attributes:false,characterData:false});
         if('ResizeObserver' in window){
             var ro=new ResizeObserver(scheduleThumbUpdate);
             ro.observe(scroller);
             ro.observe(host);
+            var grid=document.getElementById('blog-post-selector-grid');
+            if(grid) ro.observe(grid);
+            var article=document.getElementById('blog-article-content');
+            if(article) ro.observe(article);
+            document.addEventListener('blog:metadata-loaded', function(){
+                var g=document.getElementById('blog-post-selector-grid');
+                var a=document.getElementById('blog-article-content');
+                try{ if(g) ro.observe(g); }catch(e){}
+                try{ if(a) ro.observe(a); }catch(e){}
+                scheduleThumbUpdate();
+            });
         }
         updateThumb();
+        window._updateContentScrollbar=updateThumb;
         return updateThumb;
     }
     function setupCustomScrollbars() {
@@ -124,7 +137,10 @@
         const mainContainer = document.querySelector('.main-container');
         if (contentArea && mainContainer) {
             const updateContentScrollbar = attachCustomScrollbar(contentArea, mainContainer);
-            mainContainer.addEventListener('transitionend', updateContentScrollbar);
+            mainContainer.addEventListener('transitionend', function(e){
+                if(e.propertyName==='margin-right') updateContentScrollbar();
+            });
+            document.addEventListener('sidebar:toggle', function(){ setTimeout(updateContentScrollbar, 350); });
         }
     }
     window.setupCustomScrollbars = setupCustomScrollbars;

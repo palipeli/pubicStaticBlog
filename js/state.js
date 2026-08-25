@@ -282,14 +282,21 @@
         lastRestoredWindowY = typeof windowY === 'number' ? windowY : 0;
         setScrollPosition(x, y, lastRestoredWindowY);
     }
+    function clampScrollY(y){
+        var c=getScrollContainer();
+        if(isWindowContainer(c)) return y;
+        var max=c.scrollHeight - c.clientHeight;
+        if(max<=0) return 0;
+        return Math.max(0, Math.min(y, max));
+    }
     function restoreScrollPosition() {
         const pageKey = getCurrentPageKey();
         if (!pageKey) return;
         const saved = loadScrollPositions()[pageKey];
         const x = saved && typeof saved.x === 'number' ? saved.x : 0;
-        const y = saved && typeof saved.y === 'number' ? saved.y : 0;
+        const y = saved && typeof saved.y === 'number' ? clampScrollY(saved.y) : 0;
         const windowY = saved && typeof saved.windowY === 'number' ? saved.windowY : 0;
-        const apply = () => applyScrollPosition(pageKey, x, y, windowY);
+        const apply = () => applyScrollPosition(pageKey, x, clampScrollY(y), windowY);
         apply();
         window.requestAnimationFrame(apply);
         setTimeout(apply, 60);
@@ -329,14 +336,14 @@
         let windowY = 0;
         if (saved) {
             x = typeof saved.x === 'number' ? Math.max(0, saved.x) : 0;
-            y = typeof saved.y === 'number' ? Math.max(0, saved.y) : 0;
+            y = typeof saved.y === 'number' ? Math.max(0, clampScrollY(saved.y)) : 0;
             windowY = typeof saved.windowY === 'number' ? Math.max(0, saved.windowY) : 0;
             if (y <= COLD_LOAD_TOP_SNAP_PX) {
                 y = 0;
                 windowY = 0;
             }
         }
-        const apply = () => applyScrollPosition(pageKey, x, y, windowY);
+        const apply = () => applyScrollPosition(pageKey, x, clampScrollY(y), windowY);
         window.requestAnimationFrame(apply);
         setTimeout(apply, 100);
         setTimeout(apply, 300);

@@ -277,6 +277,16 @@
     function saveThemePreference(theme) {
         setCookie('theme_preference', theme, 365);
     }
+    function syncThemeColor(){
+        var m=document.getElementById('theme-color-meta');
+        if(!m) m=document.querySelector('meta[name="theme-color"]');
+        if(!m) return;
+        var t=document.documentElement.getAttribute('data-theme');
+        var dark='#121212', light='#f6f5f4';
+        if(t==='dark') m.content=dark;
+        else if(t==='light') m.content=light;
+        else m.content=window.matchMedia('(prefers-color-scheme: dark)').matches?dark:light;
+    }
     function applyTheme(themeName) {
         const root = document.documentElement;
         root.setAttribute('data-theme', themeName);
@@ -285,6 +295,7 @@
             applyTheme(prefersDark ? 'dark' : 'light');
             return;
         }
+        syncThemeColor();
     }
     function setupTemplates() {
         const themeBtns = document.querySelectorAll('.theme-btn');
@@ -358,10 +369,27 @@
             }
             syncBodyCollapsedClass();
         }
+        function setAnimating(on){
+            if(on){
+                sidebar.classList.add('is-animating');
+                mainContainer.classList.add('is-animating');
+                try{ document.dispatchEvent(new CustomEvent('sidebar:toggle')); }catch(e){}
+            } else {
+                sidebar.classList.remove('is-animating');
+                mainContainer.classList.remove('is-animating');
+            }
+        }
+        function clearAnimating(e){
+            if(e.propertyName==='transform' && e.target===sidebar) setAnimating(false);
+            if(e.propertyName==='margin-right' && e.target===mainContainer) setAnimating(false);
+        }
+        sidebar.addEventListener('transitionend', clearAnimating);
+        mainContainer.addEventListener('transitionend', clearAnimating);
         initSidebarState();
         sidebarToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             hiddenForSpace = false;
+            setAnimating(true);
             sidebar.classList.toggle('collapsed');
             sidebar.classList.toggle('expanded');
             mainContainer.classList.toggle('sidebar-collapsed');
@@ -369,6 +397,7 @@
             sidebarToggle.setAttribute('aria-label', isCollapsed ? 'Open Sidebar' : 'Collapse Sidebar');
             sidebarToggle.setAttribute('title', isCollapsed ? 'Open Sidebar' : 'Collapse Sidebar');
             syncBodyCollapsedClass();
+            setTimeout(function(){ setAnimating(false); }, 400);
             setTimeout(window.saveAppState, 100);
         });
         let resizeTimeout;
@@ -378,21 +407,25 @@
                 if (isMobileView()) {
                     if (!sidebar.classList.contains('collapsed')) {
                         hiddenForSpace = true;
+                        setAnimating(true);
                         sidebar.classList.add('collapsed');
                         sidebar.classList.remove('expanded');
                         mainContainer.classList.add('sidebar-collapsed');
                         sidebarToggle.setAttribute('aria-label', 'Open Sidebar');
                         sidebarToggle.setAttribute('title', 'Open Sidebar');
                         syncBodyCollapsedClass();
+                        setTimeout(function(){ setAnimating(false); }, 400);
                     }
                 } else if (hiddenForSpace) {
                     hiddenForSpace = false;
+                    setAnimating(true);
                     sidebar.classList.remove('collapsed');
                     sidebar.classList.add('expanded');
                     mainContainer.classList.remove('sidebar-collapsed');
                     sidebarToggle.setAttribute('aria-label', 'Collapse Sidebar');
                     sidebarToggle.setAttribute('title', 'Collapse Sidebar');
                     syncBodyCollapsedClass();
+                    setTimeout(function(){ setAnimating(false); }, 400);
                 } else {
                     if (!sidebar.classList.contains('collapsed') && !sidebar.classList.contains('expanded')) {
                         sidebar.classList.add('expanded');

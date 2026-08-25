@@ -228,8 +228,16 @@
             });
         });
         themeObs.observe(document.documentElement,{attributes:true});
+        var dnsResizeTimer=null;
+        function scheduleDnsResize(){
+            if(dnsResizeTimer) return;
+            dnsResizeTimer=setTimeout(function(){
+                dnsResizeTimer=null;
+                if(chart) chart.resize();
+            }, 120);
+        }
         if(typeof window.ResizeObserver!=='undefined'){
-            var ro=new ResizeObserver(function(){ if(chart) chart.resize(); });
+            var ro=new ResizeObserver(scheduleDnsResize);
             var wrap=document.querySelector('.dns-graph-canvas-wrap');
             if(wrap) ro.observe(wrap);
             var cardEl=document.querySelector('.dns-graph-card');
@@ -237,8 +245,12 @@
             var mainContainer=document.querySelector('.main-container');
             if(mainContainer) ro.observe(mainContainer);
         } else {
-            window.addEventListener('resize',function(){ if(chart) chart.resize(); });
+            window.addEventListener('resize',scheduleDnsResize);
         }
+        document.addEventListener('sidebar:toggle', scheduleDnsResize);
+        window.addEventListener('transitionend', function(e){
+            if(e.target && e.target.classList && e.target.classList.contains('main-container') && e.propertyName==='margin-right') scheduleDnsResize();
+        });
     }
     if(document.readyState==='loading'){
         document.addEventListener('DOMContentLoaded',initDnsGraph);

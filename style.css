@@ -42,6 +42,10 @@
     --glass-radius: 16px;
     --bg-image-dark: url('/media/bg-dark.webp');
     --bg-image-light: url('/media/bg-light.webp');
+    --app-height: 100vh;
+}
+@supports (height: 100dvh) {
+    :root { --app-height: 100dvh; }
 }
 [data-theme="dark"] {
     --bg-dark: #121212;
@@ -87,17 +91,18 @@ body {
     background-size: cover;
     background-position: center;
     color: var(--text-primary);
-    min-height: 100vh;
+    min-height: var(--app-height);
+    min-height: -webkit-fill-available;
     position: relative;
     transition: background var(--theme-transition-duration) ease, color var(--theme-transition-duration) ease;
 }
 body::before {
     content: '';
     position: fixed;
-    top: 0;
+    top: calc(-1 * env(safe-area-inset-top, 0px));
     left: 0;
     width: 100%;
-    height: 100%;
+    height: calc(100% + env(safe-area-inset-top, 0px) + env(safe-area-inset-bottom, 0px));
     background: var(--bg-image-light) no-repeat center center;
     background-size: cover;
     transition: background var(--theme-transition-duration) ease;
@@ -114,6 +119,8 @@ body::before {
 html {
     height: 100%;
     overflow: hidden;
+    background: var(--bg-dark);
+    min-height: -webkit-fill-available;
 }
 body {
     overflow-y: auto;
@@ -208,16 +215,21 @@ body {
 }
 .main-container {
     display: block;
-    height: 100vh;
+    height: var(--app-height);
     position: relative;
     margin-right: var(--sidebar-width);
     transition: margin-right var(--sidebar-collapse-transition);
+    will-change: margin-right;
+}
+.main-container.is-animating {
+    pointer-events: none;
 }
 .main-container.sidebar-collapsed {
     margin-right: 0;
 }
 .content-area {
-    padding: var(--content-top-inset) 15px 15px;
+    padding: var(--content-top-inset) 15px calc(15px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(15px + env(safe-area-inset-bottom, 0px));
     overflow-y: auto;
     height: 100%;
     width: 100%;
@@ -317,19 +329,25 @@ body {
     position: fixed;
     right: 0;
     top: 0;
-    height: 100vh;
+    height: var(--app-height);
     box-sizing: border-box;
     z-index: 999;
     isolation: isolate;
-    contain: paint;
     transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     transition: transform var(--sidebar-collapse-transition), opacity 0.3s ease, background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
+}
+.sidebar.is-animating {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 [data-theme="dark"] .sidebar {
     box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
 }
 .sidebar-content-wrapper {
-    padding: calc(var(--header-height) + 20px) 20px 20px;
+    padding: calc(var(--header-height) + 20px) 20px calc(20px + env(safe-area-inset-bottom, 0px));
     height: 100%;
     overflow-y: auto;
     opacity: 1;
@@ -377,6 +395,7 @@ body {
     color: var(--text-primary);
     padding: 0;
     contain: paint;
+    will-change: transform;
 }
 .sidebar-toggle svg {
     width: 22px;
@@ -1357,7 +1376,7 @@ body::-webkit-scrollbar {
 }
 @keyframes float {
     0%, 100% {
-        transform: translateY(100vh) rotate(0deg);
+        transform: translateY(var(--app-height)) rotate(0deg);
         opacity: 0;
     }
     10% {
@@ -1367,7 +1386,7 @@ body::-webkit-scrollbar {
         opacity: 1;
     }
     100% {
-        transform: translateY(-100vh) rotate(720deg);
+        transform: translateY(calc(-1 * var(--app-height))) rotate(720deg);
         opacity: 0;
     }
 }
@@ -1576,7 +1595,7 @@ body.sidebar-collapsed .mobile-tray-toggle {
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100vh;
+    height: var(--app-height);
     background: rgba(0, 0, 0, 0.5);
     z-index: 998;
     opacity: 0;
@@ -1595,7 +1614,7 @@ body.sidebar-collapsed .mobile-tray-toggle {
     background: var(--bg-panel);
     border-bottom: 1px solid var(--border-color);
     z-index: 999;
-    max-height: calc(100vh - var(--header-height));
+    max-height: calc(var(--app-height) - var(--header-height));
     overflow-y: auto;
     transform: translateY(-100%);
     transition: transform 0.3s ease;
@@ -2095,5 +2114,13 @@ body::after{ content:"PRINT DISABLED \2014 VISIT https://kamikami.eu TO READ ONL
     .github-graph-card {
         flex: 1 1 100%;
         max-width: 100%;
+    }
+}
+#consent-overlay, #warning-flash, #hdr-pre-flash {
+    height: var(--app-height) !important;
+}
+@supports (height: 100dvh) {
+    #consent-overlay, #warning-flash, #hdr-pre-flash {
+        height: 100dvh !important;
     }
 }
