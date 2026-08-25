@@ -2118,13 +2118,15 @@ body::after{ content:"PRINT DISABLED \2014 VISIT https://kamikami.eu TO READ ONL
 }
 #consent-overlay, #warning-flash, #hdr-pre-flash {
     height: var(--app-height) !important;
-    min-height: 100lvh !important;
+    min-height: 100svh !important;
     inset: 0 !important;
+    width: 100% !important;
 }
 @supports (height: 100dvh) {
     #consent-overlay, #warning-flash, #hdr-pre-flash {
-        height: 100dvh !important;
-        min-height: 100lvh !important;
+        height: 100svh !important;
+        min-height: 100svh !important;
+        width: 100% !important;
     }
 }
 @supports (-webkit-touch-callout: none) {
@@ -2155,12 +2157,11 @@ body::after{ content:"PRINT DISABLED \2014 VISIT https://kamikami.eu TO READ ONL
     body > footer {
         display: none !important;
     }
-    .content-area > footer {
-        display: block !important;
-        margin-top: 40px;
-    }
 }
 @media (pointer: coarse) {
+    body > footer {
+        display: none !important;
+    }
     .custom-scrollbar {
         display: none !important;
     }
