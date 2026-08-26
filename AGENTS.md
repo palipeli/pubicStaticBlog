@@ -240,7 +240,7 @@ Keep `pendingFetches` deduplication and same-origin validation intact.
 
 - Theme source of truth is `html[data-theme]`; valid explicit values are `light`/`dark`, with `auto`
   resolved by `matchMedia('(prefers-color-scheme: dark)')` in `ui.js`.
-- Reuse existing CSS custom properties (`--bg-*`, `--text-*`, `--accent-pink`, `--glass-*`) rather
+- Reuse existing CSS custom properties (`--bg-*`, `--text-*`, `--accent-pink`, `--surface-*`) rather
   than hardcoding parallel theme values.
 - Desktop reserves a fixed 280px sidebar; `.main-container.sidebar-collapsed` removes that margin.
 - Mobile breakpoint is `max-width: 768px`; the dynamic tray/sidebar collapse is `max-width: 1024px` and the burger appears whenever the sidebar is collapsed (auto or manual) so it can be reopened.

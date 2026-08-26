@@ -35,11 +35,11 @@
     --theme-selector-bg: rgba(255, 255, 255, 0.6);
     --theme-selector-text: #2e3436;
     --theme-selector-hover-bg: rgba(240, 240, 240, 0.7);
-    --glass-bg: rgba(255, 255, 255, 0.65);
-    --glass-border: rgba(255, 255, 255, 0.4);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    --glass-brightness: 1.05;
-    --glass-radius: 16px;
+    --surface-bg: rgba(255, 255, 255, 0.65);
+    --surface-border: rgba(255, 255, 255, 0.4);
+    --surface-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --surface-brightness: 1.05;
+    --surface-radius: 16px;
     --bg-image-dark: url('/media/bg-dark.webp');
     --bg-image-light: url('/media/bg-light.webp');
     --app-height: 100vh;
@@ -65,10 +65,10 @@
     --theme-selector-bg: rgba(26, 26, 26, 0.6);
     --theme-selector-text: #ffffff;
     --theme-selector-hover-bg: rgba(10, 10, 10, 0.7);
-    --glass-bg: rgba(26, 26, 26, 0.70);
-    --glass-border: rgba(255, 255, 255, 0.12);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    --glass-brightness: 0.92;
+    --surface-bg: rgba(26, 26, 26, 0.70);
+    --surface-border: rgba(255, 255, 255, 0.12);
+    --surface-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --surface-brightness: 0.92;
 }
 [data-theme="light"] {
     --bg-panel: rgba(255, 255, 255, 0.72);
@@ -80,10 +80,10 @@
     --theme-selector-bg: rgba(255, 255, 255, 0.6);
     --theme-selector-text: #2e3436;
     --theme-selector-hover-bg: rgba(240, 240, 240, 0.7);
-    --glass-bg: rgba(255, 255, 255, 0.65);
-    --glass-border: rgba(255, 255, 255, 0.4);
-    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    --glass-brightness: 1.05;
+    --surface-bg: rgba(255, 255, 255, 0.65);
+    --surface-border: rgba(255, 255, 255, 0.4);
+    --surface-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --surface-brightness: 1.05;
 }
 body {
     font-family: var(--font-main);
@@ -131,16 +131,16 @@ body {
     left: 0;
     right: 0;
     height: var(--header-height);
-    background: var(--glass-bg);
-    backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    background: var(--surface-bg);
+    backdrop-filter: saturate(var(--surface-saturate)) brightness(var(--surface-brightness));
+    -webkit-backdrop-filter: saturate(var(--surface-saturate)) brightness(var(--surface-brightness));
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
     z-index: 1000;
-    border-bottom: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
+    border-bottom: 1px solid var(--surface-border);
+    box-shadow: var(--surface-shadow);
     animation: slideDown 0.5s ease-out;
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
     contain: paint;
@@ -244,13 +244,13 @@ body {
     margin-top: 20px;
 }
 .home-layout-container .home-hero {
-    background: var(--glass-bg);
-    backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    border: 1px solid var(--glass-border);
-    border-radius: var(--glass-radius);
+    background: var(--surface-bg);
+    backdrop-filter: saturate(var(--surface-saturate)) brightness(var(--surface-brightness));
+    -webkit-backdrop-filter: saturate(var(--surface-saturate)) brightness(var(--surface-brightness));
+    border: 1px solid var(--surface-border);
+    border-radius: var(--surface-radius);
     padding: 20px;
-    box-shadow: var(--glass-shadow);
+    box-shadow: var(--surface-shadow);
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
     contain: paint;
     transform: translateZ(0);
@@ -319,10 +319,10 @@ body {
 }
 .sidebar {
     width: var(--sidebar-width);
-    background: var(--glass-bg);
-    backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    border-left: 1px solid var(--glass-border);
+    background: var(--surface-bg);
+    backdrop-filter: saturate(var(--surface-saturate)) brightness(var(--surface-brightness));
+    -webkit-backdrop-filter: saturate(var(--surface-saturate)) brightness(var(--surface-brightness));
+    border-left: 1px solid var(--surface-border);
     box-shadow: -4px 0 24px rgba(0, 0, 0, 0.1);
     padding: 0;
     animation: slideLeft 0.5s ease-out;
@@ -391,10 +391,10 @@ body {
     width: 28px;
     height: 56px;
     border-radius: 14px 0 0 14px;
-    background: var(--glass-bg);
-    backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    border: 1px solid var(--glass-border);
+    background: var(--surface-bg);
+    backdrop-filter: saturate(var(--surface-saturate)) brightness(var(--surface-brightness));
+    -webkit-backdrop-filter: saturate(var(--surface-saturate)) brightness(var(--surface-brightness));
+    border: 1px solid var(--surface-border);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -480,14 +480,14 @@ body {
     gap: 12px;
 }
 .template-card {
-    background: var(--glass-bg);
-    backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    border: 1px solid var(--glass-border);
-    border-radius: var(--glass-radius);
+    background: var(--surface-bg);
+    backdrop-filter: saturate(var(--surface-saturate)) brightness(var(--surface-brightness));
+    -webkit-backdrop-filter: saturate(var(--surface-saturate)) brightness(var(--surface-brightness));
+    border: 1px solid var(--surface-border);
+    border-radius: var(--surface-radius);
     padding: 15px;
     cursor: pointer;
-    box-shadow: var(--glass-shadow);
+    box-shadow: var(--surface-shadow);
     transition: transform 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, box-shadow var(--theme-transition-duration) ease;
     contain: paint;
     transform: translateZ(0);
@@ -620,10 +620,10 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     margin: 0 auto;
     padding: 25px;
     text-align: center;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--glass-radius);
-    box-shadow: var(--glass-shadow);
+    background: var(--surface-bg);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--surface-radius);
+    box-shadow: var(--surface-shadow);
     transition: background var(--theme-transition-duration) ease, border-color var(--theme-transition-duration) ease, box-shadow var(--theme-transition-duration) ease;
 }
 .about-hero.about-animate {
@@ -1221,15 +1221,15 @@ html[data-theme="dark"] .mobile-theme-btn.active {
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    border-radius: var(--glass-radius);
+    border-radius: var(--surface-radius);
     text-decoration: none;
     font-weight: 600;
     font-size: 14px;
     transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
-    border: 1px solid var(--glass-border);
+    border: 1px solid var(--surface-border);
     cursor: pointer;
-    backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    backdrop-filter: saturate(var(--surface-saturate)) brightness(var(--surface-brightness));
+    -webkit-backdrop-filter: saturate(var(--surface-saturate)) brightness(var(--surface-brightness));
     contain: paint;
     transform: translateZ(0);
 }
@@ -1885,9 +1885,9 @@ footer p {
     }
 }
 .blog-post-selector-grid .template-card {
-    background: var(--glass-bg);
-    backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
+    background: var(--surface-bg);
+    backdrop-filter: saturate(var(--surface-saturate)) brightness(var(--surface-brightness));
+    -webkit-backdrop-filter: saturate(var(--surface-saturate)) brightness(var(--surface-brightness));
 }
 [data-theme="dark"] .nav-item:hover {
     background: rgba(255, 255, 255, 0.05);
@@ -1896,10 +1896,10 @@ footer p {
     box-shadow: -2px 0 8px rgba(0, 0, 0, 0.5);
 }
 .mobile-tray {
-    background: var(--glass-bg);
-    backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    -webkit-backdrop-filter: saturate(var(--glass-saturate)) brightness(var(--glass-brightness));
-    border: 1px solid var(--glass-border);
+    background: var(--surface-bg);
+    backdrop-filter: saturate(var(--surface-saturate)) brightness(var(--surface-brightness));
+    -webkit-backdrop-filter: saturate(var(--surface-saturate)) brightness(var(--surface-brightness));
+    border: 1px solid var(--surface-border);
 }
 @supports (-webkit-overflow-scrolling: touch) {
     .content-area,
@@ -1907,60 +1907,58 @@ footer p {
         -webkit-overflow-scrolling: touch;
     }
 }
-[data-theme="dark"] .liquid-glass,
 [data-theme="dark"] .sidebar,
 [data-theme="dark"] .template-card,
 [data-theme="dark"] .mc-btn {
-    --glass-brightness: 0.90;
+    --surface-brightness: 0.90;
 }
-[data-theme="light"] .liquid-glass,
 [data-theme="light"] .sidebar,
 [data-theme="light"] .template-card,
 [data-theme="light"] .mc-btn {
-    --glass-brightness: 1.05;
+    --surface-brightness: 1.05;
 }
 :root {
-    --glass-bg-light: rgba(255, 255, 255, 0.65);
-    --glass-bg-dark: rgba(26, 26, 26, 0.70);
-    --glass-border-light: rgba(255, 255, 255, 0.5);
-    --glass-border-dark: rgba(255, 255, 255, 0.18);
-    --glass-shadow-light: 0 8px 32px rgba(0, 0, 0, 0.12);
-    --glass-shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.4);
-    --glass-saturate: 1.4;
-    --glass-brightness-light: 1.08;
-    --glass-brightness-dark: 0.95;
+    --surface-bg-light: rgba(255, 255, 255, 0.65);
+    --surface-bg-dark: rgba(26, 26, 26, 0.70);
+    --surface-border-light: rgba(255, 255, 255, 0.5);
+    --surface-border-dark: rgba(255, 255, 255, 0.18);
+    --surface-shadow-light: 0 8px 32px rgba(0, 0, 0, 0.12);
+    --surface-shadow-dark: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --surface-saturate: 1.4;
+    --surface-brightness-light: 1.08;
+    --surface-brightness-dark: 0.95;
 }
 [data-theme="dark"] {
-    --glass-bg: var(--glass-bg-dark);
-    --glass-border: var(--glass-border-dark);
-    --glass-shadow: var(--glass-shadow-dark);
-    --glass-brightness: var(--glass-brightness-dark);
+    --surface-bg: var(--surface-bg-dark);
+    --surface-border: var(--surface-border-dark);
+    --surface-shadow: var(--surface-shadow-dark);
+    --surface-brightness: var(--surface-brightness-dark);
 }
 [data-theme="light"] {
-    --glass-bg: var(--glass-bg-light);
-    --glass-border: var(--glass-border-light);
-    --glass-shadow: var(--glass-shadow-light);
-    --glass-brightness: var(--glass-brightness-light);
+    --surface-bg: var(--surface-bg-light);
+    --surface-border: var(--surface-border-light);
+    --surface-shadow: var(--surface-shadow-light);
+    --surface-brightness: var(--surface-brightness-light);
 }
 @media (prefers-color-scheme: dark) {
     [data-theme="auto"] {
-        --glass-bg: var(--glass-bg-dark);
-        --glass-border: var(--glass-border-dark);
-        --glass-shadow: var(--glass-shadow-dark);
-        --glass-brightness: var(--glass-brightness-dark);
+        --surface-bg: var(--surface-bg-dark);
+        --surface-border: var(--surface-border-dark);
+        --surface-shadow: var(--surface-shadow-dark);
+        --surface-brightness: var(--surface-brightness-dark);
     }
 }
 @media (prefers-color-scheme: light) {
     [data-theme="auto"] {
-        --glass-bg: var(--glass-bg-light);
-        --glass-border: var(--glass-border-light);
-        --glass-shadow: var(--glass-shadow-light);
-        --glass-brightness: var(--glass-brightness-light);
+        --surface-bg: var(--surface-bg-light);
+        --surface-border: var(--surface-border-light);
+        --surface-shadow: var(--surface-shadow-light);
+        --surface-brightness: var(--surface-brightness-light);
     }
 }
 @media (max-width: 768px) {
     :root {
-        --glass-radius: 12px;
+        --surface-radius: 12px;
     }
 }
 .dns-graph-card {

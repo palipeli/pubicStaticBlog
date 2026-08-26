@@ -19,7 +19,7 @@
 | Primary goal | Share posts about "shitty and janky technology" (audio, networking, Linux), distribute a privacy-preserving iOS sideloading DNS profile (`.mobileconfig`), and funnel visitors to the DNS, blog, monitoring, and cat-pictures CTAs |
 | Audience | Tech hobbyists, iOS sideloaders (WSFteam.xyz ecosystem), self-hosters, Linux/audio enthusiasts; the author's personal circle |
 | Tone | Deliberately informal, self-deprecating, chaotic-friendly ("super-cute-but-shitty"), with playful curse words and memes; content is sincere and technically competent underneath the jokes |
-| Brand keywords | retro terminal, VT323 monospace, neon pink (#ff45fc), glassmorphism, dark/light theme, particle background, flashing-light warning, cat pictures, "kamikami.eu" |
+| Brand keywords | retro terminal, VT323 monospace, neon pink (#ff45fc), translucent surface, dark/light theme, particle background, flashing-light warning, cat pictures, "kamikami.eu" |
 
 ### 1.1 Essential constraints (non-negotiable)
 
@@ -85,7 +85,7 @@
    desktop; class `.sidebar-collapsed` removes the margin. Contains `.content-area` + `.sidebar`.
 4. **`.content-area`** — the only scrollable column on desktop; gets the custom scrollbar
    (see §6.7). `padding: calc(var(--header-height) + 15px) 15px 15px`.
-5. **`.sidebar`** — fixed, `right: 0`, `width: 280px`, glass panel, z-index 999, with a
+5. **`.sidebar`** — fixed, `right: 0`, `width: 280px`, translucent surface panel, z-index 999, with a
    half-pill `.sidebar-toggle` button centered vertically on its left edge. Sections:
    - **Theme chooser** (always visible): three `.theme-btn[data-theme]` buttons
      (`auto` / `light` / `dark`) with Font Awesome icons (desktop / sun / moon).
@@ -225,14 +225,14 @@ per-file header comments or blank-line padding — update `AGENTS.md`/`SITE_SPEC
 --theme-transition-duration: 0.4s;
 --btn-bg / --btn-text / --btn-border / --btn-hover-bg;
 --theme-selector-bg / --theme-selector-text / --theme-selector-hover-bg;
---glass-bg: rgba(255,255,255,0.65);
---glass-border: rgba(255,255,255,0.4);
---glass-shadow: 0 8px 32px rgba(0,0,0,0.12);
---glass-blur: 0px;                      /* blur is intentionally 0 for perf; kept as a knob */
---glass-saturate: 1.2;
---glass-brightness: 1.05;
---glass-radius: 16px;
---glass-pulse-shadow: 0 4px 16px rgba(0,0,0,0.08);
+--surface-bg: rgba(255,255,255,0.65);
+--surface-border: rgba(255,255,255,0.4);
+--surface-shadow: 0 8px 32px rgba(0,0,0,0.12);
+--surface-blur: 0px;                      /* blur is intentionally 0 for perf; kept as a knob */
+--surface-saturate: 1.4;
+--surface-brightness: 1.05;
+--surface-radius: 16px;
+--surface-pulse-shadow: 0 4px 16px rgba(0,0,0,0.08);
 --bg-image-dark: url('/media/bg-dark.webp');
 --bg-image-light: url('/media/bg-light.webp');
 ```
@@ -249,9 +249,9 @@ per-file header comments or blank-line padding — update `AGENTS.md`/`SITE_SPEC
 --btn-hover-bg: rgba(10,10,10,0.7);
 --theme-selector-bg: rgba(26,26,26,0.6); --theme-selector-text: #fff;
 --theme-selector-hover-bg: rgba(10,10,10,0.7);
---glass-bg: rgba(26,26,26,0.70); --glass-border: rgba(255,255,255,0.12);
---glass-shadow: 0 8px 32px rgba(0,0,0,0.4); --glass-brightness: 0.92;
---glass-pulse-shadow: 0 4px 16px rgba(0,0,0,0.3);
+--surface-bg: rgba(26,26,26,0.70); --surface-border: rgba(255,255,255,0.12);
+--surface-shadow: 0 8px 32px rgba(0,0,0,0.4); --surface-brightness: 0.92;
+--surface-pulse-shadow: 0 4px 16px rgba(0,0,0,0.3);
 ```
 
 `[data-theme="light"]` re-declares only the values that differ from `:root` (mostly no-ops kept
@@ -332,7 +332,7 @@ a `div[data-post-id]` with escaped title/icon; hover prefetches the post content
 Full-viewport fixed canvas with dozens of small floating shapes (squares/diamonds/circles)
 drifting on randomized trajectories (CSS transform keyframes `floatShape1..4`, staggered
 durations/delays; some rotated 45°). **Skipped under `prefers-reduced-motion: reduce`.**
-Particles render behind content (content uses glass panels with opaque-ish backgrounds).
+Particles render behind content (content uses translucent surface panels with opaque-ish backgrounds).
 
 ### 6.7 Custom scrollbar (`js/scrollbar.js`)
 
@@ -365,7 +365,7 @@ deduplicated via a pending timer).
 ### 6.9 `.blog-card` grid (`renderBlogPostSelectorGrid`)
 
 `#blog-post-selector-grid` is auto-filled with `.blog-card` tiles (icon + title + meta). Cards
-are glass panels (`--glass-*`), radius `--glass-radius`, hover lifts/slides and prefetches the
+are translucent surface panels (`--surface-*`), radius `--surface-radius`, hover lifts/slides and prefetches the
 post; `.pinned` posts sort first. The grid renders again on `showBlogIntroView()`.
 
 ### 6.10 Charts (Chart.js 4.4.1 via cdnjs, `defer`, crossorigin)
