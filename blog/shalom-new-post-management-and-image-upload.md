@@ -11,6 +11,6 @@ icon: "🇮🇱"
 
 The new dashboard allows user to submit a post without editing the github repo directly using Github Personal Access Token (PAT) secured with password. Authentication is done through Cloudflare's Pages. 
 
-![](/media/post-editor.jpg) 
+![](/media/post-editor.webp) 
 
 This feature is still in beta and pretty much a WORK IN PROGRESS, expect bugs and glitches.

@@ -9,4 +9,4 @@ big
 
 car
 
-![](/media/big-kitty.jpg)
+![](/media/big-kitty.webp)

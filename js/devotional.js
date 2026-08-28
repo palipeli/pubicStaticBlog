@@ -4,6 +4,7 @@
     let bibleVerses = [];
     let devotionalActive = false;
     let versesLoaded = false;
+    let shortVersePool = [];
     let currentAnimationFrameId = null;
     let isAnimating = false;
     async function loadBibleVerses() {
@@ -18,6 +19,8 @@
                 verse: v[2],
                 text: v[3]
             }));
+            shortVersePool = bibleVerses.filter(v => v.text.length < 150);
+            if (shortVersePool.length === 0) shortVersePool = bibleVerses;
             versesLoaded = true;
             console.log(`Loaded ${bibleVerses.length} Bible verses`);
             return bibleVerses;
@@ -28,10 +31,8 @@
         }
     }
     function getRandomShortVerse() {
-        if (bibleVerses.length === 0) return null;
-        const shortVerses = bibleVerses.filter(v => v.text.length < 150);
-        const pool = shortVerses.length > 0 ? shortVerses : bibleVerses;
-        return pool[Math.floor(Math.random() * pool.length)];
+        if (shortVersePool.length === 0) return null;
+        return shortVersePool[Math.floor(Math.random() * shortVersePool.length)];
     }
     function cancelAnimation() {
         if (currentAnimationFrameId !== null) {

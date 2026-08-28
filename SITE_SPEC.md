@@ -536,14 +536,15 @@ Frontmatter rules (deliberately minimal, `parseFrontmatter`):
 
 ### 7.5 Verses data — `blog/nt_verses_compact.json`
 
-Compact array of tuples `[book, chapter, verse, text]` (NRSVUE). Fetched lazily only when the
-devotional starts; `getRandomShortVerse` prefers verses with text < 150 chars.
+Compact array of tuples `[book, chapter, verse, text]` (NRSVUE) containing only "short" verses
+(text < 150 chars). Fetched lazily only when the devotional starts; the short pool is filtered once
+at load.
 
 ### 7.6 Media assets — `media/`
 
-- Images: `favicon-circle.webp`, `logo.webp`, `bg-light.webp`, `bg-dark.webp`,
-  `apple.webp`, `background.webp`, `dns.webp`, `signing.webp`, `il-feel.webp`,
-  `post-editor.jpg`, `big-kitty.jpg`, `car-dumdum.jpg`, `kittler.jpg`.
+- Images: `favicon-circle.webp`, `logo.webp`, `bg-light.webp`, `bg-dark.webp`, `dns.webp`,
+  `signing.webp`, `il-feel.webp`, `post-editor.webp`, `big-kitty.webp`, `car-dumdum.webp`,
+  `kittler.webp`.
 - Font: `vt323.ttf`.
 - Downloads: `Michelle's DNS v2.mobileconfig` (iOS sideloading DNS profile — preserve URL-safe
   references and quote paths containing `'`).
@@ -669,7 +670,7 @@ Post URLs are `/ #blog-<id>` (hash link). The admin editor copies/opens these
 ```text
 pubic-static-blog-v2   # compatibility/cleanup namespace
 static-assets-v17     # HTML/CSS/JS/JSON/etc.
-images-v4            # webp/png/jpg/etc.
+images-v15            # webp/png/jpg/etc.
 blog-content-v2     # Markdown and /blog/ content
 ```
 

@@ -5,4 +5,4 @@ category: "Cat"
 icon: "🐱"
 ---
 
-![](/media/kittler.jpg)
+![](/media/kittler.webp)

@@ -1,7 +1,7 @@
 'use strict';
 const CACHE_NAME = 'pubic-static-blog-v9';
 const STATIC_CACHE_NAME = 'static-assets-v29';
-const IMAGE_CACHE_NAME = 'images-v14';
+const IMAGE_CACHE_NAME = 'images-v15';
 const CONTENT_CACHE_NAME = 'blog-content-v10';
 const pendingFetches = new Map();
 const STATIC_EXTENSIONS = /\.(html|css|js|json|webmanifest|ico|txt|xml)$/i;
@@ -377,20 +377,18 @@ async function precacheAllAssets() {
     const imageCache = await caches.open(IMAGE_CACHE_NAME);
     const contentCache = await caches.open(CONTENT_CACHE_NAME);
     const mediaFiles = [
-        '/media/apple.webp',
-        '/media/background.webp',
         '/media/bg-dark.webp',
         '/media/bg-light.webp',
-        '/media/big-kitty.jpg',
-        '/media/car-dumdum.jpg',
+        '/media/big-kitty.webp',
+        '/media/car-dumdum.webp',
         '/media/denied_left.png',
         '/media/denied_right.png',
         '/media/dns.webp',
         '/media/favicon-circle.webp',
         '/media/il-feel.webp',
-        '/media/kittler.jpg',
+        '/media/kittler.webp',
         '/media/logo.webp',
-        '/media/post-editor.jpg',
+        '/media/post-editor.webp',
         '/media/signing.webp',
         '/media/speechbuba_left.png',
         '/media/speechbuba_right.png',

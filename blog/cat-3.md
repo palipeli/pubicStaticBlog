@@ -5,4 +5,4 @@ category: "Cat"
 icon: "🐱"
 ---
 
-![](/media/car-dumdum.jpg)
+![](/media/car-dumdum.webp)
