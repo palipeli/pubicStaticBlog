@@ -13,7 +13,7 @@
 
 | Path | Responsibility | Public contract |
 |---|---|---|
-| `index.html` | SPA shell, sections, fixed header/sidebar, script order, SW registration | IDs/classes consumed by every UI module |
+| `index.html` | SPA shell, sections, fixed header/sidebar, script order, SW registration, pre-paint theme bootstrap | IDs/classes consumed by every UI module |
 | `style.css` | global reset, theme tokens, layout, responsive/mobile styles | CSS variables, `data-theme`, `768px` (mobile) / `1024px` (sidebar/tray) breakpoints |
 | `js/config.js` | shared constants | `window.CONFIG` |
 | `js/markdown.js` | custom Markdown/frontmatter parser + sanitizer | `window.parseMarkdown`, `window.parseFrontmatter` |
@@ -52,6 +52,9 @@ js/ui.js → js/blog.js → js/home.js → https://cdnjs.cloudflare.com/ajax/lib
 js/github-graph.js → js/dns-graph.js → js/mobile-tray.js → js/scrollbar.js → js/app.js
 + non-deferred after the deferred list: js/warning.js, js/chat-cloud.js (both self-init on DOM-ready)
 + early head preload: js/cp.js (anti-devtools gate, must load before any app code)
++ inline head theme bootstrap right after the theme-color meta (pre-paint): resolves the
+  theme_preference cookie / system preference into html[data-theme] + theme-color meta;
+  keep resolution identical to ui.js applyTheme()
 ```
 
 All JS/CSS files have been stripped of inline comments and unnecessary vertical whitespace; authoritative behavioral documentation lives here and in `SITE_SPEC.md`, not inline. Do not reintroduce per-file header comments or blank-line padding — update the markdown specs instead. `app.js` is the final coordinator. Do not convert scripts to ES modules or reorder them casually: modules communicate through `window`, not imports.
@@ -132,7 +135,9 @@ stable. Preserve `aria-label`/`title` updates on sidebar and mobile toggles.
   navigation clicks, and before unload; it restores via `window.restoreScrollPosition()` after
   navigation. New navigation code must call `window.restoreScrollPosition()` after its content
   renders and must not fight it with a later `scrollTo(0, 0)`.
-- Theme cookie key: `theme_preference`, one of `auto`, `light`, `dark`, one-year expiry.
+- Theme cookie key: `theme_preference`, one of `auto`, `light`, `dark`, one-year expiry. An inline
+  pre-paint `<head>` snippet in `index.html` resolves it into `html[data-theme]` and the
+  `theme-color` meta with the same logic as `ui.js`; runtime theme changes stay owned by `ui.js`.
 - Consent key: `localStorage['system_warning_consent'] === 'true'`.
 - Do not write state directly from new UI code; use `saveAppState()`/existing interaction delegation.
 

@@ -84,6 +84,18 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#f6f5f4" id="theme-color-meta">
+    <script>
+    (function(){
+        try{
+            var m=document.cookie.match(/(^| )theme_preference=([^;]+)/);
+            var saved=m?m[2]:'auto';
+            if(saved!=='light'&&saved!=='dark')saved=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+            document.documentElement.setAttribute('data-theme',saved);
+            var meta=document.getElementById('theme-color-meta');
+            if(meta)meta.setAttribute('content',saved==='dark'?'#121212':'#f6f5f4');
+        }catch(e){}
+    })();
+    </script>
     <title>Michelle's DNS and Blog</title>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">

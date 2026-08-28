@@ -143,8 +143,16 @@ All JS/CSS files have been stripped of inline comments and unnecessary vertical 
 ```text
 Early in <head> (preload, must load before any app code): js/cp.js (anti-devtools gate)
 
-Non-deferred, in <head>: inline SW-registration snippet (registers /sw.js, posts precache-bg for the
-                         active-theme background image based on theme_preference cookie + system pref)
+Non-deferred, in <head> right after the theme-color meta (pre-paint): inline theme bootstrap snippet —
+                        reads the theme_preference cookie with the same regex as ui.js getCookie();
+                        anything but light/dark resolves via matchMedia('(prefers-color-scheme: dark)');
+                        sets html[data-theme] and syncs the theme-color meta to #121212/#f6f5f4 so the
+                        first paint already matches the saved/system theme (mirrors admin.html's
+                        bootstrap; keep resolution identical to ui.js applyTheme()).
+
+Non-deferred, first thing in <body>: inline SW-registration snippet (registers /sw.js, posts precache-bg
+                                     for the active-theme background image based on theme_preference
+                                     cookie + system pref)
 
 Deferred, at end of <body> (exact order, with CDN shims):
   js/config.js → js/markdown.js → js/lazyload.js → js/state.js → js/devotional.js →
@@ -200,6 +208,11 @@ per-file header comments or blank-line padding — update `AGENTS.md`/`SITE_SPEC
 - `html[data-theme]` is the single source of truth. Valid explicit values: `light`, `dark`.
   The user-facing choice `auto` is stored separately (cookie) and **resolved** by
   `matchMedia('(prefers-color-scheme: dark)')` in `js/ui.js` into an explicit `data-theme`.
+- A synchronous inline bootstrap in `<head>` (`index.html`, right after the theme-color meta) runs the
+  same resolution **before first paint** so dark-theme users never flash light: it reads the cookie,
+  resolves `auto`/missing/junk values via the system preference, and sets both `html[data-theme]` and
+  the `theme-color` meta. `setupTemplates()` re-applies the identical result at `DOMContentLoaded`
+  (visual no-op). Keep the snippet in sync with `ui.js`.
 - Theme preference persists in cookie `theme_preference` = `auto` | `light` | `dark`,
   365-day expiry, `path=/` (`SameSite=Lax; Secure` in the admin page variant).
 - Theme changes animate via `--theme-transition-duration: 0.4s`.
