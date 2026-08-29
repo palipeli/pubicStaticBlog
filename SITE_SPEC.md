@@ -55,6 +55,9 @@
     fail closed (503). Comma-separated list allowed during rotation.
   - `GITHUB_TOKEN` — fine-grained PAT with Contents read/write on this repo.
   - `GITHUB_OWNER` / `GITHUB_REPO` / `GITHUB_BRANCH` — optional; defaults `palipeli` / `pubicStaticBlog` / `main`.
+  - `JELLYFIN_URL` / `JELLYFIN_TOKEN` — required for the Jellyfin music proxy (§11.3); proxy returns
+    503 without them. `JELLYFIN_USER` — optional; user name or GUID pinned as `UserId` on catalog
+    requests. `RATE_LIMIT_KV` — optional KV namespace; enables per-IP rate limiting on the proxy.
 
 ---
 
@@ -157,7 +160,7 @@ Non-deferred, first thing in <body>: inline SW-registration snippet (registers /
 Deferred, at end of <body> (exact order, with CDN shims):
   js/config.js → js/markdown.js → js/lazyload.js → js/state.js → js/devotional.js →
   js/ui.js → js/blog.js → js/home.js → https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js →
-  js/github-graph.js → js/dns-graph.js → js/mobile-tray.js → js/scrollbar.js → js/app.js
+  js/github-graph.js → js/dns-graph.js → js/mobile-tray.js → js/scrollbar.js → js/jellyfin.js → js/app.js
 + non-deferred after the deferred list: js/warning.js, js/chat-cloud.js (both self-init on DOM-ready)
 
 Rationale: modules communicate through `window`, so earlier modules must exist before later ones
@@ -809,6 +812,32 @@ resolves the theme cookie to `data-theme` immediately (CSP hash covers it — se
   - `pin` / `unpin` — toggles the optional `pinned` flag in `blog/posts.json`.
   - Unknown action → 400; unknown id → 404; invalid body/JSON → 400/415/413.
 
+### 11.3 `GET /api/jellyfin/*` (`functions/api/jellyfin/[[path]].js`)
+
+- Read-only reverse proxy to a private Jellyfin server; the API token never reaches the browser.
+- **Config:** `JELLYFIN_URL` + `JELLYFIN_TOKEN` env (503 if missing). `JELLYFIN_USER` optionally
+  pins the user (GUID passthrough; name resolved once via `/Users` and cached in isolate;
+  defaults to the token's first visible user). Unresolvable user → 503, never passthrough.
+- **Origin lock:** requests carrying `Sec-Fetch-Site` other than `same-origin`/`none` → 403
+  (blocks drive-by use of the proxy from other sites; direct navigation and same-tab still work).
+- **Allowlist:** GET/HEAD only; path must match a fixed regex list (`System/Info/Public`,
+  `System/Ping`, `Users`, `Users/{id}[/Views|/Items]`, `Items`, `Artists`, `Albums`,
+  `MusicGenres`, `Genres`, `Items/{id}/Images/{Primary|Backdrop|Logo|Thumb|Disc}`,
+  `Audio/{id}/stream|universal`). Anything else → 403; `..` rejected; upstream redirects (3xx)
+  are not exposed (→ 502).
+- **Parameter sanitization:** client params are allowlist-stripped (`api_key`, `UserId`, `Fields`,
+  `IncludeItemTypes`, `Recursive`, transcoding/`maxstreaming*` all dropped), then **pinned
+  server-side**: `UserId` = configured user (foreign `Users/{id}` path segments are rewritten),
+  catalog routes forced to `IncludeItemTypes=Audio&Recursive=true`, streams forced `static=true`,
+  `Limit` capped at 200.
+- **Auth injection:** forwards `X-Emby-Token` server-side; passes through `Range` for seeking.
+- **Rate limit:** with `RATE_LIMIT_KV` — 120 req/min metadata, 60 req/min audio per IP → 429.
+- **Caching/SEO:** streams `no-store`, images `public, max-age=86400`, JSON `private, max-age=60`;
+  all responses `nosniff` + `X-Robots-Tag: noindex`. `GET /Users` returns only the configured
+  user as `{Id, Name}`.
+- **Client:** `js/jellyfin.js` floating player consumes this endpoint (see §14). SW treats `/api/`
+  as network-only, so audio and metadata are never cached by the service worker.
+
 ---
 
 ## 12. Security Specification
@@ -912,6 +941,7 @@ script changes**.
 | `js/home.js` | home CTA rendering and delayed post opening | `window.renderBlogButtonsLazy` |
 | `js/mobile-tray.js` | dynamic mobile menu/tray at `window.innerWidth <= 1024` | `#mobile-nav-tray`, overlay, toggle |
 | `js/scrollbar.js` | custom scrollbar for `.content-area`, drawn below the fixed header so it never overlaps it; the sidebar intentionally has no visible scrollbar | `window.setupCustomScrollbars` |
+| `js/jellyfin.js` | floating Jellyfin music player (mini-bar + expanded panel, search, shuffle/repeat/volume, Media Session) via `/api/jellyfin` proxy; self-inits, hides itself if the proxy is unconfigured | `window.jellyfinPlayer`; `#jf-player`, `.jf-*` |
 | `js/warning.js` | flashing-light consent and interaction warning | `system_warning_consent`; `warning:cleared` event |
 | `js/chat-cloud.js` | speech-bubble that follows cursor on flash/denied | listens `warning:flash` / `denied:flash`; no public API |
 | `js/cp.js` | anti-devtools gate + redirect | `window.CP`, `window.__CP_GATE`, `window.__CP_VERIFIED` |
@@ -924,6 +954,7 @@ script changes**.
 | `admin.css` | chrome-only admin styles; editor content renders via `style.css` post styles | reuses CSS variables |
 | `functions/api/publish.js` | Pages Function: auth + slugify + atomic Git commit | `POST /api/publish`; env secrets |
 | `functions/api/posts.js` | Pages Function: admin post list + delete/pin | `GET`/`POST /api/posts` |
+| `functions/api/jellyfin/[[path]].js` | Pages Function: read-only Jellyfin proxy, token injected server-side | `GET /api/jellyfin/*` (see §11.3) |
 | `_headers` | Cloudflare Pages headers for admin surface | CSP hash must match `admin.html` |
 | `blog/posts.json` | ordered post manifest | schema in §7.1 |
 | `blog/*.md` | post source | optional frontmatter + Markdown body |

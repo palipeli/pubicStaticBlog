@@ -25,6 +25,7 @@
 | `js/home.js` | home CTA rendering and delayed post opening | `window.renderBlogButtonsLazy` |
 | `js/mobile-tray.js` | dynamic mobile menu/tray at `window.innerWidth <= 1024` | `#mobile-nav-tray`, overlay, toggle |
 | `js/scrollbar.js` | custom scrollbar for `.content-area`, drawn below the fixed header so it never overlaps it; the sidebar intentionally has no visible scrollbar | `window.setupCustomScrollbars` |
+| `js/jellyfin.js` | floating Jellyfin music player via `/api/jellyfin` proxy; self-inits, hides itself when the proxy is unconfigured | `window.jellyfinPlayer`; `#jf-player`, `.jf-*` |
 | `js/warning.js` | flashing-light consent and interaction warning | `system_warning_consent`; `warning:cleared` event |
 | `js/chat-cloud.js` | speech-bubble that follows cursor on flash/denied | listens `warning:flash` / `denied:flash`; no public API |
 | `js/cp.js` | anti-devtools gate + redirect | `window.CP`, `window.__CP_GATE`, `window.__CP_VERIFIED` |
@@ -36,6 +37,7 @@
 | `js/app.js` | startup coordinator (see Startup sequence) | runs on `DOMContentLoaded`; no public API |
 | `functions/api/publish.js` | Pages Function: auth + slugify + single Git Data API commit of new `media/` files, `blog/<id>.md`, and `blog/posts.json` | `POST /api/publish`; env secrets below |
 | `functions/api/posts.js` | Pages Function: admin post list + pin/delete + orphan media | `GET`/`POST /api/posts`; same auth as publish |
+| `functions/api/jellyfin/[[path]].js` | Pages Function: read-only Jellyfin proxy (token server-side, path allowlist, KV rate limit) | `GET /api/jellyfin/*`; `JELLYFIN_URL`/`JELLYFIN_TOKEN` env |
 | `sw.js` | install/activate, cache strategies, offline shell, prefetch messages | cache names and message types |
 | `blog/posts.json` | ordered post manifest | metadata schema below |
 | `blog/*.md` | post source | optional `---` frontmatter + Markdown body |
@@ -49,7 +51,7 @@
 ```text
 js/config.js → js/markdown.js → js/lazyload.js → js/state.js → js/devotional.js →
 js/ui.js → js/blog.js → js/home.js → https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js →
-js/github-graph.js → js/dns-graph.js → js/mobile-tray.js → js/scrollbar.js → js/app.js
+js/github-graph.js → js/dns-graph.js → js/mobile-tray.js → js/scrollbar.js → js/jellyfin.js → js/app.js
 + non-deferred after the deferred list: js/warning.js, js/chat-cloud.js (both self-init on DOM-ready)
 + early head preload: js/cp.js (anti-devtools gate, must load before any app code)
 + inline head theme bootstrap right after the theme-color meta (pre-paint): resolves the
