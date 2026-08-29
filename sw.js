@@ -1,8 +1,8 @@
 'use strict';
-const CACHE_NAME = 'pubic-static-blog-v9';
-const STATIC_CACHE_NAME = 'static-assets-v29';
-const IMAGE_CACHE_NAME = 'images-v15';
-const CONTENT_CACHE_NAME = 'blog-content-v10';
+const CACHE_NAME = 'pubic-static-blog-v10';
+const STATIC_CACHE_NAME = 'static-assets-v30';
+const IMAGE_CACHE_NAME = 'images-v16';
+const CONTENT_CACHE_NAME = 'blog-content-v11';
 const pendingFetches = new Map();
 const STATIC_EXTENSIONS = /\.(html|css|js|json|webmanifest|ico|txt|xml)$/i;
 const IMAGE_EXTENSIONS = /\.(webp|png|jpg|jpeg|gif|svg|ico)(\?.*)?$/i;
@@ -28,7 +28,6 @@ const PRECACHE_ASSETS = [
     '/js/mobile-tray.js',
     '/js/scrollbar.js',
     '/js/app.js',
-    '/js/cp.js',
     '/blog/posts.json',
     '/media/favicon-circle.webp',
     '/media/logo.webp',
@@ -91,7 +90,7 @@ function getCacheStrategy(request) {
         return 'network-only';
     }
     if (pathname === '/js/cp.js') {
-        return 'network-only';
+        return 'network-first';
     }
     if (pathname === '/' || pathname === '/index.html' || pathname.endsWith('.html')) {
         return 'network-first';
@@ -149,6 +148,7 @@ function responseMatchesCache(response, request, cacheName) {
 function isCacheableMessageUrl(value) {
     try {
         const url = new URL(value, self.location.origin);
+        if (url.pathname === '/js/cp.js') return false;
         return url.origin === self.location.origin &&
             (url.pathname === '/' || url.pathname === '/index.html' ||
              url.pathname === '/style.css' || url.pathname === '/js/warning.js' ||
@@ -195,7 +195,11 @@ async function handleRequest(request, strategy, cacheName) {
             return staleWhileRevalidate(request, cache, cacheName);
         case 'network-only':
         default:
-            return fetch(request).catch(() => new Response(null, { status: 404, statusText: 'Not Found' }));
+            try { return await fetch(request); } catch (e) {
+                const cached = await cache.match(request);
+                if (cached) return cached;
+                return new Response(null, { status: 404, statusText: 'Not Found' });
+            }
     }
 }
 async function cacheFirst(request, cache, cacheName) {
@@ -207,7 +211,9 @@ async function cacheFirst(request, cache, cacheName) {
 }
 async function networkFirst(request, cache, cacheName) {
     try {
-        const networkResponse = await fetch(request);
+        const isCp = new URL(request.url).pathname === '/js/cp.js';
+        const fetchReq = isCp ? new Request(request.url, {cache: 'no-cache', credentials: 'same-origin'}) : request;
+        const networkResponse = await fetch(fetchReq);
         if (networkResponse && networkResponse.ok && responseMatchesCache(networkResponse, request, cacheName)) {
             await cache.put(request, networkResponse.clone());
         }
@@ -426,7 +432,6 @@ async function precacheAllAssets() {
         '/js/mobile-tray.js',
         '/js/scrollbar.js',
         '/js/app.js',
-        '/js/cp.js',
         '/blog/nt_verses_compact.json',
     ])];
     const cachePromises = allAssets.map((url) => {

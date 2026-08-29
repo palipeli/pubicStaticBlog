@@ -382,18 +382,18 @@
         } catch (e) {}
         return false;
     }
+    var sizeCount=0;
     function checkWindowSizeUneven() {
         var ratio = getDeviceRatio();
         if (ratio === false) return true;
         try {
             if (window.outerWidth === 0 && window.outerHeight === 0) {
-                return true;
+                sizeCount=0; return true;
             }
             var w = window.outerWidth - window.innerWidth * ratio;
             var h = window.outerHeight - window.innerHeight * ratio;
-            if (w > 160 || h > 160) { onDevToolOpen(DETECTOR_TYPE.Size); return false; }
-            if (w > 200 || h > 300) { onDevToolOpen(DETECTOR_TYPE.Size); return false; }
-            clearOpenState(DETECTOR_TYPE.Size);
+            if (w > 200 || h > 200) { if(++sizeCount>=2){ onDevToolOpen(DETECTOR_TYPE.Size); return false; } return true; }
+            sizeCount=0; clearOpenState(DETECTOR_TYPE.Size);
         } catch (e) {  }
         return true;
     }
@@ -404,7 +404,7 @@
             if (window.outerWidth === 0 && window.outerHeight === 0) return false;
             var w = window.outerWidth - window.innerWidth * ratio;
             var h = window.outerHeight - window.innerHeight * ratio;
-            return (w > 160 || h > 160);
+            return (w > 200 || h > 200);
         } catch (e) { return false; }
     }
     function detectSize() {

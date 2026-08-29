@@ -12,3 +12,11 @@
 /admin.css
   X-Content-Type-Options: nosniff
   Cache-Control: no-cache
+
+/sw.js
+  Cache-Control: no-cache
+  X-Content-Type-Options: nosniff
+
+/js/cp.js
+  Cache-Control: no-cache
+  X-Content-Type-Options: nosniff
