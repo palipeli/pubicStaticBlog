@@ -51,48 +51,57 @@
         root.id = 'jf-player';
         root.className = 'jf-player';
         root.innerHTML = `
-            <div class="jf-panel" hidden>
-                <div class="jf-panel-head">
-                    <span class="jf-panel-title">Jellyfin</span>
-                    <button class="jf-icon-btn jf-collapse-btn" type="button" aria-label="Collapse to disc" title="Collapse to disc">◉</button>
-                </div>
-                <div class="jf-now">
-                    <div class="jf-art" aria-hidden="true"></div>
-                    <div class="jf-meta">
-                        <div class="jf-track-name">Not playing</div>
-                        <div class="jf-track-artist"></div>
+            <div class="jf-shell">
+                <div class="jf-mini">
+                    <button class="jf-disc" type="button" aria-label="Open music player" title="Open music player">
+                        <span class="jf-disc-grooves" aria-hidden="true"></span>
+                        <span class="jf-disc-label" aria-hidden="true"></span>
+                        <span class="jf-disc-hole" aria-hidden="true"></span>
+                    </button>
+                    <div class="jf-mini-meta">
+                        <div class="jf-mini-name">Not playing</div>
+                        <div class="jf-mini-artist"></div>
                     </div>
+                    <button class="jf-icon-btn jf-mini-play" type="button" aria-label="Play" title="Play">▶</button>
                 </div>
-                <div class="jf-seek-row">
-                    <span class="jf-time jf-current">0:00</span>
-                    <input class="jf-seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Seek">
-                    <span class="jf-time jf-duration">0:00</span>
+                <div class="jf-panel" hidden>
+                    <div class="jf-panel-head">
+                        <span class="jf-panel-title">Jellyfin</span>
+                        <button class="jf-icon-btn jf-collapse-btn" type="button" aria-label="Collapse player" title="Collapse player">▾</button>
+                    </div>
+                    <div class="jf-now">
+                        <div class="jf-art" aria-hidden="true"></div>
+                        <div class="jf-meta">
+                            <div class="jf-track-name">Not playing</div>
+                            <div class="jf-track-artist"></div>
+                        </div>
+                    </div>
+                    <div class="jf-seek-row">
+                        <span class="jf-time jf-current">0:00</span>
+                        <input class="jf-seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Seek">
+                        <span class="jf-time jf-duration">0:00</span>
+                    </div>
+                    <div class="jf-controls">
+                        <button class="jf-icon-btn jf-shuffle-btn" type="button" aria-label="Shuffle" title="Shuffle">⇄</button>
+                        <button class="jf-icon-btn jf-prev-btn" type="button" aria-label="Previous" title="Previous">⏮</button>
+                        <button class="jf-icon-btn jf-play-btn" type="button" aria-label="Play" title="Play">▶</button>
+                        <button class="jf-icon-btn jf-next-btn" type="button" aria-label="Next" title="Next">⏭</button>
+                        <button class="jf-icon-btn jf-repeat-btn" type="button" aria-label="Repeat" title="Repeat">↻</button>
+                    </div>
+                    <div class="jf-utility-row">
+                        <span class="jf-vol-icon">🔊</span>
+                        <input class="jf-volume" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume">
+                        <input class="jf-search" type="search" placeholder="Search…" aria-label="Search music">
+                    </div>
+                    <div class="jf-tracklist" role="list"></div>
                 </div>
-                <div class="jf-controls">
-                    <button class="jf-icon-btn jf-shuffle-btn" type="button" aria-label="Shuffle" title="Shuffle">⇄</button>
-                    <button class="jf-icon-btn jf-prev-btn" type="button" aria-label="Previous" title="Previous">⏮</button>
-                    <button class="jf-icon-btn jf-play-btn" type="button" aria-label="Play" title="Play">▶</button>
-                    <button class="jf-icon-btn jf-next-btn" type="button" aria-label="Next" title="Next">⏭</button>
-                    <button class="jf-icon-btn jf-repeat-btn" type="button" aria-label="Repeat" title="Repeat">↻</button>
-                </div>
-                <div class="jf-volume-row">
-                    <span class="jf-vol-icon">🔊</span>
-                    <input class="jf-volume" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume">
-                </div>
-                <div class="jf-search-row">
-                    <input class="jf-search" type="search" placeholder="Search music…" aria-label="Search music">
-                </div>
-                <div class="jf-tracklist" role="list"></div>
-            </div>
-            <button class="jf-disc" type="button" aria-label="Open music player" title="Open music player">
-                <span class="jf-disc-grooves" aria-hidden="true"></span>
-                <span class="jf-disc-label" aria-hidden="true"></span>
-                <span class="jf-disc-hole" aria-hidden="true"></span>
-            </button>`;
+            </div>`;
         document.body.appendChild(root);
         el('.jf-disc').addEventListener('click', function() { setExpanded(true); });
+        el('.jf-mini-meta').addEventListener('click', function() { setExpanded(true); });
         el('.jf-collapse-btn').addEventListener('click', function() { setExpanded(false); });
         el('.jf-play-btn').addEventListener('click', togglePlay);
+        el('.jf-mini-play').addEventListener('click', togglePlay);
         el('.jf-prev-btn').addEventListener('click', function() { playIndex(queuePos - 1, true); });
         el('.jf-next-btn').addEventListener('click', function() { playIndex(queuePos + 1, false); });
         el('.jf-shuffle-btn').addEventListener('click', function() {
@@ -142,9 +151,38 @@
         });
     }
     function setExpanded(value) {
+        if (value === expanded) return;
         expanded = value;
-        el('.jf-panel').hidden = !expanded;
-        el('.jf-disc').hidden = expanded;
+        const panel = el('.jf-panel');
+        const mini = el('.jf-mini');
+        const disc = el('.jf-disc');
+        panel.classList.remove('jf-genie-in', 'jf-genie-out');
+        mini.classList.remove('jf-mini-pop');
+        if (value) {
+            mini.hidden = true;
+            panel.hidden = false;
+            void panel.offsetWidth;
+            panel.classList.add('jf-genie-in');
+        } else {
+            panel.classList.add('jf-genie-out');
+            let done = false;
+            const finish = function() {
+                if (done) return;
+                done = true;
+                panel.hidden = true;
+                panel.classList.remove('jf-genie-out');
+                mini.hidden = false;
+                void mini.offsetWidth;
+                mini.classList.add('jf-mini-pop');
+                disc.focus({ preventScroll: true });
+            };
+            panel.addEventListener('animationend', function h(ev) {
+                if (ev.target !== panel) return;
+                panel.removeEventListener('animationend', h);
+                finish();
+            });
+            setTimeout(finish, 400);
+        }
         savePrefs();
     }
     function fmtTime(sec) {
@@ -247,6 +285,8 @@
     function showNowPlaying(t) {
         el('.jf-track-name').textContent = t.name;
         el('.jf-track-artist').textContent = t.artist + (t.album ? ' — ' + t.album : '');
+        el('.jf-mini-name').textContent = t.name;
+        el('.jf-mini-artist').textContent = t.artist;
         el('.jf-art').style.backgroundImage = t.image ? 'url("' + t.image + '")' : '';
         el('.jf-disc-label').style.backgroundImage = t.image ? 'url("' + t.image + '")' : '';
         if ('mediaSession' in navigator) {
@@ -268,6 +308,8 @@
         const icon = playing ? '⏸' : '▶';
         el('.jf-play-btn').textContent = icon;
         el('.jf-play-btn').setAttribute('aria-label', playing ? 'Pause' : 'Play');
+        el('.jf-mini-play').textContent = icon;
+        el('.jf-mini-play').setAttribute('aria-label', playing ? 'Pause' : 'Play');
         el('.jf-disc').classList.toggle('jf-spinning', playing);
         el('.jf-shuffle-btn').classList.toggle('jf-on', shuffle);
         el('.jf-repeat-btn').classList.toggle('jf-on', repeat !== 'off');
