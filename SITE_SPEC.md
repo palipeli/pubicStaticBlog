@@ -425,11 +425,13 @@ Activated when `window.innerWidth <= 1024` (breakpoint constant `MOBILE_BREAKPOI
   `warning:cleared`.
 - **DECLINE** → removes the consent key, then triggers the warning repeatedly for 3 seconds and
   reloads the page.
-- After consent, **any** stray `keydown`, `mousedown`, or small-movement `touchstart/touchend`
-  interaction triggers a brief full-screen white flash overlay (`#warning-flash`) with a random
-  phrase ("STOP", "PLS", "STOPPPPPP!", "STAHPPP", "ARE YOU INSANE?"). Interactions with site UI
-  (nav, theme buttons, tray, post items, graph range buttons, etc.) are exempted via a
-  `bypassWarning` flag.
+- After consent, stray `keydown`, `mousedown`, `selectstart`, `contextmenu`, or small-movement
+  `touchstart/touchend` interactions trigger a brief full-screen flash overlay (`#warning-flash`)
+  with a random phrase — **flash only, no sound**. The loud layered audio burst plays **only**
+  when the consent overlay's **DECLINE** button is clicked (the forced repeated-warning path).
+  Interactions with site UI (nav, theme buttons, tray, post items, graph range buttons, the
+  Jellyfin player `#jf-player`, etc.) are exempted entirely — no flash, no sound — via the
+  `bypassWarning` flag and the `triggerWarning` target allowlist.
 - A `beforeunload` dialog is armed whenever the user has not recently interacted with an exempt
   control (leaving the page prompts "are you sure?").
 - The `#consent-overlay` element must remain in the DOM (used by `js/devotional.js` to gate the
@@ -941,8 +943,8 @@ script changes**.
 | `js/home.js` | home CTA rendering and delayed post opening | `window.renderBlogButtonsLazy` |
 | `js/mobile-tray.js` | dynamic mobile menu/tray at `window.innerWidth <= 1024` | `#mobile-nav-tray`, overlay, toggle |
 | `js/scrollbar.js` | custom scrollbar for `.content-area`, drawn below the fixed header so it never overlaps it; the sidebar intentionally has no visible scrollbar | `window.setupCustomScrollbars` |
-| `js/jellyfin.js` | floating Jellyfin music player (mini-bar + expanded panel, search, shuffle/repeat/volume, Media Session) via `/api/jellyfin` proxy; self-inits, hides itself if the proxy is unconfigured | `window.jellyfinPlayer`; `#jf-player`, `.jf-*` |
-| `js/warning.js` | flashing-light consent and interaction warning | `system_warning_consent`; `warning:cleared` event |
+| `js/jellyfin.js` | floating Jellyfin music player: collapsed spinning-vinyl-disc button → click expands panel (art, seek, prev/play/next, shuffle/repeat/volume, search, tracklist); collapse returns to disc; Media Session; self-inits, hides itself if the proxy is unconfigured | `window.jellyfinPlayer`; `#jf-player`, `.jf-*` |
+| `js/warning.js` | flashing-light consent; post-consent misclicks = silent flash, sound only on DECLINE; `#jf-player` exempt | `system_warning_consent`; `warning:cleared` event |
 | `js/chat-cloud.js` | speech-bubble that follows cursor on flash/denied | listens `warning:flash` / `denied:flash`; no public API |
 | `js/cp.js` | anti-devtools gate + redirect | `window.CP`, `window.__CP_GATE`, `window.__CP_VERIFIED` |
 | `js/github-graph.js` | GitHub contribution charts (Chart.js) + range filter + ResizeObserver | self-init on `DOMContentLoaded` |

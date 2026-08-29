@@ -25,8 +25,8 @@
 | `js/home.js` | home CTA rendering and delayed post opening | `window.renderBlogButtonsLazy` |
 | `js/mobile-tray.js` | dynamic mobile menu/tray at `window.innerWidth <= 1024` | `#mobile-nav-tray`, overlay, toggle |
 | `js/scrollbar.js` | custom scrollbar for `.content-area`, drawn below the fixed header so it never overlaps it; the sidebar intentionally has no visible scrollbar | `window.setupCustomScrollbars` |
-| `js/jellyfin.js` | floating Jellyfin music player via `/api/jellyfin` proxy; self-inits, hides itself when the proxy is unconfigured | `window.jellyfinPlayer`; `#jf-player`, `.jf-*` |
-| `js/warning.js` | flashing-light consent and interaction warning | `system_warning_consent`; `warning:cleared` event |
+| `js/jellyfin.js` | floating Jellyfin music player via `/api/jellyfin` proxy; collapsed spinning-disc button, click expands panel; self-inits, hides itself when the proxy is unconfigured | `window.jellyfinPlayer`; `#jf-player`, `.jf-*` |
+| `js/warning.js` | flashing-light consent; post-consent misclicks flash silently, sound only on DECLINE; `#jf-player` exempt | `system_warning_consent`; `warning:cleared` event |
 | `js/chat-cloud.js` | speech-bubble that follows cursor on flash/denied | listens `warning:flash` / `denied:flash`; no public API |
 | `js/cp.js` | anti-devtools gate + redirect | `window.CP`, `window.__CP_GATE`, `window.__CP_VERIFIED` |
 | `js/github-graph.js` | GitHub contribution charts (Chart.js) + range filter + ResizeObserver | self-init on `DOMContentLoaded` |

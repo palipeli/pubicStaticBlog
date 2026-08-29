@@ -54,7 +54,7 @@
             <div class="jf-panel" hidden>
                 <div class="jf-panel-head">
                     <span class="jf-panel-title">Jellyfin</span>
-                    <button class="jf-icon-btn jf-collapse-btn" type="button" aria-label="Collapse player" title="Collapse">▾</button>
+                    <button class="jf-icon-btn jf-collapse-btn" type="button" aria-label="Collapse to disc" title="Collapse to disc">◉</button>
                 </div>
                 <div class="jf-now">
                     <div class="jf-art" aria-hidden="true"></div>
@@ -84,26 +84,15 @@
                 </div>
                 <div class="jf-tracklist" role="list"></div>
             </div>
-            <div class="jf-mini">
-                <div class="jf-mini-art" aria-hidden="true"></div>
-                <div class="jf-mini-meta">
-                    <div class="jf-mini-name">Jellyfin</div>
-                    <div class="jf-mini-sub">tap to open</div>
-                </div>
-                <button class="jf-icon-btn jf-mini-play" type="button" aria-label="Play" title="Play">▶</button>
-                <button class="jf-icon-btn jf-expand-btn" type="button" aria-label="Expand player" title="Expand">▴</button>
-            </div>`;
+            <button class="jf-disc" type="button" aria-label="Open music player" title="Open music player">
+                <span class="jf-disc-grooves" aria-hidden="true"></span>
+                <span class="jf-disc-label" aria-hidden="true"></span>
+                <span class="jf-disc-hole" aria-hidden="true"></span>
+            </button>`;
         document.body.appendChild(root);
-        const panel = el('.jf-panel');
-        const mini = el('.jf-mini');
-        mini.addEventListener('click', function(e) {
-            if (e.target.closest('.jf-mini-play')) return;
-            setExpanded(true);
-        });
-        el('.jf-expand-btn').addEventListener('click', function() { setExpanded(true); });
+        el('.jf-disc').addEventListener('click', function() { setExpanded(true); });
         el('.jf-collapse-btn').addEventListener('click', function() { setExpanded(false); });
         el('.jf-play-btn').addEventListener('click', togglePlay);
-        el('.jf-mini-play').addEventListener('click', togglePlay);
         el('.jf-prev-btn').addEventListener('click', function() { playIndex(queuePos - 1, true); });
         el('.jf-next-btn').addEventListener('click', function() { playIndex(queuePos + 1, false); });
         el('.jf-shuffle-btn').addEventListener('click', function() {
@@ -143,9 +132,9 @@
             if (row) playIndex(parseInt(row.getAttribute('data-qi'), 10), false);
         });
         document.addEventListener('keydown', function(e) {
-            if (!root || root.hidden) return;
+            if (!root || root.hidden || !expanded) return;
             const t = e.target;
-            if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+            if (t && (t.closest && t.closest('#jf-player') || t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
             if (e.code === 'Space') {
                 e.preventDefault();
                 togglePlay();
@@ -155,7 +144,7 @@
     function setExpanded(value) {
         expanded = value;
         el('.jf-panel').hidden = !expanded;
-        el('.jf-mini').hidden = expanded;
+        el('.jf-disc').hidden = expanded;
         savePrefs();
     }
     function fmtTime(sec) {
@@ -258,17 +247,8 @@
     function showNowPlaying(t) {
         el('.jf-track-name').textContent = t.name;
         el('.jf-track-artist').textContent = t.artist + (t.album ? ' — ' + t.album : '');
-        el('.jf-mini-name').textContent = t.name;
-        el('.jf-mini-sub').textContent = t.artist;
-        el('.jf-art').setAttribute('class', 'jf-art' + (t.image ? ' jf-has-art' : ''));
-        el('.jf-mini-art').setAttribute('class', 'jf-mini-art' + (t.image ? ' jf-has-art' : ''));
-        if (t.image) {
-            el('.jf-art').style.backgroundImage = 'url("' + t.image + '")';
-            el('.jf-mini-art').style.backgroundImage = 'url("' + t.image + '")';
-        } else {
-            el('.jf-art').style.backgroundImage = '';
-            el('.jf-mini-art').style.backgroundImage = '';
-        }
+        el('.jf-art').style.backgroundImage = t.image ? 'url("' + t.image + '")' : '';
+        el('.jf-disc-label').style.backgroundImage = t.image ? 'url("' + t.image + '")' : '';
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: t.name, artist: t.artist, album: t.album || 'Jellyfin',
@@ -287,9 +267,8 @@
         const playing = !audio.paused;
         const icon = playing ? '⏸' : '▶';
         el('.jf-play-btn').textContent = icon;
-        el('.jf-mini-play').textContent = icon;
         el('.jf-play-btn').setAttribute('aria-label', playing ? 'Pause' : 'Play');
-        el('.jf-mini-play').setAttribute('aria-label', playing ? 'Pause' : 'Play');
+        el('.jf-disc').classList.toggle('jf-spinning', playing);
         el('.jf-shuffle-btn').classList.toggle('jf-on', shuffle);
         el('.jf-repeat-btn').classList.toggle('jf-on', repeat !== 'off');
         el('.jf-repeat-btn').textContent = repeat === 'one' ? '🔁' : '↻';

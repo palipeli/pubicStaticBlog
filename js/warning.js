@@ -50,7 +50,8 @@
             e.target.closest('.header-right') ||
             e.target.closest('.back-to-intro-btn') ||
             e.target.closest('.blog-card') ||
-            e.target.closest('.github-graph-range-btn')) {
+            e.target.closest('.github-graph-range-btn') ||
+            e.target.closest('#jf-player')) {
             bypassWarning = true;
             setTimeout(() => {bypassWarning = false;}, 1000);
         }
@@ -269,9 +270,9 @@
             }, 3000);
         });
     }
-    async function triggerWarning(e, force = false) {
-        if (!force) {
-            if (!isAccepted || !areAssetsLoaded || isPlaying) return;
+    async function triggerWarning(e, withSound = false) {
+        if (!withSound) {
+            if (!isAccepted || !areAssetsLoaded) return;
             if (e && e.target && (
                 e.target.closest('#consent-overlay') ||
                 e.target.closest('a') ||
@@ -293,26 +294,29 @@
                 e.target.closest('.header-right') ||
                 e.target.closest('.back-to-intro-btn') ||
                 e.target.closest('.blog-card') ||
-                e.target.closest('.github-graph-range-btn')
+                e.target.closest('.github-graph-range-btn') ||
+                e.target.closest('#jf-player')
             )) return;
         }
         if (audioContext && audioContext.state === 'suspended') {
             await audioContext.resume();
         }
-        if (!force) isPlaying = true;
         preFlashOverlay.style.opacity = '1';
         setTimeout(() => {
             textSpan.innerText = phrases[Math.floor(Math.random() * phrases.length)];
             flashOverlay.style.opacity = '1';
-            let newIndex;
-            do {
-                newIndex = Math.floor(Math.random() * audioBuffers.length);
-            } while (newIndex === lastAudioIndex && audioBuffers.length > 1);
-            lastAudioIndex = newIndex;
-            if (audioBuffers[newIndex]) {
-                playSound(audioBuffers[newIndex]);
-            } else {
-                isPlaying = false;
+            if (withSound) {
+                isPlaying = true;
+                let newIndex;
+                do {
+                    newIndex = Math.floor(Math.random() * audioBuffers.length);
+                } while (newIndex === lastAudioIndex && audioBuffers.length > 1);
+                lastAudioIndex = newIndex;
+                if (audioBuffers[newIndex]) {
+                    playSound(audioBuffers[newIndex]);
+                } else {
+                    isPlaying = false;
+                }
             }
             setTimeout(() => {flashOverlay.style.opacity = '0';}, 100);
             window.dispatchEvent(new Event('warning:flash'));
