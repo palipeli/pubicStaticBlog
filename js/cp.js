@@ -507,9 +507,8 @@
             maxTableTime = Math.max(maxTableTime, logTime);
             clearConsole(true);
             if (tableTime === 0 || maxTableTime === 0) return;
-            if (tableTime > 8 * maxTableTime && tableTime > 20) {
-                perfCount++;
-                if (perfCount >= 3) onDevToolOpen(DETECTOR_TYPE.Performance);
+            if (tableTime > 8 * maxTableTime) {
+                onDevToolOpen(DETECTOR_TYPE.Performance);
             } else {
                 perfCount = 0;
             }
