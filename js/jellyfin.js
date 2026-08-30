@@ -134,10 +134,22 @@
             if (!dur) return;
             const pos = Math.min(Math.max(dur * seek.value / 1000, 0), dur - 0.25);
             if (!isFinite(pos)) return;
+            const absPos = Math.max(pos - serverStart, 0);
+            try {
+                if (isFinite(audio.duration) && audio.duration > 0 && audio.seekable && audio.seekable.length) {
+                    let canNative = false;
+                    for (let i = 0; i < audio.seekable.length; i++) {
+                        try { if (absPos >= audio.seekable.start(i) && absPos <= audio.seekable.end(i)) { canNative = true; break; } } catch(e) {}
+                    }
+                    if (canNative) { audio.currentTime = absPos; return; }
+                }
+                if (pos >= serverStart && pos < bufferedEnd() - 0.5) { audio.currentTime = absPos; return; }
+                if (isFinite(audio.duration) && audio.duration > 0) { audio.currentTime = absPos; return; }
+            } catch (e) {}
             if (pos < serverStart || pos >= bufferedEnd() - 0.5) {
                 serverSeek(pos);
             } else {
-                audio.currentTime = Math.max(pos - serverStart, 0);
+                try { audio.currentTime = absPos; } catch (e) { serverSeek(pos); }
             }
         });
         el('.jf-volume').addEventListener('input', function() {
@@ -473,7 +485,9 @@
                 let pos = details.seekTime;
                 if (isFinite(dur) && dur > 0 && pos >= dur) pos = dur - 0.5;
                 if (pos < 0) pos = 0;
-                if (pos < serverStart || pos >= bufferedEnd() - 0.5) serverSeek(pos); else audio.currentTime = Math.max(pos - serverStart, 0);
+                const abs = Math.max(pos - serverStart, 0);
+                try { if (isFinite(audio.duration) && audio.duration > 0) { audio.currentTime = abs; return; } } catch(e) {}
+                if (pos < serverStart || pos >= bufferedEnd() - 0.5) serverSeek(pos); else try { audio.currentTime = abs; } catch(e) { serverSeek(pos); }
             }); } catch (e) {}
         }
     }
