@@ -32,7 +32,7 @@
     }
     function api(path, params) {
         const qs = params ? '?' + params.toString() : '';
-        return fetch(API_BASE + '/' + path + qs, { cache: 'no-store' }).then(function(r) {
+        return fetch(API_BASE + '/' + path + qs, { cache: 'default' }).then(function(r) {
             if (!r.ok) throw new Error('jellyfin ' + r.status);
             return r.json();
         });
@@ -594,12 +594,7 @@
         maybeStartChinese();
     });
     function init() {
-        fetch(API_BASE, { cache: 'no-store' }).then(function(r) {
-            return r.ok ? r.json() : Promise.reject(new Error('proxy off'));
-        }).then(function(info) {
-            if (!info || info.ok !== true) return Promise.reject(new Error('proxy off'));
-            return api('Users');
-        }).then(function(users) {
+        api('Users').then(function(users) {
             if (!Array.isArray(users) || !users.length) throw new Error('no users');
             userId = users[0].Id;
             const stored = prefs();

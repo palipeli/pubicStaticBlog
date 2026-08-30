@@ -14,9 +14,13 @@ const ALLOWED_PATHS = [
 const GUID_RE = /^[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}$/i;
 const STRIP_PARAMS = ['api_key', 'apikey', 'userid', 'fields', 'includeitemtypes', 'static', 'enablehiddenelements', 'enableinterruptions', 'enablestreaminginfo'];
 const MAX_LIMIT = 200;
+const MAX_IMAGE_WIDTH = 800;
+const MAX_IMAGE_QUALITY = 90;
 const FORCED_TRANSCODE = {container: 'mp4', audioCodec: 'aac', audioBitRate: 256000};
 const START_TICKS_RE = /^\d{1,15}$/;
 let resolvedUserCache = null;
+let usersListCacheMem = null;
+let usersListCacheMemTs = 0;
 function json(data, status, cacheControl) {
     return new Response(JSON.stringify(data), {
         status: status || 200,
@@ -24,7 +28,10 @@ function json(data, status, cacheControl) {
             'Content-Type': 'application/json; charset=utf-8',
             'Cache-Control': cacheControl || 'no-store',
             'X-Content-Type-Options': 'nosniff',
-            'X-Robots-Tag': 'noindex, nofollow'
+            'X-Robots-Tag': 'noindex, nofollow',
+            'Vary': 'Sec-Fetch-Site, Origin',
+            'Cross-Origin-Resource-Policy': 'same-origin',
+            'Referrer-Policy': 'no-referrer'
         }
     });
 }
@@ -55,11 +62,17 @@ async function upstreamFetch(env, path, searchParams, request) {
     if (range) {
         headers.set('Range', range);
     }
+    const ifNoneMatch = request.headers.get('If-None-Match');
+    if (ifNoneMatch) headers.set('If-None-Match', ifNoneMatch);
+    const ifModSince = request.headers.get('If-Modified-Since');
+    if (ifModSince) headers.set('If-Modified-Since', ifModSince);
+    const ifRange = request.headers.get('If-Range');
+    if (ifRange) headers.set('If-Range', ifRange);
     headers.set('X-Emby-Token', env.JELLYFIN_TOKEN);
     headers.set('Accept', request.headers.get('Accept') || '*/*');
     return fetch(target.toString(), {method: request.method === 'HEAD' ? 'HEAD' : 'GET', headers: headers, redirect: 'manual'});
 }
-async function resolveUserId(env, request) {
+async function resolveUserId(env, request, prefetched) {
     const configured = String(env.JELLYFIN_USER || '').trim();
     if (configured && GUID_RE.test(configured)) {
         return configured;
@@ -67,20 +80,33 @@ async function resolveUserId(env, request) {
     if (resolvedUserCache && (!configured || resolvedUserCache.name === configured)) {
         return resolvedUserCache.id;
     }
-    let response;
-    try {
-        response = await upstreamFetch(env, 'Users', new URLSearchParams(), request);
-    } catch (err) {
-        return '';
-    }
-    if (!response.ok) {
-        return '';
-    }
-    let users;
-    try {
-        users = await response.json();
-    } catch (err) {
-        return '';
+    let users = prefetched;
+    if (!users) {
+        if (usersListCacheMem && Date.now() - usersListCacheMemTs < 60000) {
+            users = usersListCacheMem;
+        } else {
+            let response;
+            try {
+                response = await upstreamFetch(env, 'Users', new URLSearchParams(), request);
+            } catch (err) {
+                return '';
+            }
+            if (!response.ok) {
+                return '';
+            }
+            try {
+                users = await response.json();
+            } catch (err) {
+                return '';
+            }
+            if (Array.isArray(users)) {
+                usersListCacheMem = users;
+                usersListCacheMemTs = Date.now();
+            }
+        }
+    } else if (Array.isArray(users) && !usersListCacheMem) {
+        usersListCacheMem = users;
+        usersListCacheMemTs = Date.now();
     }
     const list = Array.isArray(users) ? users : [];
     const match = configured
@@ -92,6 +118,17 @@ async function resolveUserId(env, request) {
     }
     return '';
 }
+function getCI(params, nameLower) {
+    for (const k of Array.from(params.keys())) {
+        if (k.toLowerCase() === nameLower) return params.get(k);
+    }
+    return null;
+}
+function deleteCI(params, nameLower) {
+    for (const k of Array.from(params.keys())) {
+        if (k.toLowerCase() === nameLower) params.delete(k);
+    }
+}
 function sanitizeParams(path, search, configuredUser) {
     const params = new URLSearchParams(search);
     for (const key of Array.from(params.keys())) {
@@ -100,8 +137,10 @@ function sanitizeParams(path, search, configuredUser) {
             params.delete(key);
         }
     }
+    deleteCI(params, 'recursive');
+    deleteCI(params, 'includeitemtypes');
     params.set('UserId', configuredUser);
-    if (/^(Items|Users\/[^/]+\/Items)$/.test(path)) {
+    if (/^(Items|Users\/[^\/]+\/Items)$/.test(path)) {
         params.set('IncludeItemTypes', 'Audio');
         params.set('Recursive', 'true');
     }
@@ -111,32 +150,119 @@ function sanitizeParams(path, search, configuredUser) {
             params.set('container', FORCED_TRANSCODE.container);
             params.set('audioCodec', FORCED_TRANSCODE.audioCodec);
             params.set('audioBitRate', String(FORCED_TRANSCODE.audioBitRate));
-            const startTicks = (params.get('StartTimeTicks') || '').trim();
-            if (START_TICKS_RE.test(startTicks)) {
-                params.set('startTimeTicks', startTicks);
-            } else {
-                params.delete('StartTimeTicks');
-                params.delete('startTimeTicks');
+            const rawTicks = getCI(params, 'starttimeticks');
+            deleteCI(params, 'starttimeticks');
+            params.delete('StartTimeTicks');
+            params.delete('startTimeTicks');
+            const st = (rawTicks || '').trim();
+            if (START_TICKS_RE.test(st)) {
+                params.set('startTimeTicks', st);
             }
         } else {
             params.set('static', 'true');
         }
     }
-    let limit = parseInt(params.get('Limit') || '50', 10);
+    if (path.indexOf('/Images/') !== -1) {
+        const rawW = getCI(params, 'maxwidth');
+        const rawH = getCI(params, 'maxheight');
+        const rawQ = getCI(params, 'quality');
+        deleteCI(params, 'maxwidth');
+        deleteCI(params, 'maxheight');
+        deleteCI(params, 'quality');
+        let w = parseInt(rawW || '', 10);
+        if (isFinite(w) && w > 0) {
+            w = Math.min(w, MAX_IMAGE_WIDTH);
+            params.set('maxWidth', String(w));
+        } else if (rawW !== null) {
+            params.set('maxWidth', '400');
+        }
+        let h = parseInt(rawH || '', 10);
+        if (isFinite(h) && h > 0) {
+            h = Math.min(h, MAX_IMAGE_WIDTH);
+            params.set('maxHeight', String(h));
+        }
+        let q = parseInt(rawQ || '', 10);
+        if (isFinite(q) && q >= 1 && q <= 100) {
+            q = Math.min(q, MAX_IMAGE_QUALITY);
+            params.set('quality', String(q));
+        } else if (rawQ !== null) {
+            params.set('quality', '80');
+        }
+        const st = getCI(params, 'searchterm');
+        if (st !== null && String(st).length > 200) {
+            deleteCI(params, 'searchterm');
+            params.set('SearchTerm', String(st).slice(0, 200));
+        }
+    }
+    const rawLimit = getCI(params, 'limit');
+    deleteCI(params, 'limit');
+    let limit = parseInt(rawLimit || '50', 10);
     if (!isFinite(limit) || limit < 1) {
         limit = 50;
     }
     params.set('Limit', String(Math.min(limit, MAX_LIMIT)));
+    const rawSearchTerm = getCI(params, 'searchterm');
+    if (rawSearchTerm !== null && String(rawSearchTerm).length > 200) {
+        deleteCI(params, 'searchterm');
+        params.set('SearchTerm', String(rawSearchTerm).slice(0, 200));
+    }
     return params;
 }
 function crossSiteBlocked(request) {
     const site = request.headers.get('Sec-Fetch-Site');
-    return site !== null && site !== 'same-origin' && site !== 'none';
+    if (site !== null && site !== 'same-origin' && site !== 'none') return true;
+    const origin = request.headers.get('Origin');
+    if (origin) {
+        try {
+            const o = new URL(origin);
+            const host = request.headers.get('Host') || new URL(request.url).host;
+            if (o.host !== host) return true;
+        } catch (e) {}
+    } else {
+        const referer = request.headers.get('Referer');
+        if (referer) {
+            try {
+                const r = new URL(referer);
+                const host = request.headers.get('Host') || new URL(request.url).host;
+                if (r.host !== host) return true;
+            } catch (e) {}
+        }
+    }
+    return false;
+}
+function hasEncodedTraversal(rawPathname) {
+    const lower = rawPathname.toLowerCase();
+    if (lower.indexOf('%2e') !== -1 || lower.indexOf('%2f') !== -1 || lower.indexOf('%5c') !== -1) {
+        try {
+            const decoded = decodeURIComponent(rawPathname);
+            const segs = decoded.split('/');
+            for (let i = 0; i < segs.length; i++) {
+                if (segs[i] === '..' || segs[i] === '.') return true;
+            }
+            if (decoded.indexOf('\u0000') !== -1) return true;
+        } catch (e) {
+            return true;
+        }
+        const afterDecode = lower.replace(/%2e/g, '.').replace(/%2f/g, '/').replace(/%5c/g, '/');
+        if (afterDecode.indexOf('..') !== -1) return true;
+    }
+    return false;
 }
 export async function onRequest(context) {
     const {request, env} = context;
     const url = new URL(request.url);
     const ROUTE_PREFIX = '/api/jellyfin';
+    const rawUrl = request.url;
+    const qIdx = rawUrl.indexOf('?');
+    const hIdx = rawUrl.indexOf('#');
+    let rawEnd = rawUrl.length;
+    if (qIdx !== -1) rawEnd = qIdx;
+    else if (hIdx !== -1) rawEnd = hIdx;
+    const originLen = url.origin.length;
+    const rawPathname = rawUrl.slice(originLen, rawEnd);
+    if (hasEncodedTraversal(rawPathname)) {
+        return json({error: 'Malformed path'}, 400);
+    }
     if (url.pathname !== ROUTE_PREFIX && !url.pathname.startsWith(ROUTE_PREFIX + '/')) {
         return json({error: 'Not found'}, 404);
     }
@@ -161,7 +287,14 @@ export async function onRequest(context) {
     if (path.indexOf('Audio/') === 0 && path.endsWith('/universal')) {
         path = path.slice(0, -'universal'.length) + 'stream';
     }
-    if (path.indexOf('..') !== -1 || !ALLOWED_PATHS.some(function(re) { return re.test(path); })) {
+    const segs = path.split('/');
+    for (let i = 0; i < segs.length; i++) {
+        if (segs[i] === '..' || segs[i] === '.') {
+            return json({error: 'Path not allowed'}, 403);
+        }
+        if (segs[i].indexOf('\u0000') !== -1) return json({error: 'Path not allowed'}, 403);
+    }
+    if (!ALLOWED_PATHS.some(function(re) { return re.test(path); })) {
         return json({error: 'Path not allowed'}, 403);
     }
     const isStream = path.indexOf('Audio/') === 0;
@@ -171,7 +304,26 @@ export async function onRequest(context) {
     if (await requestRateLimited(env, request, scope, limit, 60)) {
         return json({error: 'Too many requests, try again later'}, 429);
     }
-    const configuredUser = await resolveUserId(env, request);
+    let prefetchedUsers = null;
+    let didPrefetchBranch = false;
+    if (path === 'Users' || /^Users\/[A-Za-z0-9_-]+$/.test(path)) {
+        if (usersListCacheMem && Date.now() - usersListCacheMemTs < 60000) {
+            prefetchedUsers = usersListCacheMem;
+        } else {
+            try {
+                const pr = await upstreamFetch(env, 'Users', new URLSearchParams(), request);
+                if (pr.ok) {
+                    try { prefetchedUsers = await pr.json(); } catch (e) { prefetchedUsers = null; }
+                    if (Array.isArray(prefetchedUsers)) {
+                        usersListCacheMem = prefetchedUsers;
+                        usersListCacheMemTs = Date.now();
+                    }
+                }
+            } catch (e) {}
+        }
+        didPrefetchBranch = true;
+    }
+    const configuredUser = await resolveUserId(env, request, prefetchedUsers);
     if (!configuredUser) {
         return json({error: 'Jellyfin user unavailable'}, 503);
     }
@@ -180,15 +332,21 @@ export async function onRequest(context) {
         path = 'Users/' + configuredUser + path.slice(userSegment[0].length);
     }
     if (path === 'Users' || /^Users\/[A-Za-z0-9_-]+$/.test(path)) {
-        const response = await upstreamFetch(env, 'Users', new URLSearchParams(), request).catch(function() { return null; });
-        if (!response || !response.ok) {
-            return json({error: 'Upstream request failed'}, 502);
-        }
-        let users;
-        try {
-            users = await response.json();
-        } catch (err) {
-            return json({error: 'Upstream request failed'}, 502);
+        let users = prefetchedUsers;
+        if (!users) {
+            const response = await upstreamFetch(env, 'Users', new URLSearchParams(), request).catch(function() { return null; });
+            if (!response || !response.ok) {
+                return json({error: 'Upstream request failed'}, 502);
+            }
+            try {
+                users = await response.json();
+            } catch (err) {
+                return json({error: 'Upstream request failed'}, 502);
+            }
+            if (Array.isArray(users)) {
+                usersListCacheMem = users;
+                usersListCacheMemTs = Date.now();
+            }
         }
         const safe = (Array.isArray(users) ? users : [])
             .filter(function(u) { return u.Id === configuredUser; })
@@ -221,12 +379,21 @@ export async function onRequest(context) {
     }
     headers.set('X-Content-Type-Options', 'nosniff');
     headers.set('X-Robots-Tag', 'noindex, nofollow');
+    headers.set('Vary', 'Sec-Fetch-Site, Origin, Accept, Range');
+    headers.set('Cross-Origin-Resource-Policy', 'same-origin');
+    headers.set('Referrer-Policy', 'no-referrer');
     if (isStream) {
         headers.set('Cache-Control', 'no-store');
     } else if (isImage) {
-        headers.set('Cache-Control', 'public, max-age=86400');
+        const inm = request.headers.get('If-None-Match');
+        const ims = request.headers.get('If-Modified-Since');
+        if ((inm && response.status === 304) || (ims && response.status === 304)) {
+            headers.set('Cache-Control', 'public, max-age=86400');
+            return new Response(null, {status: 304, headers: headers});
+        }
+        headers.set('Cache-Control', 'public, max-age=86400, stale-while-revalidate=86400');
     } else {
-        headers.set('Cache-Control', 'private, max-age=60');
+        headers.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=30');
     }
     return new Response(response.body, {status: response.status, headers: headers});
 }
