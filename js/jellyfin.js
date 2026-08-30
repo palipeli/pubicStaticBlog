@@ -20,6 +20,8 @@
     let serverStart = 0;
     let lastAdvanceAt = 0;
     let root = null;
+    let blobUrl = null;
+    let blobFetchAbort = null;
     const TRACK_END_THRESHOLD = 1.2;
     function prefs() {
         try { return JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch (e) { return {}; }
@@ -135,6 +137,7 @@
             const pos = Math.min(Math.max(dur * seek.value / 1000, 0), dur - 0.25);
             if (!isFinite(pos)) return;
             const absPos = Math.max(pos - serverStart, 0);
+            if (blobUrl && audio.src && audio.src.startsWith('blob:')) { try { audio.currentTime = pos; return; } catch(e) {} }
             try {
                 if (isFinite(audio.duration) && audio.duration > 0 && audio.seekable && audio.seekable.length) {
                     let canNative = false;
@@ -144,8 +147,15 @@
                     if (canNative) { audio.currentTime = absPos; return; }
                 }
                 if (pos >= serverStart && pos < bufferedEnd() - 0.5) { audio.currentTime = absPos; return; }
-                if (isFinite(audio.duration) && audio.duration > 0) { audio.currentTime = absPos; return; }
+                if (isFinite(audio.duration) && audio.duration > 0) {
+                    let seekableEmpty = false;
+                    try { seekableEmpty = !audio.seekable.length || (audio.seekable.length===1 && audio.seekable.end(0)===0); } catch(e) { seekableEmpty = true; }
+                    if (!seekableEmpty) { audio.currentTime = absPos; return; }
+                }
             } catch (e) {}
+            let seekableEmpty = false;
+            try { seekableEmpty = !audio.seekable.length || (audio.seekable.length===1 && audio.seekable.end(0)===0); } catch(e) { seekableEmpty = true; }
+            if (seekableEmpty && isFinite(audio.duration) && audio.duration>0) { fetchBlobAndSeek(pos); return; }
             if (pos < serverStart || pos >= bufferedEnd() - 0.5) {
                 serverSeek(pos);
             } else {
@@ -358,6 +368,8 @@
         const t = currentTrack();
         if (!t) return;
         serverStart = 0;
+        if (blobUrl) { try { URL.revokeObjectURL(blobUrl); } catch(e) {} blobUrl = null; }
+        if (blobFetchAbort) { try { blobFetchAbort.abort(); } catch(e) {} blobFetchAbort = null; }
         audio.src = streamUrl(t.id, 0);
         audio.volume = volume;
         audio.play().catch(function() {});
@@ -414,6 +426,8 @@
         if (!t || !t.id) return;
         pos = Math.max(pos || 0, 0);
         serverStart = pos;
+        if (blobUrl) { try { URL.revokeObjectURL(blobUrl); } catch(e) {} blobUrl = null; }
+        if (blobFetchAbort) { try { blobFetchAbort.abort(); } catch(e) {} blobFetchAbort = null; }
         const wasPlaying = !audio.paused;
         audio.src = streamUrl(t.id, Math.round(pos * 10000000));
         audio.volume = volume;
@@ -424,6 +438,49 @@
             if (dur > 0) seek.value = Math.round(pos / dur * 1000);
         }
         el('.jf-current').textContent = fmtTime(pos);
+    }
+    function fetchBlobAndSeek(pos) {
+        const t = currentTrack();
+        if (!t || !t.id) return;
+        pos = Math.max(pos || 0, 0);
+        const wasPlaying = !audio.paused;
+        const dur = trackDuration();
+        const seek = el('.jf-seek');
+        if (seek && dur > 0) seek.value = Math.round(pos / dur * 1000);
+        el('.jf-current').textContent = fmtTime(pos);
+        if (blobFetchAbort) { try { blobFetchAbort.abort(); } catch(e) {} }
+        blobFetchAbort = new AbortController();
+        const signal = blobFetchAbort.signal;
+        el('.jf-seek').disabled = true;
+        fetch(streamUrl(t.id, 0), { cache: 'no-store', signal: signal }).then(function(r) {
+            if (!r.ok) throw new Error('blob fetch ' + r.status);
+            return r.blob();
+        }).then(function(blob) {
+            if (signal.aborted) return;
+            if (blobUrl) { try { URL.revokeObjectURL(blobUrl); } catch(e) {} }
+            blobUrl = URL.createObjectURL(blob);
+            serverStart = 0;
+            audio.src = blobUrl;
+            audio.volume = volume;
+            audio.load();
+            const onMeta = function() {
+                audio.removeEventListener('loadedmetadata', onMeta);
+                el('.jf-seek').disabled = false;
+                try { audio.currentTime = pos; } catch(e) {}
+                if (wasPlaying) audio.play().catch(function() {});
+            };
+            audio.addEventListener('loadedmetadata', onMeta);
+            setTimeout(function() {
+                try { audio.removeEventListener('loadedmetadata', onMeta); } catch(e) {}
+                el('.jf-seek').disabled = false;
+                try { if (isFinite(pos)) audio.currentTime = pos; } catch(e) {}
+                if (wasPlaying) audio.play().catch(function() {});
+            }, 4000);
+        }).catch(function(e) {
+            el('.jf-seek').disabled = false;
+            if (signal.aborted) return;
+            serverSeek(pos);
+        });
     }
     function effectiveCurrentTime() {
         return serverStart + (isFinite(audio.currentTime) ? audio.currentTime : 0);
@@ -485,6 +542,10 @@
                 let pos = details.seekTime;
                 if (isFinite(dur) && dur > 0 && pos >= dur) pos = dur - 0.5;
                 if (pos < 0) pos = 0;
+                if (blobUrl && audio.src && audio.src.startsWith('blob:')) { try { audio.currentTime = pos; return; } catch(e) {} }
+                let seekableEmpty = false;
+                try { seekableEmpty = !audio.seekable.length || (audio.seekable.length===1 && audio.seekable.end(0)===0); } catch(e) { seekableEmpty = true; }
+                if (seekableEmpty && isFinite(audio.duration) && audio.duration>0) { fetchBlobAndSeek(pos); return; }
                 const abs = Math.max(pos - serverStart, 0);
                 try { if (isFinite(audio.duration) && audio.duration > 0) { audio.currentTime = abs; return; } } catch(e) {}
                 if (pos < serverStart || pos >= bufferedEnd() - 0.5) serverSeek(pos); else try { audio.currentTime = abs; } catch(e) { serverSeek(pos); }
