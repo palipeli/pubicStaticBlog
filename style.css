@@ -2176,11 +2176,11 @@ body::after{ content:"PRINT DISABLED \2014 VISIT https://kamikami.eu TO READ ONL
 }
 .jf-player{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom, 0px));z-index:1200;font-family:inherit;}
 .jf-shell{position:relative;display:flex;flex-direction:column;align-items:flex-end;}
-.jf-mini{display:flex;align-items:center;gap:8px;height:40px;padding:4px 10px 4px 4px;background:var(--surface-bg);border:1px solid var(--surface-border);border-radius:24px;box-shadow:var(--surface-shadow);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:transform 0.28s cubic-bezier(0.4,0,0.2,1),opacity 0.2s ease;}
+.jf-mini{display:flex;align-items:center;gap:8px;height:40px;padding:4px 10px 4px 4px;background:var(--surface-bg);border:1px solid var(--surface-border);border-radius:24px;box-shadow:var(--surface-shadow);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:transform 0.28s cubic-bezier(0.4,0,0.2,1),opacity 0.2s ease;cursor:pointer;user-select:none;}
 .jf-mini[hidden]{display:none;}
 .jf-disc{position:relative;width:32px;height:32px;flex:0 0 32px;border-radius:50%;border:1px solid var(--surface-border);background:radial-gradient(circle at 50% 50%,#1a1a1a 0%,#111 60%,#000 100%);cursor:pointer;padding:0;display:block;}
 .jf-disc-grooves{position:absolute;inset:2px;border-radius:50%;background:repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,0.06) 0 1px,transparent 1px 3px);}
-.jf-disc-label{position:absolute;inset:9px;border-radius:50%;background:var(--accent-pink) center/cover no-repeat;border:1px solid rgba(0,0,0,0.35);}
+.jf-disc-label{position:absolute;inset:4px;border-radius:50%;background:var(--accent-pink) center/cover no-repeat;border:1px solid rgba(0,0,0,0.35);}
 .jf-disc-hole{position:absolute;top:50%;left:50%;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:#000;border:1px solid rgba(255,255,255,0.25);}
 .jf-disc.jf-spinning .jf-disc-grooves,.jf-disc.jf-spinning .jf-disc-label{animation:jf-spin 2.4s linear infinite;}
 @keyframes jf-spin{to{transform:rotate(360deg);}}
@@ -2207,8 +2207,10 @@ body::after{ content:"PRINT DISABLED \2014 VISIT https://kamikami.eu TO READ ONL
 0%{opacity:0;transform:scale(0.3);filter:blur(2px);}
 100%{opacity:1;transform:scale(1);filter:blur(0);}
 }
-.jf-panel-head{display:flex;align-items:center;justify-content:space-between;}
-.jf-panel-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--accent-pink);}
+.jf-panel-head{display:flex;align-items:center;justify-content:space-between;margin:-10px -10px 0;padding:10px 10px 0;cursor:pointer;user-select:none;}
+.jf-panel-head:hover{background:var(--border-color);}
+.jf-panel-title{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--accent-pink);cursor:pointer;user-select:none;}
+.jf-panel-title:hover{opacity:0.75;}
 .jf-now{display:flex;gap:8px;align-items:center;}
 .jf-art{width:44px;height:44px;flex:0 0 44px;border-radius:8px;background:var(--bg-panel) center/cover no-repeat;border:1px solid var(--border-color);}
 .jf-meta{min-width:0;}

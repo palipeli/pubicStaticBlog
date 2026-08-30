@@ -53,20 +53,22 @@
         root.innerHTML = `
             <div class="jf-shell">
                 <div class="jf-mini">
-                    <button class="jf-disc" type="button" aria-label="Open music player" title="Open music player">
-                        <span class="jf-disc-grooves" aria-hidden="true"></span>
-                        <span class="jf-disc-label" aria-hidden="true"></span>
-                        <span class="jf-disc-hole" aria-hidden="true"></span>
-                    </button>
-                    <div class="jf-mini-meta">
-                        <div class="jf-mini-name">Not playing</div>
-                        <div class="jf-mini-artist"></div>
-                    </div>
+                    <span class="jf-mini-bar">
+                        <button class="jf-disc" type="button" aria-label="Open music player" title="Open music player">
+                            <span class="jf-disc-grooves" aria-hidden="true"></span>
+                            <span class="jf-disc-label" aria-hidden="true"></span>
+                            <span class="jf-disc-hole" aria-hidden="true"></span>
+                        </button>
+                        <span class="jf-mini-meta">
+                            <span class="jf-mini-name">Not playing</span>
+                            <span class="jf-mini-artist"></span>
+                        </span>
+                    </span>
                     <button class="jf-icon-btn jf-mini-play" type="button" aria-label="Play" title="Play">▶</button>
                 </div>
                 <div class="jf-panel" hidden>
                     <div class="jf-panel-head">
-                        <span class="jf-panel-title">Jellyfin</span>
+                        <span class="jf-panel-title" title="Collapse player">Jellyfin</span>
                         <button class="jf-icon-btn jf-collapse-btn" type="button" aria-label="Collapse player" title="Collapse player">▾</button>
                     </div>
                     <div class="jf-now">
@@ -97,9 +99,8 @@
                 </div>
             </div>`;
         document.body.appendChild(root);
-        el('.jf-disc').addEventListener('click', function() { setExpanded(true); });
-        el('.jf-mini-meta').addEventListener('click', function() { setExpanded(true); });
-        el('.jf-collapse-btn').addEventListener('click', function() { setExpanded(false); });
+        el('.jf-mini-bar').addEventListener('click', function() { setExpanded(true); });
+        el('.jf-panel-head').addEventListener('click', function() { setExpanded(false); });
         el('.jf-play-btn').addEventListener('click', togglePlay);
         el('.jf-mini-play').addEventListener('click', togglePlay);
         el('.jf-prev-btn').addEventListener('click', function() { playIndex(queuePos - 1, true); });
