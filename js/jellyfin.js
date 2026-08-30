@@ -3,6 +3,8 @@
     try{ if(!window.__CP_VERIFIED||!window.__CP_ALLOW_LOAD||!window.CP||typeof window.CP.isRunning!=='function'||!window.CP.version||window.CP.version!=='2.3.1-foolproof'||(Object.isFrozen&&!Object.isFrozen(window.CP))||!window.CP.isRunning()){ try{ if(window.__CP_RECOVER) window.__CP_RECOVER(); else if(window.__CP_FAIL) window.__CP_FAIL(); }catch(e){} throw new Error('CP not verified'); } if(window.CP.isDevToolOpened&&window.CP.isDevToolOpened()){ try{window.__CP_FAIL&&window.__CP_FAIL()}catch(e){} throw new Error('CP devtool'); } if(window.__CP_GATE&&window.__CP_GATE.isWindowSizeIndicatingDevTools&&window.__CP_GATE.isWindowSizeIndicatingDevTools()){ try{window.CP.trigger()}catch(e){} try{window.__CP_FAIL&&window.__CP_FAIL()}catch(e){} throw new Error('CP size gate'); } }catch(e){ try{ if(e.message==='CP not verified'&&window.__CP_RECOVER) window.__CP_RECOVER(); else if(window.__CP_FAIL) window.__CP_FAIL(); }catch(e2){} throw e; }
     const API_BASE = '/api/jellyfin';
     const PREFS_KEY = 'jellyfin_player_prefs';
+    const HAN_RE = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/;
+    const KANA_RE = /[\u3040-\u309f\u30a0-\u30ff\u31f0-\u31ff]/;
     const audio = new Audio();
     audio.preload = 'metadata';
     let userId = '';
@@ -420,6 +422,32 @@
             }); } catch (e) {}
         }
     }
+    function isChineseTitle(t) {
+        return !!t && HAN_RE.test(t.name || '') && !KANA_RE.test(t.name || '');
+    }
+    function startChineseDefault() {
+        if (!tracks.length) return;
+        const pool = tracks.filter(isChineseTitle);
+        if (!pool.length) return;
+        const order = orderedTracks();
+        const pick = pool[Math.floor(Math.random() * pool.length)];
+        const pos = order.indexOf(tracks.indexOf(pick));
+        queue = order;
+        queuePos = pos >= 0 ? pos : 0;
+        playIndex(queuePos, false);
+    }
+    function maybeStartChinese() {
+        if (defaultStarted || !consentGranted) return;
+        defaultStarted = true;
+        startChineseDefault();
+    }
+    let consentGranted = false;
+    let defaultStarted = false;
+    try { consentGranted = localStorage.getItem('system_warning_consent') === 'true'; } catch (e) {}
+    document.addEventListener('warning:cleared', function() {
+        consentGranted = true;
+        maybeStartChinese();
+    });
     function init() {
         fetch(API_BASE, { cache: 'no-store' }).then(function(r) {
             return r.ok ? r.json() : Promise.reject(new Error('proxy off'));
@@ -444,6 +472,7 @@
             tracks = items;
             applyQueueOrder();
             renderTracklist();
+            maybeStartChinese();
         }).catch(function() {});
     }
     if (document.readyState === 'loading') {
