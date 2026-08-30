@@ -17,7 +17,15 @@ const MAX_LIMIT = 200;
 const MAX_IMAGE_WIDTH = 800;
 const MAX_IMAGE_QUALITY = 90;
 const FORCED_TRANSCODE = {container: 'mp4', audioCodec: 'aac', audioBitRate: 256000};
+const FORCED_TRANSCODE_SAFARI = {container: 'mp3', audioCodec: 'mp3', audioBitRate: 256000};
 const START_TICKS_RE = /^\d{1,15}$/;
+function isSafariRequest(request) {
+    const ua = request.headers.get('User-Agent') || '';
+    return /Safari/.test(ua) && !/Chrome|Chromium|CriOS|FxiOS|Android/.test(ua);
+}
+function forcedTranscodeFor(request) {
+    return isSafariRequest(request) ? FORCED_TRANSCODE_SAFARI : FORCED_TRANSCODE;
+}
 let resolvedUserCache = null;
 let usersListCacheMem = null;
 let usersListCacheMemTs = 0;
@@ -129,7 +137,7 @@ function deleteCI(params, nameLower) {
         if (k.toLowerCase() === nameLower) params.delete(k);
     }
 }
-function sanitizeParams(path, search, configuredUser) {
+function sanitizeParams(path, search, configuredUser, request) {
     const params = new URLSearchParams(search);
     for (const key of Array.from(params.keys())) {
         const lower = key.toLowerCase();
@@ -145,11 +153,12 @@ function sanitizeParams(path, search, configuredUser) {
         params.set('Recursive', 'true');
     }
     if (path.indexOf('Audio/') === 0) {
-        if (FORCED_TRANSCODE) {
+        const ft = forcedTranscodeFor(request);
+        if (ft) {
             params.set('static', 'false');
-            params.set('container', FORCED_TRANSCODE.container);
-            params.set('audioCodec', FORCED_TRANSCODE.audioCodec);
-            params.set('audioBitRate', String(FORCED_TRANSCODE.audioBitRate));
+            params.set('container', ft.container);
+            params.set('audioCodec', ft.audioCodec);
+            params.set('audioBitRate', String(ft.audioBitRate));
             const rawTicks = getCI(params, 'starttimeticks');
             deleteCI(params, 'starttimeticks');
             params.delete('StartTimeTicks');
@@ -356,7 +365,7 @@ export async function onRequest(context) {
         }
         return safe.length ? json(safe[0], 200, 'private, max-age=60') : json({error: 'Not found'}, 404);
     }
-    const params = sanitizeParams(path, url.search, configuredUser);
+    const params = sanitizeParams(path, url.search, configuredUser, request);
     let response;
     try {
         response = await upstreamFetch(env, path, params, request);
@@ -367,8 +376,11 @@ export async function onRequest(context) {
         return json({error: 'Redirects not allowed'}, 502);
     }
     const headers = new Headers();
-    const contentType = response.headers.get('Content-Type');
-    if (contentType) {
+    let contentType = response.headers.get('Content-Type');
+    if (isStream && isSafariRequest(request)) {
+        contentType = 'audio/mpeg';
+        headers.set('Content-Type', contentType);
+    } else if (contentType) {
         headers.set('Content-Type', contentType);
     }
     for (const h of ['Content-Length', 'Content-Range', 'Accept-Ranges', 'ETag', 'Last-Modified']) {
@@ -377,9 +389,16 @@ export async function onRequest(context) {
             headers.set(h, value);
         }
     }
+    if (isStream && isSafariRequest(request) && !headers.get('Accept-Ranges')) {
+        headers.set('Accept-Ranges', 'bytes');
+    }
     headers.set('X-Content-Type-Options', 'nosniff');
     headers.set('X-Robots-Tag', 'noindex, nofollow');
-    headers.set('Vary', 'Sec-Fetch-Site, Origin, Accept, Range');
+    if (isStream && isSafariRequest(request)) {
+        headers.set('Vary', 'Sec-Fetch-Site, Origin, Accept, Range, User-Agent');
+    } else {
+        headers.set('Vary', 'Sec-Fetch-Site, Origin, Accept, Range');
+    }
     headers.set('Cross-Origin-Resource-Policy', 'same-origin');
     headers.set('Referrer-Policy', 'no-referrer');
     if (isStream) {

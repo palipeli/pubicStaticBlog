@@ -6,7 +6,9 @@
     const HAN_RE = /[\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff]/;
     const KANA_RE = /[\u3040-\u309f\u30a0-\u30ff\u31f0-\u31ff]/;
     const audio = new Audio();
-    audio.preload = 'metadata';
+    const _isSafari = (function(){ try{ const ua=navigator.userAgent||''; return /Safari/.test(ua) && !/Chrome|Chromium|CriOS|FxiOS|Android/.test(ua); }catch(e){return false;}})();
+    audio.preload = _isSafari ? 'auto' : 'metadata';
+    try { audio.playsInline = true; audio.setAttribute('webkit-playsinline','true'); } catch(e) {}
     let userId = '';
     let tracks = [];
     let queue = [];
@@ -387,7 +389,12 @@
         if (blobFetchAbort) { try { blobFetchAbort.abort(); } catch(e) {} blobFetchAbort = null; try { const sk2 = el('.jf-seek'); if (sk2) sk2.disabled = false; } catch(e) {} }
         audio.src = streamUrl(t.id, 0);
         audio.volume = volume;
-        audio.play().catch(function() {});
+        audio.play().catch(function(e) {
+            try {
+                const n = e && e.name || '';
+                if (n === 'NotAllowedError' || n === 'AbortError') return;
+            } catch(_e){}
+        });
         showNowPlaying(t);
         renderTracklist();
     }
@@ -543,6 +550,17 @@
         });
         audio.addEventListener('error', function() {
             if (!audio.src) return;
+            try {
+                const e = audio.error;
+                if (e) {
+                    const code = e.code;
+                    // 1=aborted 2=network 3=decode 4=src_not_supported
+                    // Safari fMP4 gives 4; with mp3 fix it should not fire. Log for diagnostics.
+                    if (code === 4 && _isSafari) {
+                        console.warn('[jf] Safari src not supported', {code: code, src: audio.src && audio.src.slice(-80), type: audio.src && audio.src.indexOf('.mp3')!==-1?'mp3':'mp4'});
+                    }
+                }
+            } catch(_e){}
             const name = el('.jf-track-name');
             if (name) name.textContent = 'Playback error';
         });
