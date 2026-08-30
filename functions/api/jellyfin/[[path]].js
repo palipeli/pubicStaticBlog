@@ -389,7 +389,7 @@ export async function onRequest(context) {
             headers.set(h, value);
         }
     }
-    if (isStream && isSafariRequest(request) && !headers.get('Accept-Ranges')) {
+    if (isStream && isSafariRequest(request)) {
         headers.set('Accept-Ranges', 'bytes');
     }
     headers.set('X-Content-Type-Options', 'nosniff');
