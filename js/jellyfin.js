@@ -163,6 +163,7 @@
                 togglePlay();
             }
         });
+        setupAutoCollapse();
     }
     function setExpanded(value) {
         if (value === expanded) return;
@@ -198,6 +199,60 @@
             setTimeout(finish, 400);
         }
         savePrefs();
+    }
+    const COLLAPSE_ZONE_FLAG = '__jfScrollCollapseZone';
+    function registerScrollCollapseZone(elm) {
+        if (!elm || elm[COLLAPSE_ZONE_FLAG]) return;
+        elm[COLLAPSE_ZONE_FLAG] = true;
+    }
+    function setupAutoCollapse() {
+        function handleCollapseScroll(ev) {
+            if (!root || !expanded) return;
+            let target = null;
+            try { target = (ev.composedPath && ev.composedPath()[0]) || ev.target; } catch (e) { target = ev.target; }
+            let node = target;
+            while (node) {
+                if (node.id === 'jf-player' || (node.classList && node.classList.contains('jf-tracklist'))) return;
+                if (node[COLLAPSE_ZONE_FLAG]) {
+                    setExpanded(false);
+                    return;
+                }
+                if (node === document || node === window || node === document.documentElement || node === document.body) {
+                    setExpanded(false);
+                    return;
+                }
+                node = node.parentElement;
+            }
+        }
+        window.addEventListener('scroll', handleCollapseScroll, { capture: true, passive: true });
+        document.addEventListener('scroll', handleCollapseScroll, { capture: true, passive: true });
+        const contentArea = document.querySelector('.content-area');
+        if (contentArea) registerScrollCollapseZone(contentArea);
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) registerScrollCollapseZone(sidebar);
+        const tray = document.getElementById('mobile-nav-tray');
+        if (tray) registerScrollCollapseZone(tray);
+        if (typeof MutationObserver !== 'undefined') {
+            try {
+                const mo = new MutationObserver(function(muts) {
+                    for (let i = 0; i < muts.length; i++) {
+                        const list = muts[i].addedNodes;
+                        for (let j = 0; j < list.length; j++) {
+                            const n = list[j];
+                            if (!n || n.nodeType !== 1) continue;
+                            if (n.matches && (n.matches('.content-area') || n.matches('#sidebar') || n.matches('#mobile-nav-tray'))) registerScrollCollapseZone(n);
+                            const ca = n.querySelector ? n.querySelector('.content-area') : null;
+                            if (ca) registerScrollCollapseZone(ca);
+                            const sb = n.querySelector ? n.querySelector('#sidebar') : null;
+                            if (sb) registerScrollCollapseZone(sb);
+                            const tr = n.querySelector ? n.querySelector('#mobile-nav-tray') : null;
+                            if (tr) registerScrollCollapseZone(tr);
+                        }
+                    }
+                });
+                mo.observe(document.body, { childList: true, subtree: true });
+            } catch (e) {}
+        }
     }
     function fmtTime(sec) {
         if (!isFinite(sec) || sec < 0) sec = 0;
@@ -480,5 +535,6 @@
     } else {
         init();
     }
+    window.jfRegisterScrollCollapseZone = registerScrollCollapseZone;
     window.jellyfinPlayer = { play: togglePlay, pause: function() { audio.pause(); } };
 })();

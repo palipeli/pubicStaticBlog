@@ -35,6 +35,7 @@
             </div>
         `;
         document.body.appendChild(tray);
+        if (window.jfRegisterScrollCollapseZone) try { window.jfRegisterScrollCollapseZone(tray); } catch(e) {}
         setupTrayEventListeners(tray);
         syncThemeButtons();
     }
