@@ -22,6 +22,7 @@
     let root = null;
     let blobUrl = null;
     let blobFetchAbort = null;
+    let isScrubbing = false;
     const TRACK_END_THRESHOLD = 1.2;
     function prefs() {
         try { return JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch (e) { return {}; }
@@ -126,12 +127,24 @@
             syncButtons();
         });
         const seek = el('.jf-seek');
+        seek.addEventListener('pointerdown', function(){ isScrubbing = true; });
+        seek.addEventListener('mousedown', function(){ isScrubbing = true; });
+        seek.addEventListener('touchstart', function(){ isScrubbing = true; }, {passive:true});
+        const endScrub = function(){ isScrubbing = false; };
+        seek.addEventListener('pointerup', endScrub);
+        seek.addEventListener('mouseup', endScrub);
+        seek.addEventListener('touchend', endScrub);
+        seek.addEventListener('touchcancel', endScrub);
+        seek.addEventListener('blur', endScrub);
         seek.addEventListener('input', function() {
+            isScrubbing = true;
             if (trackDuration()) {
                 el('.jf-current').textContent = fmtTime(trackDuration() * seek.value / 1000);
             }
         });
         seek.addEventListener('change', function() {
+            isScrubbing = false;
+            try { seek.blur(); } catch(e) {}
             const dur = trackDuration();
             if (!dur) return;
             const pos = Math.min(Math.max(dur * seek.value / 1000, 0), dur - 0.25);
@@ -368,6 +381,8 @@
         const t = currentTrack();
         if (!t) return;
         serverStart = 0;
+        isScrubbing = false;
+        try { const sk = el('.jf-seek'); if (sk) sk.blur(); } catch(e) {}
         if (blobUrl) { try { URL.revokeObjectURL(blobUrl); } catch(e) {} blobUrl = null; }
         if (blobFetchAbort) { try { blobFetchAbort.abort(); } catch(e) {} blobFetchAbort = null; }
         audio.src = streamUrl(t.id, 0);
@@ -503,7 +518,7 @@
         });
         audio.addEventListener('timeupdate', function() {
             const seek = el('.jf-seek');
-            if (!seek || document.activeElement === seek) return;
+            if (!seek || isScrubbing) return;
             const dur = trackDuration();
             if (dur) {
                 const pos = effectiveCurrentTime();
