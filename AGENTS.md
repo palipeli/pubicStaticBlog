@@ -25,7 +25,7 @@
 | `js/home.js` | home CTA rendering and delayed post opening | `window.renderBlogButtonsLazy` |
 | `js/mobile-tray.js` | dynamic mobile menu/tray at `window.innerWidth <= 1024` | `#mobile-nav-tray`, overlay, toggle |
 | `js/scrollbar.js` | custom scrollbar for `.content-area`, drawn below the fixed header so it never overlaps it; the sidebar intentionally has no visible scrollbar | `window.setupCustomScrollbars` |
-| `js/jellyfin.js` | floating Jellyfin music player via `/api/jellyfin` proxy; collapsed spinning-disc button, click expands panel; self-inits, hides itself when the proxy is unconfigured | `window.jellyfinPlayer`; `#jf-player`, `.jf-*` |
+| `js/jellyfin.js` | floating Jellyfin music player via `/api/jellyfin` proxy — always serves transcoded AAC 256k (`/Audio/{id}/stream`, mp4); server-side seeks via `StartTimeTicks`, `RunTimeTicks` fallback for duration, Media Session `seekto`; collapsed spinning-disc button → click expands panel; self-inits, hides itself when the proxy is unconfigured | `window.jellyfinPlayer`; `#jf-player`, `.jf-*` |
 | `js/warning.js` | flashing-light consent; post-consent misclicks flash silently, sound only on DECLINE; `#jf-player` exempt | `system_warning_consent`; `warning:cleared` event |
 | `js/chat-cloud.js` | speech-bubble that follows cursor on flash/denied | listens `warning:flash` / `denied:flash`; no public API |
 | `js/cp.js` | anti-devtools gate + redirect | `window.CP`, `window.__CP_GATE`, `window.__CP_VERIFIED` |
@@ -37,7 +37,7 @@
 | `js/app.js` | startup coordinator (see Startup sequence) | runs on `DOMContentLoaded`; no public API |
 | `functions/api/publish.js` | Pages Function: auth + slugify + single Git Data API commit of new `media/` files, `blog/<id>.md`, and `blog/posts.json` | `POST /api/publish`; env secrets below |
 | `functions/api/posts.js` | Pages Function: admin post list + pin/delete + orphan media | `GET`/`POST /api/posts`; same auth as publish |
-| `functions/api/jellyfin/[[path]].js` | Pages Function: read-only Jellyfin proxy (token server-side, path allowlist, KV rate limit) | `GET /api/jellyfin/*`; `JELLYFIN_URL`/`JELLYFIN_TOKEN` env |
+| `functions/api/jellyfin/[[path]].js` | Pages Function: read-only Jellyfin proxy (token server-side, path allowlist, KV rate limit) — **forces AAC 256k transcode** (`static=false&container=mp4&audioCodec=aac&audioBitRate=256000`) on `Audio/*`, `StartTimeTicks` sanitized, `universal` rewritten to `stream` | `GET /api/jellyfin/*`; `JELLYFIN_URL`/`JELLYFIN_TOKEN` env |
 | `sw.js` | install/activate, cache strategies, offline shell, prefetch messages | cache names and message types |
 | `blog/posts.json` | ordered post manifest | metadata schema below |
 | `blog/*.md` | post source | optional `---` frontmatter + Markdown body |

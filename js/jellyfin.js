@@ -15,7 +15,10 @@
     let expanded = false;
     let searchTimer = null;
     let searchToken = 0;
+    let serverStart = 0;
+    let lastAdvanceAt = 0;
     let root = null;
+    const TRACK_END_THRESHOLD = 1.2;
     function prefs() {
         try { return JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch (e) { return {}; }
     }
@@ -29,19 +32,21 @@
             return r.json();
         });
     }
-    function streamUrl(id) {
-        return API_BASE + '/Audio/' + id + '/stream?static=true';
+    function streamUrl(id, startTicks) {
+        return API_BASE + '/Audio/' + id + '/stream' + (startTicks > 0 ? '?StartTimeTicks=' + Math.round(startTicks) : '');
     }
     function imageUrl(itemId, primaryItemId) {
         if (!primaryItemId) return '';
         return API_BASE + '/Items/' + itemId + '/Images/Primary?maxWidth=400&quality=80';
     }
     function mapItem(item) {
+        const runtimeSeconds = Math.round((item.RunTimeTicks || 0) / 10000000);
         return {
             id: item.Id,
             name: item.Name || 'Unknown',
             artist: (item.Artists && item.Artists[0]) || item.AlbumArtist || 'Unknown artist',
             album: item.Album || '',
+            runtimeSeconds: runtimeSeconds > 0 ? runtimeSeconds : 0,
             image: imageUrl(item.Id, item.ImageTags && item.ImageTags.Primary ? item.ImageTags.Primary : item.AlbumPrimaryImageTag)
         };
     }
@@ -118,13 +123,19 @@
         });
         const seek = el('.jf-seek');
         seek.addEventListener('input', function() {
-            if (audio.duration) {
-                el('.jf-current').textContent = fmtTime(audio.duration * seek.value / 1000);
+            if (trackDuration()) {
+                el('.jf-current').textContent = fmtTime(trackDuration() * seek.value / 1000);
             }
         });
         seek.addEventListener('change', function() {
-            if (audio.duration) {
-                audio.currentTime = audio.duration * seek.value / 1000;
+            const dur = trackDuration();
+            if (!dur) return;
+            const pos = Math.min(Math.max(dur * seek.value / 1000, 0), dur - 0.25);
+            if (!isFinite(pos)) return;
+            if (pos < serverStart || pos >= bufferedEnd() - 0.5) {
+                serverSeek(pos);
+            } else {
+                audio.currentTime = Math.max(pos - serverStart, 0);
             }
         });
         el('.jf-volume').addEventListener('input', function() {
@@ -277,7 +288,8 @@
         queuePos = qi;
         const t = currentTrack();
         if (!t) return;
-        audio.src = streamUrl(t.id);
+        serverStart = 0;
+        audio.src = streamUrl(t.id, 0);
         audio.volume = volume;
         audio.play().catch(function() {});
         showNowPlaying(t);
@@ -290,6 +302,7 @@
         el('.jf-mini-artist').textContent = t.artist;
         el('.jf-art').style.backgroundImage = t.image ? 'url("' + t.image + '")' : '';
         el('.jf-disc-label').style.backgroundImage = t.image ? 'url("' + t.image + '")' : '';
+        if (t.runtimeSeconds) el('.jf-duration').textContent = fmtTime(t.runtimeSeconds);
         if ('mediaSession' in navigator) {
             navigator.mediaSession.metadata = new MediaMetadata({
                 title: t.name, artist: t.artist, album: t.album || 'Jellyfin',
@@ -316,12 +329,47 @@
         el('.jf-repeat-btn').classList.toggle('jf-on', repeat !== 'off');
         el('.jf-repeat-btn').textContent = repeat === 'one' ? '🔁' : '↻';
     }
+    function trackDuration() {
+        return (isFinite(audio.duration) && audio.duration > 0) ? audio.duration : (currentTrack() ? currentTrack().runtimeSeconds : 0);
+    }
+    function bufferedEnd() {
+        try {
+            if (audio.buffered.length && isFinite(audio.duration) && audio.duration > 0) {
+                return serverStart + audio.buffered.end(audio.buffered.length - 1);
+            }
+        } catch (e) {}
+        return serverStart;
+    }
+    function serverSeek(pos) {
+        const t = currentTrack();
+        if (!t || !t.id) return;
+        pos = Math.max(pos || 0, 0);
+        serverStart = pos;
+        const wasPlaying = !audio.paused;
+        audio.src = streamUrl(t.id, Math.round(pos * 10000000));
+        audio.volume = volume;
+        if (wasPlaying) audio.play().catch(function() {});
+        const seek = el('.jf-seek');
+        if (seek) {
+            const dur = trackDuration();
+            if (dur > 0) seek.value = Math.round(pos / dur * 1000);
+        }
+        el('.jf-current').textContent = fmtTime(pos);
+    }
+    function effectiveCurrentTime() {
+        return serverStart + (isFinite(audio.currentTime) ? audio.currentTime : 0);
+    }
     function wireAudio() {
         audio.addEventListener('play', syncButtons);
         audio.addEventListener('pause', syncButtons);
         audio.addEventListener('ended', function() {
-            if (repeat === 'one') {
-                audio.currentTime = 0;
+            const now = Date.now();
+            if (now - lastAdvanceAt < 800) return;
+            lastAdvanceAt = now;
+            if (repeat === 'one' && currentTrack()) {
+                serverStart = 0;
+                audio.src = streamUrl(currentTrack().id, 0);
+                audio.volume = volume;
                 audio.play().catch(function() {});
             } else {
                 playIndex(queuePos + 1, false);
@@ -330,10 +378,26 @@
         audio.addEventListener('timeupdate', function() {
             const seek = el('.jf-seek');
             if (!seek || document.activeElement === seek) return;
-            if (audio.duration) {
-                seek.value = Math.round(audio.currentTime / audio.duration * 1000);
-                el('.jf-current').textContent = fmtTime(audio.currentTime);
-                el('.jf-duration').textContent = fmtTime(audio.duration);
+            const dur = trackDuration();
+            if (dur) {
+                const pos = effectiveCurrentTime();
+                if (audio.currentTime > 0.3 && pos > dur - TRACK_END_THRESHOLD && pos < dur + 60) {
+                    audio.pause();
+                    audio.dispatchEvent(new Event('ended'));
+                    return;
+                }
+                seek.value = Math.round(Math.min(pos / dur, 1) * 1000);
+                el('.jf-current').textContent = fmtTime(Math.min(pos, dur));
+                el('.jf-duration').textContent = fmtTime(dur);
+                if ('mediaSession' in navigator && 'setPositionState' in navigator.mediaSession && isFinite(audio.duration) && audio.duration > 0) {
+                    try {
+                        navigator.mediaSession.setPositionState({
+                            duration: audio.duration,
+                            playbackRate: audio.playbackRate,
+                            position: Math.min(audio.currentTime, audio.duration)
+                        });
+                    } catch (e) {}
+                }
             }
         });
         audio.addEventListener('error', function() {
@@ -346,6 +410,14 @@
             navigator.mediaSession.setActionHandler('pause', function() { audio.pause(); });
             navigator.mediaSession.setActionHandler('previoustrack', function() { playIndex(queuePos - 1, true); });
             navigator.mediaSession.setActionHandler('nexttrack', function() { playIndex(queuePos + 1, false); });
+            try { navigator.mediaSession.setActionHandler('seekto', function(details) {
+                if (!details || !isFinite(details.seekTime)) return;
+                const dur = trackDuration();
+                let pos = details.seekTime;
+                if (isFinite(dur) && dur > 0 && pos >= dur) pos = dur - 0.5;
+                if (pos < 0) pos = 0;
+                if (pos < serverStart || pos >= bufferedEnd() - 0.5) serverSeek(pos); else audio.currentTime = Math.max(pos - serverStart, 0);
+            }); } catch (e) {}
         }
     }
     function init() {

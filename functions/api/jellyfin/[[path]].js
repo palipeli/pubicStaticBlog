@@ -9,11 +9,13 @@ const ALLOWED_PATHS = [
     /^MusicGenres$/,
     /^Genres$/,
     /^Items\/[A-Za-z0-9_-]+\/Images\/(Primary|Backdrop|Logo|Thumb|Disc)(\/\d+)?$/,
-    /^Audio\/[A-Za-z0-9_-]+\/(stream|universal)$/
+    /^Audio\/[A-Za-z0-9_-]+\/stream$/
 ];
 const GUID_RE = /^[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}$/i;
 const STRIP_PARAMS = ['api_key', 'apikey', 'userid', 'fields', 'includeitemtypes', 'static', 'enablehiddenelements', 'enableinterruptions', 'enablestreaminginfo'];
 const MAX_LIMIT = 200;
+const FORCED_TRANSCODE = {container: 'mp4', audioCodec: 'aac', audioBitRate: 256000};
+const START_TICKS_RE = /^\d{1,15}$/;
 let resolvedUserCache = null;
 function json(data, status, cacheControl) {
     return new Response(JSON.stringify(data), {
@@ -104,7 +106,21 @@ function sanitizeParams(path, search, configuredUser) {
         params.set('Recursive', 'true');
     }
     if (path.indexOf('Audio/') === 0) {
-        params.set('static', 'true');
+        if (FORCED_TRANSCODE) {
+            params.set('static', 'false');
+            params.set('container', FORCED_TRANSCODE.container);
+            params.set('audioCodec', FORCED_TRANSCODE.audioCodec);
+            params.set('audioBitRate', String(FORCED_TRANSCODE.audioBitRate));
+            const startTicks = (params.get('StartTimeTicks') || '').trim();
+            if (START_TICKS_RE.test(startTicks)) {
+                params.set('startTimeTicks', startTicks);
+            } else {
+                params.delete('StartTimeTicks');
+                params.delete('startTimeTicks');
+            }
+        } else {
+            params.set('static', 'true');
+        }
     }
     let limit = parseInt(params.get('Limit') || '50', 10);
     if (!isFinite(limit) || limit < 1) {
@@ -141,6 +157,9 @@ export async function onRequest(context) {
     }
     if (!path) {
         return json({proxy: 'jellyfin', ok: true});
+    }
+    if (path.indexOf('Audio/') === 0 && path.endsWith('/universal')) {
+        path = path.slice(0, -'universal'.length) + 'stream';
     }
     if (path.indexOf('..') !== -1 || !ALLOWED_PATHS.some(function(re) { return re.test(path); })) {
         return json({error: 'Path not allowed'}, 403);

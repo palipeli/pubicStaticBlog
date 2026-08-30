@@ -825,14 +825,22 @@ resolves the theme cookie to `data-theme` immediately (CSP hash covers it — se
 - **Allowlist:** GET/HEAD only; path must match a fixed regex list (`System/Info/Public`,
   `System/Ping`, `Users`, `Users/{id}[/Views|/Items]`, `Items`, `Artists`, `Albums`,
   `MusicGenres`, `Genres`, `Items/{id}/Images/{Primary|Backdrop|Logo|Thumb|Disc}`,
-  `Audio/{id}/stream|universal`). Anything else → 403; `..` rejected; upstream redirects (3xx)
-  are not exposed (→ 502).
+  `Audio/{id}/stream`). `Audio/{id}/universal` is transparently rewritten to
+  `Audio/{id}/stream` before allowlisting (kills the direct-play/302 branch; everything
+  goes through the forced transcode). Anything else → 403; `..` rejected; upstream
+  redirects (3xx) are not exposed (→ 502).
 - **Parameter sanitization:** client params are allowlist-stripped (`api_key`, `UserId`, `Fields`,
   `IncludeItemTypes`, `Recursive`, transcoding/`maxstreaming*` all dropped), then **pinned
   server-side**: `UserId` = configured user (foreign `Users/{id}` path segments are rewritten),
-  catalog routes forced to `IncludeItemTypes=Audio&Recursive=true`, streams forced `static=true`,
-  `Limit` capped at 200.
+  catalog routes forced to `IncludeItemTypes=Audio&Recursive=true`, streams **always force
+  transcoded AAC 256k** (`static=false&container=mp4&audioCodec=aac&audioBitRate=256000`);
+  only a digits-validated `StartTimeTicks` (sanitized as `startTimeTicks`, `^\d{1,15}$`) is
+  kept for server-side seeks. `Limit` capped at 200.
 - **Auth injection:** forwards `X-Emby-Token` server-side; passes through `Range` for seeking.
+- **Bandwidth:** every `Audio/*` play is an AAC 256k transcode — ~63% smaller than the same
+  track's FLAC (≈10 MB/3 min song off the tunnel uplink). Cost is one ffmpeg job per first
+  play (and per seek outside the buffered window) on the Jellyfin host. Transcode container is
+  `mp4` with `-movflags empty_moov+delay_moov`, browser-playable as progressive audio.
 - **Rate limit:** with `RATE_LIMIT_KV` — 120 req/min metadata, 60 req/min audio per IP → 429.
 - **Caching/SEO:** streams `no-store`, images `public, max-age=86400`, JSON `private, max-age=60`;
   all responses `nosniff` + `X-Robots-Tag: noindex`. `GET /Users` returns only the configured
@@ -943,7 +951,7 @@ script changes**.
 | `js/home.js` | home CTA rendering and delayed post opening | `window.renderBlogButtonsLazy` |
 | `js/mobile-tray.js` | dynamic mobile menu/tray at `window.innerWidth <= 1024` | `#mobile-nav-tray`, overlay, toggle |
 | `js/scrollbar.js` | custom scrollbar for `.content-area`, drawn below the fixed header so it never overlaps it; the sidebar intentionally has no visible scrollbar | `window.setupCustomScrollbars` |
-| `js/jellyfin.js` | floating Jellyfin music player: collapsed spinning-vinyl-disc button → click expands panel (art, seek, prev/play/next, shuffle/repeat/volume, search, tracklist); collapse returns to disc; Media Session; self-inits, hides itself if the proxy is unconfigured | `window.jellyfinPlayer`; `#jf-player`, `.jf-*` |
+| `js/jellyfin.js` | floating Jellyfin music player: collapsed spinning-vinyl-disc button → click expands panel (art, seek, prev/play/next, shuffle/repeat/volume, search, tracklist); streams **always as transcoded AAC 256k** via `Audio/{id}/stream`; server-side seeks via `StartTimeTicks`; catalog `RunTimeTicks` fallback for duration when `audio.duration` is unavailable (transcode); Media Session with `seekto`; self-inits, hides itself if the proxy is unconfigured | `window.jellyfinPlayer`; `#jf-player`, `.jf-*` |
 | `js/warning.js` | flashing-light consent; post-consent misclicks = silent flash, sound only on DECLINE; `#jf-player` exempt | `system_warning_consent`; `warning:cleared` event |
 | `js/chat-cloud.js` | speech-bubble that follows cursor on flash/denied | listens `warning:flash` / `denied:flash`; no public API |
 | `js/cp.js` | anti-devtools gate + redirect | `window.CP`, `window.__CP_GATE`, `window.__CP_VERIFIED` |
@@ -956,7 +964,7 @@ script changes**.
 | `admin.css` | chrome-only admin styles; editor content renders via `style.css` post styles | reuses CSS variables |
 | `functions/api/publish.js` | Pages Function: auth + slugify + atomic Git commit | `POST /api/publish`; env secrets |
 | `functions/api/posts.js` | Pages Function: admin post list + delete/pin | `GET`/`POST /api/posts` |
-| `functions/api/jellyfin/[[path]].js` | Pages Function: read-only Jellyfin proxy, token injected server-side | `GET /api/jellyfin/*` (see §11.3) |
+| `functions/api/jellyfin/[[path]].js` | Pages Function: read-only Jellyfin proxy, token injected server-side; **forces AAC 256k transcode** on `Audio/*` | `GET /api/jellyfin/*` (see §11.3) |
 | `_headers` | Cloudflare Pages headers for admin surface | CSP hash must match `admin.html` |
 | `blog/posts.json` | ordered post manifest | schema in §7.1 |
 | `blog/*.md` | post source | optional frontmatter + Markdown body |
