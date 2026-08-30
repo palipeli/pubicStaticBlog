@@ -382,9 +382,9 @@
         if (!t) return;
         serverStart = 0;
         isScrubbing = false;
-        try { const sk = el('.jf-seek'); if (sk) sk.blur(); } catch(e) {}
+        try { const sk = el('.jf-seek'); if (sk) { sk.disabled = false; sk.blur(); } } catch(e) {}
         if (blobUrl) { try { URL.revokeObjectURL(blobUrl); } catch(e) {} blobUrl = null; }
-        if (blobFetchAbort) { try { blobFetchAbort.abort(); } catch(e) {} blobFetchAbort = null; }
+        if (blobFetchAbort) { try { blobFetchAbort.abort(); } catch(e) {} blobFetchAbort = null; try { const sk2 = el('.jf-seek'); if (sk2) sk2.disabled = false; } catch(e) {} }
         audio.src = streamUrl(t.id, 0);
         audio.volume = volume;
         audio.play().catch(function() {});
@@ -471,7 +471,7 @@
             if (!r.ok) throw new Error('blob fetch ' + r.status);
             return r.blob();
         }).then(function(blob) {
-            if (signal.aborted) return;
+            if (signal.aborted) { try { el('.jf-seek').disabled = false; } catch(e) {} return; }
             if (blobUrl) { try { URL.revokeObjectURL(blobUrl); } catch(e) {} }
             blobUrl = URL.createObjectURL(blob);
             serverStart = 0;
@@ -492,7 +492,7 @@
                 if (wasPlaying) audio.play().catch(function() {});
             }, 4000);
         }).catch(function(e) {
-            el('.jf-seek').disabled = false;
+            try { el('.jf-seek').disabled = false; } catch(e2) {}
             if (signal.aborted) return;
             serverSeek(pos);
         });
