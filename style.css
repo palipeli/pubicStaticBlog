@@ -2178,13 +2178,14 @@ body::after{ content:"PRINT DISABLED \2014 VISIT https://kamikami.eu TO READ ONL
 .jf-shell{position:relative;display:flex;flex-direction:column;align-items:flex-end;}
 .jf-mini{display:flex;align-items:center;gap:8px;height:40px;padding:4px 10px 4px 4px;background:var(--surface-bg);border:1px solid var(--surface-border);border-radius:24px;box-shadow:var(--surface-shadow);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:transform 0.28s cubic-bezier(0.4,0,0.2,1),opacity 0.2s ease;cursor:pointer;user-select:none;}
 .jf-mini[hidden]{display:none;}
+.jf-mini-bar{display:flex;align-items:center;gap:8px;min-width:0;}
 .jf-disc{position:relative;width:32px;height:32px;flex:0 0 32px;border-radius:50%;border:1px solid var(--surface-border);background:radial-gradient(circle at 50% 50%,#1a1a1a 0%,#111 60%,#000 100%);cursor:pointer;padding:0;display:block;}
 .jf-disc-grooves{position:absolute;inset:2px;border-radius:50%;background:repeating-radial-gradient(circle at 50% 50%,rgba(255,255,255,0.06) 0 1px,transparent 1px 3px);}
 .jf-disc-label{position:absolute;inset:4px;border-radius:50%;background:var(--accent-pink) center/cover no-repeat;border:1px solid rgba(0,0,0,0.35);}
 .jf-disc-hole{position:absolute;top:50%;left:50%;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:#000;border:1px solid rgba(255,255,255,0.25);}
 .jf-disc.jf-spinning .jf-disc-grooves,.jf-disc.jf-spinning .jf-disc-label{animation:jf-spin 2.4s linear infinite;}
 @keyframes jf-spin{to{transform:rotate(360deg);}}
-.jf-mini-meta{min-width:0;max-width:130px;cursor:pointer;}
+.jf-mini-meta{display:flex;flex-direction:column;justify-content:center;min-width:0;max-width:130px;cursor:pointer;}
 .jf-mini-name{font-size:11px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .jf-mini-artist{font-size:9px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .jf-mini-play{font-size:13px;color:var(--accent-pink);}
