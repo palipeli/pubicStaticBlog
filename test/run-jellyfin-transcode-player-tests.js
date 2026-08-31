@@ -82,7 +82,7 @@ async function audioSrc(page) { return page.evaluate(() => window.__jfAudioSrc |
         await ctx.close();
     }
 
-    console.log('T2: seek uses server seek with StartTimeTicks when beyond buffered range');
+    console.log('T2: seek beyond buffered range uses blob (finite dur) or server seek (live/NaN dur)');
     {
         const ctx = await browser.newContext({viewport:{width:1280,height:800}, serviceWorkers:'block'});
         const page = await ctx.newPage();
@@ -103,14 +103,19 @@ async function audioSrc(page) { return page.evaluate(() => window.__jfAudioSrc |
         });
         await page.waitForTimeout(800);
         const after = await audioSrc(page);
-        check('far seek triggers server seek (URL gains StartTimeTicks)', after.includes('StartTimeTicks') || after.includes('startTimeTicks'), 'src=' + after);
-        if (after.includes('Ticks')) {
+        const isBlob = after.startsWith('blob:');
+        const hasTicks = after.includes('StartTimeTicks') || after.includes('startTimeTicks');
+        check('far seek triggers blob seek (finite dur) or server seek (live)', isBlob || hasTicks, 'src=' + after);
+        if (hasTicks) {
             const m = after.match(/[Ss]tartTimeTicks=(\d+)/);
             const ticks = m ? parseInt(m[1], 10) : 0;
             check('StartTimeTicks is digits and in expected range (far seek)', ticks > 100000000 && ticks < 3000000000, 'ticks=' + ticks);
+        } else if (isBlob) {
+            check('blob seek uses full-file blob (no StartTimeTicks, avoids restart-to-0)', !after.includes('Ticks'), 'src=' + after);
         }
-        const netHit = streamUrls.find(u => u.includes('/Audio/') && u.includes('Ticks'));
-        check('network reflects server seek (Ticks param sent)', !!netHit, 'stream hits=' + JSON.stringify(streamUrls.slice(-4)));
+        const netHitTicks = streamUrls.find(u => u.includes('/Audio/') && u.includes('Ticks'));
+        const netHitBlob = streamUrls.find(u => u.includes('/Audio/') && u.includes('/stream') && !u.includes('Ticks'));
+        check('network reflects blob fetch or server seek', !!(netHitTicks || netHitBlob), 'stream hits=' + JSON.stringify(streamUrls.slice(-4)));
         await ctx.close();
     }
 

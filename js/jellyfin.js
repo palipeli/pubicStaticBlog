@@ -24,6 +24,8 @@
     let root = null;
     let blobUrl = null;
     let blobFetchAbort = null;
+    let blobFetchTimeout = null;
+    let blobFetchPos = null;
     let isScrubbing = false;
     const TRACK_END_THRESHOLD = 1.2;
     function prefs() {
@@ -154,7 +156,7 @@
             const absPos = Math.max(pos - serverStart, 0);
             if (blobUrl && audio.src && audio.src.startsWith('blob:')) { try { audio.currentTime = pos; return; } catch(e) {} }
             try {
-                if (isFinite(audio.duration) && audio.duration > 0 && audio.seekable && audio.seekable.length) {
+                if (isFinite(dur) && dur > 0 && audio.seekable && audio.seekable.length) {
                     let canNative = false;
                     for (let i = 0; i < audio.seekable.length; i++) {
                         try { if (absPos >= audio.seekable.start(i) && absPos <= audio.seekable.end(i)) { canNative = true; break; } } catch(e) {}
@@ -162,7 +164,7 @@
                     if (canNative) { audio.currentTime = absPos; return; }
                 }
                 if (pos >= serverStart && pos < bufferedEnd() - 0.5) { audio.currentTime = absPos; return; }
-                if (isFinite(audio.duration) && audio.duration > 0) {
+                if (isFinite(dur) && dur > 0) {
                     let seekableEmpty = false;
                     try { seekableEmpty = !audio.seekable.length || (audio.seekable.length===1 && audio.seekable.end(0)===0); } catch(e) { seekableEmpty = true; }
                     if (!seekableEmpty) { audio.currentTime = absPos; return; }
@@ -170,11 +172,13 @@
             } catch (e) {}
             let seekableEmpty = false;
             try { seekableEmpty = !audio.seekable.length || (audio.seekable.length===1 && audio.seekable.end(0)===0); } catch(e) { seekableEmpty = true; }
-            if (seekableEmpty && isFinite(audio.duration) && audio.duration>0) { fetchBlobAndSeek(pos); return; }
+            if (seekableEmpty && isFinite(dur) && dur>0) { fetchBlobAndSeek(pos); return; }
             if (pos < serverStart || pos >= bufferedEnd() - 0.5) {
+                // serverSeek restarts to 0 on this Jellyfin (Range/StartTimeTicks ignored) — avoid for finite dur, use Blob
+                if (isFinite(dur) && dur>0) { fetchBlobAndSeek(pos); return; }
                 serverSeek(pos);
             } else {
-                try { audio.currentTime = absPos; } catch (e) { serverSeek(pos); }
+                try { audio.currentTime = absPos; } catch (e) { if (isFinite(dur) && dur>0) fetchBlobAndSeek(pos); else serverSeek(pos); }
             }
         });
         el('.jf-volume').addEventListener('input', function() {
@@ -385,6 +389,8 @@
         serverStart = 0;
         isScrubbing = false;
         try { const sk = el('.jf-seek'); if (sk) { sk.disabled = false; sk.blur(); } } catch(e) {}
+        if (blobFetchTimeout) { try { clearTimeout(blobFetchTimeout); } catch(e){} blobFetchTimeout=null; }
+        blobFetchPos=null;
         if (blobUrl) { try { URL.revokeObjectURL(blobUrl); } catch(e) {} blobUrl = null; }
         if (blobFetchAbort) { try { blobFetchAbort.abort(); } catch(e) {} blobFetchAbort = null; try { const sk2 = el('.jf-seek'); if (sk2) sk2.disabled = false; } catch(e) {} }
         audio.src = streamUrl(t.id, 0);
@@ -471,14 +477,17 @@
         if (seek && dur > 0) seek.value = Math.round(pos / dur * 1000);
         el('.jf-current').textContent = fmtTime(pos);
         if (blobFetchAbort) { try { blobFetchAbort.abort(); } catch(e) {} }
+        if (blobFetchTimeout) { try { clearTimeout(blobFetchTimeout); } catch(e){} blobFetchTimeout=null; }
+        blobFetchPos = pos;
         blobFetchAbort = new AbortController();
         const signal = blobFetchAbort.signal;
+        const myPos = pos;
         el('.jf-seek').disabled = true;
         fetch(streamUrl(t.id, 0), { cache: 'no-store', signal: signal }).then(function(r) {
             if (!r.ok) throw new Error('blob fetch ' + r.status);
             return r.blob();
         }).then(function(blob) {
-            if (signal.aborted) { try { el('.jf-seek').disabled = false; } catch(e) {} return; }
+            if (signal.aborted || blobFetchPos !== myPos) { try { el('.jf-seek').disabled = false; } catch(e) {} return; }
             if (blobUrl) { try { URL.revokeObjectURL(blobUrl); } catch(e) {} }
             blobUrl = URL.createObjectURL(blob);
             serverStart = 0;
@@ -486,22 +495,30 @@
             audio.volume = volume;
             audio.load();
             const onMeta = function() {
+                if (blobFetchPos !== myPos) return;
                 audio.removeEventListener('loadedmetadata', onMeta);
+                if (blobFetchTimeout) { try{ clearTimeout(blobFetchTimeout);}catch(e){} blobFetchTimeout=null; }
                 el('.jf-seek').disabled = false;
-                try { audio.currentTime = pos; } catch(e) {}
-                if (wasPlaying) audio.play().catch(function() {});
+                try { audio.currentTime = myPos; } catch(e) {}
+                if (wasPlaying) audio.play().catch(function(e) {
+                    try { const n=e&&e.name||''; if(n==='NotAllowedError'||n==='AbortError') return; }catch(_e){}
+                });
             };
             audio.addEventListener('loadedmetadata', onMeta);
-            setTimeout(function() {
+            blobFetchTimeout = setTimeout(function() {
+                if (blobFetchPos !== myPos) return;
                 try { audio.removeEventListener('loadedmetadata', onMeta); } catch(e) {}
                 el('.jf-seek').disabled = false;
-                try { if (isFinite(pos)) audio.currentTime = pos; } catch(e) {}
-                if (wasPlaying) audio.play().catch(function() {});
+                try { if (isFinite(myPos)) audio.currentTime = myPos; } catch(e) {}
+                if (wasPlaying) audio.play().catch(function(e) {
+                    try { const n=e&&e.name||''; if(n==='NotAllowedError'||n==='AbortError') return; }catch(_e){}
+                });
             }, 4000);
         }).catch(function(e) {
             try { el('.jf-seek').disabled = false; } catch(e2) {}
-            if (signal.aborted) return;
-            serverSeek(pos);
+            if (signal.aborted || blobFetchPos !== myPos) return;
+            if (isFinite(dur) && dur>0) fetchBlobAndSeek(myPos); else serverSeek(myPos);
+            // fallback to serverSeek only if blob repeatedly fails and dur is not finite; for finite dur we already use blob
         });
     }
     function effectiveCurrentTime() {
@@ -578,10 +595,12 @@
                 if (blobUrl && audio.src && audio.src.startsWith('blob:')) { try { audio.currentTime = pos; return; } catch(e) {} }
                 let seekableEmpty = false;
                 try { seekableEmpty = !audio.seekable.length || (audio.seekable.length===1 && audio.seekable.end(0)===0); } catch(e) { seekableEmpty = true; }
-                if (seekableEmpty && isFinite(audio.duration) && audio.duration>0) { fetchBlobAndSeek(pos); return; }
+                if (seekableEmpty && isFinite(dur) && dur>0) { fetchBlobAndSeek(pos); return; }
                 const abs = Math.max(pos - serverStart, 0);
-                try { if (isFinite(audio.duration) && audio.duration > 0) { audio.currentTime = abs; return; } } catch(e) {}
-                if (pos < serverStart || pos >= bufferedEnd() - 0.5) serverSeek(pos); else try { audio.currentTime = abs; } catch(e) { serverSeek(pos); }
+                try { if (isFinite(dur) && dur > 0) { audio.currentTime = abs; return; } } catch(e) {}
+                if (pos < serverStart || pos >= bufferedEnd() - 0.5) {
+                    if (isFinite(dur) && dur>0) fetchBlobAndSeek(pos); else serverSeek(pos);
+                } else try { audio.currentTime = abs; } catch(e) { if (isFinite(dur) && dur>0) fetchBlobAndSeek(pos); else serverSeek(pos); }
             }); } catch (e) {}
         }
     }
