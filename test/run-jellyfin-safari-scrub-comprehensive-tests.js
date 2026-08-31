@@ -21,6 +21,37 @@ async function setupCapture(page, capture, ua){
       // Safari: preload auto, Chrome: metadata
       try{ a.preload = isSafari ? 'auto' : 'metadata'; }catch(e){}
       try{ a.playsInline=true; a.setAttribute('webkit-playsinline','true'); }catch(e){}
+      let mockDuration=NaN;
+      let mockSeekable={length:1, start:()=>0, end:()=>0};
+      let mockBuffered={length:1, start:()=>0, end:()=>5};
+      let mockReadyState=0;
+      let isBlob=false;
+      const updateMock=()=>{
+        isBlob = a.src && a.src.startsWith('blob:');
+        if(isBlob){
+          mockDuration=137;
+          mockSeekable={length:1, start:(i)=>0, end:(i)=>137};
+          mockBuffered={length:1, start:(i)=>0, end:(i)=>137};
+          mockReadyState=0;
+          setTimeout(()=>{
+            mockReadyState=1;
+            a.dispatchEvent(new Event('loadedmetadata'));
+            setTimeout(()=>{ mockReadyState=4; a.dispatchEvent(new Event('canplay')); },10);
+          },10);
+        } else if(a.src && a.src.includes('/Audio/')){
+          mockDuration=NaN;
+          mockSeekable={length:1, start:()=>0, end:()=>0};
+          mockBuffered={length:1, start:()=>0, end:()=>5};
+          mockReadyState=0;
+          setTimeout(()=>{
+            mockDuration=137;
+            mockSeekable={length:1, start:()=>0, end:()=>0};
+            mockReadyState=1;
+            a.dispatchEvent(new Event('loadedmetadata'));
+            setTimeout(()=>{ mockReadyState=4; a.dispatchEvent(new Event('canplay')); },10);
+          },30);
+        }
+      };
       const origSet = Object.getOwnPropertyDescriptor(HTMLAudioElement.prototype,'src')?.set;
       const origGet = Object.getOwnPropertyDescriptor(HTMLAudioElement.prototype,'src')?.get;
       try{
@@ -28,58 +59,25 @@ async function setupCapture(page, capture, ua){
           get(){ return origGet ? origGet.call(this) : this.getAttribute('src')||''; },
           set(v){
             window.__jfAudioSrc=String(v||'');
-            if(origSet) return origSet.call(this,v);
-            this.setAttribute('src',v);
+            let ret;
+            if(origSet) ret=origSet.call(this,v);
+            else ret=this.setAttribute('src',v);
+            updateMock();
+            return ret;
           },
           configurable:true
         });
       }catch(e){}
       // Also trap setAttribute
       const origSA=a.setAttribute;
-      a.setAttribute=function(k,v){ if(String(k).toLowerCase()==='src') window.__jfAudioSrc=String(v||''); return origSA.call(this,k,v); };
-    // Simulate Safari MP3 vs Chrome fMP4 seekable/buffered/duration
-      // For initial stream src, duration is NaN until loadedmetadata, seekable 0-0, buffered 0-5
-      // For blob: src, duration 137, seekable 0-137, buffered 0-137
-      let isBlob=false;
-      const origSrcDesc=Object.getOwnPropertyDescriptor(HTMLAudioElement.prototype,'src');
-      // We will mock duration/seekable/buffered after src set
-      let mockDuration=NaN;
-      let mockSeekable={length:1, start:()=>0, end:()=>0};
-      let mockBuffered={length:1, start:()=>0, end:()=>5};
-      // Override duration/seekable/buffered after src set
-      const updateMock=()=>{
-        isBlob = a.src && a.src.startsWith('blob:');
-        if(isBlob){
-          mockDuration=137;
-          mockSeekable={length:1, start:(i)=>0, end:(i)=>137};
-          mockBuffered={length:1, start:(i)=>0, end:(i)=>137};
-          // fire loadedmetadata for blob after 10ms
-          setTimeout(()=>{ a.dispatchEvent(new Event('loadedmetadata')); },10);
-        } else if(a.src && a.src.includes('/Audio/')){
-          // stream: initially NaN, then after 30ms becomes 137 but seekable 0-0
-          mockDuration=NaN;
-          mockSeekable={length:1, start:()=>0, end:()=>0};
-          mockBuffered={length:1, start:()=>0, end:()=>5};
-          // simulate loadedmetadata for stream after 30ms (duration becomes finite but seekable stays 0-0 for fMP4, 0-5 for MP3)
-          setTimeout(()=>{
-            mockDuration=137;
-            // Safari MP3 after stream metadata: seekable 0-0 (still not seekable), Chrome fMP4 also 0-0
-            mockSeekable={length:1, start:()=>0, end:()=>0};
-            a.dispatchEvent(new Event('loadedmetadata'));
-          },30);
-        }
-      };
+      a.setAttribute=function(k,v){ if(String(k).toLowerCase()==='src') { window.__jfAudioSrc=String(v||''); const r=origSA.call(this,k,v); updateMock(); return r; } return origSA.call(this,k,v); };
       const origAddEvent=a.addEventListener;
-      // Intercept src set to update mock
-      const origSrcSet = a.__lookupSetter__ ? a.__lookupSetter__('src') : null;
-      // Instead, poll for src changes
-      let lastSrc='';
-      setInterval(()=>{ if(a.src!==lastSrc){ lastSrc=a.src; updateMock(); } },20);
       // Expose mock getters
       try{
         Object.defineProperty(a,'duration',{ get(){ return mockDuration; }, configurable:true });
         Object.defineProperty(a,'seekable',{ get(){ return mockSeekable; }, configurable:true });
         Object.defineProperty(a,'buffered',{ get(){ return mockBuffered; }, configurable:true });
+        Object.defineProperty(a,'readyState',{ get(){ return mockReadyState; }, configurable:true });
       }catch(e){}
       // Track currentTime sets
       let _currentTime=0;
@@ -163,11 +161,14 @@ async function audioState(page){ return page.evaluate(()=>{
     src: a&&a.src||'',
     currentTime: a?Math.round(a.currentTime*10)/10:0,
     duration: a? (isFinite(a.duration)?Math.round(a.duration*10)/10:String(a.duration)):0,
+    readyState: a&&a.readyState,
     seekVal: seek&&seek.value,
     seekDisabled: seek&&seek.disabled,
     cur: cur&&cur.textContent,
     dur: dur&&dur.textContent,
-    blobFetches: (window.__jfBlobFetches||[]).slice(-3)
+    blobFetches: (window.__jfBlobFetches||[]).slice(-3),
+    pendingSeek: window.__jfPendingSeek||null,
+    blobSeekSeq: window.__jfPendingSeek?window.__jfPendingSeek.seq:0
   };
 }); }
 
@@ -198,11 +199,11 @@ async function audioState(page){ return page.evaluate(()=>{
     st=await audioState(page);
     check(`${label}: input updates jf-current to ~1:08`, st.cur && st.cur.includes('1:0'), st.cur);
     await page.locator('.jf-seek').evaluate(el=>{ el.dispatchEvent(new Event('change',{bubbles:true})); });
-    await page.waitForTimeout(1200); // wait for blob fetch (if any) + metadata
+    await page.waitForTimeout(2000); // wait for blob fetch (if any) + metadata (slow network: 4MB over 3G ~ 10s, but mock is fast)
     st=await audioState(page);
     // After 50% scrub, should be either blob with currentTime 68, or native if seekable
     const isBlob50 = st.src.startsWith('blob:');
-    console.log(`  after 50% scrub: src=${st.src.slice(0,30)} currentTime=${st.currentTime} blobFetches=${st.blobFetches.length}`);
+    console.log(`  after 50% scrub: src=${st.src.slice(0,30)} currentTime=${st.currentTime} duration=${st.duration} readyState=${st.readyState} blobFetches=${st.blobFetches.length}`);
     check(`${label}: 50% scrub lands near 68s (not 0)`, st.currentTime>60 && st.currentTime<75, `currentTime=${st.currentTime} src=${st.src.slice(-20)}`);
     check(`${label}: 50% scrub does not restart to 0`, st.currentTime!==0, `currentTime=${st.currentTime}`);
     // T: second scrub to 30% (41s) — the flaky bug case

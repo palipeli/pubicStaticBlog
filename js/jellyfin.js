@@ -23,9 +23,11 @@
     let lastAdvanceAt = 0;
     let root = null;
     let blobUrl = null;
-    let blobFetchAbort = null;
-    let blobFetchTimeout = null;
-    let blobFetchPos = null;
+    let blobSeekSeq = 0;
+    let blobWatchdog = null;
+    let pendingSeek = null;
+    const blobCache = new Map();
+    const BLOB_CACHE_MAX = 3;
     let isScrubbing = false;
     const TRACK_END_THRESHOLD = 1.2;
     function prefs() {
@@ -389,10 +391,9 @@
         serverStart = 0;
         isScrubbing = false;
         try { const sk = el('.jf-seek'); if (sk) { sk.disabled = false; sk.blur(); } } catch(e) {}
-        if (blobFetchTimeout) { try { clearTimeout(blobFetchTimeout); } catch(e){} blobFetchTimeout=null; }
-        blobFetchPos=null;
+        if (blobWatchdog) { try { clearTimeout(blobWatchdog); } catch(e){} blobWatchdog=null; }
+        pendingSeek=null;
         if (blobUrl) { try { URL.revokeObjectURL(blobUrl); } catch(e) {} blobUrl = null; }
-        if (blobFetchAbort) { try { blobFetchAbort.abort(); } catch(e) {} blobFetchAbort = null; try { const sk2 = el('.jf-seek'); if (sk2) sk2.disabled = false; } catch(e) {} }
         audio.src = streamUrl(t.id, 0);
         audio.volume = volume;
         audio.play().catch(function(e) {
@@ -403,6 +404,8 @@
         });
         showNowPlaying(t);
         renderTracklist();
+        try { ensureBlobFetch(t.id); } catch(e){}
+        try { prefetchNextBlob(); } catch(e){}
     }
     function showNowPlaying(t) {
         el('.jf-track-name').textContent = t.name;
@@ -467,6 +470,67 @@
         }
         el('.jf-current').textContent = fmtTime(pos);
     }
+    function ensureBlobFetch(trackId) {
+        if (blobCache.has(trackId)) return true;
+        if (blobCache.has('__pending__' + trackId)) return false;
+        blobCache.set('__pending__' + trackId, true);
+        fetch(streamUrl(trackId, 0), { cache: 'no-store' }).then(function(r) {
+            if (!r.ok) throw new Error('blob fetch ' + r.status);
+            return r.blob();
+        }).then(function(blob) {
+            blobCache.delete('__pending__' + trackId);
+            blobCache.set(trackId, blob);
+            if (blobCache.size > BLOB_CACHE_MAX * 2) {
+                const keys = Array.from(blobCache.keys());
+                for (let i=0; i<keys.length && blobCache.size > BLOB_CACHE_MAX; i++) {
+                    const k = keys[i];
+                    if (typeof k === 'string' && k.startsWith('__pending__')) continue;
+                    if (blobCache.get(k) === blob) continue;
+                    blobCache.delete(k);
+                }
+        }
+        }).catch(function() {
+            blobCache.delete('__pending__' + trackId);
+        });
+        return false;
+    }
+    function prefetchNextBlob() {
+        try {
+            const nextIdx = queue[queuePos + 1];
+            const t = nextIdx !== undefined ? tracks[nextIdx] : null;
+            if (t && t.id) ensureBlobFetch(t.id);
+        } catch (e) {}
+    }
+    function attachBlobAndSeek(trackId, pos, wasPlaying) {
+        const entry = blobCache.get(trackId);
+        if (!entry) return false;
+        if (blobUrl) { try { URL.revokeObjectURL(blobUrl); } catch(e) {} blobUrl = null; }
+        blobUrl = URL.createObjectURL(entry);
+        serverStart = 0;
+        audio.src = blobUrl;
+        audio.volume = volume;
+        audio.load();
+        const seq = ++blobSeekSeq;
+        pendingSeek = { pos: pos, seq: seq, wasPlaying: wasPlaying };
+        try { window.__jfPendingSeek = pendingSeek; } catch(e){}
+        if (isFinite(audio.duration) && audio.duration > 0) {
+            const p = pendingSeek; pendingSeek = null;
+            try { window.__jfPendingSeek = null; } catch(e){}
+            try { audio.currentTime = p.pos; } catch(e) {}
+            if (p.wasPlaying) audio.play().catch(function() {});
+        }
+        if (blobWatchdog) { try { clearTimeout(blobWatchdog); } catch(e){} }
+        blobWatchdog = setTimeout(function() {
+            if (seq !== blobSeekSeq) return;
+            if (pendingSeek && pendingSeek.seq === seq) {
+                pendingSeek = null;
+                try { window.__jfPendingSeek = null; } catch(e){}
+                try { el('.jf-seek').disabled = false; } catch(e2) {}
+                if (wasPlaying) audio.play().catch(function() {});
+            }
+        }, 12000);
+        return true;
+    }
     function fetchBlobAndSeek(pos) {
         const t = currentTrack();
         if (!t || !t.id) return;
@@ -476,50 +540,56 @@
         const seek = el('.jf-seek');
         if (seek && dur > 0) seek.value = Math.round(pos / dur * 1000);
         el('.jf-current').textContent = fmtTime(pos);
-        if (blobFetchAbort) { try { blobFetchAbort.abort(); } catch(e) {} }
-        if (blobFetchTimeout) { try { clearTimeout(blobFetchTimeout); } catch(e){} blobFetchTimeout=null; }
-        blobFetchPos = pos;
-        blobFetchAbort = new AbortController();
-        const signal = blobFetchAbort.signal;
-        const myPos = pos;
+        const seq = ++blobSeekSeq;
+        pendingSeek = { pos: pos, seq: seq, wasPlaying: wasPlaying };
+        try { window.__jfPendingSeek = pendingSeek; } catch(e){}
+        if (blobCache.has(t.id)) {
+            if (attachBlobAndSeek(t.id, pos, wasPlaying)) { try { el('.jf-seek').disabled = false; } catch(e) {} return; }
+        }
+        ensureBlobFetch(t.id);
+        // single-flight wait: if already waiting for this track, just update pendingSeek and return
+        if (blobCache.has('__pending__' + t.id)) {
+            el('.jf-seek').disabled = true;
+            if (!window.__jfBlobWaitActive) {
+                window.__jfBlobWaitActive = true;
+                const startedAt = Date.now();
+                const trackId = t.id;
+                const waitAndAttach = function() {
+                    const entry = blobCache.get(trackId);
+                    if (entry) {
+                        window.__jfBlobWaitActive = false;
+                        // use latest pendingSeek, not the original pos
+                        const latest = pendingSeek;
+                        if (latest) {
+                            attachBlobAndSeek(trackId, latest.pos, latest.wasPlaying);
+                            try { el('.jf-seek').disabled = false; } catch(e) {}
+                        }
+                        return;
+                    }
+                    if (Date.now() - startedAt > 30000) { window.__jfBlobWaitActive = false; try { el('.jf-seek').disabled = false; } catch(e2) {} return; }
+                    setTimeout(waitAndAttach, 200);
+                };
+                el('.jf-seek').disabled = true;
+                waitAndAttach();
+            }
+            return;
+        }
+        // fallback: if ensureBlobFetch didn't make it pending (e.g., already cached but attach failed), just try again
         el('.jf-seek').disabled = true;
-        fetch(streamUrl(t.id, 0), { cache: 'no-store', signal: signal }).then(function(r) {
-            if (!r.ok) throw new Error('blob fetch ' + r.status);
-            return r.blob();
-        }).then(function(blob) {
-            if (signal.aborted || blobFetchPos !== myPos) { try { el('.jf-seek').disabled = false; } catch(e) {} return; }
-            if (blobUrl) { try { URL.revokeObjectURL(blobUrl); } catch(e) {} }
-            blobUrl = URL.createObjectURL(blob);
-            serverStart = 0;
-            audio.src = blobUrl;
-            audio.volume = volume;
-            audio.load();
-            const onMeta = function() {
-                if (blobFetchPos !== myPos) return;
-                audio.removeEventListener('loadedmetadata', onMeta);
-                if (blobFetchTimeout) { try{ clearTimeout(blobFetchTimeout);}catch(e){} blobFetchTimeout=null; }
-                el('.jf-seek').disabled = false;
-                try { audio.currentTime = myPos; } catch(e) {}
-                if (wasPlaying) audio.play().catch(function(e) {
-                    try { const n=e&&e.name||''; if(n==='NotAllowedError'||n==='AbortError') return; }catch(_e){}
-                });
-            };
-            audio.addEventListener('loadedmetadata', onMeta);
-            blobFetchTimeout = setTimeout(function() {
-                if (blobFetchPos !== myPos) return;
-                try { audio.removeEventListener('loadedmetadata', onMeta); } catch(e) {}
-                el('.jf-seek').disabled = false;
-                try { if (isFinite(myPos)) audio.currentTime = myPos; } catch(e) {}
-                if (wasPlaying) audio.play().catch(function(e) {
-                    try { const n=e&&e.name||''; if(n==='NotAllowedError'||n==='AbortError') return; }catch(_e){}
-                });
-            }, 4000);
-        }).catch(function(e) {
-            try { el('.jf-seek').disabled = false; } catch(e2) {}
-            if (signal.aborted || blobFetchPos !== myPos) return;
-            if (isFinite(dur) && dur>0) fetchBlobAndSeek(myPos); else serverSeek(myPos);
-            // fallback to serverSeek only if blob repeatedly fails and dur is not finite; for finite dur we already use blob
-        });
+        const startedAt2 = Date.now();
+        const trackId2 = t.id;
+        const waitAndAttach2 = function() {
+            const entry = blobCache.get(trackId2);
+            if (entry) {
+                const latest = pendingSeek;
+                if (latest) attachBlobAndSeek(trackId2, latest.pos, latest.wasPlaying);
+                try { el('.jf-seek').disabled = false; } catch(e) {}
+                return;
+            }
+            if (Date.now() - startedAt2 > 30000) { try { el('.jf-seek').disabled = false; } catch(e2) {} return; }
+            setTimeout(waitAndAttach2, 200);
+        };
+        waitAndAttach2();
     }
     function effectiveCurrentTime() {
         return serverStart + (isFinite(audio.currentTime) ? audio.currentTime : 0);
@@ -527,6 +597,21 @@
     function wireAudio() {
         audio.addEventListener('play', syncButtons);
         audio.addEventListener('pause', syncButtons);
+        const applyPendingSeek = function() {
+            if (!pendingSeek) return;
+            if (!isFinite(audio.duration) || audio.duration <= 0) return;
+            if (audio.readyState < 1) return;
+            const p = pendingSeek;
+            pendingSeek = null;
+            try { window.__jfPendingSeek = null; } catch(e){}
+            if (blobWatchdog) { try { clearTimeout(blobWatchdog); } catch(e){} blobWatchdog = null; }
+            try { el('.jf-seek').disabled = false; } catch(e2) {}
+            try { audio.currentTime = Math.min(Math.max(p.pos, 0), Math.max(audio.duration - 0.25, 0)); } catch(e) {}
+            if (p.wasPlaying) audio.play().catch(function() {});
+        };
+        audio.addEventListener('loadedmetadata', applyPendingSeek);
+        audio.addEventListener('canplay', applyPendingSeek);
+        audio.addEventListener('durationchange', applyPendingSeek);
         audio.addEventListener('ended', function() {
             const now = Date.now();
             if (now - lastAdvanceAt < 800) return;
