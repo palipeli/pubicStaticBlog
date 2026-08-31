@@ -30,6 +30,10 @@
     const BLOB_CACHE_MAX = 3;
     let isScrubbing = false;
     const TRACK_END_THRESHOLD = 1.2;
+    let mutedFallback = false;
+    let gestureHooked = false;
+    let mutedRetryToken = 0;
+    let mutedRetryTimer = null;
     function setDiscBuffering(v){ try{ const d=el('.jf-disc'); if(d) d.classList.toggle('jf-buffering', !!v); const a=el('.jf-art'); if(a) a.classList.toggle('jf-buffering', !!v); }catch(e){} }
     function prefs() {
         try { return JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch (e) { return {}; }
@@ -187,6 +191,7 @@
         el('.jf-volume').addEventListener('input', function() {
             volume = parseFloat(this.value);
             audio.volume = volume;
+            if (mutedFallback) unmuteNow();
             savePrefs();
         });
         el('.jf-search').addEventListener('input', function() {
@@ -382,6 +387,65 @@
         const ti = queue[queuePos];
         return ti === undefined ? null : tracks[ti];
     }
+    function unmuteNow() {
+        mutedFallback = false;
+        mutedRetryToken++;
+        if (mutedRetryTimer) { try { clearTimeout(mutedRetryTimer); } catch(e) {} mutedRetryTimer = null; }
+        hideMuteWaitBadge();
+        try { audio.muted = false; } catch(e) {}
+    }
+    function attemptPlay() {
+        unmuteNow();
+        const token = mutedRetryToken;
+        audio.play().catch(function(e) {
+            const n = e && e.name || '';
+            if (n === 'AbortError' || n !== 'NotAllowedError' || token !== mutedRetryToken) return;
+            mutedFallback = true;
+            const delays = [300, 1200, 3500];
+            let idx = 0;
+            const tryMuted = function() {
+                if (token !== mutedRetryToken) return;
+                try { audio.muted = true; } catch(e3) {}
+                audio.play().then(function() {
+                    if (token === mutedRetryToken) showMuteWaitBadge();
+                }).catch(function(e4) {
+                    const n4 = e4 && e4.name || '';
+                    if (token !== mutedRetryToken || n4 === 'AbortError') return;
+                    if (idx < delays.length) { mutedRetryTimer = setTimeout(tryMuted, delays[idx]); idx++; }
+                });
+            };
+            mutedRetryTimer = setTimeout(tryMuted, delays[idx]);
+            idx++;
+        });
+    }
+    function showMuteWaitBadge() {
+        try {
+            let b = document.getElementById('jf-mute-wait');
+            if (!b) {
+                b = document.createElement('div');
+                b.id = 'jf-mute-wait';
+                b.setAttribute('role', 'status');
+                b.textContent = '\uD83D\uDD08 tap for sound';
+                document.body.appendChild(b);
+            }
+            b.classList.add('jf-show');
+        } catch(e) {}
+    }
+    function hideMuteWaitBadge() {
+        try { const b = document.getElementById('jf-mute-wait'); if (b) b.classList.remove('jf-show'); } catch(e) {}
+    }
+    function hookGestureUnmute() {
+        if (gestureHooked) return;
+        gestureHooked = true;
+        const unlock = function() {
+            if (!mutedFallback) return;
+            unmuteNow();
+            if (audio.paused && !audio.ended) audio.play().catch(function() {});
+        };
+        ['pointerdown', 'keydown', 'touchstart'].forEach(function(t) {
+            try { document.addEventListener(t, unlock, {capture: true, passive: true}); } catch(e) { try { document.addEventListener(t, unlock, true); } catch(e2) {} }
+        });
+    }
     function playIndex(qi, allowWrapBack) {
         if (!queue.length) return;
         if (qi < 0) qi = repeat === 'all' || allowWrapBack ? queue.length - 1 : 0;
@@ -397,12 +461,7 @@
         if (blobUrl) { try { URL.revokeObjectURL(blobUrl); } catch(e) {} blobUrl = null; }
         audio.src = streamUrl(t.id, 0);
         audio.volume = volume;
-        audio.play().catch(function(e) {
-            try {
-                const n = e && e.name || '';
-                if (n === 'NotAllowedError' || n === 'AbortError') return;
-            } catch(_e){}
-        });
+        attemptPlay();
         showNowPlaying(t);
         renderTracklist();
         // defer blob fetches to avoid 3 concurrent transcodes (stream + blob + next)
@@ -432,6 +491,10 @@
         if (!queue.length) {
             playIndex(0, false);
             return;
+        }
+        if (mutedFallback) {
+            unmuteNow();
+            try { audio.play().catch(function() {}); } catch(e) {}
         }
         if (audio.paused) audio.play().catch(function() {}); else audio.pause();
     }
@@ -773,6 +836,7 @@
             audio.volume = volume;
             buildDom();
             wireAudio();
+            hookGestureUnmute();
             root.hidden = false;
             setExpanded(!!stored.expanded);
             syncButtons();
