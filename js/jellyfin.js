@@ -30,7 +30,7 @@
     const BLOB_CACHE_MAX = 3;
     let isScrubbing = false;
     const TRACK_END_THRESHOLD = 1.2;
-    function setDiscBuffering(v){ try{ const d=el('.jf-disc'); if(d) d.classList.toggle('jf-buffering', !!v); }catch(e){} }
+    function setDiscBuffering(v){ try{ const d=el('.jf-disc'); if(d) d.classList.toggle('jf-buffering', !!v); const a=el('.jf-art'); if(a) a.classList.toggle('jf-buffering', !!v); }catch(e){} }
     function prefs() {
         try { return JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch (e) { return {}; }
     }
@@ -624,7 +624,9 @@
         audio.addEventListener('durationchange', applyPendingSeek);
         audio.addEventListener('waiting', function(){ setDiscBuffering(true); });
         audio.addEventListener('stalled', function(){ setDiscBuffering(true); });
+        audio.addEventListener('suspend', function(){ if (audio.readyState < 3) setDiscBuffering(true); });
         audio.addEventListener('loadstart', function(){ setDiscBuffering(true); });
+        audio.addEventListener('progress', function(){ if (audio.readyState < 3 && !audio.paused) setDiscBuffering(true); });
         audio.addEventListener('seeking', function(){ if (pendingSeek) setDiscBuffering(true); });
         audio.addEventListener('seeked', function(){ setDiscBuffering(false); });
         audio.addEventListener('canplay', function(){ setDiscBuffering(false); });
@@ -712,19 +714,45 @@
         return !!t && String(t.name || '').trim() === '糸守高校';
     }
     function startItomoriDefault() {
-        if (!tracks.length) return;
-        const pool = tracks.filter(isItomoriTitle);
-        if (!pool.length) return;
-        const order = orderedTracks();
-        const pick = pool[Math.floor(Math.random() * pool.length)];
-        const pos = order.indexOf(tracks.indexOf(pick));
-        queue = order;
-        queuePos = pos >= 0 ? pos : 0;
-        playIndex(queuePos, false);
+        // Direct search — the random 200 library page almost never contains 糸守高校 (7188 tracks total)
+        const params = new URLSearchParams({IncludeItemTypes:'Audio', Recursive:'true', Limit:'10', SearchTerm:'糸守高校', SortBy:'SortName'});
+        if (userId) params.set('UserId', userId);
+        api('Items', params).then(function(data){
+            const found = (data.Items||[]).map(mapItem).filter(isItomoriTitle);
+            if (!found.length) {
+                // retry without SearchTerm filter (fallback to library scan) — handles 429 or empty
+                if (tracks.length) {
+                    const pool2 = tracks.filter(isItomoriTitle);
+                    if (pool2.length) {
+                        defaultStarted = true;
+                        const pick2 = pool2[Math.floor(Math.random()*pool2.length)];
+                        let idx2 = tracks.findIndex(function(t){ return t.id===pick2.id; });
+                        if (idx2===-1) { tracks.unshift(pick2); applyQueueOrder(); renderTracklist(); idx2 = tracks.findIndex(function(t){ return t.id===pick2.id; }); }
+                        const qpos2 = queue.indexOf(idx2);
+                        queuePos = qpos2>=0? qpos2 : 0;
+                        playIndex(queuePos, false);
+                        return;
+                    }
+                }
+                return;
+            }
+            defaultStarted = true;
+            const pick = found[Math.floor(Math.random()*found.length)];
+            let idx = tracks.findIndex(function(t){ return t.id===pick.id; });
+            if (idx===-1) {
+                tracks.unshift(pick);
+                applyQueueOrder();
+                renderTracklist();
+                idx = tracks.findIndex(function(t){ return t.id===pick.id; });
+            }
+            const qpos = queue.indexOf(idx);
+            queuePos = qpos>=0? qpos : queue.indexOf(tracks.indexOf(pick));
+            if (queuePos===-1) queuePos=0;
+            playIndex(queuePos, false);
+        }).catch(function(){});
     }
     function maybeStartItomori() {
         if (defaultStarted || !consentGranted) return;
-        defaultStarted = true;
         startItomoriDefault();
     }
     let consentGranted = false;
