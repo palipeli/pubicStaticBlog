@@ -204,7 +204,7 @@
             if (row) playIndex(parseInt(row.getAttribute('data-qi'), 10), false);
         });
         document.addEventListener('keydown', function(e) {
-            if (!root || root.hidden || !expanded) return;
+            if (!root || root.hidden) return;
             const t = e.target;
             if (t && (t.closest && t.closest('#jf-player') || t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
             if (e.code === 'Space') {
@@ -365,6 +365,10 @@
         }
         p.then(function(items) {
             if (token !== searchToken) return;
+            const cur = currentTrack();
+            if (cur && cur.id && items.length && !items.some(function(t){ return t.id===cur.id; })) {
+                items = [cur].concat(items);
+            }
             tracks = items;
             applyQueueOrder();
             renderTracklist();
@@ -539,11 +543,26 @@
         }
         el('.jf-current').textContent = fmtTime(pos);
     }
+    function shouldPrefetch() {
+        try {
+            const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+            if (c) {
+                if (c.saveData) return false;
+                if (c.effectiveType && (c.effectiveType === '2g' || c.effectiveType === 'slow-2g')) return false;
+                if (typeof c.downlink === 'number' && c.downlink < 0.5) return false;
+            }
+        } catch(e){}
+        return true;
+    }
     function ensureBlobFetch(trackId) {
         if (blobCache.has(trackId)) return true;
         if (blobCache.has('__pending__' + trackId)) return false;
         blobCache.set('__pending__' + trackId, true);
-        fetch(streamUrl(trackId, 0), { cache: 'no-store' }).then(function(r) {
+        const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        let timeout = null;
+        if (ctrl) timeout = setTimeout(function(){ try{ ctrl.abort(); }catch(e){} }, 15000);
+        fetch(streamUrl(trackId, 0), ctrl ? { cache: 'no-store', signal: ctrl.signal } : { cache: 'no-store' }).then(function(r) {
+            if (timeout) clearTimeout(timeout);
             if (!r.ok) throw new Error('blob fetch ' + r.status);
             return r.blob();
         }).then(function(blob) {
@@ -558,12 +577,15 @@
                     blobCache.delete(k);
                 }
         }
-        }).catch(function() {
+        }).catch(function(e) {
+            if (timeout) clearTimeout(timeout);
             blobCache.delete('__pending__' + trackId);
+            try{ if (e && e.name === 'AbortError') console.warn('[jf] blob fetch timeout', trackId); }catch(_e){}
         });
         return false;
     }
     function prefetchNextBlob() {
+        if (!shouldPrefetch()) return;
         try {
             const nextIdx = queue[queuePos + 1];
             const t = nextIdx !== undefined ? tracks[nextIdx] : null;
@@ -815,7 +837,7 @@
         }).catch(function(){});
     }
     function maybeStartItomori() {
-        if (defaultStarted || !consentGranted) return;
+        if (defaultStarted || !consentGranted || queuePos !== -1) return;
         startItomoriDefault();
     }
     let consentGranted = false;
