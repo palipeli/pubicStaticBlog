@@ -30,6 +30,7 @@
     const BLOB_CACHE_MAX = 3;
     let isScrubbing = false;
     const TRACK_END_THRESHOLD = 1.2;
+    function setDiscBuffering(v){ try{ const d=el('.jf-disc'); if(d) d.classList.toggle('jf-buffering', !!v); }catch(e){} }
     function prefs() {
         try { return JSON.parse(localStorage.getItem(PREFS_KEY) || '{}'); } catch (e) { return {}; }
     }
@@ -404,8 +405,13 @@
         });
         showNowPlaying(t);
         renderTracklist();
-        try { ensureBlobFetch(t.id); } catch(e){}
-        try { prefetchNextBlob(); } catch(e){}
+        // defer blob fetches to avoid 3 concurrent transcodes (stream + blob + next)
+        // current blob after 1s, next prefetch after canplay
+        setTimeout(function(){ try{ ensureBlobFetch(t.id); }catch(e){} }, 1000);
+        const _onCanPlayPrefetch = function(){
+            try { prefetchNextBlob(); } catch(e){}
+        };
+        try { audio.addEventListener('canplay', _onCanPlayPrefetch, {once:true}); } catch(e){ try{ audio.addEventListener('canplay', _onCanPlayPrefetch); }catch(e2){} }
     }
     function showNowPlaying(t) {
         el('.jf-track-name').textContent = t.name;
@@ -502,6 +508,8 @@
         } catch (e) {}
     }
     function attachBlobAndSeek(trackId, pos, wasPlaying) {
+        const cur = currentTrack();
+        if (!cur || cur.id !== trackId) return false;
         const entry = blobCache.get(trackId);
         if (!entry) return false;
         if (blobUrl) { try { URL.revokeObjectURL(blobUrl); } catch(e) {} blobUrl = null; }
@@ -543,6 +551,7 @@
         const seq = ++blobSeekSeq;
         pendingSeek = { pos: pos, seq: seq, wasPlaying: wasPlaying };
         try { window.__jfPendingSeek = pendingSeek; } catch(e){}
+        setDiscBuffering(true);
         if (blobCache.has(t.id)) {
             if (attachBlobAndSeek(t.id, pos, wasPlaying)) { try { el('.jf-seek').disabled = false; } catch(e) {} return; }
         }
@@ -606,12 +615,22 @@
             try { window.__jfPendingSeek = null; } catch(e){}
             if (blobWatchdog) { try { clearTimeout(blobWatchdog); } catch(e){} blobWatchdog = null; }
             try { el('.jf-seek').disabled = false; } catch(e2) {}
+            setDiscBuffering(false);
             try { audio.currentTime = Math.min(Math.max(p.pos, 0), Math.max(audio.duration - 0.25, 0)); } catch(e) {}
             if (p.wasPlaying) audio.play().catch(function() {});
         };
         audio.addEventListener('loadedmetadata', applyPendingSeek);
         audio.addEventListener('canplay', applyPendingSeek);
         audio.addEventListener('durationchange', applyPendingSeek);
+        audio.addEventListener('waiting', function(){ setDiscBuffering(true); });
+        audio.addEventListener('stalled', function(){ setDiscBuffering(true); });
+        audio.addEventListener('loadstart', function(){ setDiscBuffering(true); });
+        audio.addEventListener('seeking', function(){ if (pendingSeek) setDiscBuffering(true); });
+        audio.addEventListener('seeked', function(){ setDiscBuffering(false); });
+        audio.addEventListener('canplay', function(){ setDiscBuffering(false); });
+        audio.addEventListener('canplaythrough', function(){ setDiscBuffering(false); });
+        audio.addEventListener('playing', function(){ setDiscBuffering(false); });
+        audio.addEventListener('emptied', function(){ setDiscBuffering(false); });
         audio.addEventListener('ended', function() {
             const now = Date.now();
             if (now - lastAdvanceAt < 800) return;
@@ -689,12 +708,12 @@
             }); } catch (e) {}
         }
     }
-    function isChineseTitle(t) {
-        return !!t && HAN_RE.test(t.name || '') && !KANA_RE.test(t.name || '');
+    function isItomoriTitle(t) {
+        return !!t && String(t.name || '').trim() === '糸守高校';
     }
-    function startChineseDefault() {
+    function startItomoriDefault() {
         if (!tracks.length) return;
-        const pool = tracks.filter(isChineseTitle);
+        const pool = tracks.filter(isItomoriTitle);
         if (!pool.length) return;
         const order = orderedTracks();
         const pick = pool[Math.floor(Math.random() * pool.length)];
@@ -703,17 +722,17 @@
         queuePos = pos >= 0 ? pos : 0;
         playIndex(queuePos, false);
     }
-    function maybeStartChinese() {
+    function maybeStartItomori() {
         if (defaultStarted || !consentGranted) return;
         defaultStarted = true;
-        startChineseDefault();
+        startItomoriDefault();
     }
     let consentGranted = false;
     let defaultStarted = false;
     try { consentGranted = localStorage.getItem('system_warning_consent') === 'true'; } catch (e) {}
     document.addEventListener('warning:cleared', function() {
         consentGranted = true;
-        maybeStartChinese();
+        maybeStartItomori();
     });
     function init() {
         api('Users').then(function(users) {
@@ -734,7 +753,7 @@
             tracks = items;
             applyQueueOrder();
             renderTracklist();
-            maybeStartChinese();
+            maybeStartItomori();
         }).catch(function() {});
     }
     if (document.readyState === 'loading') {

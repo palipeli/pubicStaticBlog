@@ -2185,6 +2185,10 @@ body::after{ content:"PRINT DISABLED \2014 VISIT https://kamikami.eu TO READ ONL
 .jf-disc-hole{position:absolute;top:50%;left:50%;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:#000;border:1px solid rgba(255,255,255,0.25);}
 .jf-disc.jf-spinning .jf-disc-grooves,.jf-disc.jf-spinning .jf-disc-label{animation:jf-spin 2.4s linear infinite;}
 @keyframes jf-spin{to{transform:rotate(360deg);}}
+.jf-disc.jf-buffering{box-shadow:0 0 0 2px rgba(168,85,247,0.95),0 0 14px rgba(168,85,247,0.75);animation:jf-breathe 1.1s ease-in-out infinite;}
+.jf-disc.jf-buffering.jf-spinning{animation:jf-breathe 1.1s ease-in-out infinite;}
+.jf-disc.jf-buffering.jf-spinning .jf-disc-grooves,.jf-disc.jf-buffering.jf-spinning .jf-disc-label{animation:jf-spin 2.4s linear infinite;}
+@keyframes jf-breathe{0%,100%{transform:scale(1);opacity:1;box-shadow:0 0 0 2px rgba(168,85,247,0.95),0 0 14px rgba(168,85,247,0.75);}50%{transform:scale(1.06);opacity:0.92;box-shadow:0 0 0 3px rgba(168,85,247,1),0 0 18px rgba(168,85,247,0.9);}}
 .jf-mini-meta{display:flex;flex-direction:column;justify-content:center;min-width:0;max-width:130px;cursor:pointer;}
 .jf-mini-name{font-size:11px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .jf-mini-artist{font-size:9px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}

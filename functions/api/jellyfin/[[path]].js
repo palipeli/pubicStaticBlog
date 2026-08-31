@@ -9,7 +9,8 @@ const ALLOWED_PATHS = [
     /^MusicGenres$/,
     /^Genres$/,
     /^Items\/[A-Za-z0-9_-]+\/Images\/(Primary|Backdrop|Logo|Thumb|Disc)(\/\d+)?$/,
-    /^Audio\/[A-Za-z0-9_-]+\/stream$/
+    /^Audio\/[A-Za-z0-9_-]+\/stream$/,
+    /^Audio\/[A-Za-z0-9_-]+\/universal$/
 ];
 const GUID_RE = /^[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}$/i;
 const STRIP_PARAMS = ['api_key', 'apikey', 'userid', 'fields', 'includeitemtypes', 'static', 'enablehiddenelements', 'enableinterruptions', 'enablestreaminginfo'];
@@ -293,9 +294,6 @@ export async function onRequest(context) {
     if (!path) {
         return json({proxy: 'jellyfin', ok: true});
     }
-    if (path.indexOf('Audio/') === 0 && path.endsWith('/universal')) {
-        path = path.slice(0, -'universal'.length) + 'stream';
-    }
     const segs = path.split('/');
     for (let i = 0; i < segs.length; i++) {
         if (segs[i] === '..' || segs[i] === '.') {
@@ -373,7 +371,25 @@ export async function onRequest(context) {
         return json({error: 'Upstream unreachable'}, 502);
     }
     if (response.status >= 300 && response.status < 400) {
-        return json({error: 'Redirects not allowed'}, 502);
+        // universal may 302 to the real media; follow it for API compatibility
+        if (path.endsWith('/universal') && response.headers.get('Location')) {
+            const loc = response.headers.get('Location');
+            try {
+                const locUrl = new URL(loc, upstreamBase(env));
+                const headers2 = new Headers();
+                const range2 = request.headers.get('Range');
+                if (range2) headers2.set('Range', range2);
+                headers2.set('X-Emby-Token', env.JELLYFIN_TOKEN);
+                headers2.set('Accept', request.headers.get('Accept') || '*/*');
+                const r2 = await fetch(locUrl.toString(), {method: request.method === 'HEAD' ? 'HEAD' : 'GET', headers: headers2, redirect: 'manual'});
+                if (r2.status >= 300 && r2.status < 400) return json({error: 'Redirects not allowed'}, 502);
+                response = r2;
+            } catch(e) {
+                return json({error: 'Redirects not allowed'}, 502);
+            }
+        } else {
+            return json({error: 'Redirects not allowed'}, 502);
+        }
     }
     const headers = new Headers();
     let contentType = response.headers.get('Content-Type');

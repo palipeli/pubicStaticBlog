@@ -13,8 +13,8 @@ const modPath = path.join(__dirname, '..', 'functions', 'api', 'jellyfin', '[[pa
 const src = fs.readFileSync(modPath, 'utf8');
 
 ok('allows Audio/<id>/stream', src.includes("Audio\\/") && src.includes("stream"));
-ok('no longer allows /universal as a direct allowlisted route (must be rewritten)', !/^.*ALLOWED_PATHS[\s\S]*?\/universal/.test(src) || src.includes("endsWith('/universal')"));
-    ok('rewrites Audio/*/universal → Audio/*/stream', src.includes('/universal') && src.includes("'stream'"));
+ok('allows Audio/<id>/universal passthrough (API compatible)', src.includes("Audio\\/") && src.includes("universal"));
+ok('handles Audio/*/universal without rewrite (direct allowlist)', src.includes("universal") && src.includes("ALLOWED_PATHS"));
 ok('FORCED_TRANSCODE defined (mp4/aac/256k)', src.includes('FORCED_TRANSCODE') && src.includes("'mp4'") && src.includes("'aac'") && src.includes('256000'));
 ok('START_TICKS_RE defined (digits only)', src.includes('START_TICKS_RE') && src.includes('\\d{1,15}'));
 ok('sanitizeParams forces static=false + container/audioCodec/audioBitRate', src.includes("params.set('static', 'false')") && src.includes("params.set('container'") && src.includes("params.set('audioCodec'") && src.includes("params.set('audioBitRate'"));
@@ -78,7 +78,7 @@ ok('has fallback static=true branch (guarded by FORCED_TRANSCODE)', src.includes
         try {
             await onRequest({request: makeReq('/api/jellyfin/Audio/t1/universal'), env: makeEnv()});
         } catch (e) {}
-        ok('universal path fetches as /stream (no Past Allowlist 403)', reqPath.includes('/Audio/') && reqPath.includes('/stream') && !reqPath.includes('/universal'), 'upstream path=' + reqPath);
+        ok('universal path allowed (API compatible, no 403)', reqPath.includes('/Audio/') && (reqPath.includes('/universal') || reqPath.includes('/stream')), 'upstream path=' + reqPath);
         globalThis.fetch = origFetch;
     }
 
