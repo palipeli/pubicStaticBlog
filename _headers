@@ -20,3 +20,7 @@
 /js/cp.js
   Cache-Control: no-cache
   X-Content-Type-Options: nosniff
+
+/js/jellyfin.js
+  Cache-Control: no-cache
+  X-Content-Type-Options: nosniff

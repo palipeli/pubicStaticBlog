@@ -875,10 +875,16 @@ resolves the theme cookie to `data-theme` immediately (CSP hash covers it — se
 
 /js/admin.js        → X-Content-Type-Options: nosniff; Cache-Control: no-cache
 /admin.css          → X-Content-Type-Options: nosniff; Cache-Control: no-cache
+/js/cp.js           → X-Content-Type-Options: nosniff; Cache-Control: no-cache
+/sw.js              → X-Content-Type-Options: nosniff; Cache-Control: no-cache
+/js/jellyfin.js     → X-Content-Type-Options: nosniff; Cache-Control: no-cache
 ```
 
 The CSP `script-src` hash covers the inline theme script in `admin.html`; **keep in sync if the
-script changes**.
+script changes**. `/js/jellyfin.js` carries `no-cache` because it proxies a live upstream whose
+breaking changes (e.g. the Jellyfin 12 auth/user-resolution break) must reach visitors without
+waiting for edge TTLs — CF edge POPs revalidate on every request instead of serving stale
+bytes for hours (observed 2026-09-11: plain URL 8/10 stale across POPs after deploy).
 
 ### 12.2 API security
 
