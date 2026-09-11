@@ -818,8 +818,13 @@ resolves the theme cookie to `data-theme` immediately (CSP hash covers it — se
 
 - Read-only reverse proxy to a private Jellyfin server; the API token never reaches the browser.
 - **Config:** `JELLYFIN_URL` + `JELLYFIN_TOKEN` env (503 if missing). `JELLYFIN_USER` optionally
-  pins the user (GUID passthrough; name resolved once via `/Users` and cached in isolate;
-  defaults to the token's first visible user). Unresolvable user → 503, never passthrough.
+  pins the user (GUID passthrough; name resolved once and cached in isolate; defaults to the
+  token's first visible user). Unresolvable user → 503, never passthrough.
+- **User resolution (Jellyfin 12 compat):** authed `/Users` first (dual auth headers, see below);
+  if it 401s (admin-scoped on Jellyfin ≥10.11+ where non-admin tokens may be rejected), falls back
+  to unauthenticated `/Users/Public` (login-page endpoint, same-origin only; returns `{Id, Name}`
+  per user — enough for resolution). Object-wrapped responses (`{Items:[…]}`) normalized. Result
+  cached in isolate 60 s.
 - **Origin lock:** requests carrying `Sec-Fetch-Site` other than `same-origin`/`none` → 403
   (blocks drive-by use of the proxy from other sites; direct navigation and same-tab still work).
 - **Allowlist:** GET/HEAD only; path must match a fixed regex list (`System/Info/Public`,
@@ -836,7 +841,9 @@ resolves the theme cookie to `data-theme` immediately (CSP hash covers it — se
   transcoded AAC 256k** (`static=false&container=mp4&audioCodec=aac&audioBitRate=256000`);
   only a digits-validated `StartTimeTicks` (sanitized as `startTimeTicks`, `^\d{1,15}$`) is
   kept for server-side seeks. `Limit` capped at 200.
-- **Auth injection:** forwards `X-Emby-Token` server-side; passes through `Range` for seeking.
+- **Auth injection:** forwards `X-Emby-Token` **and** `Authorization: MediaBrowser Token="…"`
+  server-side (Jellyfin 12 accepts both; legacy header alone may be insufficient); passes through
+  `Range` for seeking.
 - **Bandwidth:** every `Audio/*` play is an AAC 256k transcode — ~63% smaller than the same
   track's FLAC (≈10 MB/3 min song off the tunnel uplink). Cost is one ffmpeg job per first
   play (and per seek outside the buffered window) on the Jellyfin host. Transcode container is

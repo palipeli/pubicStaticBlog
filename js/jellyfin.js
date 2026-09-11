@@ -850,6 +850,11 @@
     function init() {
         api('Users').then(function(users) {
             if (!Array.isArray(users) || !users.length) throw new Error('no users');
+            return users;
+        }).catch(function() {
+            return new Promise(function(res) { setTimeout(res, 400); }).then(function() { return api('Users'); });
+        }).then(function(users) {
+            if (!Array.isArray(users) || !users.length) throw new Error('no users');
             userId = users[0].Id;
             const stored = prefs();
             shuffle = !!stored.shuffle;

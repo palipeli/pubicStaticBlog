@@ -78,8 +78,26 @@ async function upstreamFetch(env, path, searchParams, request) {
     const ifRange = request.headers.get('If-Range');
     if (ifRange) headers.set('If-Range', ifRange);
     headers.set('X-Emby-Token', env.JELLYFIN_TOKEN);
+    try { headers.set('Authorization', 'MediaBrowser Token="' + env.JELLYFIN_TOKEN + '"'); } catch (e) {}
     headers.set('Accept', request.headers.get('Accept') || '*/*');
     return fetch(target.toString(), {method: request.method === 'HEAD' ? 'HEAD' : 'GET', headers: headers, redirect: 'manual'});
+}
+function usersToIds(users) {
+    if (Array.isArray(users)) return users;
+    if (users && Array.isArray(users.Items)) return users.Items;
+    if (users && Array.isArray(users.items)) return users.items;
+    return [];
+}
+async function fetchUsersFallback(env, request) {
+    try {
+        const pub = await upstreamFetch(env, 'Users/Public', new URLSearchParams(), request);
+        if (pub.ok) {
+            const pu = await pub.json();
+            const list = usersToIds(pu);
+            if (list.length) return list;
+        }
+    } catch (e) {}
+    return [];
 }
 async function resolveUserId(env, request, prefetched) {
     const configured = String(env.JELLYFIN_USER || '').trim();
@@ -89,35 +107,28 @@ async function resolveUserId(env, request, prefetched) {
     if (resolvedUserCache && (!configured || resolvedUserCache.name === configured)) {
         return resolvedUserCache.id;
     }
-    let users = prefetched;
-    if (!users) {
-        if (usersListCacheMem && Date.now() - usersListCacheMemTs < 60000) {
-            users = usersListCacheMem;
-        } else {
-            let response;
-            try {
-                response = await upstreamFetch(env, 'Users', new URLSearchParams(), request);
-            } catch (err) {
-                return '';
-            }
-            if (!response.ok) {
-                return '';
-            }
-            try {
-                users = await response.json();
-            } catch (err) {
-                return '';
-            }
-            if (Array.isArray(users)) {
-                usersListCacheMem = users;
-                usersListCacheMemTs = Date.now();
-            }
-        }
-    } else if (Array.isArray(users) && !usersListCacheMem) {
-        usersListCacheMem = users;
-        usersListCacheMemTs = Date.now();
+    let users = prefetched || null;
+    if (!users && usersListCacheMem && Date.now() - usersListCacheMemTs < 60000) {
+        users = usersListCacheMem;
     }
-    const list = Array.isArray(users) ? users : [];
+    if (!users) {
+        let response = null;
+        try {
+            response = await upstreamFetch(env, 'Users', new URLSearchParams(), request);
+        } catch (err) { response = null; }
+        if (response && response.ok) {
+            try { users = await response.json(); } catch (err) { users = null; }
+        }
+        if (!usersToIds(users || []).length) {
+            users = await fetchUsersFallback(env, request);
+        }
+        const list0 = usersToIds(users);
+        if (list0.length) {
+            usersListCacheMem = list0;
+            usersListCacheMemTs = Date.now();
+        }
+    }
+    const list = usersToIds(users);
     const match = configured
         ? list.find(function(u) { return String(u.Name || '').toLowerCase() === configured.toLowerCase(); })
         : list[0];
@@ -321,12 +332,15 @@ export async function onRequest(context) {
                 const pr = await upstreamFetch(env, 'Users', new URLSearchParams(), request);
                 if (pr.ok) {
                     try { prefetchedUsers = await pr.json(); } catch (e) { prefetchedUsers = null; }
-                    if (Array.isArray(prefetchedUsers)) {
-                        usersListCacheMem = prefetchedUsers;
-                        usersListCacheMemTs = Date.now();
-                    }
                 }
             } catch (e) {}
+            if (!usersToIds(prefetchedUsers || []).length) {
+                prefetchedUsers = await fetchUsersFallback(env, request);
+            }
+            if (usersToIds(prefetchedUsers || []).length) {
+                usersListCacheMem = usersToIds(prefetchedUsers);
+                usersListCacheMemTs = Date.now();
+            }
         }
         didPrefetchBranch = true;
     }
@@ -342,20 +356,18 @@ export async function onRequest(context) {
         let users = prefetchedUsers;
         if (!users) {
             const response = await upstreamFetch(env, 'Users', new URLSearchParams(), request).catch(function() { return null; });
-            if (!response || !response.ok) {
-                return json({error: 'Upstream request failed'}, 502);
+            if (response && response.ok) {
+                try { users = await response.json(); } catch (err) { users = null; }
             }
-            try {
-                users = await response.json();
-            } catch (err) {
-                return json({error: 'Upstream request failed'}, 502);
+            if (!usersToIds(users || []).length) {
+                users = await fetchUsersFallback(env, request);
             }
-            if (Array.isArray(users)) {
-                usersListCacheMem = users;
+            if (usersToIds(users || []).length) {
+                usersListCacheMem = usersToIds(users);
                 usersListCacheMemTs = Date.now();
             }
         }
-        const safe = (Array.isArray(users) ? users : [])
+        const safe = usersToIds(users)
             .filter(function(u) { return u.Id === configuredUser; })
             .map(function(u) { return {Id: u.Id, Name: u.Name}; });
         if (path === 'Users') {
