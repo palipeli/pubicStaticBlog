@@ -1,6 +1,6 @@
 'use strict';
 const CACHE_NAME = 'pubic-static-blog-v11';
-const STATIC_CACHE_NAME = 'static-assets-v55';
+const STATIC_CACHE_NAME = 'static-assets-v56';
 const IMAGE_CACHE_NAME = 'images-v17';
 const CONTENT_CACHE_NAME = 'blog-content-v12';
 const pendingFetches = new Map();
@@ -27,7 +27,7 @@ const PRECACHE_ASSETS = [
     '/js/chat-cloud.js',
     '/js/mobile-tray.js',
     '/js/scrollbar.js',
-    '/js/jellyfin.js',
+    '/js/jellyfin.js?v=56',
     '/js/app.js',
     '/blog/posts.json',
     '/media/favicon-circle.webp',
@@ -432,7 +432,7 @@ async function precacheAllAssets() {
         '/js/chat-cloud.js',
         '/js/mobile-tray.js',
         '/js/scrollbar.js',
-        '/js/jellyfin.js',
+        '/js/jellyfin.js?v=56',
         '/js/app.js',
         '/blog/nt_verses_compact.json',
     ])];
