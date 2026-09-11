@@ -40,11 +40,23 @@ async function setupPage(page, opts={}){
         }
         if(url.includes('/Images/')) return route.fulfill({status:200, contentType:'image/webp', body:Buffer.alloc(10)});
         let body={ok:true};
-        if(url.includes('/Users') && !url.includes('/Users/')) body=[{Name:'kami',Id:'u1'}];
-        else if(url.includes('/Users/')||url.includes('IncludeItemTypes')||url.includes('SearchTerm')) {
+        if(url.includes('/Artists')) {
             const u=new URL(url);
+            const term=(u.searchParams.get('searchTerm')||u.searchParams.get('SearchTerm')||'').toLowerCase();
+            const names=[];
+            TRACKS.Items.forEach(t=>{ (t.Artists||[]).forEach(a=>{ if((!term||a.toLowerCase().includes(term))&&!names.includes(a)) names.push(a); }); });
+            body={Items: names.slice(0,5).map(n=>({Id:'art:'+n, Name:n}))};
+        }
+        else if(url.includes('/Users') && !url.includes('/Users/')) body=[{Name:'kami',Id:'u1'}];
+        else if(url.includes('/Users/')||url.includes('IncludeItemTypes')||url.includes('SearchTerm')||url.includes('ArtistIds')) {
+            const u=new URL(url);
+            const aids=u.searchParams.get('ArtistIds')||'';
             const term=u.searchParams.get('SearchTerm')||'';
-            if(term){ body={Items: TRACKS.Items.filter(t=> String(t.Name).toLowerCase().includes(term.toLowerCase())|| String(t.Artists[0]).toLowerCase().includes(term.toLowerCase())) }; }
+            if(aids && !term){
+                const names=aids.split(',').map(id=>id.startsWith('art:')?id.slice(4):null).filter(Boolean);
+                body={Items: TRACKS.Items.filter(t=> (t.Artists||[]).some(a=>names.includes(a)))};
+            }
+            else if(term){ body={Items: TRACKS.Items.filter(t=> String(t.Name).toLowerCase().includes(term.toLowerCase())|| String(t.Artists[0]).toLowerCase().includes(term.toLowerCase())) }; }
             else body=TRACKS;
         }
         return route.fulfill({status:200, contentType:'application/json', body:JSON.stringify(body)});

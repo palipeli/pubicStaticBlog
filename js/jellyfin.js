@@ -327,11 +327,11 @@
         if (queuePos === -1 && currentId && order.length) queuePos = 0;
         syncButtons();
     }
-    function renderTracklist() {
+    function renderTracklist(emptyMsg) {
         const list = el('.jf-tracklist');
         if (!list) return;
         if (!tracks.length) {
-            list.innerHTML = '<div class="jf-empty">No tracks loaded.</div>';
+            list.innerHTML = '<div class="jf-empty">' + escapeHtml(emptyMsg || 'No tracks loaded.') + '</div>';
             return;
         }
         list.innerHTML = queue.map(function(ti, qi) {
@@ -360,7 +360,18 @@
             });
             if (userId) params.set('UserId', userId);
             p = api('Items', params).then(function(data) {
-                return (data.Items || []).map(mapItem);
+                let items = (data.Items || []).map(mapItem);
+                if (items.length || term.length < 2) return items;
+                const ap = new URLSearchParams({searchTerm: term, Limit: '5'});
+                return api('Artists', ap).then(function(adata) {
+                    const arts = (adata.Items || []).slice(0, 5);
+                    if (!arts.length) return items;
+                    const tp = new URLSearchParams({ArtistIds: arts.map(function(a){ return a.Id; }).join(','), Limit: '100', SortBy: 'SortName'});
+                    if (userId) tp.set('UserId', userId);
+                    return api('Items', tp).then(function(tdata) {
+                        return (tdata.Items || []).map(mapItem);
+                    }).catch(function() { return items; });
+                }).catch(function() { return items; });
             });
         }
         p.then(function(items) {
@@ -371,7 +382,7 @@
             }
             tracks = items;
             applyQueueOrder();
-            renderTracklist();
+            renderTracklist(items.length ? undefined : 'No matches.');
         }).catch(function() {
             if (token !== searchToken) return;
             const list = el('.jf-tracklist');
