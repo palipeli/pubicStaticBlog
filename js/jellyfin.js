@@ -319,8 +319,10 @@
         }
         return idx;
     }
-    function applyQueueOrder() {
-        const currentId = queue[queuePos] !== undefined && tracks[queue[queuePos]] ? tracks[queue[queuePos]].id : '';
+    function applyQueueOrder(currentId) {
+        if (currentId === undefined) {
+            currentId = queue[queuePos] !== undefined && tracks[queue[queuePos]] ? tracks[queue[queuePos]].id : '';
+        }
         const order = orderedTracks();
         queue = order;
         queuePos = currentId ? order.findIndex(function(i) { return tracks[i].id === currentId; }) : -1;
@@ -330,7 +332,7 @@
     function renderTracklist(emptyMsg) {
         const list = el('.jf-tracklist');
         if (!list) return;
-        if (!tracks.length) {
+        if (emptyMsg || !tracks.length) {
             list.innerHTML = '<div class="jf-empty">' + escapeHtml(emptyMsg || 'No tracks loaded.') + '</div>';
             return;
         }
@@ -377,12 +379,14 @@
         p.then(function(items) {
             if (token !== searchToken) return;
             const cur = currentTrack();
-            if (cur && cur.id && items.length && !items.some(function(t){ return t.id===cur.id; })) {
+            const curId = cur && cur.id ? cur.id : '';
+            const matched = items.length > 0;
+            if (cur && cur.id && !items.some(function(t){ return t.id===cur.id; })) {
                 items = [cur].concat(items);
             }
             tracks = items;
-            applyQueueOrder();
-            renderTracklist(items.length ? undefined : 'No matches.');
+            applyQueueOrder(curId);
+            renderTracklist(matched ? undefined : 'No matches.');
         }).catch(function() {
             if (token !== searchToken) return;
             const list = el('.jf-tracklist');
